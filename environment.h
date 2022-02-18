@@ -3,18 +3,20 @@
 #include "map.h"
 #include <vector>
 #include <string>
-#include <dirent.h>
+//#include <dirent.h>
 
 
 class Environment {
-private:
-	float timeStepSim = 1 / 80; //sec, in simulation
-	int velIt = 8;
-	int posIt = 3;
+//private:
+public:
+	// float timeStepSim = 1.0f / 80.0f; //sec, in simulation
+	// int velIt = 8;
+	// int posIt = 3;
 	std::vector <std::string> fileList; //list of all the names of the text files containing maps. this list is pulled from maps.txt for now but later it will need to be optimised
 	int i = 0; // iteration useful to know what map we're using
-	float timeStepLidar = 1 / 5;
-	b2Vec2 realVelocity = 0;
+	float timeStepLidar = 1.0f / 5.0f;
+	b2Vec2 realVelocity = {0.0,0.0};
+	int iteration=-	1; //represents that hasn't started yet, robot isn't moving and there are no map data
 public:
 	b2Vec2 gravity = { 0.0f, 0.0f };
 	b2World* world = new b2World(gravity);
@@ -32,23 +34,19 @@ public:
 	}
 
 
-	void setFileList() { //i'll need to change this when i stop working offline
+	void setFileList() { //i'll need to change this when i stop working offline or every
 		std::ifstream list;
 		list.open("maps.txt", std::fstream::in);
 		std::string map;
 		while (list >> map) {
-			fileList.push_back(map);
+			fileList.push_back(map); //map name is sample_maps/map* (= includes file path)
 		}
 		list.close();
 	}
 
-///____TO DO: FIX THIS FUNCTIONNN_________________
 
-	void setFileList(int i, std::vector <std::string> _filelist) { //can i use dirent.h to do this?
-		
-	}
 
-	std::vector <std::string> getFileList() {
+	std::vector <std::string> getFileList() { //doesn't work to get the names of the files
 		return fileList;
 	}
 
@@ -59,17 +57,17 @@ public:
 
 	void makeObstacles(Map *map) { //obstacle vector (emp
 		for (int i = 0; i < map->xVec->size(); i++) {
-			Obstacle* obPtr = new Obstacle(*world, map->xVec->at(i), map->yVec->at(i));
-			obPtr->body->SetAwake(true);
-			map->obstacles->push_back(obPtr);
+			Obstacle* obstacle = new Obstacle(*world, map->xVec->at(i), map->yVec->at(i));
+			obstacle->body->SetAwake(true);
+			map->obstacles->push_back(obstacle);
 		}
 	}
 
-	void setMapDetails(int i) { //may not need to be a for loop, just make i=iteration
-		//(*maps)[i]->setFilename((*fileList)[i]); //filelist as pointer
-		(*maps)[i]->setFilename(fileList[i]);
-
+	void setMapDetails(int i) { 
+		(*maps)[i]->setFilename(fileList[i]); 
 		(*maps)[i]->setIteration(i);
+		(*maps)[i]->storePoints();
+	//	(*maps)[i]->setMax(); //THIS IS NOT NEEDED RIGHT NOW BECAUSE NOT WORKING ON OBSTACLE AVOIDANCE JUST YET
 		makeObstacles((*maps)[i]);
 	}
 
@@ -86,59 +84,53 @@ public:
 	}
 
 	void update() {
+		iteration++;
 		createMap();
 		setMapDetails(iteration);
-		iteration++;
+
 	}
 
-	b2Vec2 findRealDistance() { //takes in the list of maps and the number of (1/5)sec intervals passed since start of simulation
-		b2Vec2 returnVec = { 0.0f, 0.0f };
-		if ((*maps)[i]->getMax() & (*maps)[i - 1]) {
-			returnVec = { (*maps)[i]->getMax().x - (*maps)[i - 1]->getMax().x, (*maps)[i]->getMax().y - (*maps)[i - 1]->getMax().y };
+	b2Vec2 findRealDistance() {//returns the distance of the robot from upper corner of the room, idk why im spending so much time on this since its just a temporary fix
+		b2Vec2 returnVec(0.0, 0.0);
+			if ((*maps)[iteration - 1]) {
+			returnVec.x = (*maps)[iteration]->upperCorner.x - (*maps)[iteration-1]->upperCorner.x;
+			returnVec.y = (*maps)[iteration]->upperCorner.y - (*maps)[iteration-1]->upperCorner.y;
 		}
-		//std::vector <float>* x = new std::vector <float>;
-		//std::vector <float>* y = new std::vector <float>;
-		//(*maps)[i]->storePoints((*maps)[i]->getFilename(), x, y);
-		//if (i == 0) {
-		//	returnVec = { (*std::max_element(x->begin(), x->end())) ,(*std::max_element(y->begin(), y->end())) };
-		//}
-		//else if (i > 0) {
-		//	std::vector <float>* xPrev = new std::vector <float>;
-		//	std::vector <float>* yPrev = new std::vector <float>;
-		//	(*maps)[i-1]->storePoints((*maps)[i-1]->getFilename(), xPrev, yPrev);
-		//	returnVec = { (*std::max_element(x->begin(), x->end())) - (*std::max_element(xPrev->begin(), xPrev->end())) ,(*std::max_element(y->begin(), y->end())) - (*std::max_element(yPrev->begin(), yPrev->end())) };
-		//	delete xPrev, yPrev;
-		//}
-		//delete x, y;
 		return returnVec;
+	} //this only woroks in a single room with size less than max lidar range
+
+	//testing purposes
+
+	void printRealDistance(){
+		std::cout<<findRealDistance().x<<" , "<<findRealDistance().y<<std::endl;  
 	}
 
 	void setRealVelocity(b2Vec2 distance) {
-		b2Vec2 vel;
-		float velScalar = distance.Length() / timeStepLidar;
+		float velScalar = distance.Length() / timeStepLidar; //substitue this with time elapsed for 1 lidar revolution
 		float angle= atan2(distance.y, distance.x);//in rad
-		vel.x = velScalar * cos(angle);
-		vel.y = velScalar * sin(angle);
-		realVelocity=vel;
+		realVelocity.x = velScalar * cos(angle);
+		realVelocity.y = velScalar * sin(angle);
 	}
 
 	b2Vec2 getRealVelocity() {
 		return realVelocity;
 	}
 
-	void step(Robot robot) { //simulates wht happens in 5 seconds ////NOT TESTED!!!!!!!!!!!!!!!!!!
+	void simulate(float timeStep = 1.0f/80.0f, int posIt = 3, int velIt = 8) { //simulates wht happens in 5 seconds ////produces segfault
+		robot->bodyDef.position.Set(0.0f, 0.0f); //robot is always 0.0 at the beginning of the simulation
+		update();
+		// if (iteration > 0) { //NOT IMPLEMENTING THIS YET BECAUSE OBSTACLE AVOIDANCE IS GOING TO BE A LIL HARDER THAN THIS
+		// 	setRealVelocity(findRealDistance()); 
+		// 	robot->setVelocity(realVelocity); /
+		// 	}
 		for (int i = 0; i < 300; i++) {//5 seconds with time step 1/80
-			if (i > 0) {
-				setRealVelocity(findRealDistance());
-				robot.setVelocity(realVelocity);
-				robot.bodyDef.position.Set(0.0f, 0.0f); //robot is always 0.0 at the beginning of the simulation
-			}
-			world->Step(timeStepSim, velIt, posIt);
-			if (robot.crashed) {
-				break;
-			}
+			world->Step(timeStep, velIt, posIt);
+			// if (robot->crashed) {
+			// 	robot->pathPlan();
+			// 	break;
+			// }
 		}
-		robot.pathPlan(); //can plan paths to 1. get out of being stuck, 2. avoid a close obstacle 3. avoid far away obstacle
+			//std::cout<<robot->body->GetPosition().x<<"\t"<<robot->body->GetPosition().y<<"\n";
 	}
 
 	///TO_DO: make the map vector of a max size reflecting working memory ca. 20s = 100 maps

@@ -11,6 +11,7 @@ public:
 		void* bodyData = &(contact->GetFixtureA()->GetBody()->GetUserData());
 		if (bodyData) {
 			static_cast<Robot*>(bodyData)->startContact(); //this is where I've had problems in the past
+			//std::cout<<"bonk\n";
 		}
 	}
 
@@ -23,11 +24,11 @@ public:
 		//std::cout << "unbonked\n";
 	}
 
-	void PreSolve() {
-		void* bodyData = &(contact->GetFixtureA()->GetBody()->GetUserData());
-		if (bodyData) {
+	//void PreSolve() {
+	//	void* bodyData = &(contact->GetFixtureA()->GetBody()->GetUserData());
+	//	if (bodyData) {
 			//static_cast<Robot*>(bodyData)->body->a; //this is where I've had problems in the past
 			//std::cout << "bye-ee!\n";
-		}
-	}
+	//	}
+	//}
 };

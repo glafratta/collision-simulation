@@ -5,7 +5,7 @@
 
 class Robot {
 private:
-	b2Vec2 velocity = 0;
+	b2Vec2 velocity = {0,0};
 	float timeCrashed;
 public:
 	b2Body* body;
@@ -21,8 +21,8 @@ public:
 		return steer * distanceBeteenWheels;
 	}
 
-	float getVelocity() { 
-		return velocity.Length();
+	b2Vec2 getVelocity() { 
+		return velocity;
 	}
 	//Robot();
 
@@ -67,12 +67,12 @@ public:
 	}
 
 	void startContact() {
-		std::cout << "bonk\n";
+		//std::cout << "bonk\n";
 		crashed = true;
 	}
 
 	void endContact() {
-		std::cout << "bye-ee!\n";
+		//std::cout << "bye-ee!\n";
 		crashed = false;
 	}
 

@@ -1,13 +1,15 @@
-#include "box2d/box2d.h"
+#include "/usr/include/Box2D/Box2D.h"
+#include "/usr/include/opencv4/opencv2/opencv.hpp" 
 #include <iostream>
 #include <chrono>
 #include "robot.h"
 #include "listener.h"
 #include "environment.h"
+#include "cppTimer/CppTimerCallback.h"
+#include <thread>
 
-#define TIME_STEP 1.0f / 80.0f //environment sampled every .2s
-#define VEL_IT 8
-#define POS_IT 3
+
+//the environment is sampled by the LIDAR every .2 seconds
 
 void plotData(b2Body* body, b2World& world, std::string filename) { ///prints path on screen	
 	std::ofstream file(filename);
@@ -22,15 +24,62 @@ void plotData(b2Body* body, b2World& world, std::string filename) { ///prints pa
 	}
 }
 
+
+class updateCallback :public CppTimerCallback::Runnable{
+public:
+	Environment * e;
+	void setEnv(Environment * env){
+		e=env;
+	}
+private:
+	void run(){
+		e->robot->bodyDef.position.SetZero();
+		e->update();
+		int i= e->getIteration();
+		//std::cout<<e->getMap(i)->getFilename()<<std::endl;
+	}
+
+};
+
 int main() {
 	//world setup with environment class
 
 	Environment* env = new Environment;
 	Listener* listener = new Listener;
-	b2World* world = env->world;
+	b2World* world = env->world; //using these variables for ease
 	world->SetContactListener(listener);
 	Robot* robot = env->robot;
-	//robot->setVelocity({ 0.0, 3.0 });
+	env->setFileList();
+
+	// robot->setVelocity({ 0.0, 3.0 });
+	CppTimerCallback timer;
+	updateCallback callback;
+	callback.setEnv(env);
+	timer.registerEventRunnable(callback);
+	timer.startms(200);
+	int duration= 200 * env->getFileList().size();
+	//while (env->getMap(env->getIteration())){
+		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+	//}
+	std::cout<<env->getIteration();
+
+	// for (int i=0; i<env->getFileList().size(); i++){
+	// 	//env->simulate();
+	// 	env->update();
+	// 	env->getMap(i)->printMax();
+	// }
+
+
+
+
+
+
+
+
+
+
+
+
 
 	////////CODE LAYOUT////////////
 	///For event handling install Qt
@@ -45,14 +94,16 @@ int main() {
 		// env->step(); //simulates data for the next x seconds and if the robot crashes in that time it makes a maneuvre
 		//}
 //}
-	plotData(robot->body, *world, "robot.dat");
+	
+	
+	
+	//plotData(robot->body, *world, "robot.dat");
 
-
-	//for (int i = 0; i < 300; i++) {
-	//	world->Step(TIME_STEP, VEL_IT, POS_IT);
-	//	std::cout << robot.body->GetPosition().x << "\t" << robot.body->GetPosition().y << std::endl;
-
-	//};
+	// for (int i = 0; i < 300; i++) {
+	// 	world->Step(TIME_STEP, VEL_IT, POS_IT);
+	// 	std::cout << robot->body->GetPosition().x << "\t" << robot->body->GetPosition().y << std::endl;
+	// };
+	// std::cout<<robot->getVelocity().Length()<<std::endl;
 
 	delete listener, env, world, robot;
 }

@@ -9,11 +9,12 @@ class Map {
 private:
 	std::string filename;
 	int iteration;
-	b2Vec2 upperCorner;
 public:
 	std::vector <float>* xVec= new std::vector <float>;
 	std::vector <float>* yVec= new std::vector <float>;
 	std::vector <Obstacle*>* obstacles= new std::vector <Obstacle*>;
+	b2Vec2 upperCorner;
+
  
 	~Map() {
 		delete xVec, yVec, obstacles;
@@ -36,15 +37,6 @@ public:
 	}
 
 
-	void storePoints(std::string filename, std::vector <float>* xPtr, std::vector <float>* yPtr) { //reads into .dat file and creates a static body per point. maybe use argv in main to get those, or map+file no
-		std::ifstream map(filename);
-		float x, y;
-		while (map >> x >> y) {
-			xPtr->push_back(x);
-			yPtr->push_back(y);
-		}
-	}
-
 	void storePoints() { //reads into .dat file and creates a static body per point. maybe use argv in main to get those, or map+file no
 		std::ifstream map(filename); //EXCEPTION: filename doesnt exist
 		float x, y;
@@ -64,11 +56,24 @@ public:
 
 	void setMax() {
 		//EXCEPTION: map vector is empty
-		upperCorner.x = std::max_element(xVec->begin(), xVec->end());
-		upperCorner.y = std::max_element(yVec->begin(), yVec->end());
+		std::vector<float>::iterator xIt = std::max_element(xVec->begin(), xVec->end());
+		std::vector<float>::iterator yIt = std::max_element(yVec->begin(), yVec->end());
+		upperCorner.x = *xIt;
+		upperCorner.y = *yIt;
 	}
 
-	b2Vec2 getMax() {
-		return upperCorner;
+	// b2Vec2 getMax() {
+	// 	return upperCorner;
+	// }
+
+	///for testing purposes only
+
+	void printMax(){
+		std::cout<<upperCorner.x<<"\t"<<upperCorner.y<<std::endl;
+	}
+
+
+	void printMaxType(){
+		std::cout<<typeid(upperCorner.x).name()<<" , "<<typeid(upperCorner.y).name()<<std::endl;
 	}
 };
