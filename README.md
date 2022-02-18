@@ -1,3 +1,10 @@
 # collision-simulation
-under construction! 
-robot.h was written by Dr Bernd Porr
+under construction! this
+
+# prerequisites
+cmake
+box2d
+opencv core module
+rplidar: https://github.com/berndporr/rplidar_rpi
+cpptimer:https://github.com/berndporr/cppTimer
+
