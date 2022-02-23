@@ -1,4 +1,4 @@
-#include "box2d/box2d.h"
+
 #include "obstacle.h"
 #include "map.h"
 #include <vector>
@@ -56,8 +56,9 @@ public:
 	}
 
 	void makeObstacles(Map *map) { //obstacle vector (emp
-		for (int i = 0; i < map->xVec->size(); i++) {
-			Obstacle* obstacle = new Obstacle(*world, map->xVec->at(i), map->yVec->at(i));
+		for (int i=0; i<map->xVec->size(); i++) {
+			//Obstacle* obstacle = new Obstacle(*world, map->xVec->at(i), map->yVec->at(i));
+			Obstacle* obstacle = new Obstacle(*world, map->xVec->at(i), map->yVec->at(i)); //ok right this aint gon work using iterators, so 
 			obstacle->body->SetAwake(true);
 			map->obstacles->push_back(obstacle);
 		}
@@ -67,6 +68,7 @@ public:
 		(*maps)[i]->setFilename(fileList[i]); 
 		(*maps)[i]->setIteration(i);
 		(*maps)[i]->storePoints();
+		(*maps)[i]->storeCoords();
 	//	(*maps)[i]->setMax(); //THIS IS NOT NEEDED RIGHT NOW BECAUSE NOT WORKING ON OBSTACLE AVOIDANCE JUST YET
 		makeObstacles((*maps)[i]);
 	}
@@ -90,31 +92,35 @@ public:
 
 	}
 
-	b2Vec2 findRealDistance() {//returns the distance of the robot from upper corner of the room, idk why im spending so much time on this since its just a temporary fix
-		b2Vec2 returnVec(0.0, 0.0);
-			if ((*maps)[iteration - 1]) {
-			returnVec.x = (*maps)[iteration]->upperCorner.x - (*maps)[iteration-1]->upperCorner.x;
-			returnVec.y = (*maps)[iteration]->upperCorner.y - (*maps)[iteration-1]->upperCorner.y;
-		}
-		return returnVec;
-	} //this only woroks in a single room with size less than max lidar range
+//THESE FUNCTIONS WERE FROM WHEN I WAS TRYING TO GET THE VELOCITY FROM TH EUPPER CORNER
 
-	//testing purposes
+	// b2Vec2 findRealDistance() {//returns the distance of the robot from upper corner of the room, idk why im spending so much time on this since its just a temporary fix
+	// 	b2Vec2 returnVec(0.0, 0.0);
+	// 		if ((*maps)[iteration - 1]) {
+	// 		returnVec.x = (*maps)[iteration]->upperCorner.x - (*maps)[iteration-1]->upperCorner.x;
+	// 		returnVec.y = (*maps)[iteration]->upperCorner.y - (*maps)[iteration-1]->upperCorner.y;
+	// 	}
+	// 	return returnVec;
+	// } //this only woroks in a single room with size less than max lidar range
 
-	void printRealDistance(){
-		std::cout<<findRealDistance().x<<" , "<<findRealDistance().y<<std::endl;  
-	}
+	// //testing purposes
 
-	void setRealVelocity(b2Vec2 distance) {
-		float velScalar = distance.Length() / timeStepLidar; //substitue this with time elapsed for 1 lidar revolution
-		float angle= atan2(distance.y, distance.x);//in rad
-		realVelocity.x = velScalar * cos(angle);
-		realVelocity.y = velScalar * sin(angle);
-	}
+	// void printRealDistance(){
+	// 	std::cout<<findRealDistance().x<<" , "<<findRealDistance().y<<std::endl;  
+	// }
 
-	b2Vec2 getRealVelocity() {
-		return realVelocity;
-	}
+	// void setRealVelocity(b2Vec2 distance) {
+	// 	float velScalar = distance.Length() / timeStepLidar; //substitue this with time elapsed for 1 lidar revolution
+	// 	float angle= atan2(distance.y, distance.x);//in rad
+	// 	realVelocity.x = velScalar * cos(angle);
+	// 	realVelocity.y = velScalar * sin(angle);
+	// }
+
+	// b2Vec2 getRealVelocity() {
+	// 	return realVelocity;
+	// }
+
+
 
 	void simulate(float timeStep = 1.0f/80.0f, int posIt = 3, int velIt = 8) { //simulates wht happens in 5 seconds ////produces segfault
 		robot->bodyDef.position.Set(0.0f, 0.0f); //robot is always 0.0 at the beginning of the simulation

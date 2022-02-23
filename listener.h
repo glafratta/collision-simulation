@@ -1,4 +1,4 @@
-#include "box2d/box2d.h"
+#include "Box2D/Box2D.h"
 #include "robot.h"
 #include <iostream>
 
@@ -8,20 +8,31 @@ public:
 	//Listener();
 	//~Listener();
 	void BeginContact(b2Contact * contact) {
-		void* bodyData = &(contact->GetFixtureA()->GetBody()->GetUserData());
+		void* bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
 		if (bodyData) {
-			static_cast<Robot*>(bodyData)->startContact(); //this is where I've had problems in the past
-			//std::cout<<"bonk\n";
+			static_cast<Robot*>(bodyData)->startContact(); 
+			//std::cout<<"robot is fixture A\n";
 		}
+
+		bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
+		if (bodyData) {
+			static_cast<Robot*>(bodyData)->startContact(); 
+		}
+		
 	}
 
 	void EndContact(b2Contact* contact) {
-		void* bodyData = &(contact->GetFixtureA()->GetBody()->GetUserData());
+		void* bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
 		if (bodyData) {
-			static_cast<Robot*>(bodyData)->endContact(); //this is where I've had problems in the past
-			//std::cout << "bye-ee!\n";
+			static_cast<Robot*>(bodyData)->endContact(); 
+			//std::cout << "unbonk robot A!\n";
 		}
-		//std::cout << "unbonked\n";
+		bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
+		if (bodyData) {
+			static_cast<Robot*>(bodyData)->endContact(); 
+			//std::cout << "unbonk robot B!\n";
+		}
+		
 	}
 
 	//void PreSolve() {

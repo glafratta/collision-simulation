@@ -1,7 +1,6 @@
 #ifndef OBSTACLE_H
 #define OBSTACLE_H
 #include <iostream>
-#include "box2d/box2d.h"
 
 //can also make one obstacle body with different fixtures but can do later
 
@@ -13,7 +12,8 @@ public:
 		bodyDef.type = b2_staticBody;
 		//obDef.bullet = true; //optimise collisions, not necessary
 		bodyDef.position.Set(pos_x, pos_y); //set origin to ground body (is this in world coor?)
-		bodyDef.enabled = true;
+		//bodyDef.enabled = true;
+		bodyDef.active = true;
 		body = world.CreateBody(&bodyDef);
 		b2PolygonShape fixture; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
 		fixture.SetAsBox(.01f, .01f); 

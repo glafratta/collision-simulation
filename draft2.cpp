@@ -1,5 +1,4 @@
 #include "/usr/include/Box2D/Box2D.h"
-#include "/usr/include/opencv4/opencv2/opencv.hpp" 
 #include <iostream>
 #include <chrono>
 #include "robot.h"
@@ -50,24 +49,36 @@ int main() {
 	world->SetContactListener(listener);
 	Robot* robot = env->robot;
 	env->setFileList();
+	robot->setVelocity({1.0f, 0.0f});
 
 	// robot->setVelocity({ 0.0, 3.0 });
-	CppTimerCallback timer;
-	updateCallback callback;
-	callback.setEnv(env);
-	timer.registerEventRunnable(callback);
-	timer.startms(200);
-	int duration= 200 * env->getFileList().size();
-	//while (env->getMap(env->getIteration())){
-		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
-	//}
-	std::cout<<env->getIteration();
+	// CppTimerCallback timer;
+	// updateCallback callback;
+	// callback.setEnv(env);
+	// timer.registerEventRunnable(callback);
+	// timer.startms(200);
+	// int duration= 200 * env->getFileList().size();
+	// //while (env->getMap(env->getIteration())){
+	// std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+	// //}
+	// std::cout<<env->getIteration();
+	int total=0;
+	for (int i=0; i<env->getFileList().size(); i++){
+		//env->simulate();
+		env->update();
+		std::cout<<env->getMap(i)->getFilename()<<std::endl;
+		// std::cout<<"duplicates: "<<env->getMap(i)->countDup()<<" out of "<<env->getMap(i)->countLines()<<". This is "<<(float)env->getMap(i)->countDup()/(float)env->getMap(i)->countLines()<<"of total points."<<std::endl;
+		// total += env->getMap(i)->countDup();
 
-	// for (int i=0; i<env->getFileList().size(); i++){
-	// 	//env->simulate();
-	// 	env->update();
-	// 	env->getMap(i)->printMax();
-	// }
+
+		for (int j=0; j<1000;j++){
+			for (int z=0; z<2; z++){
+				std::cout<<env->getMap(j)->coordinates[j][z]<<"\t";
+			}
+			std::cout<<"\n";
+		}
+	}
+	// std::cout<<"avg number of duplicates is "<<total /env->getFileList().size()<<std::endl;
 
 
 

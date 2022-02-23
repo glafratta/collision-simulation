@@ -1,7 +1,7 @@
 #ifndef _ROBOT
 #define _ROBOT
 
-#include "box2d/box2d.h"
+#include "Box2D/Box2D.h"
 
 class Robot {
 private:
@@ -31,7 +31,8 @@ public:
 		//robotBodyDef.bullet = true; //to optimise collision detection between fixtures
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world.CreateBody(&bodyDef);
-		body->GetUserData().pointer = (uintptr_t)body;
+		//body->GetUserData()= (void*)body; //old box2d
+		body->SetUserData(this); //idk why this doesn't create body data
 		b2CircleShape circleShape;
 		circleShape.m_radius = 0.1;   
 		b2FixtureDef fixtureDef;
@@ -67,12 +68,12 @@ public:
 	}
 
 	void startContact() {
-		//std::cout << "bonk\n";
+		std::cout << "bonk\n";
 		crashed = true;
 	}
 
 	void endContact() {
-		//std::cout << "bye-ee!\n";
+		std::cout << "bye-ee!\n";
 		crashed = false;
 	}
 
