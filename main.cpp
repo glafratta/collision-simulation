@@ -5,6 +5,7 @@
 #include "listener.h"
 #include "environment.h"
 #include "cppTimer/CppTimerCallback.h"
+#include "lidar.h"
 #include <thread>
 
 
