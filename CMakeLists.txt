@@ -10,11 +10,13 @@ target_link_libraries(simulate cpptimer rt)
 
 target_link_libraries(simulate /usr/lib/x86_64-linux-gnu/libBox2D.a)
 
+target_link_libraries(simulate /usr/local/lib/aarch64-linux-gnu/liba1lidarrpi.a) 
+
 include_directories("/usr/include/opencv4/")
 
 include_directories("/usr/include/Box2D/")
 
-include_directories("../rplidar_rpi/")
+include_directories("/usr/local/include/") ##for a1lidarrpi.h
 
 
 
