@@ -1,4 +1,4 @@
-//#include "/usr/include/Box2D/Box2D.h"
+#include "Box2D/Box2D.h"
 #include "/usr/include/opencv4/opencv2/core.hpp" 
 #include <fstream>
 #include <vector>
@@ -8,7 +8,7 @@
 class Map {
 private:
 	int iteration;
-	int filename;
+	std::string filename;
 public:
 	//void * obstacles;  //maybe i'll implement this if I need to make the vector into a 2d array
 	// std::vector <float>* xVec= new std::vector <float>;
@@ -18,7 +18,7 @@ public:
 
  
 	~Map() {
-		delete xVec, yVec, obstacles;
+		delete obstacles;
 	};
 
 	void setFilename(std::string file) {

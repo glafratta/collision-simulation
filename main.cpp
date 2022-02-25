@@ -25,21 +25,21 @@ void plotData(b2Body* body, b2World& world, std::string filename) { ///prints pa
 }
 
 
-class updateCallback :public CppTimerCallback::Runnable{
-public:
-	Box2DEnv * b;
-	void setEnv(Box2DEnv * _box2d){
-		b=_box2d;
-	}
-private:
-	void run(){
-		box2d->robot->bodyDef.position.SetZero();
-		box2d->update();
-		int i= box2d->getIteration();
-		//std::cout<<e->getMap(i)->getFilename()<<std::endl;
-	}
+// class updateCallback :public CppTimerCallback::Runnable{
+// public:
+// 	Box2DEnv * b;
+// 	void setEnv(Box2DEnv * _box2d){
+// 		b=_box2d;
+// 	}
+// private:
+// 	void run(){
+// 		box2d->robot->bodyDef.position.SetZero();
+// 		box2d->update();
+// 		int i= box2d->getIteration();
+// 		//std::cout<<e->getMap(i)->getFilename()<<std::endl;
+// 	}
 
-};
+// };
 
 
 

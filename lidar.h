@@ -1,14 +1,17 @@
 #include "a1lidarrpi.h"
 #include "map.h"
+#include "environment.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string> 
 #include <sstream> //for writing string into file, for checking, std::ostringstream
 //#define title(name, number,) name##number
 
 class DataInterface : public A1Lidar::DataInterface{
-	public: 
+public: 
     int numberOfScans=0; //for testing purposes
     Box2DEnv * box2d;
+    
 
     void setBox2D(Box2DEnv * _box2d){
         box2d = _box2d;
@@ -21,7 +24,7 @@ class DataInterface : public A1Lidar::DataInterface{
         std::stringstream filename;
         filename << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
         //std::ofstream file(getFilename());
-        FILE * file =fopen(filename, "w+");
+        FILE * file =fopen(filename.str(), "w+");
         numberOfScans++;
 		for (A1LidarData &data:data){
 			if (data.valid){

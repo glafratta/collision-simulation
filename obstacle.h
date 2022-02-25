@@ -1,6 +1,7 @@
 #ifndef OBSTACLE_H
 #define OBSTACLE_H
-#include <iostream>
+//#include <iostream>
+#include "Box2D/Box2D.h"
 
 //can also make one obstacle body with different fixtures but can do later
 

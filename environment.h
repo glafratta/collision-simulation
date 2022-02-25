@@ -2,6 +2,8 @@
 #include "obstacle.h"
 #include "map.h"
 #include "lidar.h"
+#include "Box2D/Box2D.h"
+#include "robot.h"
 #include <vector>
 #include <string>
 //#include <dirent.h>
