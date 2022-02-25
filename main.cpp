@@ -28,8 +28,8 @@ void plotData(b2Body* body, b2World& world, std::string filename) { ///prints pa
 class updateCallback :public CppTimerCallback::Runnable{
 public:
 	Box2DEnv * b;
-	void setEnv(Box2DEnv * box2d){
-		e=env;
+	void setEnv(Box2DEnv * _box2d){
+		b=_box2d;
 	}
 private:
 	void run(){
@@ -69,46 +69,9 @@ int main() {
 	// //}
 	
 
-	}
-	// std::cout<<"avg number of duplicates is "<<total /env->getFileList().size()<<std::endl;
 
 
-
-
-
-
-
-
-
-
-
-
-
-	////////CODE LAYOUT////////////
-	///For event handling install Qt
-	//Events that need handled: robot-> is crashed, a map.dat file being created
-
-
-	//timeStart;
-
-	//while(stopKeyPressed = false){
-		//if (time==timeStart+.2s){
-		//env->update(); //uodates environment data
-		// env->step(); //simulates data for the next x seconds and if the robot crashes in that time it makes a maneuvre
-		//}
-//}
-	
-	
-	
-	//plotData(robot->body, *world, "robot.dat");
-
-	// for (int i = 0; i < 300; i++) {
-	// 	world->Step(TIME_STEP, VEL_IT, POS_IT);
-	// 	std::cout << robot->body->GetPosition().x << "\t" << robot->body->GetPosition().y << std::endl;
-	// };
-	// std::cout<<robot->getVelocity().Length()<<std::endl;
-
-	delete listener, env, world, robot;
+	delete listener, box2d;
 }
 	
 	
