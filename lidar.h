@@ -1,5 +1,5 @@
 #include "a1lidarrpi.h"
-#include "map.h"
+//#include "map.h"
 #include "environment.h"
 #include <stdio.h>
 #include <stdlib.h>

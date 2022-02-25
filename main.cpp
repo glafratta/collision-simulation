@@ -48,7 +48,7 @@ int main() {
 
 	Box2DEnv* box2d = new Box2DEnv;
 	Listener* listener = new Listener;
-	world->SetContactListener(listener);
+	box2d->world->SetContactListener(listener);
 	A1Lidar lidar;
 	DataInterface dataInterface;
 	lidar.registerInterface(&dataInterface);
