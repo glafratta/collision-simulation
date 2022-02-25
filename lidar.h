@@ -1,4 +1,4 @@
-#include "../rplidar_rpi/a1lidarrpi.h"
+#include "a1lidarrpi.h"
 #include "map.h"
 #include <stdlib.h>
 #include <string> 
