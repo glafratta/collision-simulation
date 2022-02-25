@@ -1,9 +1,10 @@
-#include "a1lidarrpi.h"
+#include "/usr/local/include/a1lidarrpi.h"
 //#include "map.h"
 #include "environment.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string> 
+#include <iomanip>
 #include <sstream> //for writing string into file, for checking, std::ostringstream
 //#define title(name, number,) name##number
 
@@ -30,7 +31,7 @@ public:
 			if (data.valid){
                 std::ostringstream stream;
                 //std::ostringstream yStream;                
-                Obstacle* obstacle = new Obstacle(*world, approximate(data.x), approximate(data.y); 
+                Obstacle* obstacle = new Obstacle(box2d->world, approximate(data.x), approximate(data.y); 
                 obstacle->body->SetAwake(true);
 			    map->obstacles->push_back(obstacle);
                 stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";

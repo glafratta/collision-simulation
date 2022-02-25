@@ -38,13 +38,13 @@ public:
 	// 	}
 	// }
 
-	void setMapDetails(int i) { 
-	//	(*maps)[i]->setFilename(fileList[i]); 
-		(*maps)[i]->setIteration(i);
-	//	(*maps)[i]->storePoints();
-		//(*maps)[i]->storeCoords();
-		//makeObstacles((*maps)[i]);
-	}
+	// void setMapDetails(int i) { 
+	// //	(*maps)[i]->setFilename(fileList[i]); 
+	// 	(*maps)[i]->setIteration(i);
+	// //	(*maps)[i]->storePoints();
+	// 	//(*maps)[i]->storeCoords();
+	// 	//makeObstacles((*maps)[i]);
+	// }
 
 	Map* getMap(int i) {
 		return (*maps)[i];

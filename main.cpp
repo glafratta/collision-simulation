@@ -3,7 +3,7 @@
 #include <chrono>
 #include "robot.h"
 #include "listener.h"
-#include "environment.h"
+//#include "environment.h"
 #include "/usr/local/include/CppTimer.h"
 #include "lidar.h"
 #include <thread>
@@ -51,6 +51,7 @@ int main() {
 	box2d->world->SetContactListener(listener);
 	A1Lidar lidar;
 	DataInterface dataInterface;
+	dataInterface.setBox2D(box2d);
 	lidar.registerInterface(&dataInterface);
 	lidar.start();
 	do {
