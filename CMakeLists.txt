@@ -8,7 +8,7 @@ add_executable(simulate main.cpp)
 
 target_link_libraries(simulate cpptimer rt)
 
-target_link_libraries(simulate /usr/lib/x86_64-linux-gnu/libBox2D.a)
+target_link_libraries(simulate /usr/lib/aarch64-linux-gnu/libBox2D.a)
 
 target_link_libraries(simulate /usr/local/lib/aarch64-linux-gnu/liba1lidarrpi.a) 
 
