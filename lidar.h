@@ -25,12 +25,11 @@ public:
         numberOfScans++;
         box2d->createMap();
         Map * map = box2d->maps->at(box2d->maps->size()-1);
-        std::cout<<"map in box2d->maps\n";
         std::stringstream tmp;
         tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
         const char * filename = tmp.str().c_str();
-        //std::cout<<filename<<std::endl;
-        FILE * file =fopen(filename, "w+"); //uncomment
+        std::cout<<filename<<std::endl;
+        //FILE * file =fopen(filename, "w+"); //uncomment
 		for (A1LidarData &data:data){
 			if (data.valid){
                 std::ostringstream stream;
@@ -38,14 +37,13 @@ public:
                 obstacle->body->SetAwake(true);
 			    map->obstacles->push_back(obstacle);
                 //stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
-                std::cout<<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
-//                const char * line = stream.str().c_str();
-                // fputs(line, file);
-                // fclose(file);
-                // printf("hi");
+                //std::cout<<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
+                //const char * line = stream.str().c_str();
+                 //fputs(line, file);
+                 //fclose(file);
 			}
 		}
-        //box2d->simulate(); //simulates collision for 5 seconds
+        box2d->simulate(); //simulates collision for 5 seconds
 
 	}
 
