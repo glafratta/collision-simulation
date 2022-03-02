@@ -1,5 +1,5 @@
 #include "../rplidar_rpi/a1lidarrpi.h"
-//include "/usr/include/pigpio.h"
+//#include "/usr/include/pigpio.h"
 //#include "map.h"
 #include "environment.h"
 #include <stdio.h>
@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <sstream> //for writing string into file, for checking, std::ostringstream
 //#define title(name, number,) name##number
+#include <iostream>
 
 class DataInterface : public A1Lidar::DataInterface{
 public: 
@@ -22,6 +23,7 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){
         box2d->createMap();
+	std::cout<<"map created"<<std::endl;
         Map * map = box2d->maps->at(box2d->maps->size()-1);
         std::stringstream tmp;
         tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
@@ -44,6 +46,9 @@ public:
 			}
 		}
         box2d->simulate(); //simulates collision for 5 seconds
+	numberOfScans++;
+	std::cout<<numberOfScans<<std::endl;
+	
 
 	}
 
