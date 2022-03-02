@@ -29,8 +29,8 @@ public:
         std::stringstream tmp;
         tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
         const char * filename = tmp.str().c_str();
-        std::cout<<filename<<std::endl;
-//        FILE * file =fopen(filename, "w+"); //uncomment
+        //std::cout<<filename<<std::endl;
+        FILE * file =fopen(filename, "w+"); //uncomment
 		for (A1LidarData &data:data){
 			if (data.valid){
                 std::ostringstream stream;
