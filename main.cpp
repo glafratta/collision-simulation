@@ -43,7 +43,7 @@ void plotData(b2Body* body, b2World& world, std::string filename) { ///prints pa
 
 
 
-int main() {
+int main(int, char**) {
 	//world setup with environment class
 
 	Box2DEnv* box2d = new Box2DEnv;
