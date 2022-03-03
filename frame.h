@@ -1,6 +1,5 @@
 #include "Box2D/Box2D.h"
-#include "/usr/include/opencv4/opencv2/core/core.hpp" 
-#include "opencv2/core/mat.hpp"
+#include "opencv2/opencv.hpp"
 #include <fstream>
 #include <vector>
 #include <algorithm>
