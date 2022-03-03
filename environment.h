@@ -69,7 +69,7 @@ public:
 		iteration++;
 		if (iteration > 0) { //NOT IMPLEMENTING THIS YET BECAUSE OBSTACLE AVOIDANCE IS GOING TO BE A LIL HARDER THAN THIS
 			findRealVelocity();
-			robot->setVelocity(realVelocity); /
+			robot->setVelocity(realVelocity); 
 		}
 		for (int i = 0; i < 300; i++) {//5 seconds with time step 1/80
 			world->Step(timeStep, velIt, posIt);

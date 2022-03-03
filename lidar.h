@@ -41,7 +41,7 @@ public:
                 Obstacle* obstacle = new Obstacle(*(box2d->world), x, y); //doesn't check obstacles for duplicates
                 //obstacle->body->SetAwake(true);
 			    frame->obstacles->push_back(obstacle);
-                transformForMatrix(x, y, row, column);
+                transformForMatrix(x, y, *row, *column);
                 *((frame->matrix.ptr(*row, *column))= 1; 
                 //stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
                 //std::cout<<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
