@@ -53,8 +53,8 @@ public:
 
 
 	void findRealVelocity(){
-		cv::_InputArray current = cv::_InputArray(getFrame(getIteration()));
-		cv::_InputArray previous = cv::_InputArray(getFrame(getIteration()-1));
+		cv::Mat current = getFrame(iteration).matrix;
+		cv::Mat previous = getFrame(iteration-1).matrix;
 		cv::Mat transformMatrix = estimateAffinePartial2D(previous, current);
 		if (!transformMatrix.empty()){
 			realVelocity.x = -(transformMatrix.at<double>(0,2))*samplingRate;

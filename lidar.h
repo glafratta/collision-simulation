@@ -42,7 +42,7 @@ public:
                 //obstacle->body->SetAwake(true);
 			    frame->obstacles->push_back(obstacle);
                 transformForMatrix(x, y, *row, *column);
-                *((frame->matrix.ptr(*row, *column))= 1; 
+                *(frame->matrix.ptr(*row, *column))= 1; 
                 //stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
                 //std::cout<<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
                 //const char * line = stream.str().c_str();
@@ -67,7 +67,7 @@ public:
         return a;
 	}
     
-    void transformForMatrix(float x, float y, float * i, float * j){ //transform cartesian coordinates into matrix coordinates
+    void transformForMatrix(float x, float y, int * i, int * j){ //transform cartesian coordinates into matrix coordinates
         //matrix is 240 bins of .1m, lidar data is in meters
         x = (int)x*10; // transform x and y in decimeters and rounds down
         y = (int)y*10;
