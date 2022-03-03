@@ -6,7 +6,6 @@
 //#include <string>
 //#include <dirent.h>
 #include "opencv2/calib3d.hpp"
-#include <stdexcept>
 
 class Box2DEnv{
 public:
@@ -30,7 +29,7 @@ public:
 		frames->push_back(frame);
 	}
 
-	Frame* getFrame(int i=iteration) { //unless prompted otherwise, returns map for current iteration
+	Frame* getFrame(int i) { //unless prompted otherwise, returns map for current iteration
 		return (*frames)[i];
 	}
 
@@ -54,8 +53,8 @@ public:
 
 
 	void findRealVelocity(){
-		cv::_InputArray current = cv::_InputArray::_InputArray(getFrame());
-		cv::_InputArray previous = cv::_InputArray::_InputArray(getFrame(iteration-1));
+		cv::_InputArray current = cv::_InputArray(getFrame(getIteration()));
+		cv::_InputArray previous = cv::_InputArray(getFrame(getIteration()-1));
 		cv::Mat transformMatrix = estimateAffinePartial2D(previous, current);
 		if (!transformMatrix.empty()){
 			realVelocity.x = -(transformMatrix.at<double>(0,2))*samplingRate;
