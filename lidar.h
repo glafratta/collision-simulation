@@ -1,14 +1,13 @@
 #include "../rplidar_rpi/a1lidarrpi.h"
-//include "/usr/include/pigpio.h"
-//#include "map.h"
 #include "environment.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string> 
 #include <iomanip>
 #include <sstream> //for writing string into file, for checking, std::ostringstream
-//#define title(name, number,) name##number
 #include <iostream>
+
+//TO DO: benchmark
 
 class DataInterface : public A1Lidar::DataInterface{
 public: 
@@ -21,51 +20,43 @@ public:
     }
 
 
-	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //should print map name and coordinates to the console
+	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ 
         numberOfScans++;
+        int obstacleIndexCount = 0;
         box2d->createMap();
-        Map * map = box2d->maps->at(box2d->maps->size()-1);
-        std::stringstream tmp;
-        tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
-        const char * filename = tmp.str().c_str();
-        std::cout<<filename<<std::endl;
+        Frame * frame = box2d->frames->at(box2d->frames->size()-1);
+        // std::stringstream tmp;
+        // tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
+        // const char * filename = tmp.str().c_str();
+        // std::cout<<filename<<std::endl;
         //FILE * file =fopen(filename, "w+"); //uncomment
+        float x, y;
+        int * row;
+        int * column;
 		for (A1LidarData &data:data){
-			if (data.valid){
-                std::ostringstream stream;
-                Obstacle* obstacle = new Obstacle(*(box2d->world), approximate(data.x), approximate(data.y)); 
-                obstacle->body->SetAwake(true);
-			    map->obstacles->push_back(obstacle);
+			if (data.valid){ 
+                x= approximate(data.x);
+                y= approximate(data.y);
+                //std::ostringstream stream;
+                Obstacle* obstacle = new Obstacle(*(box2d->world), x, y); //doesn't check obstacles for duplicates
+                //obstacle->body->SetAwake(true);
+			    frame->obstacles->push_back(obstacle);
+                transformForMatrix(x, y, row, column);
+                *((frame->matrix.ptr(*row, *column))= 1; 
                 //stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
                 //std::cout<<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n";
                 //const char * line = stream.str().c_str();
                  //fputs(line, file);
-                 //fclose(file);
 			}
 		}
+        //fclose(file);
         box2d->simulate(); //simulates collision for 5 seconds
+        std::cout << "velocity estimated to be "<<box2d->realVelocity.x<<", "<<box2d->realVelocity.y<<"\n";
 
 	}
 
-    // std::string getFilename(){
-    //     char numbers[3];
-    //     for (int i=2; i>=0; i--){
-    //         if (number[i]<9){
-    //             number[i]++;
-    //             itoa(number[i], numbers, 10);
-    //             goto finish;
-    //         }
-    //         else if (number[i]==9){
-    //             number[i]=0;
-    //             itoa(number[i], numbers, 10);
-    //         }
-    //     }
-    //     finish:
-    //     return "map"+numbers+".dat"; //NOT TESTED
-    // }
 
-
-	float approximate(float a){
+	float approximate(float a){ //more efficient with pointers?? (float a, float * ptr){assign value of a to *ptr}
 		a = round(a*10)/10;
 		if (a<0){
 			a-=0.05;
@@ -73,7 +64,16 @@ public:
 		else if (a>=0){
 			a+= 0.05;
 		}
-		return a;
+        return a;
 	}
+    
+    void transformForMatrix(float x, float y, float * i, float * j){ //transform cartesian coordinates into matrix coordinates
+        //matrix is 240 bins of .1m, lidar data is in meters
+        x = (int)x*10; // transform x and y in decimeters and rounds down
+        y = (int)y*10;
+        *i= 240/2-y; // x index: columns/2-y
+        *j= 240/2+x; //y index: columns/2+x
+
+    }
 };
 
