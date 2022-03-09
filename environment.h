@@ -3,6 +3,7 @@
 #include "Box2D/Box2D.h"
 #include "robot.h"
 #include <vector>
+#include "opencv2/opencv.hpp"
 //#include <string>
 //#include <dirent.h>
 
@@ -54,7 +55,7 @@ public:
 	void findRealVelocity(){
 		cv::Mat current = getFrame(iteration)->matrix;
 		cv::Mat previous = getFrame(iteration-1)->matrix;
-		cv::Mat transformMatrix = estimateAffinePartial2D(previous, current);
+		cv::Mat transformMatrix = cv::estimateAffinePartial2D(previous, current, cv::noArray(), cv::LMEDS);
 		if (!transformMatrix.empty()){
 			realVelocity.x = -(transformMatrix.at<double>(0,2))*samplingRate;
 			realVelocity.y = -(transformMatrix.at<double>(1,2))*samplingRate;
