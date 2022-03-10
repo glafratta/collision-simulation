@@ -53,13 +53,17 @@ public:
 
 
 	void findRealVelocity(){
-		cv::Mat current = getFrame(iteration)->matrix;
-		cv::Mat previous = getFrame(iteration-1)->matrix;
+		std::vector <cv::Point> current = getFrame(iteration)->coordinates;
+		std::vector <cv::Point> previous = getFrame(iteration-1)->coordinates;
 		cv::Mat transformMatrix = cv::estimateAffinePartial2D(previous, current, cv::noArray(), cv::LMEDS);
 		if (!transformMatrix.empty()){
 			realVelocity.x = -(transformMatrix.at<double>(0,2))*samplingRate;
 			realVelocity.y = -(transformMatrix.at<double>(1,2))*samplingRate;
 		}
+	}
+
+	void printRealVelocity(){
+		std::cout<<realVelocity.Length()<<std::endl;
 	}
 
 

@@ -68,12 +68,12 @@ public:
 	}
 
 	void startContact() {
-		std::cout << "bonk\n";
+		//std::cout << "bonk\n";
 		crashed = true;
 	}
 
 	void endContact() {
-		std::cout << "bye-ee!\n";
+		//std::cout << "bye-ee!\n";
 		crashed = false;
 	}
 

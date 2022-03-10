@@ -49,7 +49,6 @@ int main(int, char**) {
 	Box2DEnv* box2d = new Box2DEnv;
 	Listener* listener = new Listener;
 	box2d->world->SetContactListener(listener);
-	box2d->robot->setVelocity({0.0f, 3.0f});
 	A1Lidar lidar;
 	DataInterface dataInterface;
 	dataInterface.setBox2D(box2d);
