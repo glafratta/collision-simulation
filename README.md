@@ -7,12 +7,12 @@ build with cmake:
 `cmake .`
 `make`
 
-run: `sudo ./simulate` : this searches into the sample_maps folder and every 200ms creates a static body in box2d world per (x,y) point. This looks different to the data acquired using [rplidar_rpi] 
-(https://github.com/berndporr/rplidar_rpi) so acquiring data using that program will not work. In this program the robot is always at (0,0).
+run: `sudo ./simulate` : creates a representation of the external world and calculates the velocity at which the robot is moving [rplidar_rpi] 
+(https://github.com/berndporr/rplidar_rpi).In this program the robot is always at (0,0).
 
 ## prerequisites
-### install box2d
-using `dselect` , install `libbox2d-dev`
+### install box2d and opencv
+using `dselect` , install `libbox2d-dev` and 'libopencv-core-dev'
 
 ### rplidar
 rplidar: https://github.com/berndporr/rplidar_rpi
