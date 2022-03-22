@@ -10,11 +10,13 @@ find_package(OpenCV REQUIRED)
 
 add_executable(simulate main.cpp)
 
-target_link_libraries(simulate cpptimer rt)
+##target_link_libraries(simulate cpptimer rt)
 
 target_link_libraries(simulate /usr/lib/aarch64-linux-gnu/libBox2D.a)
 
-target_link_libraries(simulate pigpio rt a1lidarrpi)
+target_link_libraries(simulate /usr/local/lib/aarch64-linux-gnu/libalphabot.a)
+
+target_link_libraries(simulate pigpio rt a1lidarrpi cpptimer)
 
 target_link_libraries(simulate ${OpenCV_LIBS})
 
