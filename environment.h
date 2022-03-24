@@ -4,6 +4,7 @@
 #include "robot.h"
 #include <vector>
 #include "opencv2/opencv.hpp"
+#include "/usr/local/include/alphabot.h"
 //#include <string>
 //#include <dirent.h>
 
@@ -18,7 +19,7 @@ public:
 	b2World* world = new b2World(gravity);
 	Robot* robot = new Robot(*world);
 	std::vector <Frame*>* frames = new std::vector <Frame*>;
-	
+	AlphaBot * alphabot;
 	
 
 
@@ -39,6 +40,10 @@ public:
 
 	int getIteration() {
 		return iteration;
+	}
+
+	void setAlphabot(AlphaBot * _alphabot){
+		alphabot = _alphabot; 
 	}
 
 
@@ -68,20 +73,24 @@ public:
 
 
 
-	void simulate(float timeStep = 1.0f/80.0f, int posIt = 3, int velIt = 8) { //simulates wht happens in 5 seconds ////produces segfault
+	void simulate(float timeStep = 1.0f/10.0f, int posIt = 3, int velIt = 8) { //simulates wht happens in 5 seconds ////produces segfault
 		robot->bodyDef.position.Set(0.0f, 0.0f); //robot is always 0.0 at the beginning of the simulation
 		iteration++;
-		if (iteration > 0) { //NOT IMPLEMENTING THIS YET BECAUSE OBSTACLE AVOIDANCE IS GOING TO BE A LIL HARDER THAN THIS
+		if (iteration > 0) { 
 			findRealVelocity();
-			robot->setVelocity(realVelocity); 
+			robot->velocity = realVelocity; 
 		}
-		for (int i = 0; i < 300; i++) {//5 seconds with time step 1/80
+		for (int i = 0; i < 30; i++) {//5 seconds with time step 1/80
 			world->Step(timeStep, velIt, posIt);
 			if (robot->crashed) {
-			 	robot->pathPlan();
-			 	return;
-			 }
+			 	//robot->pathPlan();
+				//alphabot->setRightWheelSpeed(0.0f);
+				//alphabot->setLeftWheelSpeed(0.0f);
+				return;
+			 	break;
+			}
 		}
+		
 	}
 };
 	///TO_DO: make the map vector of a max size reflecting working memory ca. 20s = 100 maps
