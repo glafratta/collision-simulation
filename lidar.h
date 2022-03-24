@@ -1,4 +1,4 @@
-#include "../rplidar_rpi/a1lidarrpi.h"
+#include "a1lidarrpi.h"
 #include "environment.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,16 +21,17 @@ public:
 
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
-        numberOfScans++;
-        int obstacleIndexCount = 0;
+        //numberOfScans++;
         box2d->createMap();
         Frame * frame = box2d->frames->at(box2d->frames->size()-1);
         frame->coordinates.resize(240*240); //range is 12m
         cv::Point point;
-        std::stringstream tmp; //uncomment from here
-        tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
-        const char * filename = tmp.str().c_str();
-        FILE * file =fopen(filename, "w+"); //to here
+
+
+        // std::stringstream tmp; //uncomment from here
+        // tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
+        // const char * filename = tmp.str().c_str();
+        // FILE * file =fopen(filename, "w+"); //to here
         float x, y;
         int iteration =0;
         //std::cout<<"Scan n. "<<numberOfScans<<"#############################################################################################################"<<std::endl;
@@ -38,14 +39,17 @@ public:
 			if (data.valid){ 
                 x = approximate(data.x);
                 y= approximate(data.y);
-                std::ostringstream stream; //uncomment here
+                std::cout<<x<<"\t"<<y<<"\n";
+
+
+                //std::ostringstream stream; //uncomment here
                 Obstacle* obstacle = new Obstacle(*(box2d->world), x, y); //doesn't check obstacles for duplicates
 			    frame->obstacles->push_back(obstacle);
                 point = cv::Point(x, y);
                 frame->coordinates[iteration] = point;
-                stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n"; //uncomment from here
-                const char * line = stream.str().c_str();
-                 fputs(line, file); //to here
+                // stream <<obstacle->body->GetPosition().x<<"\t"<<obstacle->body->GetPosition().y<<"\n"; //uncomment from here
+                // const char * line = stream.str().c_str();
+                //  fputs(line, file); //to here
 			}
             iteration++;
 		}
