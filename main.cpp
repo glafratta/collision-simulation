@@ -1,26 +1,31 @@
 #include "Box2D/Box2D.h"
-#include <iostream>
-#include "robot.h"
-#include "listener.h"
+//#include "listener.h"
 #include <thread>
-#include "alphabot.h"
-#include <unistd.h>
+///#include "StepCallback.h"
+//#include <unistd.h>
 #include "a1lidarrpi.h"
-#include "environment.h"
+//#include "environment.h"
+#include "StepCallback.h"
 #include <stdio.h>
 #include <stdlib.h>
+//#include "obstacle.h"
+#include <iostream>
+#include <ncurses.h>
+#define _USE_MATH_DEFINES
+
+
 
 //the environment is sampled by the LIDAR every .2 seconds
 
 class DataInterface : public A1Lidar::DataInterface{
+COnfigurator &box2d;
 public: 
     int numberOfScans=0; //for testing purposes
-    Box2DEnv * box2d;
+	const float distance = 1.0f;
+
     
 
-    void setBox2D(Box2DEnv * _box2d){
-        box2d = _box2d;
-    }
+    DataInterface(COnfigurator & _box2d): box2d(_box2d){};
 
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
@@ -28,24 +33,28 @@ public:
 		// //START BENCHMARKING
 
 		// auto begin = std::chrono::high_resolution_clock::now();
-
 		////WRITE TO FILE
-        //numberOfScans++; //uncomment for writing
-		// std::stringstream tmp; //uncomment from here
-        // tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
-        // const char * filename = tmp.str().c_str();
-        // FILE * file =fopen(filename, "w+"); //to here
+        numberOfScans++; 
+		// char tmp[256];
+		// sprintf(tmp, "/tmp/map%04d.dat", numberOfScans);
+        //  FILE * file =fopen(tmp, "w+"); //to here
+
+
+		box2d.previous=box2d.current;
+		box2d.current.clear();
 
 		for (A1LidarData &data:data){
-			if (data.valid){ 
-				box2d->frames[1].push_back(cv::Point2f(data.x,data.y));
+			if (data.valid&& (-M_PI_4<=data.phi<= M_PI_4)){
+				box2d.current.push_back(cv::Point2f(data.x,data.y));
+				//fprintf(file, "%f\t%f\n", data.x, data.y);
+            }
 
-			}
 
 		}
 		//fclose(file); //uncomment here - FINISH WRITE TO FILE
-		box2d->lidarIteration++;
-		//std::cout<<"scan "<<box2d->lidarIteration<<std::endl;
+		box2d.NewScan();
+		//refresh();
+
 
 
 		// FINISH BENCHMARKING
@@ -62,38 +71,35 @@ public:
 
 
 
+
 int main(int, char**) {
 	//world setup with environment class
-	//AlphaBot *motors = new AlphaBot();
-	AlphaBot motors;
-	Box2DEnv box2d;
-	Listener* listener = new Listener;
-	box2d.world->SetContactListener(listener);
+	initscr();
 	A1Lidar lidar;
-	DataInterface dataInterface;
-	dataInterface.setBox2D(&box2d);
+	AlphaBot motors;
+	COnfigurator box2d;
+	DataInterface dataInterface(box2d);
+	Callback cb(box2d);
 	lidar.registerInterface(&dataInterface);
-	//box2d->robot->setMotors(&motors);
-	box2d.start();
+	motors.registerStepCallback(&cb);
 	lidar.start();
-	//motors.start();
-	// motors.setRightWheelSpeed(0.0); //possible solution for the gpioinitialise is macros?
-	// motors.setLeftWheelSpeed(0.0);
-	// motors.setRightWheelSpeed(0.25f); //possible solution for the gpioinitialise is macros?
-	// motors.setLeftWheelSpeed(0.25f);
-	do {
-	} while (!getchar());
-	//motors.stop();
+	motors.start();
+
+	// do {
+	// } while (!getchar());
+	std::this_thread::sleep_for(std::chrono::seconds(10));
+	endwin();
+
+
+	motors.stop();
+	std::cout<<dataInterface.numberOfScans<<std::endl;
 	lidar.stop();
-	box2d.stop();
 
 
-	//make lidar and alphabod type classes pointers, can create threads for processes that start and stop lidar and robot separately
 	
 
 
-
-	delete listener;
+//	delete listener;
 }
 	
 	
