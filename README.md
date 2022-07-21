@@ -7,8 +7,7 @@ build with cmake:
 `cmake .`
 `make`
 
-run: `sudo ./simulate` : creates a representation of the external world and calculates the velocity at which the robot is moving [rplidar_rpi] 
-(https://github.com/berndporr/rplidar_rpi).In this program the robot is always at (0,0).
+currently not tested on a live robot. In the 'test' folder you can test the code on offline maps. The program turnMaps.sh goes into the selected folders containing maps and turns them 90 degrees.
 
 ## prerequisites
 ### install box2d and opencv
