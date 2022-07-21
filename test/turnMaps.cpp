@@ -27,13 +27,7 @@ int main(int argc, char** argv){
     cv::transform(vec, transformedVec,transformMatrix);//transforms input
 
     //save to file
-    char * destFolder;
-    if (argc ==3){
-        destFolder = argv[2];
-    }
-    else if (argc==2){
-        destFolder = "./";
-    }
+
     char name[25];
     sprintf(name,"%strans%s", destFolder, argv[1]);
     FILE * out=fopen(name, "w+");
