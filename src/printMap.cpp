@@ -16,31 +16,24 @@
 //the environment is sampled by the LIDAR every .2 seconds
 
 class DataInterface : public A1Lidar::DataInterface{
+char[50] folderPath;
 public: 
-int numberOfScans =1;
+DataInterface(char path[50]): folderPath(path){}
+int iteration =0;
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
-		
 	
 		////WRITE TO FILE
-        // numberOfScans++; //uncomment for writing
-		// std::stringstream tmp; //uncomment from here
-        // tmp << "map" << std::setw(4) << std::setfill('0') << numberOfScans << ".dat";
-        // const char * filename = tmp.str().c_str();
-        // FILE * file =fopen(filename, "w+"); //to here
-		// std::ostringstream stream; //uncomment here
+		char name[50];
+		sprintf(name, "/%s/map%04f.dat");
+		FILE * file = fopen(name, "w+");
 		for (A1LidarData &data:data){
 			if (data.valid){ 
-				//stream <<data.x<<"\t"<<data.y<<"\n"; //uncomment from here
-				std::cout<<data.x<<"\t"<<data.y<<"\n";
+				fprintf(file, "%2f\t%2f\n",data.x, data.y);
 			} //to here
-			// const char * line = stream.str().c_str();
-            // 	//std::cout<<line<<"\n";
-			// fputs(line, file);
+
 		}
-		//fclose(file); //uncomment here
-		std::cout<<"\n\n\n";
-		//numberOfScans++;
+		file.close();
 
 	}
 
@@ -49,7 +42,41 @@ int numberOfScans =1;
 
 
 
+
+
 int main(int, char**) {
+
+	//TODAYS DATE AND TIME
+
+	time_t now =time(0);
+    tm *ltm = localtime(&now);
+    int y,m,d;
+    y=ltm->tm_year-100;
+    m = ltm->tm_mon +1;
+    d=ltm->tm_mday;
+    
+    //PICK DIRECTORY NAME
+    char dirName[256];
+    int copynumber=1;
+    while (true){
+        DIR *dir; 
+        char tmp[256];
+        sprintf(tmp, "maps%02i-%02i-%02i_%i",d, m, y, copynumber);
+        dir = opendir(tmp);
+        if (dir ==NULL){
+            sprintf(dirName, "%s", tmp);
+            std::filesystem::create_directory(dirName);
+            break;
+        } //if the directory DOESN'T return a void pointer (= exists already)
+        else if (dir!=NULL){
+            copynumber++;                                                           //increase the number at the end of the name
+            closedir(dir);
+        }
+
+    }
+
+
+
 	AlphaBot motors; //records data for 2 seconds
 	A1Lidar lidar;
 	DataInterface dataInterface;
@@ -58,8 +85,8 @@ int main(int, char**) {
 	motors.start();
 	motors.setRightWheelSpeed(0.0); //possible solution for the gpioinitialise is macros?
 	motors.setLeftWheelSpeed(0.0);
-	motors.setRightWheelSpeed(0.25f); //possible solution for the gpioinitialise is macros?
-	motors.setLeftWheelSpeed(0.25f);
+	motors.setRightWheelSpeed(0.5f); //possible solution for the gpioinitialise is macros?
+	motors.setLeftWheelSpeed(0.5f);
 	do {}
 	while (!getchar());
 	motors.stop();

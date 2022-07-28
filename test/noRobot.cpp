@@ -38,7 +38,7 @@ char * folder;
 	void newScanAvail(){ //uncomment sections to write x and y to files		
         iteration++;
 		char filePath[256];
-		sprintf(filePath, "%s/map%04d.dat", folder, iteration);
+		sprintf(filePath, "%s/transmap%04d.dat", folder, iteration);
         printf("%s\t", filePath);
 		std::ifstream file(filePath);
 
@@ -119,33 +119,33 @@ int main(int argc, char** argv) {
 
     //CREATE A FOLDER TO STORE THE RESULTS FOR THIS RUN
 
-    //TODAYS DATE AND TIME
-    time_t now =time(0);
-    tm *ltm = localtime(&now);
-    int y,m,d;
-    y=ltm->tm_year-100;
-    m = ltm->tm_mon +1;
-    d=ltm->tm_mday;
+    // //TODAYS DATE AND TIME
+    // time_t now =time(0);
+    // tm *ltm = localtime(&now);
+    // int y,m,d;
+    // y=ltm->tm_year-100;
+    // m = ltm->tm_mon +1;
+    // d=ltm->tm_mday;
     
-    //PICK DIRECTORY NAME
-    char dirName[256];
-    int copynumber=1;
-    while (true){
-        DIR *dir; 
-        char tmp[256];
-        sprintf(tmp, "LoRNoTimer%02i-%02i-%02i_%i",d, m, y, copynumber);
-        dir = opendir(tmp);
-        if (dir ==NULL){
-            sprintf(dirName, "%s", tmp);
-            std::filesystem::create_directory(dirName);
-            break;
-        } //if the directory DOESN'T return a void pointer (= exists already)
-        else if (dir!=NULL){
-            copynumber++;                                                           //increase the number at the end of the name
-            closedir(dir);
-        }
+    // //PICK DIRECTORY NAME
+    // char dirName[256];
+    // int copynumber=1;
+    // while (true){
+    //     DIR *dir; 
+    //     char tmp[256];
+    //     sprintf(tmp, "LoRNoTimer%02i-%02i-%02i_%i",d, m, y, copynumber);
+    //     dir = opendir(tmp);
+    //     if (dir ==NULL){
+    //         sprintf(dirName, "%s", tmp);
+    //         std::filesystem::create_directory(dirName);
+    //         break;
+    //     } //if the directory DOESN'T return a void pointer (= exists already)
+    //     else if (dir!=NULL){
+    //         copynumber++;                                                           //increase the number at the end of the name
+    //         closedir(dir);
+    //     }
 
-    }
+    // }
                                 //should exit when dir is null pointer
 
     //DATA INTERCFACE

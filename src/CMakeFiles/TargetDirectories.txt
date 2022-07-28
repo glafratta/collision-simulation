@@ -1,0 +1,3 @@
+/home/gula/Desktop/collision-simulation/src/CMakeFiles/rebuild_cache.dir
+/home/gula/Desktop/collision-simulation/src/CMakeFiles/edit_cache.dir
+/home/gula/Desktop/collision-simulation/src/CMakeFiles/gasolina.dir

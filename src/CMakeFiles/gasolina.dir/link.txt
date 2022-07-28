@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgasolina.a  CMakeFiles/gasolina.dir/configurator.cpp.o CMakeFiles/gasolina.dir/state.cpp.o
+/usr/bin/ranlib libgasolina.a
