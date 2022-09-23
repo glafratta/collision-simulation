@@ -1,21 +1,28 @@
-# collision-simulation
-under construction! 
+# carmelo
+Under construction. A library to implement "innate" understanding of physics in an obstacle-avoidant robot, and utilise it for planning trajectories and learning about the environment.
+The program turnMaps.sh goes into the selected folders containing maps and turns them 90 degrees.
+the subdirectory "test" contains test cases before the program is actually implemented in a real robot. noRobot.h is a simulation which does not require a robot but illustrates path planning and trajectory correction.
 
-build with cmake:
-
-`cd collision-simulation`
-`cmake .`
-`make`
-
-currently not tested on a live robot. In the 'test' folder you can test the code on offline maps. The program turnMaps.sh goes into the selected folders containing maps and turns them 90 degrees.
-
+######################################
 ## prerequisites
 ### install box2d and opencv
 using `dselect` , install `libbox2d-dev` and 'libopencv-core-dev'
 
-### rplidar
-rplidar: https://github.com/berndporr/rplidar_rpi
+### rplidar_rpi API
+https://github.com/berndporr/rplidar_rpi
 
+###alphabot API
+https://github.com/berndporr/alphabot
+
+See here for the wiring of the robot.
 ### timer
 cpptimer:https://github.com/berndporr/cppTimer
+
+##build
+build with cmake:
+
+`cd carmelo`
+`cmake .`
+`make`
+
 
