@@ -29,7 +29,7 @@ int main(int argc, char** argv){
     //save to file
 
     char name[25];
-    sprintf(name,"%strans%s", destFolder, argv[1]);
+    sprintf(name,"%strans%s", argv[1]);
     FILE * out=fopen(name, "w+");
     for (cv::Point2d p:transformedVec){
         fprintf(out,"%f\t%f\n", p.x, p.y);

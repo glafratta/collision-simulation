@@ -23,6 +23,7 @@ char * folder;
 		if (exists(folderPath)){
 			if (is_directory(folderPath)){
 				folder = _folder;
+                box2d->folder = _folder;
 			}
 			else{
 				printf("not a directory");
@@ -43,15 +44,15 @@ char * folder;
 		std::ifstream file(filePath);
 
         float x, y;
-		box2d->previous = box2d->current;
+		//box2d->previous = box2d->current;
 		box2d->current.clear();
-		while (file>>std::setprecision(2)>>x>>y){
+		while (file>>x>>y){
 			box2d->current.push_back(cv::Point2f(x, y));
 
 			
 		}
 		file.close();
-        printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
+       // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
         box2d->NewScan();
 
 		
@@ -62,6 +63,20 @@ char * folder;
 
 
 
+};
+
+class StepCallback{
+    float L,R;
+    Configurator * box2d;
+public:
+    StepCallback(Configurator * c): box2d(c){}
+    void step(){
+        box2d->controller();
+        L=box2d->leftWheelSpeed;
+        R= box2d->rightWheelSpeed;
+        printf("R= %f, L = %f\n,", R, L);
+
+    }
 };
 
 void printVectorToFile(std::vector<cv::Point2f> _v, int iteration, bool isCurrent, char dirName[256]){
@@ -151,11 +166,13 @@ int main(int argc, char** argv) {
     //DATA INTERCFACE
     State desiredState;
     Configurator box2d(desiredState);
+    StepCallback cb(&box2d);
     DataInterface dataInterface(&box2d, argv[1]);
                 //iterate through files
-    b2Vec2 velocity = {0,0};
+    //b2Vec2 velocity = {0,0};
     for (int j=0; j<i-1;j++){
         dataInterface.newScanAvail();
+        cb.step();
 
     }
 

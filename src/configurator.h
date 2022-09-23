@@ -1,6 +1,5 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
-
 #include "Box2D/Box2D.h"
 #include "robot.h"
 #include <vector>
@@ -18,17 +17,23 @@
 class Configurator{
 	private:
 	float maxAbsSpeed = .2;
-	std::vector <float> timeStamps;
+	float gain = 0.1;
+	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=-1; //represents that hasn't started yet, robot isn't moving and there are no map data
 	bool crashed=0;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
+	b2Vec2 desiredVelocity;
 public:
-	std::vector <cv::Point2f> previous;
+	//std::vector <cv::Point2f> previous;
+	char *folder;
 	std::vector <cv::Point2f> current;
 	char msg[25];
 	std::vector <State> plan; //from here we can find the current state
 	State desiredState;
+	float rightWheelSpeed, leftWheelSpeed, timeElapsed;
+	
+
 	
 
 	struct getVelocityResult{
@@ -53,6 +58,8 @@ Configurator(State _state): desiredState(_state){
 void NewScan(); 
 
 Configurator::getVelocityResult GetRealVelocity();
+
+void controller();
 
 };
 
