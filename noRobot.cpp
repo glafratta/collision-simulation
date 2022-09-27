@@ -79,35 +79,64 @@ public:
     }
 };
 
-void printVectorToFile(std::vector<cv::Point2f> _v, int iteration, bool isCurrent, char dirName[256]){
-    char type[15];
-    if (isCurrent==true){
-        sprintf(type,"current");
+void Configurator::controller(){
+//FIND ERROR
+b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+printf("iteration =%i\n", iteration);
+State * state;
+    if (!plan.empty()){
+        state = &(plan[0]);
     }
-    else if (isCurrent ==false){
-        sprintf(type,"previous");
+    else if (plan.empty()){
+        state = & desiredState;
     }
-    char name[256];
-    sprintf(name,"%s/%s%04d.txt", dirName, type, iteration);
-    printf("creating file at: %s\n", name);
-    FILE * file = fopen(name, "w+");
-    for (int i=0; i<_v.size(); i++){
-        fprintf(file,"cv::Point(%f, %f)\n", _v[i].x, _v[i].y);
 
 
+
+float angleError=0;
+float distanceError=0;
+if (iteration >=1){
+    float x,y, t;
+    t=0; //discrete time
+    char name[50];
+    sprintf(name, "/tmp/robot%04i.txt", iteration -1); //
+    //printf("%s\n", name);
+    std::ifstream file(name);
+
+
+    while (file>>x>>y){
+        t= t+ 1.0f/60.0f;
+        if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
+            desiredPosition = b2Vec2(x,y);
+            printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+            break;
+        }
+        else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
+            nextPosition = b2Vec2(x,y);
+        }
     }
-    fclose(file);
+    file.close();
+    desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+    recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
+    //float desiredAngle = atan2(recordedPosition.y)
+    angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+    printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+    printf("angleError =%f\n", angleError);
+    distanceError = desiredPosition.Length() - recordedPosition.Length();
+    printf("distanceError = %f\n", distanceError);
+    }
+
+leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
+rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
+
+//control function = v0 + error *gain
+
+//Generate corrective trajectory?
+// Object target(ObjectType::target, targetPosition);
+// trajectory= Object(target, simDuration, maxSpeed);
+
+
 }
-
-
-// Box2DPlanningInterface::Box2DPlanningInterface(){
-//     actionsAvailable = {GO, LEFT, RIGHT};
-// }
-
-// Box2DPlanningInterface::actionToPlan(Action action){
-//     switch (action)
-// }
-
 
 int main(int argc, char** argv) {
     //BENCHMARK
