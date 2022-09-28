@@ -15,7 +15,7 @@
 //class State;
 
 class Configurator{
-	private:
+protected:
 	float maxAbsSpeed = .2;
 	float gain = 0.1;
 	//std::vector <float> timeStamps;
@@ -24,6 +24,9 @@ class Configurator{
 	bool crashed=0;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	b2Vec2 desiredVelocity;
+	b2Vec2 absPosition = {0.0f, 0.0f};
+	FILE * dumpPath;
+	char fileNameBuffer[50];
 public:
 	//std::vector <cv::Point2f> previous;
 	char *folder;
@@ -31,14 +34,14 @@ public:
 	char msg[25];
 	std::vector <State> plan; //from here we can find the current state
 	State desiredState;
-	float rightWheelSpeed, leftWheelSpeed, timeElapsed;
+	float rightWheelSpeed, leftWheelSpeed, timeElapsed, totalTime;
 	
 
 	
 
 	struct getVelocityResult{
 		bool valid =0;
-		b2Vec2 displacement;
+		b2Vec2 displacement = {0.0f, 0.0f};
 		float angle;
 		getVelocityResult(){}
 		getVelocityResult(b2Vec2 disp):displacement(disp){
@@ -53,13 +56,18 @@ public:
 
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
+	totalTime =0.0f;
+}
+
+void setNameBuffer(char * str){
+	sprintf(fileNameBuffer, "%s", str);
 }
 
 void NewScan(); 
 
 Configurator::getVelocityResult GetRealVelocity();
 
-void controller();
+virtual void controller();
 
 };
 

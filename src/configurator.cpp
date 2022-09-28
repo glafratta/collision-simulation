@@ -16,6 +16,7 @@ void Configurator::NewScan(){
 		if ( timeElapsed< samplingRate){
 			timeElapsed= samplingRate;
 		}
+		totalTime += timeElapsed; //for debugging
 		//printf("time elapsed = %f ms\n", timeElapsed);
 		previousTimeScan=now; //update the time of sampling
 		//WRITE TO FILE (debug) + WORLD BUILDING
@@ -29,6 +30,11 @@ void Configurator::NewScan(){
 		
 		Configurator::getVelocityResult affineTransResult= GetRealVelocity();
 		b2Vec2 estimatedVelocity= affineTransResult.displacement;
+		absPosition.x += estimatedVelocity.x;
+		absPosition.y += estimatedVelocity.y;
+		dumpPath = fopen("/tmp/dumpPath.txt", "a+");
+		fprintf(dumpPath, "%f\t%f\n", absPosition.x, absPosition.y);
+		fclose(dumpPath);
 		//printf("estimatedVelocity = %f, %f\n", estimatedVelocity.x, estimatedVelocity.y);
 		if (affineTransResult.valid){
 			estimatedVelocity = affineTransResult.displacement;
@@ -95,8 +101,7 @@ void Configurator::NewScan(){
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (pointCurrent == b2Vec2(0.0f, 0.0f)){
-					printf("weird!\n");
-					printf("pointCurrent = %f, %f\n", pointCurrent.x, pointCurrent.y);
+					printf("obstacle at 0,0, not normal\n");
 					printf("body n. %i\n", i);
 				}
 				//can get transform from body
@@ -179,19 +184,19 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(){
 		std::vector <cv::Point2f> previousTmp;
 
 		if (iteration >0){
-			char filePath[256];
-			sprintf(filePath, "%s/transmap%04d.dat", folder, iteration);
+			char prevPath[256];
+			sprintf(prevPath, "%s/transmap%04d.dat", folder, iteration);
         	//printf("getting previous\n");
-			std::ifstream file(filePath);
+			std::ifstream prev(prevPath);
 			float x,y;
-			while (file>>x>>y){
+			while (prev>>x>>y){
 				previousTmp.push_back(cv::Point2f(x,y));
 			}
-			file.close();
+			prev.close();
 		}
 
 		int diff = current.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
-		printf("current: %i, previous: %i\n", current.size(), previousTmp.size());
+		//printf("current: %i, previous: %i\n", current.size(), previousTmp.size());
 
 
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
@@ -274,60 +279,61 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(){
 		}
 	//}
 
-	void Configurator::controller(){
-	//FIND ERROR
-	b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
-	printf("iteration =%i\n", iteration);
-	State * state;
-		if (!plan.empty()){
-			state = &(plan[0]);
-		}
-		else if (plan.empty()){
-			state = & desiredState;
-		}
+// 	void Configurator::controller(){
+// 	//FIND ERROR
+// 	b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+// 	printf("iteration =%i\n", iteration);
+// 	State * state;
+// 		if (!plan.empty()){
+// 			state = &(plan[0]);
+// 		}
+// 		else if (plan.empty()){
+// 			state = & desiredState;
+// 		}
 
 
 
-	float angleError=0;
-	float distanceError=0;
-	if (iteration >=1){
-		float x,y, t;
-		t=0;
-		char name[50];
-		sprintf(name, "/tmp/robot%04i.txt", iteration -1);
-		//printf("%s\n", name);
-		std::ifstream file(name);
+// 	float angleError=0;
+// 	float distanceError=0;
+// 	if (iteration >=1){
+// 		float x,y, t;
+// 		t=0; //discrete time
+// 		char name[50];
+// 		sprintf(name, "/tmp/robot%04i.txt", iteration -1); //
+// 		//printf("%s\n", name);
+// 		std::ifstream file(name);
 
 
-		while (file>>x>>y){
-			t= t+ 1.0f/60.0f;
-			//printf("t= %f\n", t);
-			if(timeElapsed<=t<=(timeElapsed+1/(state->hz))){ 
-				desiredPosition = b2Vec2(x,y);
-				//printf("desired position out of file: %f, %f\t time recorded as: %f\n", x, y,t);
-			}
-			else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
-				nextPosition = b2Vec2(x,y);
-			}
-		}
-		file.close();
-		desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-		recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
-		angleError = atan2(recordedPosition.y, recordedPosition.y) -atan2(desiredPosition.y, desiredPosition.x);
-		printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-		printf("angleError =%f\n", angleError);
-		distanceError = desiredPosition.Length() - recordedPosition.Length();
-		printf("distanceError = %f\n", distanceError);
-		}
+// 		while (file>>x>>y){
+// 			t= t+ 1.0f/60.0f;
+// 			if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
+// 				desiredPosition = b2Vec2(x,y);
+// 				printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+// 				break;
+// 			}
+// 			else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
+// 				nextPosition = b2Vec2(x,y);
+// 			}
+// 		}
+// 		file.close();
+// 		desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+// 		recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
+// 		//float desiredAngle = atan2(recordedPosition.y)
+// 		angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+// 		printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+// 		printf("angleError =%f\n", angleError);
+// 		distanceError = desiredPosition.Length() - recordedPosition.Length();
+// 		printf("distanceError = %f\n", distanceError);
+// 		}
 
-	leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
-	rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
+// 	leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
+// 	rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
 
-	//control function = v0 + error *gain
+// 	//control function = v0 + error *gain
 
-	//Generate corrective trajectory?
-	// Object target(ObjectType::target, targetPosition);
-	// trajectory= Object(target, simDuration, maxSpeed);
+// 	//Generate corrective trajectory?
+// 	// Object target(ObjectType::target, targetPosition);
+// 	// trajectory= Object(target, simDuration, maxSpeed);
 
 
-}
+// }

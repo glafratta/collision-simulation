@@ -12,7 +12,8 @@ protected:
    // StateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
     //b2Vec2 EstimatedLinearVelocity = {float((-sin(omega/hz))), float(cos(omega/hz))}; //is is sin and y is cos, this is pretty much instantaneous to get the system started
-    b2Vec2 RecordedVelocity, desiredVelocity, gain;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
+    b2Vec2 desiredVelocity, gain;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
+    b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     float simDuration =3;
 public:
 int planNo=0;
