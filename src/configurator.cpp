@@ -4,7 +4,25 @@
 #include <iostream>
 
 void Configurator::NewScan(){ 
-		iteration++;
+	iteration++;
+				////////FOR DEBUGGING ////////////////////////
+		char filePath[256];
+		sprintf(filePath, "%s/2ftransmap%04d.dat", folder, iteration);
+        printf("%s\t", filePath);
+		std::ifstream file(filePath);
+
+        float x, y;
+		//box2d->previous = box2d->current;
+		//box2d->current.clear();
+		while (file>>x>>y){
+			current.push_back(cv::Point2f(x, y));
+
+			
+		}
+		file.close();
+
+		//END PASTED SECTIOM
+
 		//printf("begin newScan plan size %i\n", plan.size());
 		bool isObstacleStillThere=0;
 		//see time delay between scans to calculate speed more accurately
@@ -25,6 +43,10 @@ void Configurator::NewScan(){
 		// sprintf(name, "/tmp/bodies%04d.txt", iteration);
 		// FILE *file= fopen(name, "w+");
 		// printf("%s\n", name);
+	
+
+		//printf("current size: %i\n", current.size());
+
 		
 		//put velocity calculations before world creation so that we can check if obstacle is still there
 		
@@ -88,10 +110,10 @@ void Configurator::NewScan(){
 
 		//printf("before making body\n");
 		for (int i=0; i<current.size(); i++){ //makes obstacles and checks for duplicates
-			b2Vec2 pointCurrent(roundf((current[i].x)*100.f)/100.f, roundf((current[i].y)*100.f)/100.f);
-			b2Vec2 pointPrevious(roundf((current[i-1].x)*100.f)/100.f, roundf((current[i-1].y)*100.f)/100.f);
+			//b2Vec2 pointCurrent(roundf((current[i].x)*100.f)/100.f, roundf((current[i].y)*100.f)/100.f);
+			//b2Vec2 pointPrevious(roundf((current[i-1].x)*100.f)/100.f, roundf((current[i-1].y)*100.f)/100.f);
 
-			if ((pointCurrent.x != pointPrevious.x || pointCurrent.y!=pointPrevious.y)&& pointCurrent.y>=0){ // robot only sees obstacles ahead of it
+			if ((current[i].x != current[i-1].x || current[i].y!=current[i-1].y)&& current[i].y>=0){ // robot only sees obstacles ahead of it
 				//printf("making body!\n");
 				b2Body * body;
 				b2BodyDef bodyDef;
@@ -100,7 +122,7 @@ void Configurator::NewScan(){
 				b2PolygonShape fixture; //giving the point the shape of a box
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
-				if (pointCurrent == b2Vec2(0.0f, 0.0f)){
+				if (current[i] == cv::Point2f(0.0f, 0.0f)){
 					printf("obstacle at 0,0, not normal\n");
 					printf("body n. %i\n", i);
 				}
@@ -115,21 +137,21 @@ void Configurator::NewScan(){
 					// printf("pointCurrent.y < plan[0].obstacle.getPosition().y+0.05 : %i\n ", pointCurrent.y < plan[0].obstacle.getPosition().y+0.05);
 					//printf("all together: %i", (((plan[0].obstacle.getPosition().x)-0.05<pointCurrent.x<(plan[0].obstacle.getPosition().x)+0.05) and ((plan[0].obstacle.getPosition().y)-0.05<pointCurrent.y<(plan[0].obstacle.getPosition().y)+0.05)));
 
-					if (pointCurrent.x > plan[0].obstacle.getPosition().x-0.05 && pointCurrent.x < plan[0].obstacle.getPosition().x+0.05 && pointCurrent.y > plan[0].obstacle.getPosition().y-0.05 && pointCurrent.y < plan[0].obstacle.getPosition().y+0.05){
+					if (current[i].x > plan[0].obstacle.getPosition().x-0.05 && current[i].x < plan[0].obstacle.getPosition().x+0.05 && current[i].y > plan[0].obstacle.getPosition().y-0.05 && current[i].y < plan[0].obstacle.getPosition().y+0.05){
 						isObstacleStillThere =1;
 						//printf("changed still there\n");
 					}
 				}
-					bodyDef.position.Set(pointCurrent.x, pointCurrent.y); 
+					bodyDef.position.Set(current[i].x, current[i].y); 
 					body = world.CreateBody(&bodyDef);
 					body->CreateFixture(&fixtureDef);
 					//fprintf(file, "%f\t%f\n", body->GetPosition().x, body->GetPosition().y);
 
 			}
 		}
-		printf("body count = %i\n", world.GetBodyCount());
+		//printf("body count = %i\n", world.GetBodyCount());
 		//fclose(file);
-		printf("obstacle is still there: %i\n", isObstacleStillThere);
+		//printf("obstacle is still there: %i\n", isObstacleStillThere);
 		//printf("bodies created\n");
 		if (!isObstacleStillThere && plan.size()>0){
 			plan.erase(plan.begin());
@@ -144,7 +166,7 @@ void Configurator::NewScan(){
 
 		//if no obstacles to keep track of, check if with the current trajectory it will bump into something else
 		//if the plan vector is empty the state is the default state
-		printf("plan size %i\n", plan.size());
+		//printf("plan size %i\n", plan.size());
 		if (plan.size() ==0){
 			printf("state is desired state\n");
 		desiredState.setRecordedVelocity(estimatedVelocity); //logs in previous recorded velocity in case affine transformation fails
@@ -185,7 +207,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(){
 
 		if (iteration >0){
 			char prevPath[256];
-			sprintf(prevPath, "%s/transmap%04d.dat", folder, iteration);
+			sprintf(prevPath, "%s/2ftransmap%04d.dat", folder, iteration);
         	//printf("getting previous\n");
 			std::ifstream prev(prevPath);
 			float x,y;

@@ -2,9 +2,11 @@
 #define CONFIGURATOR_H
 #include "Box2D/Box2D.h"
 #include "robot.h"
+#include <dirent.h>
 #include <vector>
 #include "opencv2/opencv.hpp"
 #include <thread>
+#include <filesystem>
 #include <cmath>
 #include <unistd.h>
 #include <ncurses.h>
@@ -20,7 +22,7 @@ protected:
 	float gain = 0.1;
 	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
-	int iteration=-1; //represents that hasn't started yet, robot isn't moving and there are no map data
+	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
 	bool crashed=0;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	b2Vec2 desiredVelocity;
@@ -54,6 +56,11 @@ public:
 
 // 1:  new scan available: box2d world is rebuilt with objects, current trajectory is checked#
 
+Configurator(){
+	previousTimeScan = std::chrono::high_resolution_clock::now();
+	totalTime = 0.0f;
+}
+
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
@@ -61,6 +68,21 @@ Configurator(State _state): desiredState(_state){
 
 void setNameBuffer(char * str){
 	sprintf(fileNameBuffer, "%s", str);
+}
+
+void setFolder(char * _folder){
+	std::filesystem::path folderPath(_folder);
+		if (exists(folderPath)){
+			if (is_directory(folderPath)){
+				folder = _folder;
+			}
+			else{
+				printf("not a directory");
+			}
+		}
+		else{
+			printf("%s doesn't exist", _folder);
+		}
 }
 
 void NewScan(); 

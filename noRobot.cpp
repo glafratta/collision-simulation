@@ -1,4 +1,3 @@
-#include <filesystem>
 #include "Box2D/Box2D.h"
 #include "src/configurator.h"
 #include <thread>
@@ -11,6 +10,7 @@
 #include <ncurses.h>
 #include <ctime>
 #include <dirent.h>
+#include <filesystem>
 
 class DataInterface {
 public:
@@ -39,7 +39,7 @@ char * folder;
 	void newScanAvail(){ //uncomment sections to write x and y to files		
         iteration++;
 		char filePath[256];
-		sprintf(filePath, "%s/transmap%04d.dat", folder, iteration);
+		sprintf(filePath, "%s/2ftransmap%04d.dat", folder, iteration);
         printf("%s\t", filePath);
 		std::ifstream file(filePath);
 
@@ -108,7 +108,7 @@ if (iteration >=1){
         t= t+ 1.0f/60.0f;
         if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
             desiredPosition = b2Vec2(x,y);
-            printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+           // printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
             break;
         }
         else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
@@ -120,10 +120,10 @@ if (iteration >=1){
     recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
     //float desiredAngle = atan2(recordedPosition.y)
     angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-    printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-    printf("angleError =%f\n", angleError);
+   // printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+   // printf("angleError =%f\n", angleError);
     distanceError = desiredPosition.Length() - recordedPosition.Length();
-    printf("distanceError = %f\n", distanceError);
+  //  printf("distanceError = %f\n", distanceError);
     }
 
 leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
@@ -195,16 +195,18 @@ int main(int argc, char** argv) {
     //DATA INTERCFACE
     State desiredState;
     Configurator box2d(desiredState);
+    box2d.setFolder(argv[1]);
     StepCallback cb(&box2d);
-    DataInterface dataInterface(&box2d, argv[1]);
+    //DataInterface dataInterface(&box2d, argv[1]);
                 //iterate through files
     //b2Vec2 velocity = {0,0};
-    for (int j=0; j<i-1;j++){
-        dataInterface.newScanAvail();
+    for (int j=0; j<i/3;j++){
+        //dataInterface.newScanAvail();
+        box2d.NewScan();
         cb.step();
 
     }
-
+    printf("total time = %.2f", box2d.totalTime);
     // FINISH BENCHMARKING
     // auto end = std::chrono::high_resolution_clock::now();
     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
