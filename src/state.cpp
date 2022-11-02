@@ -1,6 +1,6 @@
 #include "state.h"
 #include "robot.h"
-#include "opencv2/opencv.hpp"
+//#include "opencv2/opencv.hpp"
 
 
 
@@ -14,19 +14,27 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		sprintf(name_r, "/tmp/robot%04i.txt", _iteration);
 		planNo++;
 		FILE * robotPath = fopen(name_r, "w+");
-        float dOmega;
+		float theta=0;
         //float omegaT=0; //instantaneous angular velocity at time T
 		//Object ob = obstacle; //copy the obstacle object for tracking
 		//TO DO: 	copy trajectory and update it automatically based on obstacle distance
-		Trajectory internalTrajectory;
+		//Trajectory internalTrajectory;
+		b2Vec2 instVelocity;
 		for (int step = 0; step <= (hz*simDuration); step++) {//3 second
-			if ((step*10/int(hz)) %2 ==0){
-				b2Vec2 prevVelocity = internalTrajectory.getVelocity();
-				internalTrajectory = Trajectory(obstacle, simDuration, maxSpeed, prevVelocity, robot.body->GetPosition()); //this simulates the behaviour of the robot as it gets further from the obstacle
-				dOmega ==trajectory.getOmega()/hz;
-				}
+			theta += trajectory.getOmega()/hz; //= omega *t
+			//printf("omega = %f\t theta = %f\n", trajectory.getOmega(), theta);
+			// if ((step*10/int(hz)) %2 ==0){
+			// 	b2Vec2 prevVelocity = internalTrajectory.getVelocity();
+			// 	internalTrajectory = Trajectory(obstacle, simDuration, maxSpeed, prevVelocity, robot.body->GetPosition()); //this simulates the behaviour of the robot as it gets further from the obstacle
+			// 	dOmega ==trajectory.getOmega()/hz;
+			// 	}
 			//timesPlanned++;
-			robot.setVelocity(internalTrajectory.getVelocity()); //instantaneous linear veloctiy
+			//theta = trajectory.getOmega()*hz;
+			instVelocity.x = trajectory.getLinearSpeed()*cos(theta);
+			instVelocity.y = trajectory.getLinearSpeed()*sin(theta);
+			//printf("inst vel %f\t%f\n", instVelocity.x, instVelocity.y);
+			// robot.setVelocity(internalTrajectory.getVelocity()); //instantaneous linear veloctiy
+			robot.setVelocity(instVelocity);
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			if (obstacle.isValid()){ //if we are in the process of avoiding an obstacle evaluate if you can safely steer away
@@ -87,7 +95,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 
 		}	
 		//setPlan(_action); 		//this needs refinement as the thingy for the alphabot is hard-coded. coudl be, if one callback is 10d R or 13 to the L, get the angle from each speed in the plan and divide it
-		printf("path is safe\n");
+		//printf("path is safe\n");
 		fclose(robotPath);
 		result = simResult(simResult::successful);
 		return result;
@@ -109,47 +117,71 @@ void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, 
 	object.setAngle(angle); //with respect to robot's velocity
 }
 
-// void State::controller(float timeElapsed){
-// 	//FIND ERROR
-// 	b2Vec2 error, desiredPosition, targetPosition; //target for genearting a corrective trajectory
-// 	std::ifstream file("/tmp/robot%04f_%i.txt", iteration, planNo);
-// 	float x,y, t, gainR, gainL, angleError, distanceError;
-// 	gainR=0.1;
-// 	gainL=0.1;
-
-// 	while (file>>x>>y){
-// 		t+=1/hz;
-// 		if(timeElapsed<=t<=(timeElapsed+1/hz)){ 
-// 			desiredPosition = b2Vec2(x,y);
-// 		}
-// 		else if (timeElapsed*2<=t<=(timeElapsed*2+1/hz)){ //next position
-// 			targetPosition = b2Vec2(x,y);
-// 		}
+// void State::controller(){
+// 	if (obstacle.isValid()){
+// 		return; //if there is an obstacle do not try to follow a trajectory
 // 	}
-// 	file.close();
-// 	desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-// 	// error.x = desiredVelocity.x - RecordedVelocity.x;
-// 	// error.y = desiredVelocity.y - RecordedVelocity.y;
+// 	else {
+// 		b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+// 		double angleError=0;
+// 		double distanceError=0;
+// 		if (iteration > 0){
+// 			float x,y, t;
+// 			t=0; //discrete time
+// 			char name[50];
+// 			sprintf(name, "", fileNameBuffer); //
+// 			//printf("%s\n", name);
+// 			std::ifstream file(name);
 
-// 	//FOR NOW ONLY CORRECTING THE DIRECTION
+// 			while (file>>x>>y){ 
+// 				t= t+ 1.0f/60.0f;
+// 				if(totalTime<t && t<=(totalTime+1/60.f)){ 
+// 					desiredPosition = b2Vec2(x,y);
+// 					printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+// 					break;
+// 				}
+// 				// else {
+// 				//     leftWheelSpeed = 0;
+// 				//     rightWheelSpeed = 0;
+// 				// }
 
-// 	//to find if its too much to the left or to the right
-// 	//angle of position vector of desired position - angle of current position
+// 			}
 
-// 	angleError = atan2(RecordedVelocity.x, RecordedVelocity.y) -atan2(desiredPosition.y, desiredPosition.x);
-// 	distanceError = desiredPosition.Length() - RecordedVelocity.Length();
-// 	//if angle diff <0 it moved too much to the right: reduce L wheel input
-// 	//if >0 moved too much to the left: reduce R wheel input
-// 	leftWheelSpeed = trajectory.getLWheelSpeed() + angleError*gain+ distanceError*gain;
-// 	rightWheelSpeed = trajectory.getRWheelSpeed()- angleError *gain + distanceError*gain; 
-
-
-
-// 	//control function = v0 + error *gain
-
-// 	//Generate corrective trajectory?
-// 	// Object target(ObjectType::target, targetPosition);
-// 	// trajectory= Object(target, simDuration, maxSpeed);
+// 			file.close();
+// 			//desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+// 			recordedPosition = {state->getRecordedVelocity().x, state->getRecordedVelocity().y};
+// 			printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
+// 			//float desiredAngle = atan2(recordedPosition.y)
+// 		// angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+// 			angleError = atan2(desiredPosition.y, desiredPosition.x)-atan2(recordedPosition.y, recordedPosition.x); //flag    
+// 			//normalise error
+// 			double maxError = 2* M_PI;
+// 			angleError /= maxError;
 
 
-// }
+// 			printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(recordedPosition.y, recordedPosition.x)/M_PI);
+// 			//printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+// 			printf("angleError =%f\n", angleError);
+// 			distanceError = desiredPosition.Length() - recordedPosition.Length();
+// 			printf("distanceError = %f\n", distanceError);
+// 			}
+
+// 		leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;  //og angle was +angle
+// 		rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; //og was - angle
+
+// 		if (leftWheelSpeed>1.0){
+// 			leftWheelSpeed=1.0;
+// 		}
+// 		if (rightWheelSpeed>1.0){
+// 			rightWheelSpeed=1;
+// 		}
+// 		if (leftWheelSpeed<(-1.0)){
+// 			leftWheelSpeed=-1;
+// 		}
+// 		if (rightWheelSpeed<(-1.0)){
+// 			rightWheelSpeed=1;
+
+// 		}
+
+// 	}
+//}

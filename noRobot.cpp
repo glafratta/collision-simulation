@@ -11,6 +11,7 @@
 #include <ctime>
 #include <dirent.h>
 #include <filesystem>
+#include "CppTimer.h"
 
 class DataInterface {
 public:
@@ -39,19 +40,21 @@ char * folder;
 	void newScanAvail(){ //uncomment sections to write x and y to files		
         iteration++;
 		char filePath[256];
-		sprintf(filePath, "%s/2ftransmap%04d.dat", folder, iteration);
+        char folderName[256];
+        sprintf(folderName,"%s", folder);
+		sprintf(filePath, "%s/2ftransmap%04d.dat", folderName, iteration);
         printf("%s\t", filePath);
-		std::ifstream file(filePath);
+		// std::ifstream file(filePath);
 
-        float x, y;
+        // float x, y;
 		//box2d->previous = box2d->current;
-		box2d->current.clear();
-		while (file>>x>>y){
-			box2d->current.push_back(cv::Point2f(x, y));
+		//box2d->current.clear();
+		// while (file>>x>>y){
+		// 	box2d->current.push_back(cv::Point2f(x, y));
 
 			
-		}
-		file.close();
+		// }
+		// file.close();
        // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
         box2d->NewScan();
 
@@ -79,64 +82,87 @@ public:
     }
 };
 
-void Configurator::controller(){
-//FIND ERROR
-b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
-printf("iteration =%i\n", iteration);
-State * state;
-    if (!plan.empty()){
-        state = &(plan[0]);
+// void Configurator::controller(){
+// //FIND ERROR
+// b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+// printf("iteration in controller =%i\n", iteration);
+// State * state;
+//     if (!plan.empty()){
+//         state = &(plan[0]);
+//     }
+//     else if (plan.empty()){
+//         state = & desiredState;
+//     }
+
+
+
+// float angleError=0;
+// float distanceError=0;
+// if (iteration >=1){
+//     float x,y, t;
+//     t=0; //discrete time
+//     char name[50];
+//     sprintf(name, "/tmp/robot%04i.txt", iteration -1); //
+//     //printf("%s\n", name);
+//     std::ifstream file(name);
+
+
+//     while (file>>x>>y){
+//         t= t+ 1.0f/60.0f;
+//         if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
+//             desiredPosition = b2Vec2(x,y);
+//            // printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+//             break;
+//         }
+//         else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
+//             nextPosition = b2Vec2(x,y);
+//         }
+//     }
+//     file.close();
+//     desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+//     recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
+//     //float desiredAngle = atan2(recordedPosition.y)
+//     angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+//    // printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+//    // printf("angleError =%f\n", angleError);
+//     distanceError = desiredPosition.Length() - recordedPosition.Length();
+//   //  printf("distanceError = %f\n", distanceError);
+//     }
+
+// leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
+// rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
+
+// //control function = v0 + error *gain
+
+// //Generate corrective trajectory?
+// // Object target(ObjectType::target, targetPosition);
+// // trajectory= Object(target, simDuration, maxSpeed);
+
+
+// }
+
+
+//FOR THREAD DEBUGGING
+
+class TimerStep: public CppTimer{
+    StepCallback sc;
+    public:
+    TimerStep(StepCallback & _step): sc(_step){}
+    void timerEvent(){
+        sc.step();
     }
-    else if (plan.empty()){
-        state = & desiredState;
+};
+
+class TimerDI: public CppTimer{
+    DataInterface di;
+    public:
+    TimerDI(DataInterface & _di): di(_di){}
+    void timerEvent(){
+        di.newScanAvail();
     }
+};
 
-
-
-float angleError=0;
-float distanceError=0;
-if (iteration >=1){
-    float x,y, t;
-    t=0; //discrete time
-    char name[50];
-    sprintf(name, "/tmp/robot%04i.txt", iteration -1); //
-    //printf("%s\n", name);
-    std::ifstream file(name);
-
-
-    while (file>>x>>y){
-        t= t+ 1.0f/60.0f;
-        if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
-            desiredPosition = b2Vec2(x,y);
-           // printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
-            break;
-        }
-        else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
-            nextPosition = b2Vec2(x,y);
-        }
-    }
-    file.close();
-    desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-    recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
-    //float desiredAngle = atan2(recordedPosition.y)
-    angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-   // printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-   // printf("angleError =%f\n", angleError);
-    distanceError = desiredPosition.Length() - recordedPosition.Length();
-  //  printf("distanceError = %f\n", distanceError);
-    }
-
-leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
-rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
-
-//control function = v0 + error *gain
-
-//Generate corrective trajectory?
-// Object target(ObjectType::target, targetPosition);
-// trajectory= Object(target, simDuration, maxSpeed);
-
-
-}
+//END THREAD DEBUGGING
 
 int main(int argc, char** argv) {
     //BENCHMARK
@@ -195,18 +221,28 @@ int main(int argc, char** argv) {
     //DATA INTERCFACE
     State desiredState;
     Configurator box2d(desiredState);
+    box2d.setReadMap("2ftransmap");
     box2d.setFolder(argv[1]);
     StepCallback cb(&box2d);
-    //DataInterface dataInterface(&box2d, argv[1]);
+    DataInterface dataInterface(&box2d, argv[1]);
+    TimerDI lidar(dataInterface);
+    TimerStep motors(cb);
+    lidar.startms(200);
+    motors.startms(100);
                 //iterate through files
     //b2Vec2 velocity = {0,0};
-    for (int j=0; j<i/3;j++){
-        //dataInterface.newScanAvail();
-        box2d.NewScan();
-        cb.step();
+    // for (int j=0; j<i/3;j++){
+    //     dataInterface.newScanAvail();
+    //     //box2d.NewScan();
+    //     cb.step();
 
-    }
+    // }
+    std::this_thread::sleep_for(std::chrono::milliseconds(200*i/3)); //simulates lidar
+
+
     printf("total time = %.2f", box2d.totalTime);
+    lidar.stop();
+    motors.stop();
     // FINISH BENCHMARKING
     // auto end = std::chrono::high_resolution_clock::now();
     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);

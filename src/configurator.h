@@ -19,12 +19,11 @@
 class Configurator{
 protected:
 	float maxAbsSpeed = .2;
-	float gain = 0.1;
+	float gain = 0.5;
 	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
 	bool crashed=0;
-	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
@@ -32,21 +31,26 @@ protected:
 public:
 	//std::vector <cv::Point2f> previous;
 	char *folder;
-	std::vector <cv::Point2f> current;
+	char readMap[50];
+	//std::vector <cv::Point2f> current;
 	char msg[25];
 	std::vector <State> plan; //from here we can find the current state
 	State desiredState;
-	float rightWheelSpeed, leftWheelSpeed, timeElapsed, totalTime;
+	std::chrono::high_resolution_clock::time_point previousTimeScan;
+	float rightWheelSpeed=0;
+	float leftWheelSpeed=0;
+	float timeElapsed =0;
+	float totalTime=0;
 	
 
 	
 
 	struct getVelocityResult{
 		bool valid =0;
-		b2Vec2 displacement = {0.0f, 0.0f};
+		b2Vec2 vector = {0.0f, 0.0f};
 		float angle;
 		getVelocityResult(){}
-		getVelocityResult(b2Vec2 disp):displacement(disp){
+		getVelocityResult(b2Vec2 disp):vector(disp){
 			valid=1;
 			angle= atan2(disp.y, disp.x);
 		}
@@ -66,11 +70,53 @@ Configurator(State _state): desiredState(_state){
 	totalTime =0.0f;
 }
 
-void setNameBuffer(char * str){
+class MedianFilter{
+    int kSize;
+    std::vector <float> bufferX;
+    std::vector <float> bufferY;
+public:
+    MedianFilter(int _k=3): kSize(_k){
+        bufferX = std::vector<float>(kSize);
+        bufferY = std::vector<float>(kSize);
+    }
+
+    void filterFloat(float &c, std::vector<float> & buffer){ //value gets modified in the input vector
+        buffer.push_back(c);
+        buffer.erase(buffer.begin());
+        std::vector <float> tmp = buffer;
+        std::sort(tmp.begin(), tmp.end());
+        int index = int(buffer.size()/2)+1;
+        c = tmp[index];
+        //printf("median value at index: %i, value = %f\n", index, tmp[index]);
+    }
+
+    void applyToPoint(cv::Point2f &p){
+        filterFloat(p.x, bufferX);
+        filterFloat(p.y, bufferY);
+    }
+
+};
+
+void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'state' into a robot000n.txt file.
+								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the state
 	sprintf(fileNameBuffer, "%s", str);
+	printf("reading trajectories from: %s", fileNameBuffer);
 }
 
-void setFolder(char * _folder){
+void setReadMap(char * str){
+	sprintf(readMap,"%s", str);
+	printf("map name: %s", readMap);
+
+}
+
+char * getReadMap(){
+	return readMap;
+}
+
+char * getFolder(){
+	return folder;
+}
+void setFolder(char * _folder){ //the folder from where LIDAR data is read
 	std::filesystem::path folderPath(_folder);
 		if (exists(folderPath)){
 			if (is_directory(folderPath)){
@@ -83,17 +129,48 @@ void setFolder(char * _folder){
 		else{
 			printf("%s doesn't exist", _folder);
 		}
+	printf("maps stored in %s", folder);
 }
 
 void NewScan(); 
 
-Configurator::getVelocityResult GetRealVelocity();
+int getIteration(){
+	return iteration;
+}
+Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f>);
 
-virtual void controller();
+void controller();
+
+void addIteration(){
+	iteration++;
+}
+
+
+void updateAbsPos(b2Vec2 vel){
+	absPosition.x += vel.x*timeElapsed;
+	absPosition.y += vel.y*timeElapsed;
+}
+
+b2Vec2 getAbsPos(){
+	return absPosition;
+}
+
+State getCurrentState(){
+	if (plan.size()>0){
+		return plan[0];
+	}
+	else {
+		return desiredState;
+	}
+}
+
+b2Vec2 getDesVel(){
+	return desiredVelocity;
+}
+
+b2Vec2 estimateDisplacementFromWheels();
 
 };
-
-
 
 
 
