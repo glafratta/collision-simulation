@@ -79,11 +79,12 @@ char * folder;
         printf("%s\n", filePath);
         std::ifstream map(filePath);
         std::vector <cv::Point2f> current;
-		while (map>>x>>y){
-			//if (data.valid){
+        b2Vec2 coord;
+		while (map>>coord.x>>coord.y){
+			if (coord.Length()<=1.5){
 		      //  fprintf(map, "%.2ft%.2f\t%.2f\t%.2f\n", data.x, data.y, data.r, data.phi);
-            current.push_back(cv::Point2f(x, y));
-            //}
+                current.push_back(cv::Point2f(coord.x, coord.y));
+            }
 		}
     map.close();
     c->addIteration();
@@ -132,14 +133,10 @@ public:
         L=c->leftWheelSpeed;
         R= c->rightWheelSpeed;
         printf("R= %f, L = %f\n,", R, L);
-        b2Vec2 plannedVelocity(0.0f, 0.0f);
-        if (c->timeElapsed>0){
-            plannedVelocity.x = c->estimateDisplacementFromWheels().x /c->timeElapsed ; // m/s
-            plannedVelocity.y = c->estimateDisplacementFromWheels().y /c->timeElapsed; // m/s
-        }
         b2Vec2 displacement(0, 0);
-        displacement.x =plannedVelocity.x*c->timeElapsed;
-        displacement.y =plannedVelocity.y*c->timeElapsed;
+        if (c->timeElapsed>0){
+            displacement= c->estimateDisplacementFromWheels(); // m/s
+        }
         fprintf(control, "%f\t%f\n",displacement.x, displacement.y);
         fprintf(dump, "%f\t%f\n",c->getAbsPos().x+displacement.x, c->getAbsPos().y+displacement.y);
         fclose(dump);
@@ -180,21 +177,38 @@ int main(int argc, char** argv) {
 
     //HOW MANY FILES IN DIRECTORY
     // DIR *dp;
-    // int i = 0;
+    // int howManyFiles = 0;
     // struct dirent *ep;     
-    // dp = opendir(argv[1]);
+    // dp = opendir(argv[2]);
 
     // if (dp != NULL)
     // {
     //     while (ep = readdir(dp)){
-    //         i++;
+    //         if (ep->d_name)
+    //         howManyFiles++;
     //     }
     //     closedir(dp);
     // }
     // else{
-    //     printf("Couldn't open the directory%s", argv[1]);
+    //     printf("Couldn't open the directory%s", argv[2]);
     // }
 
+    FILE * file;
+    char filePrefix[5];
+    sprintf(filePrefix, "map");
+    int fileCount =1;
+    bool fileExists = true;
+    while (fileExists){
+        char fileName[250];
+        sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
+        file = fopen(fileName, "r");
+        if (!file){
+            fileExists = 0;
+            break;
+        }
+        fileCount++;
+    }
+    printf("%i files\n", fileCount);
 
     //CREATE A FOLDER TO STORE THE RESULTS FOR THIS RUN
 
@@ -231,6 +245,9 @@ int main(int argc, char** argv) {
     State desiredState;
     Configurator conf;
     conf.setNameBuffer(argv[1]);
+    if (argc > 3){
+        conf.filterOn = argv[3];
+    }
     conf.setReadMap("map");
     //char folderName[250];
     //sprintf(folderName, "test/141022_nostraight/");
@@ -249,7 +266,7 @@ int main(int argc, char** argv) {
     //     cb.step();
 
     // }
-    std::this_thread::sleep_for(std::chrono::milliseconds(200*66)); //simulates lidar
+    std::this_thread::sleep_for(std::chrono::milliseconds(200*fileCount)); //simulates lidar
 
 
     printf("total time = %.4f", conf.totalTime);

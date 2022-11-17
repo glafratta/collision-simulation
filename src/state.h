@@ -18,6 +18,7 @@ protected:
 public:
 int planNo=0;
 float hz =60.0f;
+float accumulatedError=0;
 //int timesPlanned =0;
 //bool valid;
 

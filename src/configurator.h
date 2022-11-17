@@ -18,8 +18,8 @@
 
 class Configurator{
 protected:
-	float maxAbsSpeed = .2;
-	float gain = 0.5;
+	float maxAbsSpeed = .125;
+	float gain = .05;
 	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
@@ -27,8 +27,11 @@ protected:
 	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
+	FILE * dumpDeltaV;
 	char fileNameBuffer[50];
 public:
+	float affineTransError =0;
+	bool filterOn=1;
 	//std::vector <cv::Point2f> previous;
 	char *folder;
 	char readMap[50];
@@ -50,10 +53,16 @@ public:
 		b2Vec2 vector = {0.0f, 0.0f};
 		float angle;
 		getVelocityResult(){}
-		getVelocityResult(b2Vec2 disp):vector(disp){
+		getVelocityResult(b2Vec2 disp, float maxSpeed = 0.125):vector(disp){
 			valid=1;
-			angle= atan2(disp.y, disp.x);
+			if (disp.y ==0 && disp.x==0){
+				angle =0;
+			}
+			else{
+				angle= atan(disp.y/disp.x);
+			}
 		}
+
 	};
 
 //calculuate displacement and angle using partial affine transformation
@@ -63,10 +72,15 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
+	leftWheelSpeed = desiredState.getTrajectory().getLWheelSpeed();
+	rightWheelSpeed = desiredState.getTrajectory().getRWheelSpeed();
+	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 }
 
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
+	leftWheelSpeed = desiredState.getTrajectory().getLWheelSpeed();
+	rightWheelSpeed = desiredState.getTrajectory().getRWheelSpeed();
 	totalTime =0.0f;
 }
 

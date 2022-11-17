@@ -36,7 +36,7 @@ void Configurator::NewScan(){
 		if ( timeElapsed< samplingRate){
 			timeElapsed= samplingRate;
 		}
-		//printf("time elapsed = %f ms\n", timeElapsed);
+		//printf("time elapsed = %f ms\n", timeElapsed);/pages/
 		previousTimeScan=now; //update the time of sampling
 		//WRITE TO FILE (debug) + WORLD BUILDING
 		b2World world = b2World({0.0f,0.0f});
@@ -184,13 +184,19 @@ void Configurator::NewScan(){
 Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::Point2f> current){	 //does not modify current vector, creates copy	
 		getVelocityResult result;
 		MedianFilter filterCurrent;
-		MedianFilter filterPrevious;
+		//MedianFilter filterPrevious;
 		//std::vector <cv::Point2f> currentTmp =current;
 		std::vector <cv::Point2f> previousTmp;
 		FILE * currentSmooth;
 		char smoothName[250];
-		sprintf(smoothName,"%s/%s%04d_smooth.dat", folder, readMap, iteration);
-		currentSmooth=fopen(smoothName, "w");
+		if (filterOn){
+			sprintf(smoothName,"%s/%s%04d_smooth.dat", folder, readMap, iteration);
+			currentSmooth=fopen(smoothName, "w");
+		}
+		else {
+			sprintf(smoothName,"%s/%s%04d.dat", folder, readMap, iteration);
+			currentSmooth=fopen(smoothName, "w");
+		}
 		//filter current
 		for (cv::Point2f p:current){
 			filterCurrent.applyToPoint(p);
@@ -200,17 +206,15 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 		if (iteration >1){
 			char prevPath[256];
 			sprintf(prevPath, "%s/%s%04d_smooth.dat", folder, readMap, iteration-1);
-        	printf("getting previous from %s\n", prevPath);
 			std::ifstream prev(prevPath);
 			float x,y;
 			while (prev>>x>>y){
 				cv::Point2f p(x,y);
-				filterPrevious.applyToPoint(p);
+				//filterPrevious.applyToPoint(p); //previous is already smoothed
 				previousTmp.push_back(cv::Point2f(x,y));
 			}
 			prev.close();
 		}
-		//iteration++;
 
 		int diff = current.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
 		//printf("current: %i, previous: %i\n", current.size(), previousTmp.size());
@@ -219,9 +223,12 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
 		if(diff>0){ //(current.size()>previous.size()){
 			if (previousTmp.empty()){
-				for (cv::Point p:current){
-					previousTmp.push_back(cv::Point());
-				} }
+				// for (cv::Point2f p:current){
+				// 	previousTmp.push_back(cv::Point2f());
+					
+				// } 
+				previousTmp = current;
+				}
 			else{
 				for (int i=0; i<abs(diff); i++){
 					previousTmp.push_back(previousTmp[0]); //before it was [-1]
@@ -235,11 +242,13 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 	
 		else if (diff<0){//(current.size()<previous.size()){
 			if (current.empty()){
-				for (cv::Point p:previousTmp){
-					current.push_back(cv::Point());
-					printf("no data");
-					return result;
-				} }
+				for (cv::Point2f p:previousTmp){
+					//current.push_back(cv::Point2f());
+					printf("no data\n");
+					//return result;
+				} 
+				//current = previousTmp;
+				}
 			else{
 				for (int i=0; i<abs(diff); i++){
 			current.push_back(current[0]);
@@ -260,15 +269,36 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 				b2Vec2 tmp;
 				tmp.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 				tmp.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+				float tmpAngle = atan(tmp.y/tmp.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
+				if (tmp.y ==0 && tmp.x ==0){
+					tmpAngle =0;
+				}
+				float tmpPi = tmpAngle/M_PI;
+				dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
+				fprintf(dumpDeltaV, "og velocity x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
+				fprintf(dumpDeltaV,"tmpAngle = %f pi\n", tmpPi);
 				if (tmp.Length()>maxAbsSpeed){
-					float tmpAngle = atan2(tmp.y, tmp.x);
-					printf("tmpAngle = %f pi\n", tmpAngle/M_PI);
+					affineTransError += tmp.Length()-maxAbsSpeed;
+					// if (abs(tmpAngle)>M_PI_2){
+					// 	if (tmpAngle <0){
+					// 		tmpAngle+=M_PI;
+					// 		tmpPi = tmpAngle/M_PI;
+					// 	}
+					// 	else if (tmpAngle >0){
+					// 		tmpAngle-=M_PI;
+					// 		tmpPi = tmpAngle/M_PI;							
+					// 	}
+					// }
+					// printf("tmpAngle corrected = %f pi\n", tmpAngle/M_PI);
 					tmp.x = maxAbsSpeed * cos(tmpAngle);
 					tmp.y = maxAbsSpeed *sin(tmpAngle);
+				fprintf(dumpDeltaV, "changed velocity to x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
+
 				}
+				fclose(dumpDeltaV);
 				return getVelocityResult(tmp);
 			}
-			else if (plan.empty()){ //if the plan is empty look at the default wheel speed
+			else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
 				State * state;
 				if (plan.size()>0){
 					state = &plan[0];
@@ -318,8 +348,8 @@ b2Vec2 Configurator::estimateDisplacementFromWheels(){ //actually estimates disp
 	// vel.y = ((realL+ realR)*sin(theta)/2);
 	//printf("r = %f\t theta = %f pi\n", V, theta/M_PI);
 	if (realR-realL == 0){
-		vel.x = 0;
-		vel.y = realL;
+		vel.x = realL;
+		vel.y = 0;
 		}
 	else {
 		vel.x = (desiredState.getTrajectory().getDistanceWheels()/2)* sin(desiredState.trajectory.getDistanceWheels()*timeElapsed/(realR-realL));
@@ -329,7 +359,7 @@ b2Vec2 Configurator::estimateDisplacementFromWheels(){ //actually estimates disp
 	return vel;
 }
 
-void Configurator::controller(){
+void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
 //FIND ERROR
 b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
 State * state;
@@ -359,7 +389,7 @@ if (iteration > 0){
         t= t+ 1.0f/60.0f;
         if(totalTime<t && t<=(totalTime+1/60.f)){ 
             desiredPosition = b2Vec2(x,y);
-            printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+            //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
             break;
         }
         // else {
@@ -371,21 +401,41 @@ if (iteration > 0){
 
     file.close();
     //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-    recordedPosition = {state->getRecordedVelocity().x, state->getRecordedVelocity().y};
-    printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
+
+    //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
+
+	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
+
+    //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
     //float desiredAngle = atan2(recordedPosition.y)
    // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-    angleError = atan2(desiredPosition.y, desiredPosition.x)-atan2(recordedPosition.y, recordedPosition.x); //flag    
+	float desiredAngle, recordedAngle; 
+	if (desiredPosition.y ==0 && desiredPosition.x ==0){
+		desiredAngle =0;
+	}
+	else{
+		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
+	}
+	if (recordedPosition.y ==0 && recordedPosition.x ==0){
+		recordedAngle =0;
+	}
+	else{
+		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
+	}
+	
+    angleError = desiredAngle - recordedAngle; //flag    
     //normalise error
-    double maxError = 2* M_PI;
+    double maxError = M_PI_2;
     angleError /= maxError;
+	
+	state->accumulatedError += angleError;
 
 
-    printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(recordedPosition.y, recordedPosition.x)/M_PI);
+
+    //printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(state->getRecordedVelocity().y, state->getRecordedVelocity().x)/M_PI);
     //printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-    printf("angleError =%f\n", angleError);
-    distanceError = desiredPosition.Length() - recordedPosition.Length();
-    printf("distanceError = %f\n", distanceError);
+    //distanceError = desiredPosition.Length() - absPosition.Length();
+    //printf("distanceError = %f\n", distanceError);
     }
 
 //    // if (angleError>0){
@@ -397,12 +447,19 @@ if (iteration > 0){
 //         printf("initial R wheel speed: %f\n", state->getTrajectory().getRWheelSpeed());
 //             //}
 
-//negative angle error means too much to the R: so slow down L wheel and speed up right
-//positive angle means too much to the left, slow down R and speed up left
+//-ve angle means to the right, so bd e=d-r, +ve angle error means going too right, so need to slow L and speed R
 
-leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;  //og angle was +angle
-rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; //og was - angle
+//angle error -ve: means that the robot went to far to the left. L - (-r)= increasing L, R+ (-r)= decreasing R so going Right
+//angle error +ve: means that robot went too far to the right because r<0, d-(-r)= +ve; L-(+r)= decreasing L, R+(+r)= increasing R so going L
 
+
+leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
+rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
+
+float deltaV = angleError*gain;
+dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
+fprintf(dumpDeltaV,"angleError =%f\n", angleError);
+fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
 if (leftWheelSpeed>1.0){
     leftWheelSpeed=1.0;
 }
@@ -416,6 +473,8 @@ if (rightWheelSpeed<(-1.0)){
     rightWheelSpeed=1;
 
 }
+fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
+fclose(dumpDeltaV);
 
 }
 
