@@ -64,31 +64,35 @@ char * folder;
 	}
 
 	void newScanAvail(){ //uncomment sections to write x and y to files	
-        auto now =std::chrono::high_resolution_clock::now();
-	    std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
-	    c->timeElapsed=float(diff.count())/1000; //express in seconds	
-        c->totalTime += c->timeElapsed;
-	    c->previousTimeScan=now; //update the time of sampling
-        mapCount++;
-        float x,y;
-        //float totalTime =0;
-		char filePath[256];
-        char folderName[256];
-        sprintf(folderName,"%s", c->folder);
-		sprintf(filePath, "%s/%s%04d.dat", folderName, c->getReadMap(),mapCount);
-        printf("%s\n", filePath);
-        std::ifstream map(filePath);
-        std::vector <cv::Point2f> current;
-        b2Vec2 coord;
-		while (map>>coord.x>>coord.y){
-			if (coord.Length()<=1.5){
-		      //  fprintf(map, "%.2ft%.2f\t%.2f\t%.2f\n", data.x, data.y, data.r, data.phi);
-                current.push_back(cv::Point2f(coord.x, coord.y));
-            }
-		}
+    auto now =std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
+    c->timeElapsed=float(diff.count())/1000; //express in seconds	
+    c->totalTime += c->timeElapsed;
+    c->previousTimeScan=now; //update the time of sampling
+    mapCount++;
+    float x,y;
+    //float totalTime =0;
+    char filePath[256];
+    char folderName[256];
+    sprintf(folderName,"%s", c->folder);
+    sprintf(filePath, "%s%s%04d.dat", folderName, c->getReadMap(),mapCount);
+    printf("%s\n", filePath);
+    std::ifstream map(filePath);
+    std::vector <cv::Point2f> current;
+    b2Vec2 coord;
+    while (map>>coord.x>>coord.y){
+        if (coord.Length()<=1.5){
+            //  fprintf(map, "%.2ft%.2f\t%.2f\t%.2f\n", data.x, data.y, data.r, data.phi);
+            current.push_back(cv::Point2f(coord.x, coord.y));
+        }
+    }
+    printf("made current\n");
     map.close();
+    printf("closed map file\n");
     c->addIteration();
+    printf("added iteration : %i\n", c->getIteration());
     b2Vec2 vel = c->GetRealVelocity(current).vector;
+    printf("vel = %f, %f\n", vel.x, vel.y);
     c->desiredState.setRecordedVelocity(vel);
 
 	printf("time elapsed between newscans = %f ms\n", c->timeElapsed);
@@ -103,14 +107,128 @@ char * folder;
 	fprintf(dumpPath, "%f\t%f\n", c->getAbsPos().x, c->getAbsPos().y);
 	fclose(dumpPath);
 	}
-		
-
-	
-
-
-
-
 };
+
+void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
+//FIND ERROR
+b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+State * state;
+if (plan.size()==0){
+    state = &desiredState;
+}
+else if (plan.size()>0){
+    //state = &plan[0];
+	leftWheelSpeed = plan[0].getTrajectory().getLWheelSpeed();
+	rightWheelSpeed = plan[0].getTrajectory().getRWheelSpeed();
+	return;
+}
+double angleError=0;
+double distanceError=0;
+
+printf("iteration in controller: %i\n", iteration);
+
+if (iteration > 0){
+    float x,y, t;
+    t=0; //discrete time
+    char name[50];
+    sprintf(name, "%s", fileNameBuffer); //
+    //printf("%s\n", name);
+    std::ifstream file(name);
+
+    while (file>>x>>y){ 
+        t= t+ 1.0f/60.0f;
+        if(totalTime<t && t<=(totalTime+1/60.f)){ 
+            desiredPosition = b2Vec2(x,y);
+            //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+            break;
+        }
+        // else {
+        //     leftWheelSpeed = 0;
+        //     rightWheelSpeed = 0;
+        // }
+
+    }
+
+    file.close();
+    //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+
+    //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
+
+	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
+
+    //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
+    //float desiredAngle = atan2(recordedPosition.y)
+   // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+	float desiredAngle, recordedAngle; 
+	if (desiredPosition.y ==0 && desiredPosition.x ==0){
+		desiredAngle =0;
+	}
+	else{
+		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
+	}
+	if (recordedPosition.y ==0 && recordedPosition.x ==0){
+		recordedAngle =0;
+	}
+	else{
+		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
+	}
+	
+    angleError = desiredAngle - recordedAngle; //flag    
+    //normalise error
+    double maxError = M_PI_2;
+    angleError /= maxError;
+	
+	state->accumulatedError += angleError;
+
+
+
+    //printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(state->getRecordedVelocity().y, state->getRecordedVelocity().x)/M_PI);
+    //printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+    //distanceError = desiredPosition.Length() - absPosition.Length();
+    //printf("distanceError = %f\n", distanceError);
+    }
+
+//    // if (angleError>0){
+//         leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain; //if angle is larger than 0 means thta the robot is going to R, slow L wheel
+//         printf("initial L wheel speed: %f\n", state->getTrajectory().getLWheelSpeed());
+//     //}
+//     //else if (angleError<0){
+//         rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain;  //viceversa, sign is +ve because the angle error is neg
+//         printf("initial R wheel speed: %f\n", state->getTrajectory().getRWheelSpeed());
+//             //}
+
+//-ve angle means to the right, so bd e=d-r, +ve angle error means going too right, so need to slow L and speed R
+
+//angle error -ve: means that the robot went to far to the left. L - (-r)= increasing L, R+ (-r)= decreasing R so going Right
+//angle error +ve: means that robot went too far to the right because r<0, d-(-r)= +ve; L-(+r)= decreasing L, R+(+r)= increasing R so going L
+
+
+leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
+rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
+
+float deltaV = angleError*gain;
+dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
+fprintf(dumpDeltaV,"angleError =%f\n", angleError);
+fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
+if (leftWheelSpeed>1.0){
+    leftWheelSpeed=1.0;
+}
+if (rightWheelSpeed>1.0){
+    rightWheelSpeed=1;
+}
+if (leftWheelSpeed<(-1.0)){
+    leftWheelSpeed=-1;
+}
+if (rightWheelSpeed<(-1.0)){
+    rightWheelSpeed=1;
+
+}
+fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
+fclose(dumpDeltaV);
+
+}
+
+
 
 class StepCallback{
     float L,R;
@@ -206,6 +324,7 @@ int main(int argc, char** argv) {
             fileExists = 0;
             break;
         }
+        fclose(file);
         fileCount++;
     }
     printf("%i files\n", fileCount);
@@ -243,7 +362,7 @@ int main(int argc, char** argv) {
 
     //DATA INTERCFACE
     State desiredState;
-    Configurator conf;
+    Configurator conf(desiredState);
     conf.setNameBuffer(argv[1]);
     if (argc > 3){
         conf.filterOn = argv[3];

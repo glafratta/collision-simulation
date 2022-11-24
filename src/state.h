@@ -10,7 +10,7 @@ enum ObjectType {obstacle=0, target=1, other=2};
 class State{
 protected:
    // StateType type;
-    float maxSpeed = 0.2f; //this needs to be defined better
+    float maxSpeed = 0.125f; //this needs to be defined better
     //b2Vec2 EstimatedLinearVelocity = {float((-sin(omega/hz))), float(cos(omega/hz))}; //is is sin and y is cos, this is pretty much instantaneous to get the system started
     b2Vec2 desiredVelocity, gain;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
@@ -19,6 +19,7 @@ public:
 int planNo=0;
 float hz =60.0f;
 float accumulatedError=0;
+char planFile[250];
 //int timesPlanned =0;
 //bool valid;
 
@@ -28,8 +29,8 @@ private:
     float step;
     bool valid= 0;
     ObjectType type;
-    float angleToRobot=0; // by default angle is at the robot's midline
     int iteration;
+    float angleToRobot=0;
     b2Vec2 distance;
 public:
 	b2FixtureDef fixtureDef;
@@ -52,25 +53,14 @@ public:
     }
 
 
-    float getAngle(){
-        return angleToRobot;
-    }
-
-    float getAngle(b2Vec2 robVelocity, b2Vec2 robPos){ //gets the angle of an object wrt to another object (robot)
-        b2Vec2 distance = b2Vec2(bodyDef.position.x-robPos.x, bodyDef.position.y-robPos.y);
-        // printf("distance vector: %f, %f\n", distance.x, distance.y);
-        // printf("distance lenght: %f\n", distance.Length());
-        // printf("robVelocity lenght %f\n", robVelocity.Length());
-	    float angle = acos((robVelocity.x*distance.x+robVelocity.y*distance.y)/(robVelocity.Length()*distance.Length()));
+    float getAngle(b2Vec2 posVector2){ //gets the angle of an object wrt to another object (robot)
+        //reference is position vector 2. If the angle >0 means that object 1 is to the left of object 2
+        float angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin
+        float angle2 = atan(posVector2.y/posVector2.x);
+	    float angle = angle1-angle2;
        // printf("hi\n");
         return angle;
     }
-
-    // b2Transform  GetTransform(){
-    //     b2Transform t;
-    //     t.Set(bodyDef.position, angleToRobot);
-    //     return t;
-    // }
 
     void setPosition(b2Vec2 pos){
         bodyDef.position.Set(pos.x, pos.y);
@@ -116,9 +106,9 @@ public:
 struct Trajectory{
 private:
     //trajecotry is a function of the position of the disturbance
-    float linearSpeed=.5; //used to calculate instantaneous velocity using omega
+    float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
     float omega=0; //initial angular velocity is 0  
-    b2Vec2 velocity ={0.5, 0};
+    //b2Vec2 velocity ={0.5, 0};
     bool valid=0;
     float RightWheelSpeed=0.5;
     float LeftWheelSpeed=0.5;
@@ -127,36 +117,38 @@ private:
 public:
     Trajectory(){}
 
-    Trajectory(Object &ob, float simDuration=3, float maxSpeed=0.2, float hz=60.0f, b2Vec2 vel ={0.5, 0}, b2Vec2 startPosition = {0.0, 0.0}){
+    Trajectory(Object &ob, float simDuration, float maxSpeed, b2Vec2 vel ={0.0625, 0}, b2Vec2 startPosition = {0.0, 0.0}){
     float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
-    float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
-    float maxDistance = maxSpeed*simDuration;
+    float maxDistance = .6;
+    float stimulusMagnitude =0;
   //  printf("max speed = %f, simDuration %f, max dist %f\n", maxSpeed, simDuration, maxDistance);
         if (ob.isValid()==true){
-             b2Vec2 ObToStartVec(ob.getPosition().x-startPosition.x, ob.getPosition().y -startPosition.y);
-            float angleAtStart = acos((ObToStartVec.x * vel.x + ObToStartVec.y * vel.y)/(vel.Length()*ObToStartVec.Length())); //dot product etc
+            printf("obstacle at: %f\t%f\n", ob.getPosition().x, ob.getPosition().y);
+            //b2Vec2 ObToStartVec(ob.getPosition().x-startPosition.x, ob.getPosition().y -startPosition.y);
+            float angleAtStart = ob.getAngle(vel);
+            // float angleAtStart = acos((ObToStartVec.x * vel.x+ ObToStartVec.y * vel.y)/(vel.Length()*ObToStartVec.Length())); //dot product etc
             //printf("angle between velocity and obstacle %f pi\n", angleAtStart/M_PI);
             if (ob.getType() == ObjectType::obstacle){
-                float angleStimulus = 1-(abs(angleAtStart)/minAngle);
-                //printf("angleStimulus %f \n", angleStimulus);
+                float angleStimulus = 1-(abs(angleAtStart)/M_PI_2);
+                printf("angleStimulus %f \n", angleStimulus);
                 if (angleStimulus<0){
                     angleStimulus=0;
                 }
-                float distanceStimulus =1-(ObToStartVec.Length()/maxDistance);
-                //printf("distance to obst %f\t\n", ObToStartVec.Length());
-                //printf("distanceStimulus %f\n", distanceStimulus);
-                if (distanceStimulus<0){
+                float distanceStimulus =1-(ob.getPosition().Length()/maxDistance);
+                printf("distance to obst %f\t\n", ob.getPosition().Length());
+                printf("distanceStimulus %f\n", distanceStimulus);
+                if (distanceStimulus<0){ //if the object is too far don't bother making a plan to avoid it
                     distanceStimulus=0;
                 }
-                float stimulusMagnitude = distanceStimulus *angleStimulus; //stimMagnitude as fraction of maxDistance (percentage)
+                stimulusMagnitude = distanceStimulus *angleStimulus; //stimMagnitude as fraction of maxDistance (percentage)
                 printf("stimulus magnitude: %f\n", stimulusMagnitude);
                 //steering has a linear relationship with distance
-                if (ObToStartVec.y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
+                if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                     LeftWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
                     RightWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
                 }
-                else if (ObToStartVec.y>0){ //go right
+                else if (ob.getPosition().y>0){ //go right
                     LeftWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
                     RightWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
                 }
@@ -179,10 +171,7 @@ public:
                 
             }
     }
-    // else{
-    //     LeftWheelSpeed = defaultLeftWheelSpeed;
-    //     RightWheelSpeed = defaultRightWheelSpeed;
-    // }
+
     if (LeftWheelSpeed >1.0f){
         LeftWheelSpeed=1;
     }
@@ -308,28 +297,16 @@ class Listener : public b2ContactListener {
    // Listener(std::vector <Object> &collisions){};
 	//Object collision = Object(ObjectType::obstacle);
 		void BeginContact(b2Contact * contact) {
-            //MANIFOLD STUFF IS FOR DEBUGGING
-            int numPoints = contact->GetManifold()->pointCount;
-            b2WorldManifold wm;
-            contact->GetWorldManifold(&wm);
+            // //MANIFOLD STUFF IS FOR DEBUGGING
+            // int numPoints = contact->GetManifold()->pointCount;
+            // b2WorldManifold wm;
+            // contact->GetWorldManifold(&wm);
 			void* bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
 			if (bodyData) {
                // Robot *robot = static_cast<Robot*>(bodyData);
                 b2Body * other = contact->GetFixtureB()->GetBody();
-                //collision.setPosition(other->GetPosition());
-                //collisions.push_back(Object(ObjectType::obstacle, {other->GetPosition()}));
                 collisions.push_back(other->GetPosition());
-                // nprintf("other->GetPosition = %f, %f", other->GetPosition().x, other->GetPosition().y);
-                
-                //DEBUG + use constructor with iteration
-                // char name[250];
-                // sprintf(name,"manifold%04i.dat", iteration);
-                // FILE* file = fopen(name, "w+");
-                //printf("obstacle : %f, %f\n", other->GetPosition().x, other->GetPosition().y);
-                // printf("robot: %f, %f\n", contact->GetFixtureA()->GetBody()->GetPosition().x, contact->GetFixtureA()->GetBody()->GetPosition().y);
-                // for (int i=0; i<numPoints; i++){
-                //     fprintf(file, "%f\t%f\n", wm.points[i].x, wm.points[i].y);
-                // }
+
 			}
 
 
@@ -342,23 +319,8 @@ class Listener : public b2ContactListener {
                 collisions.push_back(other->GetPosition());
                 //printf("other->GetPosition = %f, %f", other->GetPosition().x, other->GetPosition().y);
 
-                
-                
-                //DEBUG
-                // char name[250];
-                // sprintf(name,"/tmp/manifold%04i.dat", iteration);
-                // FILE* file = fopen(name, "w+");
-
-                 //printf("obstacle: %f, %f\n", other->GetPosition().x, other->GetPosition().y);
-            // printf("robot: %f, %f\n", contact->GetFixtureB()->GetBody()->GetPosition().x, contact->GetFixtureB()->GetBody()->GetPosition().y);
-                // //collision.setPosition(other->GetPosition());
-                // for (int i=0; i<numPoints; i++){
-                //     fprintf(file, "%f\t%f\n", wm.points[i].x, wm.points[i].y);
-                // }
-
                 }
                 
-        //CHECK IF YOU CAN JUST CHANGE VARIABLES WITHIN STATE
 		}
 
 
