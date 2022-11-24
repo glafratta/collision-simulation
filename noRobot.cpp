@@ -42,8 +42,8 @@ char * folder;
 		char filePath[256];
         char folderName[256];
         sprintf(folderName,"%s", folder);
-		sprintf(filePath, "%s/2ftransmap%04d.dat", folderName, iteration);
-        printf("%s\t", filePath);
+		sprintf(filePath, "%smap%04d.dat", folderName, iteration);
+        printf("%s\n", filePath);
 		// std::ifstream file(filePath);
 
         // float x, y;
@@ -62,10 +62,6 @@ char * folder;
 		
 
 	}
-
-
-
-
 };
 
 class StepCallback{
@@ -74,7 +70,7 @@ class StepCallback{
 public:
     StepCallback(Configurator * c): box2d(c){}
     void step(){
-        box2d->controller();
+       // box2d->controller();
         L=box2d->leftWheelSpeed;
         R= box2d->rightWheelSpeed;
         printf("R= %f, L = %f\n,", R, L);
@@ -129,8 +125,8 @@ public:
 //   //  printf("distanceError = %f\n", distanceError);
 //     }
 
-// leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain+ distanceError*gain;
-// rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain + distanceError*gain; 
+// leftWheelSpeed = state->getAction().getLWheelSpeed() + angleError*gain+ distanceError*gain;
+// rightWheelSpeed = state->getAction().getRWheelSpeed()- angleError *gain + distanceError*gain; 
 
 // //control function = v0 + error *gain
 
@@ -141,6 +137,104 @@ public:
 
 // }
 
+// void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
+// //FIND ERROR
+// b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+// State * state;
+// if (plan.size()==0){
+//     state = &desiredState;
+// }
+// else if (plan.size()>0){
+//     //state = &plan[0];
+// 	leftWheelSpeed = plan[0].getAction().getLWheelSpeed();
+// 	rightWheelSpeed = plan[0].getAction().getRWheelSpeed();
+// 	return;
+// }
+// double angleError=0;
+// double distanceError=0;
+
+// printf("iteration in controller: %i\n", iteration);
+
+// if (iteration > 0){
+//     float x,y, t;
+//     t=0; //discrete time
+//     char name[50];
+//     sprintf(name, "%s", fileNameBuffer); //
+//     printf("%s\n", name);
+//     std::ifstream file(name);
+
+//     while (file>>x>>y){ 
+//         t= t+ 1.0f/60.0f;
+//         if(totalTime<t && t<=(totalTime+1/60.f)){ 
+//             desiredPosition = b2Vec2(x,y);
+//             //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+//             break;
+//         }
+//         // else {
+//         //     leftWheelSpeed = 0;
+//         //     rightWheelSpeed = 0;
+//         // }
+
+//     }
+
+//     file.close();
+//     //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+
+//     //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
+
+// 	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
+
+//     //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
+//     //float desiredAngle = atan2(recordedPosition.y)
+//    // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+// 	float desiredAngle, recordedAngle; 
+// 	if (desiredPosition.y ==0 && desiredPosition.x ==0){
+// 		desiredAngle =0;
+// 	}
+// 	else{
+// 		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
+// 	}
+// 	if (recordedPosition.y ==0 && recordedPosition.x ==0){
+// 		recordedAngle =0;
+// 	}
+// 	else{
+// 		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
+// 	}
+	
+//     angleError = desiredAngle - recordedAngle; //flag    
+//     //normalise error
+//     double maxError = M_PI_2;
+//     angleError /= maxError;
+	
+// 	state->accumulatedError += angleError;
+
+//     }
+
+
+// leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
+// rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
+
+// float deltaV = angleError*gain;
+// dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
+// fprintf(dumpDeltaV,"angleError =%f\n", angleError);
+// fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
+// if (leftWheelSpeed>1.0){
+//     leftWheelSpeed=1.0;
+// }
+// if (rightWheelSpeed>1.0){
+//     rightWheelSpeed=1;
+// }
+// if (leftWheelSpeed<(-1.0)){
+//     leftWheelSpeed=-1;
+// }
+// if (rightWheelSpeed<(-1.0)){
+//     rightWheelSpeed=1;
+
+// }
+// fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
+// fclose(dumpDeltaV);
+
+// }
 
 //FOR THREAD DEBUGGING
 
@@ -187,6 +281,25 @@ int main(int argc, char** argv) {
     }
 
 
+    //FILE * file;
+    char filePrefix[5];
+    sprintf(filePrefix, "map");
+    int fileCount =1;
+    bool fileExists = true;
+    char fileName[250];
+    sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
+    std::ifstream file(fileName);
+    while (file){   
+        printf("* ");
+        file.close();
+        fileCount++;
+        sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
+        file = std::ifstream(fileName);
+    }
+    printf("\n%i files\n", fileCount);
+
+
+
     //CREATE A FOLDER TO STORE THE RESULTS FOR THIS RUN
 
     // //TODAYS DATE AND TIME
@@ -219,30 +332,37 @@ int main(int argc, char** argv) {
                                 //should exit when dir is null pointer
 
     //DATA INTERCFACE
+    bool timerOff=1;
     State desiredState;
     Configurator box2d(desiredState);
-    box2d.setReadMap("2ftransmap");
-    box2d.setFolder(argv[1]);
+    box2d.setReadMap("map");
+    box2d.setFolder(argv[1]);        
     StepCallback cb(&box2d);
     DataInterface dataInterface(&box2d, argv[1]);
-    TimerDI lidar(dataInterface);
-    TimerStep motors(cb);
-    lidar.startms(200);
-    motors.startms(100);
-                //iterate through files
-    //b2Vec2 velocity = {0,0};
-    // for (int j=0; j<i/3;j++){
-    //     dataInterface.newScanAvail();
-    //     //box2d.NewScan();
-    //     cb.step();
 
-    // }
-    std::this_thread::sleep_for(std::chrono::milliseconds(200*i/3)); //simulates lidar
+                //iterate through files
+
+    if (timerOff ==0){
+        TimerDI lidar(dataInterface);
+        TimerStep motors(cb);
+        lidar.startms(200);
+        motors.startms(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200*fileCount)); //simulates lidar
+        lidar.stop();
+        motors.stop();
+    }
+    else if (timerOff){
+                // b2Vec2 velocity = {0,0};
+        for (int i=0; i<20;i++){
+            dataInterface.newScanAvail();
+            cb.step();
+
+        }
+    }
 
 
     printf("total time = %.2f", box2d.totalTime);
-    lidar.stop();
-    motors.stop();
+
     // FINISH BENCHMARKING
     // auto end = std::chrono::high_resolution_clock::now();
     // auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);

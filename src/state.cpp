@@ -5,15 +5,14 @@
 
 
 State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED LOOP CONTROL
-		//crashed =false;	
 		simResult result;
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
-		char name_r[50];
-		sprintf(name_r, "/tmp/robot%04i.txt", _iteration);
+		//printf("in state, world has %i bodies\n", _world.GetBodyCount());
+		sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
 		planNo++;
-		FILE * robotPath = fopen(name_r, "w+");
+		FILE * robotPath = fopen(planFile, "w+");
 		float theta=0;
 		b2Vec2 instVelocity;
 		for (int step = 0; step <= (hz*simDuration); step++) {//3 second
@@ -33,25 +32,22 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 
 
 		}	
-		//setPlan(_action); 		//this needs refinement as the thingy for the alphabot is hard-coded. coudl be, if one callback is 10d R or 13 to the L, get the angle from each speed in the plan and divide it
-		//printf("path is safe\n");
 		fclose(robotPath);
 		return result;
 	
 }
 
 
-void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos = b2Vec2(0.0,0.0)){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
+void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
 	//returns x, y, angle to the robot
 	//printf("robVel %f, %f, timeelapsed %f\n", robVelocity.x, robVelocity.y, timeElapsed);
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
 	//printf("shift: %f, %f\n", shift.x, shift.y);
 	b2Vec2 newPos(object.getPosition().x+shift.x,object.getPosition().y + shift.y);
-	//printf("new pos: %f, %f\n", newPos.x, newPos.y);
-
+	printf("new pos after tracking: %f, %f\n", newPos.x, newPos.y);
 	object.setPosition(newPos);
 //	printf("new position %f\t%f\n", object.getPosition().x, object.getPosition().y);
-	float angle = object.getAngle(robVelocity, robPos);
+	float angle = object.getAngle(robVelocity);
 	object.setAngle(angle); //with respect to robot's velocity
 }
 

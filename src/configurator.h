@@ -114,12 +114,12 @@ public:
 void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'state' into a robot000n.txt file.
 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the state
 	sprintf(fileNameBuffer, "%s", str);
-	printf("reading trajectories from: %s", fileNameBuffer);
+	printf("reading trajectories from: %s\n", fileNameBuffer);
 }
 
 void setReadMap(char * str){
 	sprintf(readMap,"%s", str);
-	printf("map name: %s", readMap);
+	printf("map name: %s\n", readMap);
 
 }
 
@@ -143,7 +143,7 @@ void setFolder(char * _folder){ //the folder from where LIDAR data is read
 		else{
 			printf("%s doesn't exist", _folder);
 		}
-	printf("maps stored in %s", folder);
+	printf("maps stored in %s\n", folder);
 }
 
 void NewScan(); 
