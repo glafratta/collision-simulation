@@ -67,20 +67,20 @@ public:
 
 //calculuate displacement and angle using partial affine transformation
 
-// 1:  new scan available: box2d world is rebuilt with objects, current trajectory is checked#
+// 1:  new scan available: box2d world is rebuilt with objects, current Action is checked#
 
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	leftWheelSpeed = desiredState.getTrajectory().getLWheelSpeed();
-	rightWheelSpeed = desiredState.getTrajectory().getRWheelSpeed();
+	leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
+	rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 }
 
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	leftWheelSpeed = desiredState.getTrajectory().getLWheelSpeed();
-	rightWheelSpeed = desiredState.getTrajectory().getRWheelSpeed();
+	leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
+	rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
 }
 

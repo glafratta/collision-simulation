@@ -113,7 +113,7 @@ public:
 }; //sub action f
 
 
-struct Trajectory{
+struct Action{
 private:
     //trajecotry is a function of the position of the disturbance
     float linearSpeed=.5; //used to calculate instantaneous velocity using omega
@@ -123,57 +123,55 @@ private:
     float RightWheelSpeed=0.5;
     float LeftWheelSpeed=0.5;
     float distanceBetweenWheels = 0.08f;
-    //float angleAtStart;
-public:
-    Trajectory(){}
-
-    Trajectory(Object &ob, float simDuration=3, float maxSpeed=0.2, float hz=60.0f, b2Vec2 vel ={0.5, 0}, b2Vec2 startPosition = {0.0, 0.0}){
-    float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
     float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
+    //float angleAtStart;
+public:
+    Action(){}
+
+    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 vel ={0.5, 0}, b2Vec2 startPosition = {0.0, 0.0}){
+    float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
   //  printf("max speed = %f, simDuration %f, max dist %f\n", maxSpeed, simDuration, maxDistance);
         if (ob.isValid()==true){
-             b2Vec2 ObToStartVec(ob.getPosition().x-startPosition.x, ob.getPosition().y -startPosition.y);
-            float angleAtStart = acos((ObToStartVec.x * vel.x + ObToStartVec.y * vel.y)/(vel.Length()*ObToStartVec.Length())); //dot product etc
-            //printf("angle between velocity and obstacle %f pi\n", angleAtStart/M_PI);
-            if (ob.getType() == ObjectType::obstacle){
-                float angleStimulus = 1-(abs(angleAtStart)/minAngle);
-                //printf("angleStimulus %f \n", angleStimulus);
-                if (angleStimulus<0){
-                    angleStimulus=0;
-                }
-                float distanceStimulus =1-(ObToStartVec.Length()/maxDistance);
-                //printf("distance to obst %f\t\n", ObToStartVec.Length());
-                //printf("distanceStimulus %f\n", distanceStimulus);
-                if (distanceStimulus<0){
-                    distanceStimulus=0;
-                }
-                float stimulusMagnitude = distanceStimulus *angleStimulus; //stimMagnitude as fraction of maxDistance (percentage)
-                printf("stimulus magnitude: %f\n", stimulusMagnitude);
+            // b2Vec2 ObToStartVec(ob.getPosition().x-startPosition.x, ob.getPosition().y -startPosition.y);
+            // float angleAtStart = acos((ObToStartVec.x * vel.x + ObToStartVec.y * vel.y)/(vel.Length()*ObToStartVec.Length())); //dot product etc
+            // //printf("angle between velocity and obstacle %f pi\n", angleAtStart/M_PI);
+            // if (ob.getType() == ObjectType::obstacle){
+            //     float angleStimulus = 1-(abs(angleAtStart)/minAngle);
+            //     //printf("angleStimulus %f \n", angleStimulus);
+            //     if (angleStimulus<0){
+            //         angleStimulus=0;
+            //     }
+            //     float distanceStimulus =1-(ObToStartVec.Length()/maxDistance);
+            //     //printf("distance to obst %f\t\n", ObToStartVec.Length());
+            //     //printf("distanceStimulus %f\n", distanceStimulus);
+            //     if (distanceStimulus<0){
+            //         distanceStimulus=0;
+            //     }
+            //     float stimulusMagnitude = distanceStimulus *angleStimulus; //stimMagnitude as fraction of maxDistance (percentage)
+            //     printf("stimulus magnitude: %f\n", stimulusMagnitude);
                 //steering has a linear relationship with distance
                 if (ObToStartVec.y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                    LeftWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
-                    RightWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
+                    LeftWheelSpeed =0; //go left
                 }
                 else if (ObToStartVec.y>0){ //go right
-                    LeftWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
-                    RightWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
+                    RightWheelSpeed=0;
                 }
-                else {
-                    int isLeft = rand()%2; //if x==0 the direction is random
-                    switch (isLeft){
-                        case 1:     //go left            
-                            LeftWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
-                            RightWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
-                        break;
-                        case 0: //go right
-                            LeftWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
-                            RightWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
-                        break;
-                        default:printf("invalid multiplier\n"); break;
-                    }
-                }
+                // else {
+                //     int isLeft = rand()%2; //if x==0 the direction is random
+                //     switch (isLeft){
+                //         case 1:     //go left            
+                //             LeftWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
+                //             RightWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
+                //         break;
+                //         case 0: //go right
+                //             LeftWheelSpeed+=minWheelSpeedIncrement*(stimulusMagnitude);
+                //             RightWheelSpeed-=minWheelSpeedIncrement*(stimulusMagnitude);
+                //         break;
+                //         default:printf("invalid multiplier\n"); break;
+                //     }
+                // }
             }
             else if (ob.getType() == ObjectType::target){
                 
@@ -197,14 +195,14 @@ public:
     }
 
     omega = (maxSpeed*(RightWheelSpeed-LeftWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
-    printf("omega = %f pi\n", omega/M_PI);
-    if (abs(omega)>maxOmega){
-        float multiplier=1;
-        if (omega<0){
-            multiplier=-1;
+            printf("omega = %f pi\n", omega/M_PI);
+        if (abs(omega)>M_PI){ //max turning angle in one second
+            float multiplier=1;
+            if (omega<0){
+                multiplier=-1;
+            }
+            omega=M_PI*multiplier;
         }
-        omega=maxOmega*multiplier;
-    }
 
     linearSpeed = maxSpeed*(LeftWheelSpeed+RightWheelSpeed)/2;
     if (abs(linearSpeed)>maxSpeed){
@@ -219,11 +217,49 @@ public:
     //printf("omega=%f, linearSpeed =%f, L=%f, R=%f, vel.x =%f, vel.y=%f\n", omega, linearSpeed, LeftWheelSpeed, RightWheelSpeed, velocity.x, velocity.y);
     }
 
-    //TO DO: HAVE A FUNCTION UPDATE TRAJECTORY BASED ON OBSTACLE: steering is proportional to distance
- 
-   void findWheelSpeed();
-        //system of equations: 
-        //1. L-R= omega *dist
+
+    float getAngularVelocity(float R, float L, float maxV = 0.125){
+        float W = (maxV*(R-L)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
+        printf("omega = %f pi\n", omega/M_PI);
+        if (abs(W)>maxOmega){
+            float multiplier=1;
+            if (W<0){
+                multiplier=-1;
+            }
+            W=*multiplier;
+        }
+    }
+
+    float getLinearSpeed(float R, float L, float maxV = 0.125){
+        float v = maxV*(L+R)/2;
+        if (abs(v)>maxV){
+            float multiplier=1;
+        if (v<0){
+            multiplier=-1;
+        }
+        v=maxV*multiplier;
+        }
+    }
+
+    b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
+        b2Vec2 vel;
+        float realL = maxV*L;
+        float realR = maxV*R;
+            //find angle theta in the pose:
+        float W = (realL-realR)/distanceBetweenWheels; //rad/s, final angle at end of 1s
+        //find absolute speed
+        float V =(realL+realR)/2; //velocity
+        if (realR-realL == 0){
+            vel.x = realL;
+            vel.y = 0;
+            }
+        else {
+            vel.x = (distanceBetweenWheels/2)* sin(distanceBetweenWheels/(realR-realL));
+            vel.y = -(distanceBetweenWheels/2)* cos(distanceBetweenWheels/(realR-realL));
+
+        }
+        return vel;
+    }
     
     float getRWheelSpeed(){
         return RightWheelSpeed;
@@ -251,25 +287,6 @@ public:
     }
 
 
-
-
-    // void setPreviousVelocity(b2Vec2 vel){
-    //     velocity = vel;
-    // }
-
-    // b2Vec2 getVelocity(){
-    //     velocity ={linearSpeed *cos(omega), linearSpeed*sin(omega)}; // at t=0
-    //     return velocity;
-    // }
-
-
-    // void setSafe(bool s){
-    //     safe =s;
-    // }
-
-    // bool isSafe(){
-    //     return safe;
-    // }
 
 
 };
@@ -364,17 +381,17 @@ class Listener : public b2ContactListener {
 
 	};
 
-Trajectory trajectory;
+Action action;
 Object obstacle;
 Object target;
 
 State(){
-    trajectory = Trajectory(); //this is a valid trajectory, default going straight at moderate speed
+    action = Action(); //this is a valid trajectory, default going straight at moderate speed
 
 }
 
 State(Object ob){
-    trajectory = Trajectory(ob, simDuration, maxSpeed); 
+    action = Action(ob, simDuration, maxSpeed); 
     obstacle = ob;
 }
 
@@ -406,13 +423,10 @@ b2Vec2 getRecordedVelocity(){
 }
 
 
-State::Trajectory getTrajectory(){
-    return trajectory;
+State::Action getAction(){
+    return action;
 }
 
-// void recomputeTrajectory(){
-//     trajectory = Trajectory(obstacle, simDuration, maxSpeed);
-// }
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 

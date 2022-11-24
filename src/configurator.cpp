@@ -158,7 +158,7 @@ void Configurator::NewScan(){
 				//generate new trajectory for this state: AUTOMATIC in state constructor
 				plan.push_back(newState); //if state has one or more obstacles it is "avoid" state
 				//TO DO: //start computing a plan to avoid obstacle (trajectory) -just obstacle
-				printf("collided, new state has trajectory omega= %f,  linear speed: %f\n", newState.trajectory.getOmega(), newState.trajectory.getLinearSpeed() );
+				printf("collided, new state has trajectory omega= %f,  linear speed: %f\n", newState.action.getOmega(), newState.action.getLinearSpeed() );
 			}
 		}
 		else if (plan.size()>0){ //the program enters this loop both if a disturbance has just been detected and if it was previously detected
@@ -170,7 +170,7 @@ void Configurator::NewScan(){
 				//generate new trajectory for this state: AUTOMATIC in state constructor
 				plan.push_back(newState); //if state has one or more obstacles it is "avoid" state
 				//TO DO: //start computing a plan to avoid obstacle (trajectory) -just obstacle
-				printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", newState.trajectory.getOmega(), newState.trajectory.getLinearSpeed() );
+				printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", newState.action.getOmega(), newState.action.getLinearSpeed() );
 			}
 
 		}
@@ -307,8 +307,8 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 					state = &desiredState;
 				}
 				b2Vec2 estimatedVel;
-				theta = state->getTrajectory().getOmega()* timeElapsed;
-				estimatedVel ={state->getTrajectory().getLinearSpeed()*cos(theta),state->getTrajectory().getLinearSpeed()*sin(theta)};
+				theta = state->getAction().getOmega()* timeElapsed;
+				estimatedVel ={state->getAction().getLinearSpeed()*cos(theta),state->getAction().getLinearSpeed()*sin(theta)};
 				result = getVelocityResult(estimatedVel);
 				printf("getting velocity from current state\n");
 				return result;
@@ -334,147 +334,137 @@ b2Vec2 Configurator::estimateDisplacementFromWheels(){ //actually estimates disp
 	float realL = maxAbsSpeed*leftWheelSpeed;
 	float realR = maxAbsSpeed*rightWheelSpeed;
     	//find angle theta in the pose:
-	float theta = (realL-realR)*timeElapsed/desiredState.getTrajectory().getDistanceWheels(); //rad/s, final angle at end of 1s
+	float theta = (realL-realR)*timeElapsed/desiredState.getAction().getDistanceWheels(); //rad/s, final angle at end of 1s
 	//find absolute speed
 	float V =(realL+realR)/2; //distance covered
-	//find velocity vector: this is per second so no need to change this; but it is the instantaneous velocity
-	//vel= b2Vec2(speed*sin(angVel), speed*(-cos(angVel)));
-    //from the derivation (see notes on robot kinematics)
-	//////below is wrong but that's how we find pose
-	// vel.x = ((V/(theta)) * sin(theta*timeElapsed))*timeElapsed; //i added theta *timeElapsed because idkz
-	// vel.y = ((V/theta)*(1-cos(theta*timeElapsed)))*timeElapsed;
-	// /////////////////CORRECT VELOCITY: we just take the derivative of the formula used to find pose, which is in the notes
-	// vel.x = ((realL+ realR)*cos(theta)/2); //by multiplying by timeElapsed we get how far we expect the robot to get in the next scan
-	// vel.y = ((realL+ realR)*sin(theta)/2);
-	//printf("r = %f\t theta = %f pi\n", V, theta/M_PI);
 	if (realR-realL == 0){
 		vel.x = realL;
 		vel.y = 0;
 		}
 	else {
-		vel.x = (desiredState.getTrajectory().getDistanceWheels()/2)* sin(desiredState.trajectory.getDistanceWheels()*timeElapsed/(realR-realL));
-		vel.y = -(desiredState.getTrajectory().getDistanceWheels()/2)* cos(desiredState.getTrajectory().getDistanceWheels()*timeElapsed/(realR-realL));
+		vel.x = (desiredState.getAction().getDistanceWheels()/2)* sin(desiredState.getAction().getDistanceWheels()*timeElapsed/(realR-realL));
+		vel.y = -(desiredState.getAction().getDistanceWheels()/2)* cos(desiredState.getAction().getDistanceWheels()*timeElapsed/(realR-realL));
 
 	}
 	return vel;
 }
 
-void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
-//FIND ERROR
-b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
-State * state;
-if (plan.size()==0){
-    state = &desiredState;
-}
-else if (plan.size()>0){
-    //state = &plan[0];
-	leftWheelSpeed = plan[0].getTrajectory().getLWheelSpeed();
-	rightWheelSpeed = plan[0].getTrajectory().getRWheelSpeed();
-	return;
-}
-double angleError=0;
-double distanceError=0;
+// void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
+// //FIND ERROR
+// b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
+// State * state;
+// if (plan.size()==0){
+//     state = &desiredState;
+// }
+// else if (plan.size()>0){
+//     //state = &plan[0];
+// 	leftWheelSpeed = plan[0].getTrajectory().getLWheelSpeed();
+// 	rightWheelSpeed = plan[0].getTrajectory().getRWheelSpeed();
+// 	return;
+// }
+// double angleError=0;
+// double distanceError=0;
 
-printf("iteration in controller: %i\n", iteration);
+// printf("iteration in controller: %i\n", iteration);
 
-if (iteration > 0){
-    float x,y, t;
-    t=0; //discrete time
-    char name[50];
-    sprintf(name, "%s", fileNameBuffer); //
-    //printf("%s\n", name);
-    std::ifstream file(name);
+// if (iteration > 0){
+//     float x,y, t;
+//     t=0; //discrete time
+//     char name[50];
+//     sprintf(name, "%s", fileNameBuffer); //
+//     //printf("%s\n", name);
+//     std::ifstream file(name);
 
-    while (file>>x>>y){ 
-        t= t+ 1.0f/60.0f;
-        if(totalTime<t && t<=(totalTime+1/60.f)){ 
-            desiredPosition = b2Vec2(x,y);
-            //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
-            break;
-        }
-        // else {
-        //     leftWheelSpeed = 0;
-        //     rightWheelSpeed = 0;
-        // }
+//     while (file>>x>>y){ 
+//         t= t+ 1.0f/60.0f;
+//         if(totalTime<t && t<=(totalTime+1/60.f)){ 
+//             desiredPosition = b2Vec2(x,y);
+//             //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
+//             break;
+//         }
+//         // else {
+//         //     leftWheelSpeed = 0;
+//         //     rightWheelSpeed = 0;
+//         // }
 
-    }
+//     }
 
-    file.close();
-    //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
+//     file.close();
+//     //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
 
-    //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
+//     //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
 
-	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
+// 	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
 
-    //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
-    //float desiredAngle = atan2(recordedPosition.y)
-   // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-	float desiredAngle, recordedAngle; 
-	if (desiredPosition.y ==0 && desiredPosition.x ==0){
-		desiredAngle =0;
-	}
-	else{
-		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
-	}
-	if (recordedPosition.y ==0 && recordedPosition.x ==0){
-		recordedAngle =0;
-	}
-	else{
-		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
-	}
+//     //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
+//     //float desiredAngle = atan2(recordedPosition.y)
+//    // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
+// 	float desiredAngle, recordedAngle; 
+// 	if (desiredPosition.y ==0 && desiredPosition.x ==0){
+// 		desiredAngle =0;
+// 	}
+// 	else{
+// 		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
+// 	}
+// 	if (recordedPosition.y ==0 && recordedPosition.x ==0){
+// 		recordedAngle =0;
+// 	}
+// 	else{
+// 		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
+// 	}
 	
-    angleError = desiredAngle - recordedAngle; //flag    
-    //normalise error
-    double maxError = M_PI_2;
-    angleError /= maxError;
+//     angleError = desiredAngle - recordedAngle; //flag    
+//     //normalise error
+//     double maxError = M_PI_2;
+//     angleError /= maxError;
 	
-	state->accumulatedError += angleError;
+// 	state->accumulatedError += angleError;
 
 
 
-    //printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(state->getRecordedVelocity().y, state->getRecordedVelocity().x)/M_PI);
-    //printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-    //distanceError = desiredPosition.Length() - absPosition.Length();
-    //printf("distanceError = %f\n", distanceError);
-    }
+//     //printf("desired angle: %f pi\t recorded angle: %f pi\n", atan2(desiredPosition.y, desiredPosition.x)/M_PI, atan2(state->getRecordedVelocity().y, state->getRecordedVelocity().x)/M_PI);
+//     //printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
+//     //distanceError = desiredPosition.Length() - absPosition.Length();
+//     //printf("distanceError = %f\n", distanceError);
+//     }
 
-//    // if (angleError>0){
-//         leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain; //if angle is larger than 0 means thta the robot is going to R, slow L wheel
-//         printf("initial L wheel speed: %f\n", state->getTrajectory().getLWheelSpeed());
-//     //}
-//     //else if (angleError<0){
-//         rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain;  //viceversa, sign is +ve because the angle error is neg
-//         printf("initial R wheel speed: %f\n", state->getTrajectory().getRWheelSpeed());
-//             //}
+// //    // if (angleError>0){
+// //         leftWheelSpeed = state->getTrajectory().getLWheelSpeed() + angleError*gain; //if angle is larger than 0 means thta the robot is going to R, slow L wheel
+// //         printf("initial L wheel speed: %f\n", state->getTrajectory().getLWheelSpeed());
+// //     //}
+// //     //else if (angleError<0){
+// //         rightWheelSpeed = state->getTrajectory().getRWheelSpeed()- angleError *gain;  //viceversa, sign is +ve because the angle error is neg
+// //         printf("initial R wheel speed: %f\n", state->getTrajectory().getRWheelSpeed());
+// //             //}
 
-//-ve angle means to the right, so bd e=d-r, +ve angle error means going too right, so need to slow L and speed R
+// //-ve angle means to the right, so bd e=d-r, +ve angle error means going too right, so need to slow L and speed R
 
-//angle error -ve: means that the robot went to far to the left. L - (-r)= increasing L, R+ (-r)= decreasing R so going Right
-//angle error +ve: means that robot went too far to the right because r<0, d-(-r)= +ve; L-(+r)= decreasing L, R+(+r)= increasing R so going L
+// //angle error -ve: means that the robot went to far to the left. L - (-r)= increasing L, R+ (-r)= decreasing R so going Right
+// //angle error +ve: means that robot went too far to the right because r<0, d-(-r)= +ve; L-(+r)= decreasing L, R+(+r)= increasing R so going L
 
 
-leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
-rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
+// leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
+// rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
 
-float deltaV = angleError*gain;
-dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
-fprintf(dumpDeltaV,"angleError =%f\n", angleError);
-fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
-if (leftWheelSpeed>1.0){
-    leftWheelSpeed=1.0;
-}
-if (rightWheelSpeed>1.0){
-    rightWheelSpeed=1;
-}
-if (leftWheelSpeed<(-1.0)){
-    leftWheelSpeed=-1;
-}
-if (rightWheelSpeed<(-1.0)){
-    rightWheelSpeed=1;
+// float deltaV = angleError*gain;
+// dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
+// fprintf(dumpDeltaV,"angleError =%f\n", angleError);
+// fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
+// if (leftWheelSpeed>1.0){
+//     leftWheelSpeed=1.0;
+// }
+// if (rightWheelSpeed>1.0){
+//     rightWheelSpeed=1;
+// }
+// if (leftWheelSpeed<(-1.0)){
+//     leftWheelSpeed=-1;
+// }
+// if (rightWheelSpeed<(-1.0)){
+//     rightWheelSpeed=1;
 
-}
-fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
-fclose(dumpDeltaV);
+// }
+// fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
+// fclose(dumpDeltaV);
 
-}
+// }
 

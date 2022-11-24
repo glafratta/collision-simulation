@@ -15,81 +15,20 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		planNo++;
 		FILE * robotPath = fopen(name_r, "w+");
 		float theta=0;
-        //float omegaT=0; //instantaneous angular velocity at time T
-		//Object ob = obstacle; //copy the obstacle object for tracking
-		//TO DO: 	copy trajectory and update it automatically based on obstacle distance
-		//Trajectory internalTrajectory;
 		b2Vec2 instVelocity;
 		for (int step = 0; step <= (hz*simDuration); step++) {//3 second
-			theta += trajectory.getOmega()/hz; //= omega *t
-			//printf("omega = %f\t theta = %f\n", trajectory.getOmega(), theta);
-			// if ((step*10/int(hz)) %2 ==0){
-			// 	b2Vec2 prevVelocity = internalTrajectory.getVelocity();
-			// 	internalTrajectory = Trajectory(obstacle, simDuration, maxSpeed, prevVelocity, robot.body->GetPosition()); //this simulates the behaviour of the robot as it gets further from the obstacle
-			// 	dOmega ==trajectory.getOmega()/hz;
-			// 	}
-			//timesPlanned++;
-			//theta = trajectory.getOmega()*hz;
-			instVelocity.x = trajectory.getLinearSpeed()*cos(theta);
-			instVelocity.y = trajectory.getLinearSpeed()*sin(theta);
-			//printf("inst vel %f\t%f\n", instVelocity.x, instVelocity.y);
-			// robot.setVelocity(internalTrajectory.getVelocity()); //instantaneous linear veloctiy
+			theta += action.getOmega()/hz; //= omega *t
+			instVelocity.x = action.getLinearSpeed()*cos(theta);
+			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.setVelocity(instVelocity);
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
-			if (obstacle.isValid()){ //if we are in the process of avoiding an obstacle evaluate if you can safely steer away
-				// int count=1;
-				// for (b2Body * b= _world.GetBodyList(); b!=NULL; b= b->GetNext()){
-				// 	if (b!= robot.body){
-				// 		char name[250];
-				// 		sprintf(name, "/tmp/obstacle%04i", _iteration);
-				// 		FILE * file = fopen(name, "w+");
-				// 		fprintf(file, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-				// 		fclose(file);
-				// 	}
-
-				// }
-
-
-					// if (abs(obstacle.getAngle(robot.body->GetLinearVelocity(), robot.body->GetPosition()))>=M_PI_2 && listener.collisions.size()==0){
-					// 	printf("willCollide: at step %i angle from obstacle = %f\n", step, obstacle.getAngle(robot.body->GetLinearVelocity(), robot.body->GetPosition()));
-					// 	result = simResult(simResult::successful);
-					// 	fclose(robotPath);
-					// 	//trajectory.setSafe(1);
-					// 	return result;
-					// }
-
-									//PLOT MOVEMENT OF OBSTACLE
-				
-				}			
 			if (listener.collisions.size()>0){ //
-				//find center of collision site
-				//TO DO: remember as a big body
-				// float midX = listener.collisions[0].getPosition().x - listener.collisions[-1].getPosition().x;
-				// float midY = listener.collisions[0].getPosition().y - listener.collisions[-1].getPosition().y;
-				// b2Vec2 avgCollisionPos={midX, midY}; //the x coordinate is perpendicular to the angle of the robot (c0s), y is parallel (sin)
-
-				//GET VERTICES OF ROBOT
-
-				// char name[250];
-				// sprintf(name, "/tmp/finalRobot%04i_%i.dat", _iteration, planNo);
-				// FILE * file = fopen(name, "w");
-				// std::vector <cv::Point2f> vec = {cv::Point2f(-0.04, 0.085), cv::Point2f(0.04, 0.085), cv::Point2f(-0.04, -.085), cv::Point2f(0.04, -0.085)};
-				// std::vector <cv::Point2f> endRobot(vec.size());
-				// float turningAngle = robot.body->GetAngle();
-				// cv::Mat transformMatrix = (cv::Mat_<double>(2,3)<<cos(turningAngle), -sin(turningAngle), robot.body->GetPosition().x, sin(turningAngle), cos(turningAngle), robot.body->GetPosition().y);
-				// cv::transform(vec, endRobot, transformMatrix);
-				// for (cv::Point2f p:endRobot){
-				// 	fprintf(file, "%f\t%f\n", p.x, p.y);
-				// }
-				
-				// fclose(file);
 				int index = int(listener.collisions.size()/2);
-				//printf("collisioN step %i position =%f, %f\n", step, listener.collisions[index].x, listener.collisions[index].y);
 				result = simResult(simResult::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
-				fclose(robotPath);
-
-				return result;
+			}
+			else{
+			result = simResult(simResult::successful);
 			}
 
 
@@ -97,7 +36,6 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		//setPlan(_action); 		//this needs refinement as the thingy for the alphabot is hard-coded. coudl be, if one callback is 10d R or 13 to the L, get the angle from each speed in the plan and divide it
 		//printf("path is safe\n");
 		fclose(robotPath);
-		result = simResult(simResult::successful);
 		return result;
 	
 }
