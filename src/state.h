@@ -54,12 +54,18 @@ public:
     }
 
 
-    float getAngle(b2Vec2 posVector2){ //gets the angle of an object wrt to another object (robot)
+    float getAngle(b2Vec2 posVector){ //gets the angle of an object wrt to another object (robot)
         //reference is position vector 2. If the angle >0 means that object 1 is to the left of object 2
-        float angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin
-        float angle2 = atan(posVector2.y/posVector2.x);
+        float angle1=0;
+        float angle2 =0;
+        if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
+            angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin 
+        }
+        if (posVector.y != 0 && posVector.y !=0){
+            angle2 = atan(posVector.y/posVector.x);
+        }
+        //printf("angle1 =%f, angle2 =%f\n", angle1, angle2);
 	    float angle = angle1-angle2;
-       // printf("hi\n");
         return angle;
     }
 
@@ -103,6 +109,15 @@ public:
     }
 }; //sub action f
 
+struct Constraint{
+    enum Type {NONE =0};
+    Type type;
+
+    Constraint(){
+        type = NONE;
+    }
+
+};
 
 struct Action{
 private:
@@ -119,21 +134,47 @@ public:
     float RightWheelSpeed=0.5;
     float LeftWheelSpeed=0.5;
 
+
     Action(){}
 
-    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 vel ={0.5, 0}, b2Vec2 startPosition = {0.0, 0.0}){
+    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, State::Constraint constraint= State::Constraint()){
     float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
-        if (ob.isValid()==true){
+    if (ob.isValid()==true){
+        if (ob.getType()==ObjectType::obstacle){
+            printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
+            if (abs(ob.getAngle(pos))<M_PI_2){
                 if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                    LeftWheelSpeed =0; //go left
+                    LeftWheelSpeed = -LeftWheelSpeed; //go left
                 }
                 else if (ob.getPosition().y>0){ //go right
-                    RightWheelSpeed=0;
+                    RightWheelSpeed= - RightWheelSpeed;
+                }  
+                else if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                    int goL = rand()%2;
+                    switch (goL)
+                    {
+                    case 0: //
+                    LeftWheelSpeed = - LeftWheelSpeed;
+                    break;
+                    case 1:
+                    RightWheelSpeed = -RightWheelSpeed;
+                    break;
+                    default:
+                    printf("invalid case\n");
+                        break;
+                    }
                 }
             }
-            else if (ob.getType() == ObjectType::target){    
+            else{
+                ob.invalidate();
+                printf("invalidated obstacle because angle >pi/2\n");
             }
+     
+        }
+        else if (ob.getType() == ObjectType::target){    
+        }
+    }
     if (LeftWheelSpeed >1.0f){
         LeftWheelSpeed=1;
     }
@@ -147,8 +188,9 @@ public:
         RightWheelSpeed =-1;
     }
 
-    omega = (maxSpeed*(RightWheelSpeed-LeftWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
-        // printf("omega = %f pi\n", omega/M_PI);
+    printf("in action: r = %f l = %f\n", RightWheelSpeed, LeftWheelSpeed);
+    omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
+        printf("omega = %f pi\n", omega/M_PI);
         if (abs(omega)>M_PI){ //max turning angle in one second
             float multiplier=1;
             if (omega<0){
@@ -158,6 +200,7 @@ public:
         }
 
     linearSpeed = maxSpeed*(LeftWheelSpeed+RightWheelSpeed)/2;
+    //linearSpeed = distanceBetweenWheels*omega;
     if (abs(linearSpeed)>maxSpeed){
         float multiplier=1;
     if (linearSpeed<0){
@@ -165,6 +208,8 @@ public:
     }
     linearSpeed=maxSpeed*multiplier;
     }
+    printf("linear speed = %f\n", linearSpeed);
+
 
     valid=1;
     }
@@ -223,7 +268,6 @@ public:
 
 };
 
-//or velocity?
 
 struct simResult{
     enum resultType {successful =0, crashed =1, finished =2}; //successful means no collisions, finished means target reached, for later

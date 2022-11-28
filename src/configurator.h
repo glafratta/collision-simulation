@@ -169,18 +169,16 @@ b2Vec2 getAbsPos(){
 	return absPosition;
 }
 
-State getCurrentState(){
+State * getCurrentState(){
 	if (plan.size()>0){
-		return plan[0];
+		return &plan[0];
 	}
 	else {
-		return desiredState;
+		return &desiredState;
 	}
 }
 
-b2Vec2 getDesVel(){
-	return desiredVelocity;
-}
+
 
 b2Vec2 estimateDisplacementFromWheels();
 

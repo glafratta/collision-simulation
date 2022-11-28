@@ -51,10 +51,12 @@ void Configurator::NewScan(){
 	else{
 		estimatedVelocity = {0.0f, 0.0f};
 		printf("invalid affine trans result\n");
-		//return 2; //if returns 2 it means its time to panic
 	}
 	printf("estimatedVelocity = %f, %f\n", estimatedVelocity.x, estimatedVelocity.y);
 
+	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
+	bool wasAvoiding = 0;
+	bool isSameState = 1;
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	absPosition.x += estimatedVelocity.x*timeElapsed;
@@ -65,6 +67,7 @@ void Configurator::NewScan(){
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	if (plan.size()>0 && plan[0].obstacle.isValid()){
+		wasAvoiding =1; //remember that the robot was avoiding an obstacle
 		printf("old untracked obstacle position: %f\t%f\n", plan[0].obstacle.getPosition().x, plan[0].obstacle.getPosition().y);
 		plan[0].trackObject(plan[0].obstacle, timeElapsed, estimatedVelocity, {0.0f, 0.0f}); //robot default position is 0,0
 		if (plan[0].obstacle.getAngle(estimatedVelocity) >= M_PI_2){ 		//if obstacle (pos) and robot (vel) are perpendicular
@@ -83,11 +86,7 @@ void Configurator::NewScan(){
 
 	bool isObstacleStillThere=0;
 	for (int i=0; i<current.size(); i++){ //makes obstacles and checks for duplicates
-		//b2Vec2 pointCurrent(roundf((current[i].x)*100.f)/100.f, roundf((current[i].y)*100.f)/100.f);
-		//b2Vec2 pointPrevious(roundf((current[i-1].x)*100.f)/100.f, roundf((current[i-1].y)*100.f)/100.f);
-
 		if ((current[i].x != current[i-1].x || current[i].y!=current[i-1].y)&& current[i].y>=0 && sqrt(pow(current[i].x,2)+pow(current[i].y,2))<1){ // robot only sees obstacles ahead of it
-			//printf("making body!\n");
 			b2Body * body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;
@@ -103,7 +102,7 @@ void Configurator::NewScan(){
 				}
 			}
 			if (current[i].x == 0 && current[i].y ==0){
-				printf("obstacle at 0,0, skipping\n");
+				//printf("obstacle at 0,0, skipping\n");
 			}
 			else{
 				bodyDef.position.Set(current[i].x, current[i].y); 
@@ -113,9 +112,6 @@ void Configurator::NewScan(){
 
 		}
 	}
-	//printf("body count = %i\n", world.GetBodyCount());
-	//printf("obstacle is still there: %i\n", isObstacleStillThere);
-
 
 	if (!isObstacleStillThere && plan.size()>0){
 		plan.erase(plan.begin());
@@ -124,65 +120,63 @@ void Configurator::NewScan(){
 	current.clear();
 
 	//CHECK IF WITH THE CURRENT STATE THE ROBOT WILL CRASH
-
 	printf("plan size %i\n", plan.size());
+	isSameState = wasAvoiding == plan.size()>0;
+	State * state;
+	State::simResult result;
 	if (plan.size() ==0){
 		printf("state is desired state\n");
+		state = &desiredState;
 		desiredState.setRecordedVelocity(estimatedVelocity); 
-		State::simResult result =desiredState.willCollide(world, iteration);
-		setNameBuffer(desiredState.planFile);
-		if (result.resultCode == State::simResult::crashed){
-			plan.push_back(State(result.collision)); //if state has one or more obstacles it is "avoid" state
-			printf("collided, new state has trajectory omega= %f,  linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
+		result =desiredState.willCollide(world, iteration);
+		//setNameBuffer(desiredState.planFile);
+		// if (result.resultCode == State::simResult::crashed){
+		// 	plan.push_back(State(result.collision)); //if state has one or more obstacles it is "avoid" state
+		// 	printf("collided, new state has trajectory omega= %f,  linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 		}
-		else if (plan.size()>0){ //the program enters this loop both if a disturbance has just been detected and if it was previously detected
-			plan[0].setRecordedVelocity(estimatedVelocity);
-			 //check if the trajectory being followed will bump the robot into something
-			State::simResult result =plan[0].willCollide(world, iteration);
-			setNameBuffer(plan[0].planFile);
-			if (result.resultCode == State::simResult::crashed){
-				//generate new trajectory for this state: AUTOMATIC in state constructor
-				plan.push_back(State(result.collision)); //if state has one or more obstacles it is "avoid" state
-				//TO DO: //start computing a plan to avoid obstacle (trajectory) -just obstacle
-				printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", plam[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
+	else if (plan.size()>0){ //the program enters this loop both if a disturbance has just been detected and if it was previously detected
+		plan[0].setRecordedVelocity(estimatedVelocity);
+			//check if the trajectory being followed will bump the robot into something
+		result =plan[0].willCollide(world, iteration);
+		//setNameBuffer(plan[0].planFile);
+		state = & plan[0];
+	}		
+	if (result.resultCode == State::simResult::crashed){
+		printf("crashed\n");
+		//CHECK IF THE OBSTACLE DETECTED IS THE SAME OBSTACLE THAT IS ALREADY BEING AVOIDED
+		if (plan.size()>0){
+			if (result.collision.getPosition().x > plan[0].obstacle.getPosition().x-0.05 && result.collision.getPosition().x < plan[0].obstacle.getPosition().x+0.05 && result.collision.getPosition().y > plan[0].obstacle.getPosition().y-0.05 && result.collision.getPosition().y < plan[0].obstacle.getPosition().y+0.05){
+				printf("same obstacle, plan still executing\n");
 			}
-		
-			else{
-				plan[0] =State(result.collision); 
-				printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", plan[-1].getAction().getOmega(), plan[-1].getAction().getLinearSpeed() );
+		}
+		else{ 
+			plan.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
+			printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 
-			}
+		}			
 		}
+	//IF THE STATE DIDN'T CHANGE, CORRECT ANY INACCURACIES IN 
+	if (isSameState){
+		state->controller();
+	}
+
+
 
 	}
-}
+
+
+	
+
 
 	
 
 Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::Point2f> current){	 //does not modify current vector, creates copy	
 		getVelocityResult result;
-		//MedianFilter filterPrevious;
-		//std::vector <cv::Point2f> currentTmp =current;
 		std::vector <cv::Point2f> previousTmp;
 		FILE * currentSmooth;
 		char smoothName[250];
 		char prevPath[256];
-
-		// if (filterOn){
-		// 	sprintf(smoothName,"%s/%s%04d_smooth.dat", folder, readMap, iteration);
-		// 	sprintf(prevPath, "%s/%s%04d_smooth.dat", folder, readMap, iteration-1);
-		// 	currentSmooth=fopen(smoothName, "w");
-		// 	for (cv::Point2f p:current){
-		// 	filterCurrent.applyToPoint(p);
-		// 	fprintf(currentSmooth, "%f\t%f\n", p.x, p.y);
-		// 	fclose(currentSmooth);
-		// }
-		//}
-		//else {
 		sprintf(prevPath, "%s/%s%04d.dat", folder, readMap, iteration-1);
-		//}
-		//filter current
-		//printf("getting prv from: %s\n", prevPath);
 		if (iteration >1){
 			std::ifstream prev(prevPath);
 			float x,y;
@@ -191,23 +185,15 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 				if (v.Length()<1.5){
 					previousTmp.push_back(cv::Point2f(x,y));
 				}
-				//filterPrevious.applyToPoint(p); //previous is already smoothed
 			}
 			prev.close();
 		}
-		//printf("current size: %i, previous size %i\n", current.size(), previousTmp.size());
 
 		int diff = current.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
-		//printf("current: %i, previous: %i\n", current.size(), previousTmp.size());
-
 
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
 		if(diff>0){ //(current.size()>previous.size()){
 			if (previousTmp.empty()){
-				// for (cv::Point2f p:current){
-				// 	previousTmp.push_back(cv::Point2f());
-					
-				// } 
 				previousTmp = current;
 				}
 			else{
@@ -257,6 +243,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 			b2Vec2 tmp;
 			tmp.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 			tmp.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+			printf("velocity result %f %f\n", tmp.x, tmp.y);
 			float tmpAngle = atan(tmp.y/tmp.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
 			if (tmp.y ==0 && tmp.x ==0){
 				tmpAngle =0;
@@ -269,6 +256,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <cv::P
 				affineTransError += tmp.Length()-maxAbsSpeed;
 				tmp.x = state->getAction().getLinearSpeed() *cos(tmpAngle);
 				tmp.y = state->getAction().getLinearSpeed() *sin(tmpAngle);
+				printf("getting velocity from proprioception\n");
 			//fprintf(dumpDeltaV, "changed velocity to x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
 
 			}
