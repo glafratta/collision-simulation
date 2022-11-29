@@ -154,10 +154,18 @@ void Configurator::NewScan(){
 			printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 
 		}			
-		}
+	}
+	else {printf("not crashed\n");}
 	//IF THE STATE DIDN'T CHANGE, CORRECT ANY INACCURACIES IN 
+	printf("was avoiding? %i\tis same state? %i\n", wasAvoiding, isSameState);
 	if (isSameState){
-		state->controller();
+		printf("state is the same\n");
+		if (state->controller()==State::controlResult::DONE){
+			plan.erase(plan.begin());						//no need to be in obstacle avoiding state
+		}
+	}
+	else {
+		printf("state has changed\n");
 	}
 
 
