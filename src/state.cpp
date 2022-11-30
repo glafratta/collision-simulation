@@ -10,36 +10,38 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		Listener listener;
 		_world.SetContactListener(&listener);	
 		//printf("in state, world has %i bodies\n", _world.GetBodyCount());
-		sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
+		//sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
 		planNo++;
-		FILE * robotPath = fopen(planFile, "w+");
+		//FILE * robotPath = fopen(planFile, "w+");
 		char debug[250];
 		sprintf(debug, "/tmp/collision%04i.txt", _iteration);
 		FILE * robotDebug = fopen(debug, "w");
 		float theta=0;
 		b2Vec2 instVelocity = {0,0};
+		printf("entering for loop\n");
 		for (int step = 0; step <= (hz*simDuration); step++) {//3 second
 			instVelocity.x = action.getLinearSpeed()*cos(theta); //integrate?
 			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
-			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
+			//fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
 		}	
+		printf("existed for loop\n");
 		if (listener.collisions.size()>0){ //
 			int index = int(listener.collisions.size()/2);
 			result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 			printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
-			fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
+			//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 
 		}
 		else{
 			result = simResult(simResult::resultType::successful);
 		}
-		printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
+		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
 		fclose(robotDebug);
-		fclose(robotPath);
+		//fclose(robotPath);
 		return result;
 	
 }

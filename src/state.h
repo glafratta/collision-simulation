@@ -142,7 +142,7 @@ public:
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
-            printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
+            //printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
             if (abs(ob.getAngle(pos))<M_PI_2){
                 if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                     LeftWheelSpeed = -LeftWheelSpeed; //go left
@@ -168,7 +168,7 @@ public:
             }
             else{
                 ob.invalidate();
-                printf("invalidated obstacle because angle >pi/2\n");
+                //printf("invalidated obstacle because angle >pi/2\n");
             }
      
         }
@@ -188,9 +188,9 @@ public:
         RightWheelSpeed =-1;
     }
 
-    printf("in action: r = %f l = %f\n", RightWheelSpeed, LeftWheelSpeed);
+    //printf("in action: r = %f l = %f\n", RightWheelSpeed, LeftWheelSpeed);
     omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
-        printf("omega = %f pi\n", omega/M_PI);
+        //printf("omega = %f pi\n", omega/M_PI);
         if (abs(omega)>M_PI){ //max turning angle in one second
             float multiplier=1;
             if (omega<0){
@@ -208,7 +208,7 @@ public:
     }
     linearSpeed=maxSpeed*multiplier;
     }
-    printf("linear speed = %f\n", linearSpeed);
+    //printf("linear speed = %f\n", linearSpeed);
 
 
     valid=1;
@@ -409,11 +409,11 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
         }
     }
     else {
-        printf("obstacle not valid\n");
-        float angleError = action.getOmega()*0.2 - recordedAngle; 
-        if (angleError>=tolerance){
-            action.LeftWheelSpeed -= angleError*pGain;  //og angle was +angle
-            action.RightWheelSpeed += angleError *pGain; //og was - angle
+        printf("correcting straight path\n\n");
+        accumulatedError = action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
+        if (accumulatedError>=tolerance){
+            action.LeftWheelSpeed -= accumulatedError*pGain;  //og angle was +angle
+            action.RightWheelSpeed += accumulatedError *pGain; //og was - angle
         }
         if (action.LeftWheelSpeed>1.0){
             action.LeftWheelSpeed=1.0;

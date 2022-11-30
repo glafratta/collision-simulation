@@ -44,19 +44,25 @@ char * folder;
         sprintf(folderName,"%s", folder);
 		sprintf(filePath, "%smap%04d.dat", folderName, iteration);
         printf("%s\n", filePath);
-		// std::ifstream file(filePath);
+        //std::vector <cv::Point2f> current;
+        std::vector <Point> current;
+		std::ifstream file(filePath);
 
-        // float x, y;
+        float x, y;
 		//box2d->previous = box2d->current;
 		//box2d->current.clear();
-		// while (file>>x>>y){
-		// 	box2d->current.push_back(cv::Point2f(x, y));
-
+		while (file>>x>>y){
+            Point p(x,y);
+            Point pp = *(&p-1);
+            if (p.r<1.5 && (p!= pp)){
+            	//current.push_back(cv::Point2f(x, y));
+                current.push_back(p);
+            }
 			
-		// }
-		// file.close();
+		}
+		file.close();
        // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
-        box2d->NewScan();
+        box2d->NewScan(current);
 
 		
 		
@@ -289,7 +295,7 @@ int main(int argc, char** argv) {
     sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
     std::ifstream file(fileName);
     while (file){   
-        printf("* ");
+        //printf("* ");
         file.close();
         fileCount++;
         sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
@@ -331,7 +337,7 @@ int main(int argc, char** argv) {
                                 //should exit when dir is null pointer
 
     //DATA INTERCFACE
-    bool timerOff=0;
+    bool timerOff=1;
     State desiredState;
     Configurator box2d(desiredState);
     box2d.setReadMap("map");

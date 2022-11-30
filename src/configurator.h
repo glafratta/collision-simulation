@@ -14,7 +14,40 @@
 #include "state.h"
 #include <time.h>
 
-//class State;
+struct Point{
+	float x=0;
+	float y=0;
+	float r=0;
+	float phi=0;
+
+	Point(float _x, float _y): x(_x), y(_y){
+		r= sqrt(x*x+y*y);
+		phi = atan(y/x);
+	}
+
+	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
+
+	void operator=(Point &p){
+		x = p.x;
+		y= p.y;
+		r= p.r;
+		phi = p.phi;
+	}
+
+	bool operator==(Point &p){
+		return (x == p.x && y == p.y);
+	}
+
+	bool operator!=(Point &p){
+		if (*this == p){
+			return false;
+		}
+		else if (!(*this ==p)){
+			return true;
+		}
+	}
+
+};
 
 class Configurator{
 protected:
@@ -44,7 +77,8 @@ public:
 	float leftWheelSpeed=0;
 	float timeElapsed =0;
 	float totalTime=0;
-	
+	// std::vector <cv::Point2f> current;
+	std::vector <Point> current;
 
 	
 
@@ -146,12 +180,16 @@ void setFolder(char * _folder){ //the folder from where LIDAR data is read
 	printf("maps stored in %s\n", folder);
 }
 
-void NewScan(); 
+// void NewScan(std::vector <cv::Point2f> &); 
+
+void NewScan(std::vector <Point> &); 
 
 int getIteration(){
 	return iteration;
 }
-Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f>);
+// Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f> &, std::vector <cv::Point2f> &);
+
+Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
 
 void controller();
 
