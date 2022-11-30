@@ -96,9 +96,11 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//MAKE BOX2D BODIES 
 
 	bool isObstacleStillThere=0;
-	for (int i=0; i<current.size(); i++){ //makes obstacles and checks for duplicates
-		if ((current[i].x != current[i-1].x || current[i].y!=current[i-1].y)&& current[i].x>=0 && current[i].r<1){ // robot only sees obstacles ahead of it
-		//if (current[i].x>=0 && current[i].r<=1){
+	//for (int i=0; i<current.size(); i++){ //makes obstacles and checks for duplicates
+	for (Point &p:current){
+		//if ((current[i].x != current[i-1].x || current[i].y!=current[i-1].y)&& current[i].x>=0 && current[i].r<1){ // robot only sees obstacles ahead of it //DEPRECATED
+		//if (current[i]!=current[i-1]&& current[i].x>=0 && current[i].r<=1){
+		if (p != *(&p-1)&& p.x >=0 && p.r <=1){
 			b2Body * body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;
@@ -109,15 +111,19 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		//CHECK IF BODIES ARE OBSERVED IN THE GENERAL AREA WHERE THE OBSTACLE SHOULD BE 
 			if (plan.size()>0 && plan[0].obstacle.isValid()){
-				if (current[i].x > plan[0].obstacle.getPosition().x-0.05 && current[i].x < plan[0].obstacle.getPosition().x+0.05 && current[i].y > plan[0].obstacle.getPosition().y-0.05 && current[i].y < plan[0].obstacle.getPosition().y+0.05){
+				//if (current[i].x > plan[0].obstacle.getPosition().x-0.05 && current[i].x < plan[0].obstacle.getPosition().x+0.05 && current[i].y > plan[0].obstacle.getPosition().y-0.05 && current[i].y < plan[0].obstacle.getPosition().y+0.05){
+				if (p.isInSquare(plan[0].obstacle.getPosition())){
 					isObstacleStillThere =1;
 				}
 			}
-			if (current[i].x == 0 && current[i].y ==0){
+			//if (current[i].x == 0 && current[i].y ==0){
+			
 				//printf("obstacle at 0,0, skipping\n");
-			}
-			else{
-				bodyDef.position.Set(current[i].x, current[i].y); 
+			//}
+			//else{
+			if (p.x !=0 && p.y!=0){
+				// bodyDef.position.Set(current[i].x, current[i].y); 
+				bodyDef.position.Set(p.x, p.y); 
 				body = world.CreateBody(&bodyDef);
 				body->CreateFixture(&fixtureDef);
 			}

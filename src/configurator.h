@@ -47,6 +47,19 @@ struct Point{
 		}
 	}
 
+	bool isInSquare(b2Vec2 point, float radius = 0.05){
+		if (this->x < point.x+radius && this->x >point.y-radius && this->y < point.y+radius && this->y >point.y-radius){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	b2Vec2 getb2Vec2(){
+		return b2Vec2(x,y);
+	}
+
 };
 
 class Configurator{
