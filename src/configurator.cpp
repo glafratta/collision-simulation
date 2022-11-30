@@ -100,7 +100,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	for (Point &p:current){
 		//if ((current[i].x != current[i-1].x || current[i].y!=current[i-1].y)&& current[i].x>=0 && current[i].r<1){ // robot only sees obstacles ahead of it //DEPRECATED
 		//if (current[i]!=current[i-1]&& current[i].x>=0 && current[i].r<=1){
-		if (p != *(&p-1)&& p.x >=0 && p.r <=1){
+		if (p != *(&p-1)&& p.x >=0 && p.r <.5){
 			b2Body * body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;

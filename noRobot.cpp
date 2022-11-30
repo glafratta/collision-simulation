@@ -53,8 +53,8 @@ char * folder;
 		//box2d->current.clear();
 		while (file>>x>>y){
             Point p(x,y);
-            Point pp = *(&p-1);
-            if (p.r<1.5 && (p!= pp)){
+            //Point pp = *(&p-1);
+            if (p.r<1.5 && p!=*(&p-1)){
             	//current.push_back(cv::Point2f(x, y));
                 current.push_back(p);
             }

@@ -18,7 +18,7 @@ protected:
     float pGain=0.1;
 public:
     int planNo=0;
-    float hz =60.0f;
+    float hz =50.0f; //og was 60
     float accumulatedError=0;
     char planFile[250];
     //int timesPlanned =0;
@@ -318,7 +318,7 @@ State(){
 }
 
 State(Object ob){
-    action = Action(ob, simDuration, maxSpeed); 
+    action = Action(ob, simDuration, maxSpeed, hz); 
     obstacle = ob;
 }
 

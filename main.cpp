@@ -44,15 +44,17 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
-		std::vector <cv::Point2f> current;
+		std::vector <Point> current;
         //char name_r[50];
 		//sprintf(name_r, "%s%s%04i.dat", folder,c.getReadMap(), mapCount);
 		//FILE * map = fopen(name_r, "wt");
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.5){
-				current.push_back(cv::Point2f(data.x, data.y));
+				Point p(data.x, data.y, data.r, data.phi);
+				if (p!= *(&p-1)){
+				current.push_back(p);
 				//fprintf(map, "%.2f\t%.2f\n", data.x, data.y);
-
+				}
             }
 		}
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE

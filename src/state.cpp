@@ -38,6 +38,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		}
 		else{
 			result = simResult(simResult::resultType::successful);
+			printf("no collisions\n");
 		}
 		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
 		fclose(robotDebug);
