@@ -20,6 +20,8 @@ struct Point{
 	float r=0;
 	float phi=0;
 
+	Point(){}
+
 	Point(float _x, float _y): x(_x), y(_y){
 		r= sqrt(x*x+y*y);
 		phi = atan(y/x);
@@ -27,7 +29,14 @@ struct Point{
 
 	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
 
-	void operator=(Point &p){
+	// void operator=(Point p){
+	// 	x = p.x;
+	// 	y= p.y;
+	// 	r= p.r;
+	// 	phi = p.phi;	
+	// }
+
+	void operator=(const Point &p){
 		x = p.x;
 		y= p.y;
 		r= p.r;
@@ -86,8 +95,8 @@ public:
 	std::vector <State> plan; //from here we can find the current state
 	State desiredState;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
-	float rightWheelSpeed=0;
-	float leftWheelSpeed=0;
+	//float rightWheelSpeed=0;
+	//float leftWheelSpeed=0;
 	float timeElapsed =0;
 	float totalTime=0;
 	// std::vector <cv::Point2f> current;
@@ -119,15 +128,15 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
-	rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
+	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
+	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 }
 
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
-	rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
+	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
+	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
 }
 

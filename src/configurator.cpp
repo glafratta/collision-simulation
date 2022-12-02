@@ -4,7 +4,7 @@
 #include <iostream>
 
 void Configurator::NewScan(std::vector <Point> & data){ 
-	//BENCHMARK + FIND TRUE SAMPLING RATE
+	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	//std::vector <cv::Point2f> current;
 	// std::vector <cv::Point2f> previous = current;
@@ -17,15 +17,24 @@ void Configurator::NewScan(std::vector <Point> & data){
 		current.push_back(p);
 	}
 	//current = data;
-	printf("current length: %i, previous length%i\n", current.size(), previous.size());
+	//printf("current length: %i, previous length%i\n", current.size(), previous.size());
+
+	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
 	timeElapsed=float(diff.count())/1000; //express in seconds
-	printf("time elapsed between newscans = %f ms\n", timeElapsed);
+	printf("time elapsed between newscans = %4f ms\n", timeElapsed);
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
-	if ( timeElapsed< samplingRate){
-		timeElapsed= samplingRate;
+
+	//timeElapsed = samplingRate;
+	//DISCARD BAD SCANS
+	if ( timeElapsed< .15){
+		//timeElapsed= samplingRate;
+		//return;
+	}
+	else if (timeElapsed >.25){
+		//return;
 	}
 	
 	
@@ -130,7 +139,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}
 	}
-	printf("bodies = %i\n", world.GetBodyCount());
+	//printf("bodies = %i\n", world.GetBodyCount());
 
 	if (!isObstacleStillThere && plan.size()>0){
 		plan.erase(plan.begin());
@@ -144,12 +153,12 @@ void Configurator::NewScan(std::vector <Point> & data){
 	State * state;
 	State::simResult result;
 	if (plan.size() ==0){
-		printf("state is desired state\n");
+		//printf("state is desired state\n");
 		desiredState.setRecordedVelocity(estimatedVelocity);
 		state = &desiredState;		 
-		printf("set state\n");
+		//printf("set state\n");
 		result =desiredState.willCollide(world, iteration);
-		printf("done willcollide\n");
+		//printf("done willcollide\n");
 		//setNameBuffer(desiredState.planFile);
 		// if (result.resultCode == State::simResult::crashed){
 		// 	plan.push_back(State(result.collision)); //if state has one or more obstacles it is "avoid" state
@@ -163,7 +172,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		state = & plan[0];
 	}		
 	if (result.resultCode == State::simResult::crashed){
-		printf("crashed\n");
+		//printf("crashed\n");
 		//CHECK IF THE OBSTACLE DETECTED IS THE SAME OBSTACLE THAT IS ALREADY BEING AVOIDED
 		if (plan.size()>0){
 			if (result.collision.getPosition().x > plan[0].obstacle.getPosition().x-0.05 && result.collision.getPosition().x < plan[0].obstacle.getPosition().x+0.05 && result.collision.getPosition().y > plan[0].obstacle.getPosition().y-0.05 && result.collision.getPosition().y < plan[0].obstacle.getPosition().y+0.05){
@@ -176,7 +185,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}			
 	}
-	else {printf("not crashed\n");}
+	else {//printf("not crashed\n");
+	}
 	//IF THE STATE DIDN'T CHANGE, CORRECT ANY INACCURACIES IN 
 	//printf("was avoiding? %i\tis same state? %i\n", wasAvoiding, isSameState);
 	if (isSameState){
@@ -281,7 +291,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			b2Vec2 tmp;
 			tmp.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 			tmp.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-			printf("velocity result %f %f\n", tmp.x, tmp.y);
+			//printf("velocity result %f %f\n", tmp.x, tmp.y);
 			float tmpAngle = atan(tmp.y/tmp.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
 			if (tmp.y ==0 && tmp.x ==0){
 				tmpAngle =0;
@@ -294,7 +304,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				affineTransError += tmp.Length()-maxAbsSpeed;
 				tmp.x = state->getAction().getLinearSpeed() *cos(tmpAngle);
 				tmp.y = state->getAction().getLinearSpeed() *sin(tmpAngle);
-				printf("getting velocity from proprioception\n");
+				//printf("getting velocity from proprioception\n");
 			//fprintf(dumpDeltaV, "changed velocity to x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
 
 			}
@@ -306,7 +316,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			theta = state->getAction().getOmega()* timeElapsed;
 			estimatedVel ={state->getAction().getLinearSpeed()*cos(theta),state->getAction().getLinearSpeed()*sin(theta)};
 			result = getVelocityResult(estimatedVel);
-			printf("getting velocity from current state\n");
+			//printf("getting velocity from current state\n");
 			return result;
 		}
 		else{

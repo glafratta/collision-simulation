@@ -370,7 +370,7 @@ b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
 
 float getAngularVelocity(float R, float L, float maxV = 0.125){
     float W = (maxV*(R-L)/action.getDistanceWheels()); //instant velocity, determines angle increment in willcollide
-    printf("omega = %f pi\n", W/M_PI);
+    //printf("omega = %f pi\n", W/M_PI);
     if (abs(W)>M_PI){
         float multiplier=1;
         if (W<0){
@@ -397,40 +397,7 @@ State::simResult willCollide(b2World &, int);
 
 enum controlResult{DONE =0, CONTINUE =1};
 
-controlResult controller(){
-float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
-    float tolerance = 0.1; //tolerance in radians (angle): 5.8 degrees circa
-    if (obstacle.isValid()){
-        printf("obstacle valid\n");
-        float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
-        float angleDifference = obstacleAngle - recordedAngle;
-        if (abs(angleDifference) >= M_PI_2){
-            return DONE;
-        }
-    }
-    else {
-        printf("correcting straight path\n\n");
-        accumulatedError = action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
-        if (accumulatedError>=tolerance){
-            action.LeftWheelSpeed -= accumulatedError*pGain;  //og angle was +angle
-            action.RightWheelSpeed += accumulatedError *pGain; //og was - angle
-        }
-        if (action.LeftWheelSpeed>1.0){
-            action.LeftWheelSpeed=1.0;
-        }
-        if (action.RightWheelSpeed>1.0){
-            action.RightWheelSpeed=1;
-        }
-        if (action.LeftWheelSpeed<(-1.0)){
-            action.LeftWheelSpeed=-1;
-        }
-        if (action.RightWheelSpeed<(-1.0)){
-            action.RightWheelSpeed=1;
-
-        }
-    }
-    return CONTINUE;
-}
+controlResult controller();
 
 
 private:

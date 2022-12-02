@@ -24,18 +24,18 @@ public:
     int mapCount =0;
 
     LidarInterface(Configurator & _c): c(_c){
-		// time_t now =time(0);
-		// tm *ltm = localtime(&now);
-		// int y,m,d, h, min;
-		// y=ltm->tm_year-100;
-		// m = ltm->tm_mon +1;
-		// d=ltm->tm_mday;
-		// h = ltm->tm_hour;
-		// min = ltm->tm_min;
-		// sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
-		// if (mkdir(folder, 0777)!= -1){
-		// 	c.setFolder(folder);
-		// }
+		time_t now =time(0);
+		tm *ltm = localtime(&now);
+		int y,m,d, h, min;
+		y=ltm->tm_year-100;
+		m = ltm->tm_mon +1;
+		d=ltm->tm_mday;
+		h = ltm->tm_hour;
+		min = ltm->tm_min;
+		sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
+		if (mkdir(folder, 0777)!= -1){
+			c.setFolder(folder);
+		}
         // dumpPath = fopen("/tmp/dumpPath.txt", "w");
         // fclose(dumpPath);
         // speed = fopen("/tmp/speed.txt", "w");
@@ -44,17 +44,32 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
+        // auto now =std::chrono::high_resolution_clock::now();
+	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
+	    // c->timeElapsed=float(diff.count())/1000; //express in seconds	
+        // c->totalTime += c->timeElapsed;
+	    // c->previousTimeScan=now; //update the time of sampling
+        // if (c->timeElapsed >.25){
+        //     return;
+        // }
 		std::vector <Point> current;
-        //char name_r[50];
-		//sprintf(name_r, "%s%s%04i.dat", folder,c.getReadMap(), mapCount);
-		//FILE * map = fopen(name_r, "wt");
+	    // char name_r[50];
+		// sprintf(name_r, "%s%s%04i.dat", folder,c.getReadMap(), mapCount);
+		// FILE * map = fopen(name_r, "wt");
+		Point p1, p0;
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.5){
-				Point p(data.x, data.y, data.r, data.phi);
-				if (p!= *(&p-1)){
-				current.push_back(p);
+				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
+				float x = round(data.x*100)/100;
+				float y = round(data.y*100)/100;
+				float r = round(data.r*100)/100;
+				float phi = round(data.phi*100)/100;
+				p1= (Point(x, y, r, phi));
+				if (p1!= p0){
+					current.push_back(p1);
 				//fprintf(map, "%.2f\t%.2f\n", data.x, data.y);
 				}
+				p0= p1;
             }
 		}
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE
@@ -84,6 +99,7 @@ Callback(Configurator *conf): c(conf){
 void step( AlphaBot &motors){
     motors.setRightWheelSpeed(-(c->getCurrentState()->getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(-(c->getCurrentState()->getAction().getRWheelSpeed()));
+	printf("R=%f\tL=%f\n", c->getCurrentState()->getAction().getLWheelSpeed(), c->getCurrentState()->getAction().getRWheelSpeed());
     iteration++;
 //         confIteration = c->getIteration();
 //         //desiredVelocity = c->estimateVelocityFromWheels(.2, c->leftWheelSpeed, c->rightWheelSpeed, 0.08);
