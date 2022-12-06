@@ -23,7 +23,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
 	timeElapsed=float(diff.count())/1000; //express in seconds
-	printf("time elapsed between newscans = %4f ms\n", timeElapsed);
+	//printf("time elapsed between newscans = %4f ms\n", timeElapsed);
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
@@ -181,7 +181,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		}
 		else{ 
 			plan.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
-			printf("plan[0] collided, new state has trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
+			printf("created new trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 
 		}			
 	}
@@ -192,13 +192,15 @@ void Configurator::NewScan(std::vector <Point> & data){
 	if (isSameState){
 		//printf("state is the same\n");
 		if (state->controller()==State::controlResult::DONE){
-			plan.erase(plan.begin());						//no need to be in obstacle avoiding state
+			plan.erase(plan.begin());	
+			printf("obstacle successfully avoided\n");					//no need to be in obstacle avoiding state
 		}
 	}
 	else {
 		//printf("state has changed\n");
 	}
 
+	printf("plan size (end of newscan) = %i, iteration %i\n", plan.size(), iteration);
 
 
 	}
@@ -248,7 +250,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				for (int i=0; i<abs(diff); i++){
 					previousTmp.push_back(previousTmp[0]); //before it was [-1]
 				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
-					printf("previous fucked up\n");
+					printf("can't get previous data\n");
 				}
 
 			}
@@ -268,7 +270,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				for (int i=0; i<abs(diff); i++){
 			currentTmp.push_back(currentTmp[0]);
 				if (currentTmp[-1].x == 0 && currentTmp[-1].y ==0){
-					//printf("current fucked up\n");
 				}
 
 				}
@@ -279,13 +280,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
-		State * state;
-		if (plan.size()>0){
-			state = &plan[0];
-		}
-		else{
-			state = &desiredState;
-		}
+		State * state = getCurrentState();
 		//printf("matrix is empty? %i\n", transformMatrix.empty());
 		if (!transformMatrix.empty()){
 			b2Vec2 tmp;

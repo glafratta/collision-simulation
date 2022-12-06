@@ -78,7 +78,7 @@ public:
     void step(){
         L=box2d->getCurrentState()->getAction().getLWheelSpeed();
         R= box2d->getCurrentState()->getAction().getRWheelSpeed();
-        printf("R= %f, L = %f\n,", R, L);
+        printf("step :R= %f, L = %f\n,", R, L);
 
     }
 };
@@ -337,7 +337,7 @@ int main(int argc, char** argv) {
                                 //should exit when dir is null pointer
 
     //DATA INTERCFACE
-    bool timerOff=1;
+    bool timerOff=0;
     State desiredState;
     Configurator box2d(desiredState);
     box2d.setReadMap("map");

@@ -24,6 +24,8 @@ public:
     //int timesPlanned =0;
     //bool valid;
 
+enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
+
 struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
 private:
     //b2Vec2 where;
@@ -174,21 +176,21 @@ public:
         }
         else if (ob.getType() == ObjectType::target){    
         }
-    }
-    if (LeftWheelSpeed >1.0f){
-        LeftWheelSpeed=1;
-    }
-    if (RightWheelSpeed >1.0f){
-        RightWheelSpeed =1;
-    }
-    if (LeftWheelSpeed <-1.0f){
-        LeftWheelSpeed=-1;
-    }
-    if (RightWheelSpeed <-1.0f){
-        RightWheelSpeed =-1;
+        if (LeftWheelSpeed >1.0f){
+            LeftWheelSpeed=1;
+        }
+        if (RightWheelSpeed >1.0f){
+            RightWheelSpeed =1;
+        }
+        if (LeftWheelSpeed <-1.0f){
+            LeftWheelSpeed=-1;
+        }
+        if (RightWheelSpeed <-1.0f){
+            RightWheelSpeed =-1;
+        }
     }
 
-    //printf("in action: r = %f l = %f\n", RightWheelSpeed, LeftWheelSpeed);
+
     omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
         //printf("omega = %f pi\n", omega/M_PI);
         if (abs(omega)>M_PI){ //max turning angle in one second
@@ -311,15 +313,26 @@ Action action;
 public:
 Object obstacle;
 Object target;
+stateType type=stateType::BASELINE;
+
+State::Action getAction(){
+    return action;
+}
 
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
+    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
 State(Object ob){
     action = Action(ob, simDuration, maxSpeed, hz); 
     obstacle = ob;
+    if (obstacle.getType()== ObjectType::obstacle){
+        type =stateType::AVOID;
+    }
+    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+
 }
 
 //other state to set both target and obstacle
@@ -343,10 +356,6 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
-
-State::Action getAction(){
-    return action;
-}
 
 b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
     b2Vec2 vel;

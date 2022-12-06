@@ -2,6 +2,7 @@
 #include "src/configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
+#include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <bits/stdc++.h>
@@ -88,51 +89,52 @@ public:
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     int iteration=0;
     int confIteration=0;
-    Configurator *c;
+    Configurator c;
+    float L,R;
 
 public:
 
-Callback(Configurator *conf): c(conf){
-    float L,R;
-    Configurator * box2d;
+Callback(Configurator &conf): c(conf){
 }
 void step( AlphaBot &motors){
-    motors.setRightWheelSpeed(-(c->getCurrentState()->getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(-(c->getCurrentState()->getAction().getRWheelSpeed()));
-	printf("R=%f\tL=%f\n", c->getCurrentState()->getAction().getLWheelSpeed(), c->getCurrentState()->getAction().getRWheelSpeed());
+	// if (c->plan.size()==0){
+	// printf("baseline state\n");
+    // motors.setRightWheelSpeed(-(c->desiredState.getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
+    // motors.setLeftWheelSpeed(-(c->desiredState.getAction().getRWheelSpeed()));
+	// }
+	// else if ( c->plan.size() >0){   
+	// printf("avoidance state\n"); 
+	// motors.setRightWheelSpeed(-(c->plan[0].getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
+    // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
+
+	// }
+	L= -(c.getCurrentState()->getAction().getRWheelSpeed());
+	R = -(c.getCurrentState()->getAction().getLWheelSpeed());
+    motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
+    motors.setLeftWheelSpeed(L);
+	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c.getIteration());
     iteration++;
-//         confIteration = c->getIteration();
-//         //desiredVelocity = c->estimateVelocityFromWheels(.2, c->leftWheelSpeed, c->rightWheelSpeed, 0.08);
-//     printf("changed speed to R= %f, L= %f\n",c->rightWheelSpeed, c->leftWheelSpeed);
-//     if (-c->rightWheelSpeed > -c->leftWheelSpeed){
-//         printf("robot going left\n");
-//     }
-//     else if (-c->rightWheelSpeed < -c->leftWheelSpeed){
-//         printf("robot foing right\n");
-//     }
-
-//   }
-//     printf("callback iteration %i\n", iteration);
-//     //b2Vec2 plannedVelocity(0.0f, 0.0f);
-//     b2Vec2 displacement(0, 0);
-
-//         if (c->timeElapsed>0){
-//             // plannedVelocity.x = c->estimateDisplacementFromWheels().x /c->timeElapsed ; // m/s
-//             // plannedVelocity.y = c->estimateDisplacementFromWheels().y /c->timeElapsed; // m/s
-//             displacement = c->estimateDisplacementFromWheels();
-//         }
-//         // displacement.x =plannedVelocity.x*c->timeElapsed;
-//         // displacement.y =plannedVelocity.y*c->timeElapsed;
-//         fprintf(control, "%f\t%f\n",displacement.x, displacement.y);
-//         fprintf(dump, "%f\t%f\n",c->getAbsPos().x+displacement.x, c->getAbsPos().y+displacement.y);
-//         fclose(dump);
-//         fclose(control);
-
 }
 };
 
+class DebugClass: public CppTimer{
+	float L,R;
+	Configurator c;
+	public:
 
-int main(int, char**) {
+	DebugClass(Configurator & _c): c(_c){}
+
+	void timerEvent(){
+	R= (c.getCurrentState()->getAction().getRWheelSpeed());
+	L = (c.getCurrentState()->getAction().getLWheelSpeed());
+	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c.getIteration());
+
+
+	}
+};
+
+
+int main(int argc, char** argv) {
 	//world setup with environment class
 	initscr();
 	A1Lidar lidar;
@@ -140,9 +142,9 @@ int main(int, char**) {
     State desiredState;
     Configurator configurator(desiredState);
     configurator.setReadMap("map");
-   // configurator.setFolder(lidar.getFolder());
 	LidarInterface dataInterface(configurator);
-	Callback cb(&configurator);
+	//DebugClass db(configurator);
+	Callback cb(configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
 	lidar.start();
@@ -150,13 +152,12 @@ int main(int, char**) {
 
 	do {
 	} while (!getchar());
-	//std::this_thread::sleep_for(std::chrono::seconds(10));
-	// endwin();
+	endwin();
 
 
 	motors.stop();
-	//std::cout<<dataInterface.numberOfScans<<std::endl;
 	lidar.stop();
+	//db.stop();
 
 
 	

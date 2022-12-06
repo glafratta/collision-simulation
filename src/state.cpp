@@ -70,13 +70,14 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= M_PI_2){
+			//obstacle.invalidate();
             return DONE;
         }
     }
     else {
         accumulatedError = action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
         if (accumulatedError>=tolerance){
-            printf("correcting straight path\n\n");
+            printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
             action.LeftWheelSpeed -= accumulatedError*pGain;  //og angle was +angle
             action.RightWheelSpeed += accumulatedError *pGain; //og was - angle
             if (action.LeftWheelSpeed>1.0){

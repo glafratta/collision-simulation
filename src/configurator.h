@@ -230,7 +230,7 @@ b2Vec2 getAbsPos(){
 }
 
 State * getCurrentState(){
-	if (plan.size()>0){
+	if (!plan.empty()){
 		return &plan[0];
 	}
 	else {
