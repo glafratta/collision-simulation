@@ -16,7 +16,7 @@
 //the environment is sampled by the LIDAR every .2 seconds
 
 class LidarInterface : public A1Lidar::DataInterface{
-Configurator c;
+Configurator * c;
 FILE * dumpPath;
 //for debugging
 FILE * speed;
@@ -24,7 +24,7 @@ char folder[250];
 public: 
     int mapCount =0;
 
-    LidarInterface(Configurator & _c): c(_c){
+    LidarInterface(Configurator * _c): c(_c){
 		time_t now =time(0);
 		tm *ltm = localtime(&now);
 		int y,m,d, h, min;
@@ -35,7 +35,7 @@ public:
 		min = ltm->tm_min;
 		sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
 		if (mkdir(folder, 0777)!= -1){
-			c.setFolder(folder);
+			c->setFolder(folder);
 		}
         // dumpPath = fopen("/tmp/dumpPath.txt", "w");
         // fclose(dumpPath);
@@ -74,7 +74,7 @@ public:
             }
 		}
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE
-		c.NewScan(current);
+		c->NewScan(current);
 		
 
 	}
@@ -89,12 +89,12 @@ public:
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     int iteration=0;
     int confIteration=0;
-    Configurator c;
+    Configurator * c;
     float L,R;
 
 public:
 
-Callback(Configurator &conf): c(conf){
+Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
 	// if (c->plan.size()==0){
@@ -108,30 +108,15 @@ void step( AlphaBot &motors){
     // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
 
 	// }
-	L= -(c.getCurrentState()->getAction().getRWheelSpeed());
-	R = -(c.getCurrentState()->getAction().getLWheelSpeed());
+	L= -(c->getCurrentState()->getAction().getRWheelSpeed());
+	R = -(c->getCurrentState()->getAction().getLWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c.getIteration());
+	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());
     iteration++;
 }
 };
 
-class DebugClass: public CppTimer{
-	float L,R;
-	Configurator c;
-	public:
-
-	DebugClass(Configurator & _c): c(_c){}
-
-	void timerEvent(){
-	R= (c.getCurrentState()->getAction().getRWheelSpeed());
-	L = (c.getCurrentState()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c.getIteration());
-
-
-	}
-};
 
 
 int main(int argc, char** argv) {
@@ -142,9 +127,9 @@ int main(int argc, char** argv) {
     State desiredState;
     Configurator configurator(desiredState);
     configurator.setReadMap("map");
-	LidarInterface dataInterface(configurator);
+	LidarInterface dataInterface(&configurator);
 	//DebugClass db(configurator);
-	Callback cb(configurator);
+	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
 	lidar.start();
