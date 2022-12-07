@@ -19,24 +19,33 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		float theta=0;
 		b2Vec2 instVelocity = {0,0};
 		//printf("entering for loop\n");
-		for (int step = 0; step <= (hz*simDuration); step++) {//3 second
+		int step=0;
+		for (step; step <= (hz*simDuration); step++) {//3 second
 			instVelocity.x = action.getLinearSpeed()*cos(theta); //integrate?
 			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
-			//fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
+			robot.body->SetTransform(robot.body->GetPosition(), theta);
+			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
+			if (obstacle.isValid()){
+				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
+				if (abs(obstacle.getAngle(robot.body->GetAngle()))>=M_PI_2){
+				//printf("obstacle successfully avoided after %i steps\n", step);
+				break;
+				}
+			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
-				printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
+				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
 			}
 
 		}	
-		//printf("existed for loop\n");
+		//printf("exited for loop after %i steps\n", step);
 		// else{
 		// 	result = simResult(simResult::resultType::successful);
 		// 	//printf("no collisions\n");
@@ -70,12 +79,12 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= M_PI_2){
-			//obstacle.invalidate();
+			obstacle.invalidate();
             return DONE;
         }
     }
     else {
-        accumulatedError = action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
+        accumulatedError += action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
         if (accumulatedError>=tolerance){
             printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
             action.LeftWheelSpeed -= accumulatedError*pGain;  //og angle was +angle
