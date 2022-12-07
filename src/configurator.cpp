@@ -176,34 +176,36 @@ void Configurator::NewScan(std::vector <Point> & data){
 		//CHECK IF THE OBSTACLE DETECTED IS THE SAME OBSTACLE THAT IS ALREADY BEING AVOIDED
 		if (plan.size()>0){
 			if (result.collision.getPosition().x > plan[0].obstacle.getPosition().x-0.05 && result.collision.getPosition().x < plan[0].obstacle.getPosition().x+0.05 && result.collision.getPosition().y > plan[0].obstacle.getPosition().y-0.05 && result.collision.getPosition().y < plan[0].obstacle.getPosition().y+0.05){
-				printf("same obstacle, plan still executing\n");
+				//printf("same obstacle, plan still executing\n");
 			}
 		}
 		else{ 
 			plan.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
-			printf("created new trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
+			//printf("created new trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 
 		}			
 	}
 	else {//printf("not crashed\n");
 	}
-	//IF THE STATE DIDN'T CHANGE, CORRECT ANY INACCURACIES IN 
+	//IF THE STATE DIDN'T CHANGE, CORRECT PATH 
 	//printf("was avoiding? %i\tis same state? %i\n", wasAvoiding, isSameState);
+	applyController(isSameState, state);
+	//printf("plan size (end of newscan) = %i, iteration %i\n", plan.size(), iteration);
+
+
+}
+
+Configurator::applyController(bool isSameState, State* state){
 	if (isSameState){
 		//printf("state is the same\n");
 		if (state->controller()==State::controlResult::DONE){
 			plan.erase(plan.begin());	
-			printf("obstacle successfully avoided\n");					//no need to be in obstacle avoiding state
+			//printf("obstacle successfully avoided\n");					//no need to be in obstacle avoiding state
 		}
 	}
-	else {
-		//printf("state has changed\n");
-	}
-
-	printf("plan size (end of newscan) = %i, iteration %i\n", plan.size(), iteration);
 
 
-	}
+}
 
 
 	

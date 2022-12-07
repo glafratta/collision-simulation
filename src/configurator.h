@@ -238,6 +238,8 @@ State * getCurrentState(){
 	}
 }
 
+void applyController(bool);
+
 
 
 b2Vec2 estimateDisplacementFromWheels();
