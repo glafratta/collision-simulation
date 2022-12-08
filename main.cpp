@@ -108,8 +108,8 @@ void step( AlphaBot &motors){
     // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
 
 	// }
-	L= -(c->getCurrentState()->getAction().getRWheelSpeed());
-	R = -(c->getCurrentState()->getAction().getLWheelSpeed());
+	L= -(c->state()->getAction().getRWheelSpeed());
+	R = -(c->state()->getAction().getLWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	//printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());

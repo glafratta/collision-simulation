@@ -8,8 +8,11 @@ enum ObjectType {obstacle=0, target=1, other=2};
 
 
 class State{
+
+enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
+
 protected:
-   // StateType type;
+    stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
     //b2Vec2 EstimatedLinearVelocity = {float((-sin(omega/hz))), float(cos(omega/hz))}; //is is sin and y is cos, this is pretty much instantaneous to get the system started
     b2Vec2 desiredVelocity, gain;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
@@ -24,7 +27,6 @@ public:
     //int timesPlanned =0;
     //bool valid;
 
-enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
 
 struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
 private:
@@ -65,6 +67,17 @@ public:
         }
         if (posVector.y != 0 && posVector.y !=0){
             angle2 = atan(posVector.y/posVector.x);
+        }
+        //printf("angle1 =%f, angle2 =%f\n", angle1, angle2);
+	    float angle = angle1-angle2;
+        return angle;
+    }
+
+    float getAngle(float angle2){ //gets the angle of an object wrt to the heading direction of another object
+        //reference is position vector 2. If the angle >0 means that object 1 is to the left of object 2
+        float angle1=0;
+        if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
+            angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin 
         }
         //printf("angle1 =%f, angle2 =%f\n", angle1, angle2);
 	    float angle = angle1-angle2;
@@ -313,7 +326,6 @@ Action action;
 public:
 Object obstacle;
 Object target;
-stateType type=stateType::BASELINE;
 
 State::Action getAction(){
     return action;
@@ -321,6 +333,7 @@ State::Action getAction(){
 
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
+    type = stateType::BASELINE;
     printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
@@ -387,6 +400,7 @@ float getAngularVelocity(float R, float L, float maxV = 0.125){
         }
         W= M_PI*multiplier;
     }
+    return W;
 }
 
 float getLinearSpeed(float R, float L, float maxV = 0.125){
@@ -398,6 +412,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
     }
     v=maxV*multiplier;
     }
+    return v;
 }
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
@@ -408,6 +423,10 @@ enum controlResult{DONE =0, CONTINUE =1};
 
 controlResult controller();
 
+void tunePGain(float yError){ //unused, not tested
+    float learningRate = 0.01;
+    pGain -= yError*learningRate;
+}
 
 private:
 

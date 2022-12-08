@@ -27,6 +27,11 @@ struct Point{
 		phi = atan(y/x);
 	}
 
+	Point(b2Vec2 v): x(v.x), y(v.y){
+		r= sqrt(x*x+y*y);
+		phi = atan(y/x);
+	}
+
 	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
 
 	// void operator=(Point p){
@@ -128,6 +133,7 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
+	plan.push_back(desiredState);
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
@@ -135,6 +141,7 @@ Configurator(){
 
 Configurator(State _state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
+	plan.push_back(desiredState);
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
@@ -229,16 +236,14 @@ b2Vec2 getAbsPos(){
 	return absPosition;
 }
 
-State * getCurrentState(){
-	if (!plan.empty()){
-		return &plan[0];
+State * state(){ //returns state being executed
+	if (plan.empty()){
+		plan.push_back(desiredState);
 	}
-	else {
-		return &desiredState;
-	}
+	return &plan[0];
 }
 
-void applyController(bool);
+void applyController(bool, State*);
 
 
 

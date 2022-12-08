@@ -76,9 +76,9 @@ class StepCallback{
 public:
     StepCallback(Configurator * c): box2d(c){}
     void step(){
-        L=box2d->getCurrentState()->getAction().getLWheelSpeed();
-        R= box2d->getCurrentState()->getAction().getRWheelSpeed();
-        printf("step :R= %f, L = %f\n,", R, L);
+        L=box2d->state()->getAction().getLWheelSpeed();
+        R= box2d->state()->getAction().getRWheelSpeed();
+        //printf("step :R= %f, L = %f\n,", R, L);
 
     }
 };

@@ -26,7 +26,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
-			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
+			//fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
 			if (obstacle.isValid()){
@@ -73,7 +73,7 @@ void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, 
 
 State::controlResult State::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
-    float tolerance = 0.1; //tolerance in radians (angle): 5.8 degrees circa
+    float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
     if (obstacle.isValid()){
         printf("obstacle valid\n");
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
@@ -85,10 +85,11 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     }
     else {
         accumulatedError += action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
+		float normAccErr = accumulatedError/M_PI;
         if (accumulatedError>=tolerance){
             printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
-            action.LeftWheelSpeed -= accumulatedError*pGain;  //og angle was +angle
-            action.RightWheelSpeed += accumulatedError *pGain; //og was - angle
+            action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
+            action.RightWheelSpeed += normAccErr *pGain; //og was + angle
             if (action.LeftWheelSpeed>1.0){
             action.LeftWheelSpeed=1.0;
             }
