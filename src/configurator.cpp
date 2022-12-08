@@ -16,6 +16,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	for (Point p:data){
 		current.push_back(p);
 	}
+	printf("data = %i\n", current.size());
 	//current = data;
 	//printf("current length: %i, previous length%i\n", current.size(), previous.size());
 
@@ -69,7 +70,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		estimatedVelocity = affineTransResult.vector;
 	}
 	else{
-		estimatedVelocity = {0.0f, 0.0f};
+		estimatedVelocity = state()->getAction().getLinearVelocity();
 		//printf("invalid affine trans result\n");
 	}
 	//printf("estimatedVelocity = %f, %f\n", estimatedVelocity.x, estimatedVelocity.y);
@@ -92,12 +93,12 @@ void Configurator::NewScan(std::vector <Point> & data){
 		state()->trackObject(state()->obstacle, timeElapsed, estimatedVelocity, {0.0f, 0.0f}); //robot default position is 0,0
 		if (state()->obstacle.getAngle(estimatedVelocity) >= M_PI_2){ 		//if obstacle (pos) and robot (vel) are perpendicular
 			state()->obstacle.invalidate();
-			plan.erase(plan.begin());						//no need to be in obstacle avoiding state
+			plan()->states.erase(plan()->states.begin());						//no need to be in obstacle avoiding state
 		//	printf("erased plan\n");
 		}
 		else{
 			State::Object temp = state()->obstacle;			//otherwise update current state with new obstacle position
-			plan[0]= State(temp);
+			plan()->states[0]= State(temp);
 		}
 
 	}
@@ -141,8 +142,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 	}
 	//printf("bodies = %i\n", world.GetBodyCount());
 
-	if (!isObstacleStillThere && plan.size()>0){
-		plan.erase(plan.begin());
+	if (!isObstacleStillThere && plan()->states.size()>0){
+		plan()->states.erase(plan()->states.begin());
 	}
 
 	//current.clear(); //commented because now we're keeping previous in memory
@@ -184,7 +185,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		// 	}
 		// }
 		// else{ 
-			plan.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
+			plan()->states.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
 			//printf("created new trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
 
 		}			
@@ -203,7 +204,7 @@ void Configurator::applyController(bool isSameState, State* state){
 	if (isSameState){
 		//printf("state is the same\n");
 		if (state->controller()==State::controlResult::DONE){
-			plan.erase(plan.begin());	
+			plan()->states.erase(plan()->states.begin());	
 			//printf("obstacle successfully avoided\n");					//no need to be in obstacle avoiding state
 		}
 	}

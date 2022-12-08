@@ -76,6 +76,13 @@ struct Point{
 
 };
 
+class Plan{
+	public:
+	std::vector <State> states;
+	float timeDesired =0;
+	float timeAvoid =0;
+};
+
 class Configurator{
 protected:
 	float maxAbsSpeed = .125;
@@ -97,7 +104,8 @@ public:
 	char readMap[50];
 	//std::vector <cv::Point2f> current;
 	char msg[25];
-	std::vector <State> plan; //from here we can find the current state
+	//std::vector <State> plan; //from here we can find the current state
+	Plan currentPlan;
 	State desiredState;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	//float rightWheelSpeed=0;
@@ -133,15 +141,15 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	plan.push_back(desiredState);
+	plan()->states.push_back(desiredState);
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 }
 
-Configurator(State _state): desiredState(_state){
+Configurator(State &_state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	plan.push_back(desiredState);
+	plan()->states.push_back(desiredState);
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
@@ -236,12 +244,18 @@ b2Vec2 getAbsPos(){
 	return absPosition;
 }
 
-State * state(){ //returns state being executed
-	if (plan.empty()){
-		plan.push_back(desiredState);
-	}
-	return &plan[0];
+Plan * plan(){
+	return &currentPlan;
 }
+
+
+State * state(){ //returns state being executed
+	if (plan()->states.empty()){
+		plan()->states.push_back(desiredState);
+	}
+	return &(plan()->states[0]);
+}
+
 
 void applyController(bool, State*);
 
