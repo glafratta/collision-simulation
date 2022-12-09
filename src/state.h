@@ -125,7 +125,7 @@ public:
 }; //sub action f
 
 struct Constraint{
-    enum Type {NONE =0};
+    enum Type {NONE =0, LEFT =1, RIGHT =2};
     Type type;
 
     Constraint(){
@@ -159,25 +159,38 @@ public:
         if (ob.getType()==ObjectType::obstacle){
             //printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
             if (abs(ob.getAngle(pos))<M_PI_2){
-                if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                    LeftWheelSpeed = -LeftWheelSpeed; //go left
-                }
-                else if (ob.getPosition().y>0){ //go right
-                    RightWheelSpeed= - RightWheelSpeed;
-                }  
-                else if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-                    int goL = rand()%2;
-                    switch (goL)
-                    {
-                    case 0: //
-                    LeftWheelSpeed = - LeftWheelSpeed;
-                    break;
-                    case 1:
-                    RightWheelSpeed = -RightWheelSpeed;
-                    break;
-                    default:
-                    printf("invalid case\n");
-                        break;
+                // if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
+                //     LeftWheelSpeed = -LeftWheelSpeed; //go left
+                // }
+                // else if (ob.getPosition().y>0){ //go right
+                //     RightWheelSpeed= - RightWheelSpeed;
+                // }  
+                // else if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                //     int goL = rand()%2;
+                //     switch (goL)
+                //     {
+                //     case 0: //
+                //     LeftWheelSpeed = - LeftWheelSpeed;
+                //     break;
+                //     case 1:
+                //     RightWheelSpeed = -RightWheelSpeed;
+                //     break;
+                //     default:
+                //     printf("invalid case\n");
+                //         break;
+                //     }
+                // }
+                if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                    if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
+                        constraint.type = State::Constraint::Type::LEFT; //go left
+                    }
+                    else if (ob.getPosition().y>0){ //go right
+                        constraint.type = State::Constraint::Type::RIGHT; //go left
+                    }   
+                    else{
+                        int c = rand() % 2;
+                        constraint.type = static_cast<State::Constraint::Type>(c);
+
                     }
                 }
             }
@@ -187,8 +200,18 @@ public:
             }
      
         }
-        else if (ob.getType() == ObjectType::target){    
+
+        switch (constraint.type){
+            case State::Constraint::Type::LEFT:
+            LeftWheelSpeed = -LeftWheelSpeed;
+            break;
+            case State::Constraint::Type::RIGHT:
+            RightWheelSpeed = - RightWheelSpeed;
+            break;
+            default:
+            break;
         }
+
         if (LeftWheelSpeed >1.0f){
             LeftWheelSpeed=1;
         }
@@ -359,6 +382,13 @@ float getMaxSpeed(){
     return maxSpeed;
 }
 
+void setHz(float _hz){
+    hz = _hz;
+}
+
+void setSimDuration(int d){
+    simDuration = d;
+}
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
