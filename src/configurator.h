@@ -81,12 +81,30 @@ class Plan{
 	std::vector <State> states;
 	float timeDesired =0;
 	float timeAvoid =0;
+
+	int getStepDuration(){
+		int result =0;
+		if (!states.empty()){
+			for (State & s:states){
+				result += s.stepDuration;
+			}
+		}
+		return result;
+	}
+
+	int getObstacleCount(){
+		int result =0;
+		for (State &s:states){
+			if (s.getType() == State::stateType::AVOID){
+				result++;
+			}
+		}
+		return result;
+	}
 };
 
 class Configurator{
 protected:
-	float maxAbsSpeed = .125;
-	float gain = .05;
 	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
@@ -96,6 +114,8 @@ protected:
 	FILE * dumpPath;
 	FILE * dumpDeltaV;
 	char fileNameBuffer[50];
+	int maxObstacleWM =3;
+	State state;
 public:
 	float affineTransError =0;
 	bool filterOn=1;
@@ -105,7 +125,7 @@ public:
 	//std::vector <cv::Point2f> current;
 	char msg[25];
 	//std::vector <State> plan; //from here we can find the current state
-	Plan currentPlan;
+	//Plan plan;
 	State desiredState;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	//float rightWheelSpeed=0;
@@ -141,7 +161,8 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	plan()->states.push_back(desiredState);
+	state = desiredState;
+	//plan.states.push_back(desiredState);
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
@@ -149,7 +170,8 @@ Configurator(){
 
 Configurator(State &_state): desiredState(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	plan()->states.push_back(desiredState);
+	//plan.states.push_back(desiredState);
+	state = _state;
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
@@ -244,24 +266,37 @@ b2Vec2 getAbsPos(){
 	return absPosition;
 }
 
-Plan * plan(){
-	return &currentPlan;
+// Plan * plan(){
+// 	return &currentPlan;
+// }
+
+
+State * getState(int advance=0){ //returns state being executed
+	// if (plan.states.empty()){
+	// 	plan.states.push_back(desiredState);
+	// 	//printf("pushed back desired state\n");
+	// }
+	// //printf("index = %i, plan.size() =%i\n", advance, plan.states.size());
+	// if (plan.states.size()<=(advance)){
+	// 	printf("plan size exceeded, returning last state\n");
+	// 	advance = plan.states.size()-1;
+	// }
+	// return &(plan.states[advance]);
+	return &state;
 }
 
 
-State * state(){ //returns state being executed
-	if (plan()->states.empty()){
-		plan()->states.push_back(desiredState);
-	}
-	return &(plan()->states[0]);
+void applyController(bool, State &);
+
+int getMaxObstacleWM(){
+	return maxObstacleWM;
 }
-
-
-void applyController(bool, State*);
-
-
 
 b2Vec2 estimateDisplacementFromWheels();
+
+int getMaxStepDuration(){
+	return state.hz * state.getSimDuration();
+}
 
 };
 

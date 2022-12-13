@@ -52,6 +52,8 @@ char * folder;
 		//box2d->previous = box2d->current;
 		//box2d->current.clear();
 		while (file>>x>>y){
+            x = round(x*100)/100;
+			y = round(y*100)/100;
             Point p(x,y);
             //Point pp = *(&p-1);
             if (p.r<1.5 && p!=*(&p-1)){
@@ -76,170 +78,13 @@ class StepCallback{
 public:
     StepCallback(Configurator * c): box2d(c){}
     void step(){
-        L=box2d->state()->getAction().getLWheelSpeed();
-        R= box2d->state()->getAction().getRWheelSpeed();
-        //printf("step :R= %f, L = %f\n,", R, L);
+        L=box2d->getState()->getAction().getLWheelSpeed();
+        R= box2d->getState()->getAction().getRWheelSpeed();
+        printf("step :R= %f, L = %f\n,", R, L);
 
     }
 };
 
-// void Configurator::controller(){
-// //FIND ERROR
-// b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
-// printf("iteration in controller =%i\n", iteration);
-// State * state;
-//     if (!plan.empty()){
-//         state = &(plan[0]);
-//     }
-//     else if (plan.empty()){
-//         state = & desiredState;
-//     }
-
-
-
-// float angleError=0;
-// float distanceError=0;
-// if (iteration >=1){
-//     float x,y, t;
-//     t=0; //discrete time
-//     char name[50];
-//     sprintf(name, "/tmp/robot%04i.txt", iteration -1); //
-//     //printf("%s\n", name);
-//     std::ifstream file(name);
-
-
-//     while (file>>x>>y){
-//         t= t+ 1.0f/60.0f;
-//         if(timeElapsed<t && t<=(timeElapsed+1/60.f)){ 
-//             desiredPosition = b2Vec2(x,y);
-//            // printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
-//             break;
-//         }
-//         else if (timeElapsed*2<=t<=(timeElapsed*2+1/(state->hz))){ //next position
-//             nextPosition = b2Vec2(x,y);
-//         }
-//     }
-//     file.close();
-//     desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-//     recordedPosition = {state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed};
-//     //float desiredAngle = atan2(recordedPosition.y)
-//     angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-//    // printf("desired position = %f, %f\trecorded position: %f, %f\n", desiredPosition.x, desiredPosition.y, recordedPosition.x, recordedPosition.y);
-//    // printf("angleError =%f\n", angleError);
-//     distanceError = desiredPosition.Length() - recordedPosition.Length();
-//   //  printf("distanceError = %f\n", distanceError);
-//     }
-
-// leftWheelSpeed = state->getAction().getLWheelSpeed() + angleError*gain+ distanceError*gain;
-// rightWheelSpeed = state->getAction().getRWheelSpeed()- angleError *gain + distanceError*gain; 
-
-// //control function = v0 + error *gain
-
-// //Generate corrective trajectory?
-// // Object target(ObjectType::target, targetPosition);
-// // trajectory= Object(target, simDuration, maxSpeed);
-
-
-// }
-
-// void Configurator::controller(){ //this needs to be pasted in the straight line because it has to be different when the path is constantly recalculated
-// //FIND ERROR
-// b2Vec2 desiredPosition, nextPosition, recordedPosition; //target for genearting a corrective trajectory
-// State * state;
-// if (plan.size()==0){
-//     state = &desiredState;
-// }
-// else if (plan.size()>0){
-//     //state = &plan[0];
-// 	leftWheelSpeed = plan[0].getAction().getLWheelSpeed();
-// 	rightWheelSpeed = plan[0].getAction().getRWheelSpeed();
-// 	return;
-// }
-// double angleError=0;
-// double distanceError=0;
-
-// printf("iteration in controller: %i\n", iteration);
-
-// if (iteration > 0){
-//     float x,y, t;
-//     t=0; //discrete time
-//     char name[50];
-//     sprintf(name, "%s", fileNameBuffer); //
-//     printf("%s\n", name);
-//     std::ifstream file(name);
-
-//     while (file>>x>>y){ 
-//         t= t+ 1.0f/60.0f;
-//         if(totalTime<t && t<=(totalTime+1/60.f)){ 
-//             desiredPosition = b2Vec2(x,y);
-//             //printf("desired position out of file: %f, %f\t time recorded as: %f, timeElapsed: %f\n", x, y,t, timeElapsed);
-//             break;
-//         }
-//         // else {
-//         //     leftWheelSpeed = 0;
-//         //     rightWheelSpeed = 0;
-//         // }
-
-//     }
-
-//     file.close();
-//     //desiredVelocity =b2Vec2(desiredPosition.x/timeElapsed, desiredPosition.y/timeElapsed);
-
-//     //recordedPosition = {absPosition.x, absPosition.y}; //BUG: is the velocity being extracted from the current state?
-
-// 	recordedPosition = b2Vec2(state->getRecordedVelocity().x*timeElapsed, state->getRecordedVelocity().y*timeElapsed);
-
-//     //printf("recordedpos = %f, %f\n", recordedPosition.x, recordedPosition.y);
-//     //float desiredAngle = atan2(recordedPosition.y)
-//    // angleError = atan2(desiredPosition.x, desiredPosition.y)-atan2(recordedPosition.x, recordedPosition.y); //flag
-// 	float desiredAngle, recordedAngle; 
-// 	if (desiredPosition.y ==0 && desiredPosition.x ==0){
-// 		desiredAngle =0;
-// 	}
-// 	else{
-// 		desiredAngle= atan(desiredPosition.y/desiredPosition.x);
-// 	}
-// 	if (recordedPosition.y ==0 && recordedPosition.x ==0){
-// 		recordedAngle =0;
-// 	}
-// 	else{
-// 		recordedAngle= atan(recordedPosition.y/recordedPosition.x);
-// 	}
-	
-//     angleError = desiredAngle - recordedAngle; //flag    
-//     //normalise error
-//     double maxError = M_PI_2;
-//     angleError /= maxError;
-	
-// 	state->accumulatedError += angleError;
-
-//     }
-
-
-// leftWheelSpeed -= angleError*gain+ distanceError*gain;  //og angle was +angle
-// rightWheelSpeed += angleError *gain + distanceError*gain; //og was - angle
-
-// float deltaV = angleError*gain;
-// dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
-// fprintf(dumpDeltaV,"angleError =%f\n", angleError);
-// fprintf(dumpDeltaV, "angle error*%f = %f\n", gain, deltaV);
-// if (leftWheelSpeed>1.0){
-//     leftWheelSpeed=1.0;
-// }
-// if (rightWheelSpeed>1.0){
-//     rightWheelSpeed=1;
-// }
-// if (leftWheelSpeed<(-1.0)){
-//     leftWheelSpeed=-1;
-// }
-// if (rightWheelSpeed<(-1.0)){
-//     rightWheelSpeed=1;
-
-// }
-// fprintf(dumpDeltaV, "Right = %f, Left = %f\n", rightWheelSpeed, leftWheelSpeed);
-// fclose(dumpDeltaV);
-
-// }
 
 //FOR THREAD DEBUGGING
 
@@ -337,7 +182,7 @@ int main(int argc, char** argv) {
                                 //should exit when dir is null pointer
 
     //DATA INTERCFACE
-    bool timerOff=0;
+    bool timerOff=atoi(argv[2]);
     State desiredState;
     Configurator box2d(desiredState);
     box2d.setReadMap("map");

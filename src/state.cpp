@@ -4,20 +4,21 @@
 
 
 
-State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED LOOP CONTROL
+State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0,0}, float theta=0){ //CLOSED LOOP CONTROL
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
 		//printf("in state, world has %i bodies\n", _world.GetBodyCount());
 		//sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
-		planNo++;
+		//planNo++;
 		//FILE * robotPath = fopen(planFile, "w+");
 		//char debug[250];
 		//sprintf(debug, "/tmp/collision%04i.txt", _iteration);
 		//FILE * robotDebug = fopen(debug, "w");
-		float theta=0;
+		//float theta=0;
 		b2Vec2 instVelocity = {0,0};
+		robot.body->SetTransform(start, theta);
 		//printf("entering for loop\n");
 		int step=0;
 		for (step; step <= (hz*simDuration); step++) {//3 second
@@ -53,6 +54,9 @@ State::simResult State::willCollide(b2World & _world, int _iteration){ //CLOSED 
 		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
 		//fclose(robotDebug);
 		//fclose(robotPath);
+		endPose = robot.body->GetTransform();
+		printf("end pose x =%f, y=%f, theta = %f\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle());
+		stepDuration=step;
 		return result;
 	
 }

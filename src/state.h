@@ -8,24 +8,25 @@ enum ObjectType {obstacle=0, target=1, other=2};
 
 
 class State{
-
-enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
+public:
+    float hz =50.0f; //og was 60
+    float accumulatedError=0;
+    char planFile[250];
+    int stepDuration=0; //in willcollide steps
+    float lidarRange =1.5;
+    float box2dRange = 1.0;
+    enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
+    b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 
 protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
-    //b2Vec2 EstimatedLinearVelocity = {float((-sin(omega/hz))), float(cos(omega/hz))}; //is is sin and y is cos, this is pretty much instantaneous to get the system started
-    b2Vec2 desiredVelocity, gain;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
+    //b2Vec2 desiredVelocity;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
-    float simDuration =3;
+    float simDuration =int(box2dRange /maxSpeed); //in seconds
     float pGain=0.1;
+
 public:
-    int planNo=0;
-    float hz =50.0f; //og was 60
-    float accumulatedError=0;
-    char planFile[250];
-    //int timesPlanned =0;
-    //bool valid;
 
 
 struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
@@ -36,7 +37,7 @@ private:
     ObjectType type;
     int iteration;
     float angleToRobot=0;
-    b2Vec2 distance;
+    //b2Vec2 distance;
 public:
 	b2FixtureDef fixtureDef;
     b2BodyDef bodyDef;
@@ -107,9 +108,6 @@ public:
         iteration=_it;
     }
 
-    // b2FixtureDef getFixtureDef(){
-    //     return fixtureDef;
-    // }
 
     bool isValid(){
         return valid;
@@ -130,6 +128,14 @@ struct Constraint{
 
     Constraint(){
         type = NONE;
+    }
+
+    Type getOpposite(Type t){
+        switch (t){
+            case LEFT:return RIGHT;break;
+            case RIGHT: return LEFT; break;
+            default: return NONE; break;
+        }
     }
 
 };
@@ -159,6 +165,7 @@ public:
         if (ob.getType()==ObjectType::obstacle){
             //printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
             if (abs(ob.getAngle(pos))<M_PI_2){
+                // //old loop
                 // if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                 //     LeftWheelSpeed = -LeftWheelSpeed; //go left
                 // }
@@ -180,6 +187,8 @@ public:
                 //         break;
                 //     }
                 // }
+
+                //NEW LOOP FOR ABOVE
                 if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                         constraint.type = State::Constraint::Type::LEFT; //go left
@@ -354,6 +363,10 @@ State::Action getAction(){
     return action;
 }
 
+State::stateType getType(){
+    return type;
+}
+
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
@@ -361,10 +374,11 @@ State(){
 
 }
 
-State(Object ob){
+State(Object ob, State::Constraint constraint = State::Constraint()){
     action = Action(ob, simDuration, maxSpeed, hz); 
-    obstacle = ob;
-    if (obstacle.getType()== ObjectType::obstacle){
+    //obstacle = ob;
+    if (ob.getType()== ObjectType::obstacle){ //og obstacle.getTYpe()
+        obstacle = ob;
         type =stateType::AVOID;
     }
     printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
@@ -386,8 +400,12 @@ void setHz(float _hz){
     hz = _hz;
 }
 
-void setSimDuration(int d){
+void setSimDuration(int d){ //in seconds
     simDuration = d;
+}
+
+int getSimDuration(){ //in seconds
+    return simDuration;
 }
 
 void setRecordedVelocity(b2Vec2 vel){
@@ -447,7 +465,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 
-State::simResult willCollide(b2World &, int);
+State::simResult willCollide(b2World &, int, b2Vec2, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 

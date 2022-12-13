@@ -59,7 +59,7 @@ public:
 		// FILE * map = fopen(name_r, "wt");
 		Point p1, p0;
 		for (A1LidarData &data:data){
-			if (data.valid&& data.r <1.5){
+			if (data.valid&& data.r <c->getState()->lidarRange){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
 				float x = round(data.x*100)/100;
 				float y = round(data.y*100)/100;
@@ -75,6 +75,7 @@ public:
 		}
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE
 		c->NewScan(current);
+		//printf("scan\n");
 		
 
 	}
@@ -108,11 +109,11 @@ void step( AlphaBot &motors){
     // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
 
 	// }
-	L= -(c->state()->getAction().getRWheelSpeed());
-	R = -(c->state()->getAction().getLWheelSpeed());
+	L= -(c->getState()->getAction().getRWheelSpeed());
+	R = -(c->getState()->getAction().getLWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	//printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());
+	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());
     iteration++;
 }
 };
