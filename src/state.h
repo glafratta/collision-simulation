@@ -3,8 +3,12 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> //recommended cmath?
+#include <utility>                   // for std::pair
+#include <algorithm>                 // for std::for_each
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
-enum ObjectType {obstacle=0, target=1, other=2};   
+enum ObjectType {obstacle=0, target=1, other=2};  
 
 
 class State{
@@ -15,9 +19,8 @@ public:
     int stepDuration=0; //in willcollide steps
     float lidarRange =1.5;
     float box2dRange = 1.0;
-    enum stateType {BASELINE =0, AVOID =1, PURSUE =2};
+    enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-
 protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
@@ -25,6 +28,7 @@ protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     float simDuration =int(box2dRange /maxSpeed); //in seconds
     float pGain=0.1;
+    int placeInGraph;
 
 public:
 
@@ -80,7 +84,6 @@ public:
         if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
             angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin 
         }
-        //printf("angle1 =%f, angle2 =%f\n", angle1, angle2);
 	    float angle = angle1-angle2;
         return angle;
     }
@@ -122,23 +125,8 @@ public:
     }
 }; //sub action f
 
-struct Constraint{
-    enum Type {NONE =0, LEFT =1, RIGHT =2};
-    Type type;
 
-    Constraint(){
-        type = NONE;
-    }
-
-    Type getOpposite(Type t){
-        switch (t){
-            case LEFT:return RIGHT;break;
-            case RIGHT: return LEFT; break;
-            default: return NONE; break;
-        }
-    }
-
-};
+enum Direction{LEFT, RIGHT, NONE};
 
 struct Action{
 private:
@@ -151,6 +139,7 @@ private:
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
     float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
     //float angleAtStart;
+    State::Direction direction = State::Direction::NONE;
 public:
     float RightWheelSpeed=0.5;
     float LeftWheelSpeed=0.5;
@@ -158,47 +147,25 @@ public:
 
     Action(){}
 
-    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, State::Constraint constraint= State::Constraint()){
+    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, State::Direction d= State::Direction::NONE){
+    direction = d;
     float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
-            //printf("angle to robot: %f\n", abs(ob.getAngle(pos)));
+            printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
             if (abs(ob.getAngle(pos))<M_PI_2){
-                // //old loop
-                // if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                //     LeftWheelSpeed = -LeftWheelSpeed; //go left
-                // }
-                // else if (ob.getPosition().y>0){ //go right
-                //     RightWheelSpeed= - RightWheelSpeed;
-                // }  
-                // else if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-                //     int goL = rand()%2;
-                //     switch (goL)
-                //     {
-                //     case 0: //
-                //     LeftWheelSpeed = - LeftWheelSpeed;
-                //     break;
-                //     case 1:
-                //     RightWheelSpeed = -RightWheelSpeed;
-                //     break;
-                //     default:
-                //     printf("invalid case\n");
-                //         break;
-                //     }
-                // }
-
                 //NEW LOOP FOR ABOVE
-                if (constraint.type==State::Constraint::Type::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                if (direction = State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                        constraint.type = State::Constraint::Type::LEFT; //go left
+                        direction = State::Direction::LEFT; //go left
                     }
                     else if (ob.getPosition().y>0){ //go right
-                        constraint.type = State::Constraint::Type::RIGHT; //go left
+                        direction = State::Direction::RIGHT; //go left
                     }   
                     else{
                         int c = rand() % 2;
-                        constraint.type = static_cast<State::Constraint::Type>(c);
+                        direction = static_cast<State::Direction>(c);
 
                     }
                 }
@@ -210,14 +177,17 @@ public:
      
         }
 
-        switch (constraint.type){
-            case State::Constraint::Type::LEFT:
+        switch (direction){
+            case State::Direction::LEFT:
             LeftWheelSpeed = -LeftWheelSpeed;
+            printf("going left\n");
             break;
-            case State::Constraint::Type::RIGHT:
+            case State::Direction::RIGHT:
+            printf("going right\n");
             RightWheelSpeed = - RightWheelSpeed;
             break;
             default:
+            printf("not a valid direction\n");
             break;
         }
 
@@ -310,6 +280,9 @@ public:
     return omega;
     }
 
+    State::Direction getDirection(){
+        return direction;
+    }
 
 
 
@@ -358,6 +331,8 @@ Action action;
 public:
 Object obstacle;
 Object target;
+simResult simulationResult;
+
 
 State::Action getAction(){
     return action;
@@ -367,6 +342,10 @@ State::stateType getType(){
     return type;
 }
 
+State::Object getObstacle(){
+    return obstacle;
+}
+
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
@@ -374,8 +353,8 @@ State(){
 
 }
 
-State(Object ob, State::Constraint constraint = State::Constraint()){
-    action = Action(ob, simDuration, maxSpeed, hz); 
+State(Object ob, State::Direction direction = State::Direction::NONE){
+    action = Action(ob, simDuration, maxSpeed, hz, {0.0f, 0.0f}, direction); 
     //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle){ //og obstacle.getTYpe()
         obstacle = ob;
@@ -417,6 +396,9 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
+int getStepDuration(){
+    return stepDuration;
+}
 
 b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
     b2Vec2 vel;
@@ -465,16 +447,16 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 
-State::simResult willCollide(b2World &, int, b2Vec2, float);
+void willCollide(b2World &, int, b2Vec2, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 
 controlResult controller();
 
-void tunePGain(float yError){ //unused, not tested
-    float learningRate = 0.01;
-    pGain -= yError*learningRate;
-}
+// void tunePGain(float yError){ //unused, not tested
+//     float learningRate = 0.01;
+//     pGain -= yError*learningRate;
+// }
 
 private:
 

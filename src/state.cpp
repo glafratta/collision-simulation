@@ -4,19 +4,19 @@
 
 
 
-State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0,0}, float theta=0){ //CLOSED LOOP CONTROL
-		simResult result = simResult(simResult::resultType::successful);
+void State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.0}, float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+		simulationResult= simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
 		//printf("in state, world has %i bodies\n", _world.GetBodyCount());
-		//sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
-		//planNo++;
-		//FILE * robotPath = fopen(planFile, "w+");
+		sprintf(planFile, "/tmp/robot%04i.txt", _iteration);
+		FILE * robotPath = fopen(planFile, "a");
 		//char debug[250];
 		//sprintf(debug, "/tmp/collision%04i.txt", _iteration);
 		//FILE * robotDebug = fopen(debug, "w");
 		//float theta=0;
+		printf("starting from x =%f, y=%f, theta = %f\n", start.x, start.y, theta);
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start, theta);
 		//printf("entering for loop\n");
@@ -27,7 +27,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
-			//fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
+			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
 			if (obstacle.isValid()){
@@ -39,7 +39,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
+				simulationResult = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
@@ -53,11 +53,11 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		// }
 		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
 		//fclose(robotDebug);
-		//fclose(robotPath);
+		fclose(robotPath);
 		endPose = robot.body->GetTransform();
 		printf("end pose x =%f, y=%f, theta = %f\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle());
 		stepDuration=step;
-		return result;
+		//simulationResult = result;
 	
 }
 

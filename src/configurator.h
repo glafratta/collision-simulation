@@ -12,7 +12,14 @@
 #include <ncurses.h>
 #include <fstream>
 #include "state.h"
+#include "plan.h"
 #include <time.h>
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State> Graph;
+typedef std::pair<State &, State&> Edge; 
+// typedef boost::graph_traits<Graph>::vertex_iterator vIt; 
+typedef boost::graph_traits<Graph>::vertex_descriptor vD;
+
 
 struct Point{
 	float x=0;
@@ -33,13 +40,6 @@ struct Point{
 	}
 
 	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
-
-	// void operator=(Point p){
-	// 	x = p.x;
-	// 	y= p.y;
-	// 	r= p.r;
-	// 	phi = p.phi;	
-	// }
 
 	void operator=(const Point &p){
 		x = p.x;
@@ -76,32 +76,6 @@ struct Point{
 
 };
 
-class Plan{
-	public:
-	std::vector <State> states;
-	float timeDesired =0;
-	float timeAvoid =0;
-
-	int getStepDuration(){
-		int result =0;
-		if (!states.empty()){
-			for (State & s:states){
-				result += s.stepDuration;
-			}
-		}
-		return result;
-	}
-
-	int getObstacleCount(){
-		int result =0;
-		for (State &s:states){
-			if (s.getType() == State::stateType::AVOID){
-				result++;
-			}
-		}
-		return result;
-	}
-};
 
 class Configurator{
 protected:
@@ -119,23 +93,14 @@ protected:
 public:
 	float affineTransError =0;
 	bool filterOn=1;
-	//std::vector <cv::Point2f> previous;
 	char *folder;
 	char readMap[50];
-	//std::vector <cv::Point2f> current;
 	char msg[25];
-	//std::vector <State> plan; //from here we can find the current state
-	//Plan plan;
 	State desiredState;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
-	//float rightWheelSpeed=0;
-	//float leftWheelSpeed=0;
 	float timeElapsed =0;
 	float totalTime=0;
-	// std::vector <cv::Point2f> current;
 	std::vector <Point> current;
-
-	
 
 	struct getVelocityResult{
 		bool valid =0;
@@ -166,15 +131,23 @@ Configurator(){
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
+
 }
 
-Configurator(State &_state): desiredState(_state){
+Configurator(State &_state): desiredState(_state), state(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	//plan.states.push_back(desiredState);
-	state = _state;
+	//state = _state;
 	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
 	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
+
+}
+
+void __init__(){
+}
+
+void __init__(State & _state){
 }
 
 class MedianFilter{
@@ -272,16 +245,6 @@ b2Vec2 getAbsPos(){
 
 
 State * getState(int advance=0){ //returns state being executed
-	// if (plan.states.empty()){
-	// 	plan.states.push_back(desiredState);
-	// 	//printf("pushed back desired state\n");
-	// }
-	// //printf("index = %i, plan.size() =%i\n", advance, plan.states.size());
-	// if (plan.states.size()<=(advance)){
-	// 	printf("plan size exceeded, returning last state\n");
-	// 	advance = plan.states.size()-1;
-	// }
-	// return &(plan.states[advance]);
 	return &state;
 }
 
@@ -297,6 +260,57 @@ b2Vec2 estimateDisplacementFromWheels();
 int getMaxStepDuration(){
 	return state.hz * state.getSimDuration();
 }
+
+State returnBest(State & s1, State & s2){ //returns pointer, remember to dereference
+	switch(s1.getType() == s2.getType()){
+	//if one of the state is the desired state, return the desired state
+		case 0: 
+			if (s1.getType() == desiredState.getType()){
+				return s1;
+			}
+			else if (s2.getType() == desiredState.getType()){
+				return s2;
+			}
+		break;
+		case 1:
+			switch (s1.getType()== desiredState.getType()){
+				//if both states are avoiding, choose the one with the least duration
+				case 0: 
+					if (s1.getStepDuration()< s2.getStepDuration()){
+						return s1;
+					}
+					else if (s2.getStepDuration()< s1.getStepDuration()){
+						return s2;
+					}
+					else {
+						return s1;
+					}
+				//if both states are desired, choose the one with the most
+				case 1:
+					if (s1.getStepDuration()> s2.getStepDuration()){
+						return s1;
+					}
+					else if (s2.getStepDuration()> s1.getStepDuration()){
+						return s2;
+					}
+					else {
+						return s1;
+					}
+				default:
+					break;
+			}
+
+			break;
+			default: break;
+	}
+
+}
+
+void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
+
+void eliminateDisturbance(b2World &, vD &, Graph &, b2Vec2 &, float &, State::Direction);
+
+void decisionTreeAvoidance();
 
 };
 

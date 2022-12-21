@@ -121,8 +121,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	}
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
-	Plan plan;
-	Plan plan2;
+	// Tree decisionTree;
 	b2Vec2 start(0.0f, 0.0f);
 	float theta=0;
 
@@ -132,35 +131,20 @@ void Configurator::NewScan(std::vector <Point> & data){
 	isSameState = wasAvoiding == state.obstacle.isValid();
 	State::simResult result;
 	state.setRecordedVelocity(estimatedVelocity);
-	int advanceIndex=0;
+	//int advanceIndex=0;
 	//if plan contains less than 3 valid obstacles or is within the 1.5m range, plan next action
 	
-	//while (plan.getStepDuration()< getMaxStepDuration() || plan.getObstacleCount()< getMaxObstacleWM()){ //if there is no obstacles the max duration should be fulfilled with one state
-		//printf("plan duration (Steps) = %i, max plan duration = %i", plan.getStepDuration(), getMaxStepDuration());
-		//check if the trajectory being followed will bump the robot into something
-		result =state.willCollide(world, iteration, start, theta);
-		start = state.endPose.p;
-		theta = state.endPose.q.GetAngle();
-		if (result.resultCode == State::simResult::crashed){
-			//printf("crashed\n");
-			//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
-			Point p(result.collision.getPosition());
-			if (!state.obstacle.isValid() || !(p.isInSquare(state.obstacle.getPosition()))){
-				state = State(result.collision);
-				plan.states.push_back(State(result.collision)); //ADD TO THE QUEUE OF OBSTACLES TO AVOID
-				// printf("pushed back plan of duration = %i steps\n", state.stepDuration);
-				// printf("plan size after pushback= %i\n", plan.states.size());
-				//printf("created new trajectory omega= %f, linear speed: %f\n", plan[0].getAction().getOmega(), plan[0].getAction().getLinearSpeed() );
+	/////////////REACTIVE AVOIDANCE: substitute the state
+//	eliminateDisturbance(world, state, start, theta, state.getAction().getDirection());
 
-			}			
-		}
-		else {//printf("not crashed\n");
-		}
-	// 	advanceIndex++;
-	// 	printf("plan duration in steps = %f\n", plan.getStepDuration());
+	//use graph object
+	Graph tree;
+	auto v0 = add_vertex(tree);
+	tree[v0]=state;
+	eliminateDisturbance(world, v0, tree, start, theta, state.getAction().getDirection());
+	boost::remove_vertex(v0, tree);
+	state = tree[v0];
 
-	// }
-	//printf("plan size = %i\n", plan.states.size());
 	//IF THE STATE DIDN'T CHANGE, CORRECT PATH 
 	//printf("was avoiding? %i\tis same state? %i\n", wasAvoiding, isSameState);
 	applyController(isSameState, state);
@@ -170,26 +154,13 @@ void Configurator::NewScan(std::vector <Point> & data){
 }
 
 
-
-
 void Configurator::applyController(bool isSameState, State & state){
 	if (isSameState){
-		//printf("state is the same\n");
 		if (state.controller()==State::controlResult::DONE){
 			state = desiredState;
-			//plan.states.erase(plan.states.begin());	
-			//printf("obstacle successfully avoided\n");					//no need to be in obstacle avoiding state
 		}
 	}
-
-
 }
-
-
-	
-
-
-	
 
 Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point> &_current, std::vector <Point> &_previous){	 //does not modify current vector, creates copy	
 		getVelocityResult result;
@@ -223,11 +194,9 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 		else if (diff<0){//(current.size()<previous.size()){
 			if (currentTmp.empty()){
 				for (cv::Point2f p:previousTmp){
-					//current.push_back(cv::Point2f());
 					printf("no data\n");
 					return result;
 				} 
-				//current = previousTmp;
 				}
 			else{
 				for (int i=0; i<abs(diff); i++){
@@ -237,35 +206,25 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 
 				}
 		}
-		//printf("p>curr\n");
 		}
 
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
-		//printf("matrix is empty? %i\n", transformMatrix.empty());
 		if (!transformMatrix.empty()){
 			b2Vec2 tmp;
 			tmp.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 			tmp.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-			//printf("velocity result %f %f\n", tmp.x, tmp.y);
 			float tmpAngle = atan(tmp.y/tmp.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
 			if (tmp.y ==0 && tmp.x ==0){
 				tmpAngle =0;
 			}
 			float tmpPi = tmpAngle/M_PI;
-			//dumpDeltaV = fopen("/tmp/deltaV.txt", "a");
-			//fprintf(dumpDeltaV, "og velocity x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
-			//fprintf(dumpDeltaV,"tmpAngle = %f pi\n", tmpPi);
 			if (tmp.Length()>state.getMaxSpeed()){
 				affineTransError += tmp.Length()-state.getMaxSpeed();
 				tmp.x = state.getAction().getLinearSpeed() *cos(tmpAngle);
 				tmp.y = state.getAction().getLinearSpeed() *sin(tmpAngle);
-				//printf("getting velocity from proprioception\n");
-			//fprintf(dumpDeltaV, "changed velocity to x= %f, y=%f, length = %f\n", tmp.x, tmp.y, tmp.Length()); //technically
-
 			}
-			//fclose(dumpDeltaV);
 			return getVelocityResult(tmp);
 		}
 		else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
@@ -273,7 +232,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			theta = state.getAction().getOmega()* timeElapsed;
 			estimatedVel ={state.getAction().getLinearSpeed()*cos(theta),state.getAction().getLinearSpeed()*sin(theta)};
 			result = getVelocityResult(estimatedVel);
-			//printf("getting velocity from current state\n");
 			return result;
 		}
 		else{
@@ -281,7 +239,52 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			return result;
 		}
 	}
-	//}
 
+
+void Configurator::eliminateDisturbance(b2World& world, State & s, b2Vec2 &start, float& angle, State::Direction d = State::Direction::NONE){ //STRATEGY AVOIDING JUST ONE OBSTACLE IN FRONT, REACTIVE, NO PLANNING
+	//State::simResult result;
+	s.willCollide(world, iteration, start, angle);
+	// start = state.endPose.p;
+	// theta = state.endPose.q.GetAngle();
+	if (s.simulationResult.resultCode == State::simResult::crashed){
+		printf("crashed\n");
+		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
+		Point p(s.simulationResult.collision.getPosition());
+		if (!s.obstacle.isValid() || !(p.isInSquare(s.obstacle.getPosition()))){
+			s = State(s.simulationResult.collision, d);
+			printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
+		}			
+	}
+
+}
+
+void Configurator::eliminateDisturbance(b2World & world, vD & v, Graph &g, b2Vec2 & start, float & angle, State::Direction d = State::Direction::NONE){
+	g[v].willCollide(world, iteration, start, angle);
+	// start = state.endPose.p;
+	// theta = state.endPose.q.GetAngle();
+	if (g[v].simulationResult.resultCode == State::simResult::crashed){
+		printf("crashed\n");
+		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
+		Point p(g[v].simulationResult.collision.getPosition());
+		if (!g[v].obstacle.isValid() || !(p.isInSquare(g[v].obstacle.getPosition()))){
+			auto newV = boost::add_vertex(g);
+			g[newV]= State(g[v].simulationResult.collision, d); //no point in building an edge
+			//boost::remove_vertex(v, g);
+			printf("new state wheel speeds: %f, %f\n", g[0].getAction().LeftWheelSpeed, g[0].getAction().RightWheelSpeed);
+		}			
+	}
+
+}
+
+
+void decisionTreeAvoidance(){
+	//add one vertex per possible direction
+
+	//until plan is full (need defined)
+
+	//go through tree and prune so that the best next state is tree[0]
+
+	//save objects and track them over time
+}
 
 
