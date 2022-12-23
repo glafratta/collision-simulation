@@ -4,8 +4,8 @@
 
 
 
-void State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.0}, float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
-		simulationResult= simResult(simResult::resultType::successful);
+State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.0}, float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
@@ -39,7 +39,7 @@ void State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				simulationResult = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
+				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
@@ -56,7 +56,8 @@ void State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.
 		fclose(robotPath);
 		endPose = robot.body->GetTransform();
 		printf("end pose x =%f, y=%f, theta = %f\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle());
-		stepDuration=step;
+		result.stepDuration=step;
+		return result;
 		//simulationResult = result;
 	
 }

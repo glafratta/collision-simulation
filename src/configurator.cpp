@@ -139,11 +139,15 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//use graph object
 	Graph tree;
-	auto v0 = add_vertex(tree);
+	vertexDescriptor v0 = add_vertex(tree);
 	tree[v0]=state;
-	eliminateDisturbance(world, v0, tree, start, theta, state.getAction().getDirection());
-	boost::remove_vertex(v0, tree);
+	if (eliminateDisturbance(world, v0, tree, start, theta, state.getAction().getDirection())){
+		boost::clear_vertex(v0, tree);
+		boost::remove_vertex(v0, tree);
+	}
 	state = tree[v0];
+	printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
+
 
 	//IF THE STATE DIDN'T CHANGE, CORRECT PATH 
 	//printf("was avoiding? %i\tis same state? %i\n", wasAvoiding, isSameState);
@@ -243,48 +247,63 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 
 void Configurator::eliminateDisturbance(b2World& world, State & s, b2Vec2 &start, float& angle, State::Direction d = State::Direction::NONE){ //STRATEGY AVOIDING JUST ONE OBSTACLE IN FRONT, REACTIVE, NO PLANNING
 	//State::simResult result;
-	s.willCollide(world, iteration, start, angle);
+	State::simResult result =s.willCollide(world, iteration, start, angle);
 	// start = state.endPose.p;
 	// theta = state.endPose.q.GetAngle();
-	if (s.simulationResult.resultCode == State::simResult::crashed){
+	if (result.resultCode == State::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
-		Point p(s.simulationResult.collision.getPosition());
+		Point p(result.collision.getPosition());
 		if (!s.obstacle.isValid() || !(p.isInSquare(s.obstacle.getPosition()))){
-			s = State(s.simulationResult.collision, d);
+			s = State(result.collision, d);
 			printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
 		}			
 	}
 
 }
 
-void Configurator::eliminateDisturbance(b2World & world, vD & v, Graph &g, b2Vec2 & start, float & angle, State::Direction d = State::Direction::NONE){
-	g[v].willCollide(world, iteration, start, angle);
+bool Configurator::eliminateDisturbance(b2World & world, vertexDescriptor & v, Graph &g, b2Vec2 & start, float & angle, State::Direction d = State::Direction::NONE){
+	State::simResult result =g[v].willCollide(world, iteration, start, angle);
 	// start = state.endPose.p;
 	// theta = state.endPose.q.GetAngle();
-	if (g[v].simulationResult.resultCode == State::simResult::crashed){
+	if (result.resultCode == State::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
-		Point p(g[v].simulationResult.collision.getPosition());
+		Point p(result.collision.getPosition());
 		if (!g[v].obstacle.isValid() || !(p.isInSquare(g[v].obstacle.getPosition()))){
-			auto newV = boost::add_vertex(g);
-			g[newV]= State(g[v].simulationResult.collision, d); //no point in building an edge
+			std::vector <State::Direction> possibleDirections ={State::Direction::LEFT, State::Direction::RIGHT};
+			for (State::Direction d: possibleDirections){
+				auto newV = boost::add_vertex(g);
+				g[newV]= State(result.collision, d); //no point in building an edge
+				edgeDescriptor e = add_edge(v, newV, g).first;
+				g[e]=result; 
+				return 1;
+			}
 			//boost::remove_vertex(v, g);
-			printf("new state wheel speeds: %f, %f\n", g[0].getAction().LeftWheelSpeed, g[0].getAction().RightWheelSpeed);
 		}			
 	}
-
+	return 0;
 }
 
 
-void decisionTreeAvoidance(){
-	//add one vertex per possible direction
-
+void Configurator::decisionTreeAvoidance(Graph &g, vertexDescriptor v){
+	std::vector <vertexDescriptor> vertices;
 	//until plan is full (need defined)
+	while (1){
+	//add one vertex per possible direction
+		//depth_first_visit + visitor
+	}
 
 	//go through tree and prune so that the best next state is tree[0]
 
 	//save objects and track them over time
 }
 
+bool terminateBranch(Graph & g, vertexDescriptor v1, vertexDescriptor v2){
+	//either it has reached the maximum step length
+		//if v1 is the target for an edge 
+		//depth first visit but when branch terminates just stop
+	//or it will just start spinning on the spot
+
+}
 

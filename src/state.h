@@ -15,8 +15,7 @@ class State{
 public:
     float hz =50.0f; //og was 60
     float accumulatedError=0;
-    char planFile[250];
-    int stepDuration=0; //in willcollide steps
+    char planFile[250]; //for debug
     float lidarRange =1.5;
     float box2dRange = 1.0;
     enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
@@ -28,7 +27,6 @@ protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     float simDuration =int(box2dRange /maxSpeed); //in seconds
     float pGain=0.1;
-    int placeInGraph;
 
 public:
 
@@ -290,10 +288,12 @@ public:
 
 
 struct simResult{
-    enum resultType {successful =0, crashed =1, finished =2}; //successful means no collisions, finished means target reached, for later
+    enum resultType {successful =-1, crashed =1, finished =2}; //successful means no collisions, finished means target reached, for later
     resultType resultCode;
     Object collision;
     bool valid = 0;
+    int stepDuration=0;
+
 
     simResult(){}
 
@@ -331,7 +331,7 @@ Action action;
 public:
 Object obstacle;
 Object target;
-simResult simulationResult;
+//simResult simulationResult;
 
 
 State::Action getAction(){
@@ -396,9 +396,9 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
-int getStepDuration(){
-    return stepDuration;
-}
+// int getStepDuration(){
+//     return stepDuration;
+// }
 
 b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
     b2Vec2 vel;
@@ -447,7 +447,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 
-void willCollide(b2World &, int, b2Vec2, float);
+simResult willCollide(b2World &, int, b2Vec2, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 

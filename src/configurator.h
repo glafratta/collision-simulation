@@ -12,13 +12,17 @@
 #include <ncurses.h>
 #include <fstream>
 #include "state.h"
-#include "plan.h"
-#include <time.h>
+//#include "plan.h"
+#include <boost/graph/depth_first_search.hpp>
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State> Graph;
+
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, State, State::simResult> Graph;
 typedef std::pair<State &, State&> Edge; 
 // typedef boost::graph_traits<Graph>::vertex_iterator vIt; 
-typedef boost::graph_traits<Graph>::vertex_descriptor vD;
+typedef boost::graph_traits<Graph>::vertex_descriptor vertexDescriptor;
+typedef boost::graph_traits<Graph>::edge_descriptor edgeDescriptor;
+
 
 
 struct Point{
@@ -127,19 +131,12 @@ Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
 	state = desiredState;
-	//plan.states.push_back(desiredState);
-	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
-	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 
 }
 
 Configurator(State &_state): desiredState(_state), state(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	//plan.states.push_back(desiredState);
-	//state = _state;
-	//leftWheelSpeed = desiredState.getAction().getLWheelSpeed();
-	//rightWheelSpeed = desiredState.getAction().getRWheelSpeed();
 	totalTime =0.0f;
 
 }
@@ -261,57 +258,59 @@ int getMaxStepDuration(){
 	return state.hz * state.getSimDuration();
 }
 
-State returnBest(State & s1, State & s2){ //returns pointer, remember to dereference
-	switch(s1.getType() == s2.getType()){
-	//if one of the state is the desired state, return the desired state
-		case 0: 
-			if (s1.getType() == desiredState.getType()){
-				return s1;
-			}
-			else if (s2.getType() == desiredState.getType()){
-				return s2;
-			}
-		break;
-		case 1:
-			switch (s1.getType()== desiredState.getType()){
-				//if both states are avoiding, choose the one with the least duration
-				case 0: 
-					if (s1.getStepDuration()< s2.getStepDuration()){
-						return s1;
-					}
-					else if (s2.getStepDuration()< s1.getStepDuration()){
-						return s2;
-					}
-					else {
-						return s1;
-					}
-				//if both states are desired, choose the one with the most
-				case 1:
-					if (s1.getStepDuration()> s2.getStepDuration()){
-						return s1;
-					}
-					else if (s2.getStepDuration()> s1.getStepDuration()){
-						return s2;
-					}
-					else {
-						return s1;
-					}
-				default:
-					break;
-			}
+// State returnBest(State & s1, State & s2){ //returns pointer, remember to dereference
+// 	switch(s1.getType() == s2.getType()){
+// 	//if one of the state is the desired state, return the desired state
+// 		case 0: 
+// 			if (s1.getType() == desiredState.getType()){
+// 				return s1;
+// 			}
+// 			else if (s2.getType() == desiredState.getType()){
+// 				return s2;
+// 			}
+// 		break;
+// 		case 1:
+// 			switch (s1.getType()== desiredState.getType()){
+// 				//if both states are avoiding, choose the one with the least duration
+// 				case 0: 
+// 					if (s1.getStepDuration()< s2.getStepDuration()){
+// 						return s1;
+// 					}
+// 					else if (s2.getStepDuration()< s1.getStepDuration()){
+// 						return s2;
+// 					}
+// 					else {
+// 						return s1;
+// 					}
+// 				//if both states are desired, choose the one with the most
+// 				case 1:
+// 					if (s1.getStepDuration()> s2.getStepDuration()){
+// 						return s1;
+// 					}
+// 					else if (s2.getStepDuration()> s1.getStepDuration()){
+// 						return s2;
+// 					}
+// 					else {
+// 						return s1;
+// 					}
+// 				default:
+// 					break;
+// 			}
 
-			break;
-			default: break;
-	}
+// 			break;
+// 			default: break;
+// 	}
 
-}
+// }
 
 void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
 
-void eliminateDisturbance(b2World &, vD &, Graph &, b2Vec2 &, float &, State::Direction);
+bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &, State::Direction);
 
-void decisionTreeAvoidance();
+void decisionTreeAvoidance(Graph &, vertexDescriptor);
 
+
+// class TreeBuilder: public boost::DFSVisitorConcept{};
 };
 
 
