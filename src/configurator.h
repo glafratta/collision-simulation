@@ -247,7 +247,7 @@ bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, floa
 vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor & v, Graph &g);
 
 
-void build_tree(vertexDescriptor v, Graph&g, b2World & w);
+bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
 
 //special case if robot is going in circles
 
@@ -256,7 +256,7 @@ State::Direction getOppositeDirection(State::Direction d){
         case State::Direction::LEFT: return State::Direction::RIGHT;break;
         case State::Direction::RIGHT: return State::Direction::LEFT;break;
         default:
-        return State::Direction::NONE;break;
+        return State::Direction::NONE; printf("default direction\n");break;
     }
 }
 
@@ -276,6 +276,8 @@ bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
     }
 
 }
+
+
 
 
 };

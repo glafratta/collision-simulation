@@ -4,7 +4,7 @@
 
 
 
-State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = b2Vec2(), float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = b2Vec2(), float _theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -16,14 +16,16 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		//sprintf(debug, "/tmp/collision%04i.txt", _iteration);
 		//FILE * robotDebug = fopen(debug, "w");
 		//float theta=0;
-		printf("starting from x =%f, y=%f, theta = %f\n", start.x, start.y, theta);
+		float theta = _theta;
+		printf("starting from x =%f, y=%f, theta = %fpi \n", start.x, start.y, theta/M_PI);
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start, theta);
 		//printf("entering for loop\n");
 		int step=0;
+		printf("speed = %f\n", RecordedVelocity.Length());
 		for (step; step <= (hz*simDuration); step++) {//3 second
-			instVelocity.x = action.getLinearSpeed()*cos(theta); //integrate?
-			instVelocity.y = action.getLinearSpeed()*sin(theta);
+			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
+			instVelocity.y = RecordedVelocity.Length()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
@@ -40,8 +42,8 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
-				robot.body->SetTransform(start, theta); //if the simulation crashes reset position for 
-				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
+				robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+				printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
 			}
@@ -54,9 +56,10 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		// }
 		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
 		//fclose(robotDebug);
+		_world.DestroyBody(robot.body);		
 		fclose(robotPath);
 		endPose = robot.body->GetTransform();
-		printf("end pose x =%f, y=%f, theta = %f\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle());
+		printf("end pose x =%f, y=%f, theta = %f pi\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle()/M_PI);
 		result.stepDuration=step;
 		return result;
 		//simulationResult = result;

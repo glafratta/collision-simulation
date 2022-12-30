@@ -16,7 +16,7 @@ public:
     float box2dRange = 1.0;
     enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-    bool visited=0;
+    bool change =0;
 protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
@@ -228,24 +228,25 @@ public:
     }
 
 
-
     b2Vec2 getLinearVelocity(float maxV = 0.125){
         b2Vec2 vel;
-        float realL = maxV*LeftWheelSpeed;
-        float realR = maxV*RightWheelSpeed;
-            //find angle theta in the pose:
-        float W = (realL-realR)/distanceBetweenWheels; //rad/s, final angle at end of 1s
-        //find absolute speed
-        float V =(realL+realR)/2; //velocity
-        if (realR-realL == 0){
-            vel.x = realL;
-            vel.y = 0;
-            }
-        else {
-            vel.x = (distanceBetweenWheels/2)* sin(distanceBetweenWheels/(realR-realL));
-            vel.y = -(distanceBetweenWheels/2)* cos(distanceBetweenWheels/(realR-realL));
+        // float realL = maxV*LeftWheelSpeed;
+        // float realR = maxV*RightWheelSpeed;
+        //     //find angle theta in the pose:
+        // float W = (realL-realR)/distanceBetweenWheels; //rad/s, final angle at end of 1s
+        // //find absolute speed
+        // float V =(realL+realR)/2; //velocity
+        // if (realR-realL == 0){
+        //     vel.x = realL;
+        //     vel.y = 0;
+        //     }
+        // else {
+        //     vel.x = (distanceBetweenWheels/2)* sin(distanceBetweenWheels/(realR-realL));
+        //     vel.y = -(distanceBetweenWheels/2)* cos(distanceBetweenWheels/(realR-realL));
 
-        }
+        //}
+        vel.x = linearSpeed *cos(omega);
+        vel.y = linearSpeed *sin(omega);
         return vel;
 
     }
@@ -327,6 +328,7 @@ class Listener : public b2ContactListener {
 private:
 Action action;
 public:
+std::vector <State::Direction> options;
 Object obstacle;
 Object target;
 //simResult simulationResult;
@@ -347,18 +349,25 @@ State::Object getObstacle(){
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
-    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    // options.push_back(State::Direction::LEFT);
+    // options.push_back(State::Direction::RIGHT);
+    // maxNoChildren = options.size();
+    RecordedVelocity = action.getLinearVelocity();
+    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
 State(Object ob, State::Direction direction = State::Direction::NONE){
     action = Action(ob, simDuration, maxSpeed, hz, {0.0f, 0.0f}, direction); 
+    RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle){ //og obstacle.getTYpe()
         obstacle = ob;
         type =stateType::AVOID;
+        // options.push_back(State::Direction::NONE);
+        // maxNoChildren = options.size();
     }
-    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
@@ -367,6 +376,7 @@ State(Object ob, State::Direction direction = State::Direction::NONE){
 void setObstacle(Object ob){
     obstacle = ob;
 }
+
 
 
 float getMaxSpeed(){
@@ -387,6 +397,7 @@ int getSimDuration(){ //in seconds
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
+    
 } //useful to get the speed.
 
 
@@ -455,6 +466,8 @@ controlResult controller();
 //     float learningRate = 0.01;
 //     pGain -= yError*learningRate;
 // }
+
+
 
 private:
 
