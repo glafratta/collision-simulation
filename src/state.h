@@ -3,10 +3,6 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> //recommended cmath?
-#include <utility>                   // for std::pair
-#include <algorithm>                 // for std::for_each
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
 
 enum ObjectType {obstacle=0, target=1, other=2};  
 
@@ -20,13 +16,15 @@ public:
     float box2dRange = 1.0;
     enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+    bool visited=0;
 protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
-    //b2Vec2 desiredVelocity;//={maxSpeed *EstimatedLinearVelocity.x, maxSpeed*EstimatedLinearVelocity.y}; //velocity recorded at t. if no data is available it falls back on the prediction
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     float simDuration =int(box2dRange /maxSpeed); //in seconds
     float pGain=0.1;
+
+
 
 public:
 
@@ -349,7 +347,7 @@ State::Object getObstacle(){
 State(){
     action = Action(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
-    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
@@ -360,7 +358,7 @@ State(Object ob, State::Direction direction = State::Direction::NONE){
         obstacle = ob;
         type =stateType::AVOID;
     }
-    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 

@@ -12,73 +12,8 @@
 #include <ncurses.h>
 #include <fstream>
 #include "state.h"
-//#include "plan.h"
+#include "general.h" //general functions + point class + typedefs + state.h + boost includes
 #include <boost/graph/depth_first_search.hpp>
-
-
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, State, State::simResult> Graph;
-typedef std::pair<State &, State&> Edge; 
-// typedef boost::graph_traits<Graph>::vertex_iterator vIt; 
-typedef boost::graph_traits<Graph>::vertex_descriptor vertexDescriptor;
-typedef boost::graph_traits<Graph>::edge_descriptor edgeDescriptor;
-
-
-
-struct Point{
-	float x=0;
-	float y=0;
-	float r=0;
-	float phi=0;
-
-	Point(){}
-
-	Point(float _x, float _y): x(_x), y(_y){
-		r= sqrt(x*x+y*y);
-		phi = atan(y/x);
-	}
-
-	Point(b2Vec2 v): x(v.x), y(v.y){
-		r= sqrt(x*x+y*y);
-		phi = atan(y/x);
-	}
-
-	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
-
-	void operator=(const Point &p){
-		x = p.x;
-		y= p.y;
-		r= p.r;
-		phi = p.phi;
-	}
-
-	bool operator==(Point &p){
-		return (x == p.x && y == p.y);
-	}
-
-	bool operator!=(Point &p){
-		if (*this == p){
-			return false;
-		}
-		else if (!(*this ==p)){
-			return true;
-		}
-	}
-
-	bool isInSquare(b2Vec2 point, float radius = 0.05){
-		if (this->x < point.x+radius && this->x >point.y-radius && this->y < point.y+radius && this->y >point.y-radius){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-
-	b2Vec2 getb2Vec2(){
-		return b2Vec2(x,y);
-	}
-
-};
 
 
 class Configurator{
@@ -94,6 +29,7 @@ protected:
 	char fileNameBuffer[50];
 	int maxObstacleWM =3;
 	State state;
+	int maxNoChildren =2;
 public:
 	float affineTransError =0;
 	bool filterOn=1;
@@ -105,6 +41,7 @@ public:
 	float timeElapsed =0;
 	float totalTime=0;
 	std::vector <Point> current;
+	bool planning =1;
 
 	struct getVelocityResult{
 		bool valid =0;
@@ -303,14 +240,44 @@ int getMaxStepDuration(){
 
 // }
 
-void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
+// void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
 
-bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &, State::Direction);
+bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &); //adds two states if crashed but always next up is picked
 
-void decisionTreeAvoidance(Graph &, vertexDescriptor);
+vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor & v, Graph &g);
 
 
-// class TreeBuilder: public boost::DFSVisitorConcept{};
+void build_tree(vertexDescriptor v, Graph&g, b2World & w);
+
+//special case if robot is going in circles
+
+State::Direction getOppositeDirection(State::Direction d){
+    switch (d){
+        case State::Direction::LEFT: return State::Direction::RIGHT;break;
+        case State::Direction::RIGHT: return State::Direction::LEFT;break;
+        default:
+        return State::Direction::NONE;break;
+    }
+}
+
+bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
+	//length = stepdur/hz *linvel
+    if (boost::in_degree(v,g)<=0 && length < g[v].box2dRange){
+        return false;
+    }
+    else if (length >=g[v].box2dRange){
+        return true;
+    }
+    else{
+        edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
+        length += g[inEdge].stepDuration/g[v].hz * g[v].getAction().getLinearSpeed();
+        vertexDescriptor newV = boost::source(inEdge, g);
+        return isFullLength(newV, g, length);
+    }
+
+}
+
+
 };
 
 

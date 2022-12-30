@@ -1,45 +1,74 @@
- #ifndef GENERAL_H
+#ifndef GENERAL_H
 #define GENERAL_H
+
 #include <vector>
 #include <map>
 #include <set>
-#include "state.h"
 #include <utility>                   // for std::pair
 #include <algorithm>                 // for std::for_each
+#include "state.h"
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, State, State::simResult> Graph;
-//typedef std::pair<State &, State&> Edge; 
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, State::simResult> Graph;
 typedef boost::graph_traits<Graph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<Graph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<Graph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<Graph>::edge_iterator edgeIterator;
 
 
-State::Direction getOppositeDirection(State::Direction d){
-    switch (d){
-        case State::Direction::LEFT: return State::Direction::RIGHT;break;
-        case State::Direction::RIGHT: return State::Direction::LEFT;break;
-        default:
-        return State::Direction::NONE;
-    }
-}
 
-bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
-	//length = stepdur/hz *linvel
-    if (in_degree(v,g)<=0 && length < g[v].box2dRange){
-        return false;
-    }
-    else if (length >=g[v].box2dRange){
-        return true;
-    }
-    else{
-        edgeDescriptor inEdge= in_edges(v, g).first.dereference();
-        length += g[inEdge].stepDuration/g[v].hz * g[v].getAction().getLinearSpeed();
-        vertexDescriptor newV = source(inEdge, g);
-        return isFullLength(newV, g, length);
-    }
+struct Point{
+	float x=0;
+	float y=0;
+	float r=0;
+	float phi=0;
 
-}
+	Point(){}
 
+	Point(float _x, float _y): x(_x), y(_y){
+		r= sqrt(x*x+y*y);
+		phi = atan(y/x);
+	}
+
+	Point(b2Vec2 v): x(v.x), y(v.y){
+		r= sqrt(x*x+y*y);
+		phi = atan(y/x);
+	}
+
+	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){}
+
+	void operator=(const Point &p){
+		x = p.x;
+		y= p.y;
+		r= p.r;
+		phi = p.phi;
+	}
+
+	bool operator==(Point &p){
+		return (x == p.x && y == p.y);
+	}
+
+	bool operator!=(Point &p){
+		if (*this == p){
+			return false;
+		}
+		else if (!(*this ==p)){
+			return true;
+		}
+	}
+
+	bool isInSquare(b2Vec2 point, float radius = 0.05){
+		if (this->x < point.x+radius && this->x >point.y-radius && this->y < point.y+radius && this->y >point.y-radius){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	b2Vec2 getb2Vec2(){
+		return b2Vec2(x,y);
+	}
+
+};
 #endif

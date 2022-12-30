@@ -4,7 +4,7 @@
 
 
 
-State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = {0.0,0.0}, float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = b2Vec2(), float theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -40,6 +40,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
+				robot.body->SetTransform(start, theta); //if the simulation crashes reset position for 
 				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
