@@ -244,7 +244,7 @@ int getMaxStepDuration(){
 
 bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &); //adds two states if crashed but always next up is picked
 
-vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor & v, Graph &g);
+vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
 
 
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
@@ -278,6 +278,22 @@ bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
 }
 
 
+vertexDescriptor addVertex(vertexDescriptor src, Graph &g, State::Object obs = State::Object()){
+	vertexDescriptor v1 = boost::add_vertex(g);
+	State::Direction d= State::Direction::NONE;
+	if (g[src].options.size()>0){
+		d = g[src].options[0];
+	}
+	g[v1]= State(obs, d);
+	for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
+		if (*i = g[v1].getAction().getDirection()){
+			g[src].options.erase(i);
+		}
+	}
+	add_edge(src, v1, g).first;
+	printf("edge %i, %i\n", src, v1);
+	return v1;
+}
 
 
 };

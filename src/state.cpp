@@ -42,6 +42,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
+				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
 				robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 				printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
