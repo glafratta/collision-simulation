@@ -260,9 +260,9 @@ State::Direction getOppositeDirection(State::Direction d){
     }
 }
 
-bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
+bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
 	//length = stepdur/hz *linvel
-    if (boost::in_degree(v,g)<=0 && length < g[v].box2dRange){
+    if (boost::in_degree(v, g)<=0 && length < g[v].box2dRange){
         return false;
     }
     else if (length >=g[v].box2dRange){
@@ -270,29 +270,37 @@ bool isFullLength(vertexDescriptor v, Graph &g, float length=0){
     }
     else{
         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
+		printf("step dur = %i, linear speed = %f, a\n", g[inEdge].stepDuration, g[v].getAction().getLinearSpeed());
         length += g[inEdge].stepDuration/g[v].hz * g[v].getAction().getLinearSpeed();
+		printf("length = %f\n", length);
         vertexDescriptor newV = boost::source(inEdge, g);
-        return isFullLength(newV, g, length);
+		edgesTotal++;
+        return isFullLength(newV, g, length, edgesTotal);
     }
 
 }
 
 
-vertexDescriptor addVertex(vertexDescriptor src, Graph &g, State::Object obs = State::Object()){
-	vertexDescriptor v1 = boost::add_vertex(g);
+void addVertex(vertexDescriptor src, vertexDescriptor& v1, Graph &g, State::Object obs = State::Object()){
+	//vertexDescriptor v1=src;
 	State::Direction d= State::Direction::NONE;
 	if (g[src].options.size()>0){
+		v1 = boost::add_vertex(g);
 		d = g[src].options[0];
+		g[src].options.erase(g[src].options.begin());
+		g[v1]= State(obs, d);
+		add_edge(src, v1, g).first;
+		printf("edge %i, %i\n", src, v1);
 	}
-	g[v1]= State(obs, d);
-	for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
-		if (*i = g[v1].getAction().getDirection()){
-			g[src].options.erase(i);
-		}
+	else{///for debug
+		printf("no options\n");
 	}
-	add_edge(src, v1, g).first;
-	printf("edge %i, %i\n", src, v1);
-	return v1;
+	// for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
+	// 	if (*i = g[v1].getAction().getDirection()){
+	// 		g[src].options.erase(i);
+	// 	}
+	// }
+	//return v1;
 }
 
 
