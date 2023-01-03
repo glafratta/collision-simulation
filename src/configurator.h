@@ -281,12 +281,13 @@ bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =
 }
 
 
-void addVertex(vertexDescriptor src, vertexDescriptor& v1, Graph &g, State::Object obs = State::Object()){
+void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Object obs = State::Object()){
 	//vertexDescriptor v1=src;
 	State::Direction d= State::Direction::NONE;
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		d = g[src].options[0];
+		printf("option = %i\n", d);
 		g[src].options.erase(g[src].options.begin());
 		g[v1]= State(obs, d);
 		add_edge(src, v1, g).first;

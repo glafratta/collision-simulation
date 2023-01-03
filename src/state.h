@@ -135,7 +135,7 @@ private:
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
     float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
     //float angleAtStart;
-    State::Direction direction = State::Direction::NONE;
+    Direction direction;
 public:
     float RightWheelSpeed=0.5;
     float LeftWheelSpeed=0.5;
@@ -143,7 +143,99 @@ public:
 
     Action(){}
 
-    Action(Object &ob, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, State::Direction d= State::Direction::NONE){
+    void __init__(){
+        direction = Direction::NONE;
+    }
+
+    // Action(Object &ob, State::Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
+    // direction = d;
+    // float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
+    // float maxDistance = maxSpeed*simDuration;
+    // if (ob.isValid()==true){
+    //     if (ob.getType()==ObjectType::obstacle){
+    //         printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
+    //         if (abs(ob.getAngle(pos))<M_PI_2){
+    //             //NEW LOOP FOR ABOVE
+    //             if (direction = State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+    //             printf("direction =none\n");
+    //                 if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
+    //                     direction = State::Direction::LEFT; //go left
+    //                 }
+    //                 else if (ob.getPosition().y>0){ //go right
+    //                     direction = State::Direction::RIGHT; //go left
+    //                 }   
+    //                 else{
+    //                     int c = rand() % 2;
+    //                     direction = static_cast<State::Direction>(c);
+
+    //                 }
+    //             }
+    //             else{
+    //                 printf("direction = %i\n", static_cast<int>(direction));
+    //             }
+    //         }
+    //         else{
+    //             ob.invalidate();
+    //             //printf("invalidated obstacle because angle >pi/2\n");
+    //         }
+     
+    //     }
+
+    //     switch (direction){
+    //         case State::Direction::LEFT:
+    //         LeftWheelSpeed = -LeftWheelSpeed;
+    //         printf("going left\n");
+    //         break;
+    //         case State::Direction::RIGHT:
+    //         printf("going right\n");
+    //         RightWheelSpeed = - RightWheelSpeed;
+    //         break;
+    //         default:
+    //         printf("not a valid direction\n");
+    //         break;
+    //     }
+
+    //     if (LeftWheelSpeed >1.0f){
+    //         LeftWheelSpeed=1;
+    //     }
+    //     if (RightWheelSpeed >1.0f){
+    //         RightWheelSpeed =1;
+    //     }
+    //     if (LeftWheelSpeed <-1.0f){
+    //         LeftWheelSpeed=-1;
+    //     }
+    //     if (RightWheelSpeed <-1.0f){
+    //         RightWheelSpeed =-1;
+    //     }
+    // }
+
+
+    // omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
+    //     //printf("omega = %f pi\n", omega/M_PI);
+    //     if (abs(omega)>M_PI){ //max turning angle in one second
+    //         float multiplier=1;
+    //         if (omega<0){
+    //             multiplier=-1;
+    //         }
+    //         omega=M_PI*multiplier;
+    //     }
+
+    // linearSpeed = maxSpeed*(LeftWheelSpeed+RightWheelSpeed)/2;
+    // //linearSpeed = distanceBetweenWheels*omega;
+    // if (abs(linearSpeed)>maxSpeed){
+    //     float multiplier=1;
+    // if (linearSpeed<0){
+    //     multiplier=-1;
+    // }
+    // linearSpeed=maxSpeed*multiplier;
+    // }
+    // //printf("linear speed = %f\n", linearSpeed);
+
+
+    // valid=1;
+    // }
+
+    void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
     direction = d;
     float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
@@ -152,7 +244,8 @@ public:
             printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
             if (abs(ob.getAngle(pos))<M_PI_2){
                 //NEW LOOP FOR ABOVE
-                if (direction = State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                if (direction == State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                printf("direction =none\n");
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                         direction = State::Direction::LEFT; //go left
                     }
@@ -164,6 +257,9 @@ public:
                         direction = static_cast<State::Direction>(c);
 
                     }
+                }
+                else{
+                    printf("direction = %i\n", static_cast<int>(direction));
                 }
             }
             else{
@@ -347,7 +443,7 @@ State::Object getObstacle(){
 }
 
 State(){
-    action = Action(); //this is a valid trajectory, default going straight at moderate speed
+    action.__init__(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
     // options.push_back(State::Direction::LEFT);
     // options.push_back(State::Direction::RIGHT);
@@ -357,17 +453,15 @@ State(){
 
 }
 
-State(Object ob, State::Direction direction = State::Direction::NONE){
-    action = Action(ob, simDuration, maxSpeed, hz, {0.0f, 0.0f}, direction); 
+State(Object ob, Direction direction = Direction::NONE){
+    action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle){ //og obstacle.getTYpe()
         obstacle = ob;
         type =stateType::AVOID;
-        // options.push_back(State::Direction::NONE);
-        // maxNoChildren = options.size();
     }
-    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 
@@ -376,8 +470,6 @@ State(Object ob, State::Direction direction = State::Direction::NONE){
 void setObstacle(Object ob){
     obstacle = ob;
 }
-
-
 
 float getMaxSpeed(){
     return maxSpeed;
