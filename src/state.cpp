@@ -43,25 +43,36 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
-				robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
-				printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
+				if (type == State::stateType::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
+					if (step/hz >2){
+						start.x += instVelocity.x*(step/hz-2);
+						start.y += instVelocity.y*(step/hz-2);
+						//robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+					}
+					else{
+						change =1;
+					}
+					
+				}
+				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
 			}
 
 		}	
-		//printf("exited for loop after %i steps\n", step);
-		// else{
-		// 	result = simResult(simResult::resultType::successful);
-		// 	//printf("no collisions\n");
-		// }
-		//printf("robot pose : (%f, %f, %f pi)\n", robot.body->GetPosition().x, robot.body->GetPosition().y, robot.body->GetAngle()/M_PI);
-		//fclose(robotDebug);
+		//result.distanceCovered = robot.body->GetPosition().Length() - start.Length();
+		if (result.resultCode==simResult::resultType::crashed){
+			robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+		}
+		b2Vec2 distance = robot.body->GetPosition();
+		distance -= start;
+		result.distanceCovered = distance.Length() ;
+		result.endPose = robot.body->GetTransform();
+		endPose = robot.body->GetTransform();
 		_world.DestroyBody(robot.body);		
 		fclose(robotPath);
-		endPose = robot.body->GetTransform();
-		printf("end pose x =%f, y=%f, theta = %f pi\n", endPose.p.x, endPose.p.y, endPose.q.GetAngle()/M_PI);
-		result.stepDuration=step;
+		printf("end pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
+		//result.stepDuration=step;
 		return result;
 		//simulationResult = result;
 	

@@ -21,7 +21,7 @@ protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
-    float simDuration =int(box2dRange /maxSpeed); //in seconds
+    float simDuration =int(box2dRange*2 /maxSpeed); //in seconds
     float pGain=0.1;
 
 
@@ -241,11 +241,11 @@ public:
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
-            printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
+           // printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
             if (abs(ob.getAngle(pos))<M_PI_2){
                 //NEW LOOP FOR ABOVE
                 if (direction == State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-                printf("direction =none\n");
+                printf("direction in action =none\n");
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                         direction = State::Direction::LEFT; //go left
                     }
@@ -259,7 +259,7 @@ public:
                     }
                 }
                 else{
-                    printf("direction = %i\n", static_cast<int>(direction));
+                   // printf("direction = %i\n", static_cast<int>(direction));
                 }
             }
             else{
@@ -279,22 +279,22 @@ public:
             RightWheelSpeed = - RightWheelSpeed;
             break;
             default:
-            printf("not a valid direction\n");
+           // printf("not a valid direction\n");
             break;
         }
 
-        if (LeftWheelSpeed >1.0f){
-            LeftWheelSpeed=1;
-        }
-        if (RightWheelSpeed >1.0f){
-            RightWheelSpeed =1;
-        }
-        if (LeftWheelSpeed <-1.0f){
-            LeftWheelSpeed=-1;
-        }
-        if (RightWheelSpeed <-1.0f){
-            RightWheelSpeed =-1;
-        }
+        // if (LeftWheelSpeed >1.0f){
+        //     LeftWheelSpeed=1;
+        // }
+        // if (RightWheelSpeed >1.0f){
+        //     RightWheelSpeed =1;
+        // }
+        // if (LeftWheelSpeed <-1.0f){
+        //     LeftWheelSpeed=-1;
+        // }
+        // if (RightWheelSpeed <-1.0f){
+        //     RightWheelSpeed =-1;
+        // }
     }
 
 
@@ -383,11 +383,13 @@ public:
 
 
 struct simResult{
-    enum resultType {successful =-1, crashed =1, finished =2}; //successful means no collisions, finished means target reached, for later
+    enum resultType {successful =-1, crashed =1}; //successful means no collisions, finished means target reached, for later
     resultType resultCode;
     Object collision;
     bool valid = 0;
-    int stepDuration=0;
+   // int stepDuration=0;
+    float distanceCovered =0;
+    b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 
 
     simResult(){}
@@ -426,7 +428,7 @@ Action action;
 public:
 std::vector <State::Direction> options;
 Object obstacle;
-Object target;
+//Object target;
 //simResult simulationResult;
 
 
@@ -438,9 +440,9 @@ State::stateType getType(){
     return type;
 }
 
-State::Object getObstacle(){
-    return obstacle;
-}
+// State::Object getObstacle(){
+//     return obstacle;
+// }
 
 State(){
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
@@ -449,7 +451,7 @@ State(){
     // options.push_back(State::Direction::RIGHT);
     // maxNoChildren = options.size();
     RecordedVelocity = action.getLinearVelocity();
-    printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
@@ -461,7 +463,7 @@ State(Object ob, Direction direction = Direction::NONE){
         obstacle = ob;
         type =stateType::AVOID;
     }
-    printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
+    //printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 

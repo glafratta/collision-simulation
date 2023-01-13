@@ -32,7 +32,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		//return;
 	}
 	else if (timeElapsed >.25){
-		printf("took too long!");
+		printf("took too long! %f\n", timeElapsed);
 		//return;
 	}
 
@@ -112,7 +112,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}
 	}
-	//printf("bodies = %i\n", world.GetBodyCount());
+	printf("bodies = %i\n", world.GetBodyCount());
 	//printf("is obstacle still there = %i\n", isObstacleStillThere);
 	// if (!isObstacleStillThere && plan.states.size()>0){ 
 	if (!isObstacleStillThere){ 
@@ -133,20 +133,23 @@ void Configurator::NewScan(std::vector <Point> & data){
 	state.setRecordedVelocity(estimatedVelocity);
 
 	//creating decision tree object
-	Graph tree;
+	Graph g;
+	vertexDescriptor v = add_vertex(g);
+	g[v]=state;
+	CollisionTree tree;
 	vertexDescriptor v0 = add_vertex(tree);
-	tree[v0]=state;
+	//tree[v0]= state.willCollide(world, iteration, )
 
 	/////////////REACTIVE AVOIDANCE: substitute the state
 //	eliminateDisturbance(world, state, start, theta, state.getAction().getDirection());
 	switch (planning){
 		case 0:
-			state.change =eliminateDisturbance(world, v0, tree, start, theta);
+			state.change =eliminateDisturbance(world, v, g, start, theta);
 			break;
 		case 1:
 			printf("planning on\n");
-			state.change =build_tree(v0, tree, world); //for now should produce the same behaviour because the tree is not being pruned
-			//changeState = tree[v0].
+			//state.change =build_tree(v, g, world); //for now should produce the same behaviour because the tree is not being pruned
+			state.change =build_tree(v0, tree, state, world); //for now should produce the same behaviour because the tree is not being pruned
 			break;
 		default: break;
 
@@ -161,8 +164,11 @@ void Configurator::NewScan(std::vector <Point> & data){
 	if (state.change){
 		boost::clear_vertex(v0, tree);
 		boost::remove_vertex(v0, tree);
+		// boost::clear_vertex(v, g);
+		// boost::remove_vertex(v, g);
 	}
-	state = tree[v0];
+	//state = tree[v0];
+	state = State(tree[v].obstacle);
 	printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
 
 
@@ -274,6 +280,8 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 // 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
 // 		Point p(result.collision.getPosition());
 // 		if (!s.obstacle.isValid() || !(p.isInSquare(s.obstacle.getPosition()))){
+// 			//BUILD TREE HERE?
+// 			CollisionTree tree;
 // 			s = State(result.collision, d);
 // 			printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
 // 		}			
@@ -315,12 +323,12 @@ vertexDescriptor Configurator::eliminateDisturbance(b2World & world, vertexDescr
 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
 		//FIND IF THE PRESENT STATE WILL COLLIDE
-	printf("add to vertex %i, ", v);
+	//printf("add to vertex %i, ", v);
 	State::simResult result; 
 
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
-		printf("is not root\n");
+		//printf("is not root\n");
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		result =g[v].willCollide(world, iteration, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last state ended (if previous state crashes)
@@ -342,11 +350,197 @@ vertexDescriptor Configurator::eliminateDisturbance(b2World & world, vertexDescr
 						State::Direction reflexDirection = reflex.getDirection();
 						g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
 						g[v].options.push_back(getOppositeDirection(reflexDirection));
-						g[v].change=1;
+						//g[v].change=1;
 					}
 					break;
 				case State::simResult::resultType::successful:
 					if (g[v].getType()==State::stateType::AVOID){
+						g[v].options.push_back(State::Direction::NONE);
+					}
+					break;
+				default: break;
+			}
+	}
+
+	// for (State::Direction d:g[v].options){
+	// 	printf("action %i\n", static_cast<int>(d));
+	// }
+
+
+	isLeaf = fl ||(g[v].options.size() <=0);
+//	printf("is leaf? %i full length = %i, options = %i\n", isLeaf, fl, g[v].options.size());
+
+	//IF THE STATE COLLIDES CREATE A PLAN, DEPTH-FIRST
+			//DEFINE POSSIBLE NEXT STATES DEPENDING ON OUTCOME, only if it's not a leaf
+	if (g[v].options.size()>0){
+			addVertex(v, v1, g, result.collision);
+	}
+	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
+	else {
+		//printf("seeing if can go back\n");
+		State::Object previousCollision;
+                while (g[v].options.size()<=0){ //keep going back until it finds an incomplete node
+					// if (boost::in_degree(v,g)>0){
+					// }
+					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
+                    if(boost::in_degree(v, g)>0){
+	                    inEdge = boost::in_edges(v, g).first.dereference();
+						previousCollision = g[v].obstacle;
+						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, previousCollision.getPosition().x, previousCollision.getPosition().y, previousCollision.isValid());
+						v = source(inEdge, g); //go back a node
+					    //printf("new src = %i, in degree = %i\n", v, boost::in_degree(v, g));
+                    }
+                    else{
+                        //printf("source has no back edge\n");
+                        break;
+                    }
+                }
+				if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+					addVertex(v,v1,g, previousCollision);
+                    //printf("added edge %i, %i\n", v, v1);
+                }
+		}
+		return v1;
+	}
+
+// vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, CollisionTree&g, State  s, b2World & w){
+// 	//vertexDescriptor ogV = v;
+// 	//PREPARE TO LOOK AT BACK EDGES
+// 	edgeDescriptor inEdge;
+// 	vertexDescriptor srcVertex=v; //default
+// 	bool notRoot = boost::in_degree(v, g)>0;
+// 	//printf("degree = %i, is it >0, %i\n", boost::in_degree(v, g), boost::in_degree(v, g) >0);
+// 	bool isLeaf=0;
+// 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
+
+// 		//FIND IF THE PRESENT STATE WILL COLLIDE
+// 	//printf("add to vertex %i, ", v);
+// 	State::simResult result; 
+
+// 	//IDENTIFY SOURCE NODE, IF ANY
+// 	if (notRoot){
+// 		//printf("is not root\n");
+// 		inEdge = boost::in_edges(v, g).first.dereference();
+// 		srcVertex = boost::source(inEdge, g);
+// 		result =s.willCollide(world, iteration, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last state ended (if previous state crashes)
+// 		g[inEdge]= result; //assign data to edge
+// 	}
+
+// 	else{
+// 		result =s.willCollide(world, iteration, {0.0, 0.0}, 0); //default start from 0
+// 	}
+
+// 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
+// 	bool fl = isFullLength(v,g);
+// 	if(!fl){
+// 		switch (result.resultCode){
+// 				case State::simResult::resultType::crashed:
+// 					if (g[v].getType()==State::stateType::BASELINE){
+// 						State::Action reflex;
+// 						reflex.__init__(result.collision, State::Direction::NONE);
+// 						State::Direction reflexDirection = reflex.getDirection();
+// 						g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
+// 						g[v].options.push_back(getOppositeDirection(reflexDirection));
+// 						//g[v].change=1;
+// 					}
+// 					break;
+// 				case State::simResult::resultType::successful:
+// 					if (g[v].getType()==State::stateType::AVOID){
+// 						g[v].options.push_back(State::Direction::NONE);
+// 					}
+// 					break;
+// 				default: break;
+// 			}
+// 	}
+
+// 	// for (State::Direction d:g[v].options){
+// 	// 	printf("action %i\n", static_cast<int>(d));
+// 	// }
+
+
+// 	isLeaf = fl ||(g[v].options.size() <=0);
+// //	printf("is leaf? %i full length = %i, options = %i\n", isLeaf, fl, g[v].options.size());
+
+// 	//IF THE STATE COLLIDES CREATE A PLAN, DEPTH-FIRST
+// 			//DEFINE POSSIBLE NEXT STATES DEPENDING ON OUTCOME, only if it's not a leaf
+// 	if (g[v].options.size()>0){
+// 			addVertex(v, v1, g, result.collision);
+// 	}
+// 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
+// 	else {
+// 		//printf("seeing if can go back\n");
+// 		State::Object previousCollision;
+//                 while (g[v].options.size()<=0){ //keep going back until it finds an incomplete node
+// 					// if (boost::in_degree(v,g)>0){
+// 					// }
+// 					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
+//                     if(boost::in_degree(v, g)>0){
+// 	                    inEdge = boost::in_edges(v, g).first.dereference();
+// 						previousCollision = g[v].obstacle;
+// 						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, previousCollision.getPosition().x, previousCollision.getPosition().y, previousCollision.isValid());
+// 						v = source(inEdge, g); //go back a node
+// 					    //printf("new src = %i, in degree = %i\n", v, boost::in_degree(v, g));
+//                     }
+//                     else{
+//                         //printf("source has no back edge\n");
+//                         break;
+//                     }
+//                 }
+// 				if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+// 					addVertex(v,v1,g, previousCollision);
+//                     //printf("added edge %i, %i\n", v, v1);
+//                 }
+// 		}
+// 		return v1;
+// 	}
+
+
+vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, CollisionTree&g, State  s, b2World & w){
+	//vertexDescriptor ogV = v;
+	//PREPARE TO LOOK AT BACK EDGES
+	edgeDescriptor inEdge;
+	vertexDescriptor srcVertex=v; //default
+	bool notRoot = boost::in_degree(v, g)>0;
+	printf("degree = %i, is it >0, %i\n", boost::in_degree(v, g), boost::in_degree(v, g) >0);
+	bool isLeaf=0;
+	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
+
+		//FIND IF THE PRESENT STATE WILL COLLIDE
+	printf("add to vertex %i, ", v);
+	State::simResult result; 
+
+	//IDENTIFY SOURCE NODE, IF ANY
+	if (notRoot){
+		printf("is not root\n");
+		inEdge = boost::in_edges(v, g).first.dereference();
+		srcVertex = boost::source(inEdge, g);
+		result =s.willCollide(w, iteration, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last state ended (if previous state crashes)
+		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
+		g[inEdge].outcome = result.resultCode;
+	}
+
+	else{
+		result =s.willCollide(w, iteration, {0.0, 0.0}, 0); //default start from 0
+	}
+	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
+	g[v].obstacle = result.collision;
+	g[v].endPose = result.endPose;
+	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
+	bool fl = isFullLength(v,g);
+	if(!fl){
+		switch (result.resultCode){
+				case State::simResult::resultType::crashed:
+					if (s.getType()==State::stateType::BASELINE){
+						State::Action reflex;
+						reflex.__init__(result.collision, State::Direction::NONE);
+						State::Direction reflexDirection = reflex.getDirection();
+						g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
+						g[v].options.push_back(getOppositeDirection(reflexDirection));
+						//g[v].change=1;
+					}
+					break;
+				case State::simResult::resultType::successful:
+					if (s.getType()==State::stateType::AVOID){
 						g[v].options.push_back(State::Direction::NONE);
 					}
 					break;
@@ -365,20 +559,21 @@ vertexDescriptor Configurator::eliminateDisturbance(b2World & world, vertexDescr
 	//IF THE STATE COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT STATES DEPENDING ON OUTCOME, only if it's not a leaf
 	if (g[v].options.size()>0){
-			addVertex(v, v1, g, result.collision);
+		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
 		printf("seeing if can go back\n");
-		State::Object previousCollision;
+		//State::Object previousCollision;
                 while (g[v].options.size()<=0){ //keep going back until it finds an incomplete node
 					// if (boost::in_degree(v,g)>0){
 					// }
-					printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
+					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
                     if(boost::in_degree(v, g)>0){
+						printf("in degree >0\n");
 	                    inEdge = boost::in_edges(v, g).first.dereference();
-						previousCollision = g[v].obstacle;
-						printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, previousCollision.getPosition().x, previousCollision.getPosition().y, previousCollision.isValid());
+						//previousCollision = g[v].obstacle;
+						printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
 						v = source(inEdge, g); //go back a node
 					    printf("new src = %i, in degree = %i\n", v, boost::in_degree(v, g));
                     }
@@ -388,7 +583,7 @@ vertexDescriptor Configurator::eliminateDisturbance(b2World & world, vertexDescr
                     }
                 }
 				if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-					addVertex(v,v1,g, previousCollision);
+					addVertex(v,v1,g);
                     printf("added edge %i, %i\n", v, v1);
                 }
 		}
@@ -397,12 +592,40 @@ vertexDescriptor Configurator::eliminateDisturbance(b2World & world, vertexDescr
 
 
 
+// bool Configurator::build_tree(vertexDescriptor v, Graph&g, b2World & w){
+//     vertexDescriptor v1 = eliminateDisturbance(w, v, g);
+// 	//printf("set v1\n");
+//     if (v1!=v){
+//         build_tree(v1, g, w);
+//     }
+// 	return g[0].change; //
+
+//}
+
 bool Configurator::build_tree(vertexDescriptor v, Graph&g, b2World & w){
-    vertexDescriptor v1 = eliminateDisturbance(w, v, g);
-	printf("set v1\n");
-    if (v1!=v){
-        build_tree(v1, g, w);
-    }
+	vertexDescriptor v1 = eliminateDisturbance(w, v, g);
+    while (v1!= v){
+		printf("v1 = %i\n", v1);
+		v= v1;
+		printf("v = %i\n", v);
+		v1 = eliminateDisturbance(w, v, g);
+	}
 	return g[0].change; //
+
+}
+
+
+bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w){
+	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w);
+    while (v1!= v){
+		printf("v1 = %i\n", v1);
+		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
+		printf("direction = %i\n", static_cast<int>(d));
+		s = State(g[v].obstacle, d);
+		v= v1;
+		//printf("v = %i\n", v);
+		v1 = eliminateDisturbance(v,g,s, w);
+	}
+	return g[0].obstacle.isValid(); //
 
 }

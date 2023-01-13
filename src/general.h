@@ -6,10 +6,30 @@
 #include <set>
 #include <utility>                   // for std::pair
 #include <algorithm>                 // for std::for_each
-#include "state.h"
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/depth_first_search.hpp>
+#include "state.h"
+
+struct Node{
+	State::Object obstacle;
+	std::vector <State::Direction> options;
+    //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+	b2Transform endPose;
+};
+
+struct Edge{
+	State::Direction direction;
+	State::simResult::resultType outcome;
+	//int stepDuration =0;
+	float distanceCovered=0;
+};
+
+
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, State::simResult> Graph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionTree;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, int> G;
+
 typedef boost::graph_traits<Graph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<Graph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<Graph>::edge_descriptor edgeDescriptor;
@@ -69,6 +89,45 @@ struct Point{
 	b2Vec2 getb2Vec2(){
 		return b2Vec2(x,y);
 	}
+
+};
+
+class Pruner : public boost::default_dfs_visitor{
+	public:
+	// Graph &graph;
+
+	// Pruner(Graph &g){
+	// 	graph = (g);
+	// }
+
+	void discover_vertex(vertexDescriptor v, const Graph & g){
+		//graph = g;
+		printf("%i\n", v);
+	}
+
+	void start_vertex(vertexDescriptor v, const Graph & g){
+		//graph = g;
+		printf("start %i\n", v);
+	}
+
+	void finish_vertex(vertexDescriptor v, const Graph & g){
+		//graph = g;
+		printf("finish %i\n", v);
+	}
+	// void discover_vertex(vertexDescriptor v, const Gg & g){
+	// 	//graph = g;
+	// 	printf("%i\n", v);
+	// }
+
+	// void start_vertex(vertexDescriptor v, const Gg & g){
+	// 	//graph = g;
+	// 	printf("start %i\n", v);
+	// }
+
+	// void finish_vertex(vertexDescriptor v, const Gg & g){
+	// 	//graph = g;
+	// 	printf("finish %i\n", v);
+	// }
 
 };
 #endif

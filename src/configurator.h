@@ -240,15 +240,15 @@ int getMaxStepDuration(){
 
 // }
 
-// void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
+void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
 
 bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &); //adds two states if crashed but always next up is picked
 
 vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
 
-
+vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionTree&, State  , b2World & );
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
-
+bool build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w);
 //special case if robot is going in circles
 
 State::Direction getOppositeDirection(State::Direction d){
@@ -260,18 +260,20 @@ State::Direction getOppositeDirection(State::Direction d){
     }
 }
 
-bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
+template <typename V, typename G>
+// bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
+bool isFullLength(V v, G &g, float length=0, int edgesTotal =0){
 	//length = stepdur/hz *linvel
-    if (boost::in_degree(v, g)<=0 && length < g[v].box2dRange){
+    if (boost::in_degree(v, g)<=0 && length < 1.0){
         return false;
     }
-    else if (length >=g[v].box2dRange){
+    else if (length >=1.0){
         return true;
     }
     else{
         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-		printf("step dur = %i, linear speed = %f, a\n", g[inEdge].stepDuration, g[v].getAction().getLinearSpeed());
-        length += g[inEdge].stepDuration/g[v].hz * g[v].getAction().getLinearSpeed();
+		printf("distance = %f\n", g[inEdge].distanceCovered);
+        length += g[inEdge].distanceCovered;
 		printf("length = %f\n", length);
         vertexDescriptor newV = boost::source(inEdge, g);
 		edgesTotal++;
@@ -280,7 +282,7 @@ bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =
 
 }
 
-
+//FOR OLD STUFF WITH GRAPH
 void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Object obs = State::Object()){
 	//vertexDescriptor v1=src;
 	State::Direction d= State::Direction::NONE;
@@ -292,6 +294,31 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 		g[v1]= State(obs, d);
 		add_edge(src, v1, g).first;
 		printf("edge %i, %i\n", src, v1);
+	}
+	else{///for debug
+		printf("no options\n");
+	}
+	// for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
+	// 	if (*i = g[v1].getAction().getDirection()){
+	// 		g[src].options.erase(i);
+	// 	}
+	// }
+	//return v1;
+}
+
+//FOR NEW COLLISIONTREE
+void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
+	//v1 = src;
+	//State::Direction d= State::Direction::NONE;
+	if (g[src].options.size()>0){
+		v1 = boost::add_vertex(g);
+		//d = g[src].options[0];
+		//printf("option = %i\n", d);
+		edgeDescriptor e = add_edge(src, v1, g).first;
+		g[e].direction =g[src].options[0];
+		g[src].options.erase(g[src].options.begin());
+		//g[v1]= State(obs, d);
+		printf("edge %i, %i, direction = %i\n", src, v1, static_cast<int>(g[e].direction));
 	}
 	else{///for debug
 		printf("no options\n");
