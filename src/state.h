@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> //recommended cmath?
+#define BOX2DRANGE 0.5
 
 enum ObjectType {obstacle=0, target=1, other=2};  
 
@@ -13,7 +14,7 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
-    float box2dRange = 1.0;
+    float box2dRange = 0.5;
     enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
@@ -32,7 +33,7 @@ public:
 struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
 private:
     //b2Vec2 where;
-    float step;
+    //float step;
     bool valid= 0;
     ObjectType type;
     int iteration;
@@ -42,6 +43,7 @@ public:
 	b2FixtureDef fixtureDef;
     b2BodyDef bodyDef;
     b2Body * body;
+    bool safeForNow=1;
     Object(){};
     Object(ObjectType _t): type(_t){}
     Object(ObjectType _t, b2Vec2 position):type(_t){
@@ -102,10 +104,10 @@ public:
     void setIteration(int _it){
         iteration=_it;
     }
-    void setTimestamp(int _step, int _it){
-        step=_step;
-        iteration=_it;
-    }
+    // void setTimestamp(int _step, int _it){
+    //     step=_step;
+    //     iteration=_it;
+    // }
 
 
     bool isValid(){
@@ -298,7 +300,7 @@ public:
     }
 
 
-    omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
+    omega = (maxSpeed*(RightWheelSpeed-LeftWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
         //printf("omega = %f pi\n", omega/M_PI);
         if (abs(omega)>M_PI){ //max turning angle in one second
             float multiplier=1;
@@ -383,7 +385,7 @@ public:
 
 
 struct simResult{
-    enum resultType {successful =-1, crashed =1}; //successful means no collisions, finished means target reached, for later
+    enum resultType {successful =0, crashed =1}; //successful means no collisions, finished means target reached, for later
     resultType resultCode;
     Object collision;
     bool valid = 0;

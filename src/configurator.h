@@ -84,32 +84,32 @@ void __init__(){
 void __init__(State & _state){
 }
 
-class MedianFilter{
-    int kSize;
-    std::vector <float> bufferX;
-    std::vector <float> bufferY;
-public:
-    MedianFilter(int _k=3): kSize(_k){
-        bufferX = std::vector<float>(kSize);
-        bufferY = std::vector<float>(kSize);
-    }
+// class MedianFilter{
+//     int kSize;
+//     std::vector <float> bufferX;
+//     std::vector <float> bufferY;
+// public:
+//     MedianFilter(int _k=3): kSize(_k){
+//         bufferX = std::vector<float>(kSize);
+//         bufferY = std::vector<float>(kSize);
+//     }
 
-    void filterFloat(float &c, std::vector<float> & buffer){ //value gets modified in the input vector
-        buffer.push_back(c);
-        buffer.erase(buffer.begin());
-        std::vector <float> tmp = buffer;
-        std::sort(tmp.begin(), tmp.end());
-        int index = int(buffer.size()/2)+1;
-        c = tmp[index];
-        //printf("median value at index: %i, value = %f\n", index, tmp[index]);
-    }
+//     void filterFloat(float &c, std::vector<float> & buffer){ //value gets modified in the input vector
+//         buffer.push_back(c);
+//         buffer.erase(buffer.begin());
+//         std::vector <float> tmp = buffer;
+//         std::sort(tmp.begin(), tmp.end());
+//         int index = int(buffer.size()/2)+1;
+//         c = tmp[index];
+//         //printf("median value at index: %i, value = %f\n", index, tmp[index]);
+//     }
 
-    void applyToPoint(cv::Point2f &p){
-        filterFloat(p.x, bufferX);
-        filterFloat(p.y, bufferY);
-    }
+//     void applyToPoint(cv::Point2f &p){
+//         filterFloat(p.x, bufferX);
+//         filterFloat(p.y, bufferY);
+//     }
 
-};
+// };
 
 void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'state' into a robot000n.txt file.
 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the state
@@ -246,9 +246,9 @@ bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, floa
 
 vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
 
-vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionTree&, State  , b2World & );
+vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionTree&, State  , b2World & , std::vector <vertexDescriptor> &);
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
-bool build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w);
+bool build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w, std::vector <vertexDescriptor>&);
 //special case if robot is going in circles
 
 State::Direction getOppositeDirection(State::Direction d){
@@ -264,10 +264,10 @@ template <typename V, typename G>
 // bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
 bool isFullLength(V v, G &g, float length=0, int edgesTotal =0){
 	//length = stepdur/hz *linvel
-    if (boost::in_degree(v, g)<=0 && length < 1.0){
+    if (boost::in_degree(v, g)<=0 && length < desiredState.box2dRange){
         return false;
     }
-    else if (length >=1.0){
+    else if (length >=desiredState.box2dRange){
         return true;
     }
     else{
@@ -331,6 +331,27 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 	//return v1;
 }
 
+edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _leaves){
+	//FIND BEST LEAF
+	vertexDescriptor best = _leaves[0];
+	for (vertexDescriptor leaf: _leaves){
+		printf("leaf %i, cost = %f\n", leaf, g[leaf].costSoFar);
+		if (g[leaf].costSoFar<g[best].costSoFar){
+			best = leaf;
+		}
+	}
+	printf("best = %i\n", best);
+	//FIND FIRST NODE BEFORE ORIGIN
+	edgeDescriptor e;
+	while (best != *(boost::vertices(g).first)){
+		printf("current = %i\n", best);
+		e = boost::in_edges(best, g).first.dereference();
+		printf("best direction = %i\n", static_cast<int>(g[e].direction));
+		best = e.m_source;
+		printf("back = %i\n", best);
+	}
+	return e;
+}
 
 };
 

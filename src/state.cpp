@@ -50,7 +50,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 						//robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 					}
 					else{
-						change =1;
+						result.collision.safeForNow =0;
 					}
 					
 				}
