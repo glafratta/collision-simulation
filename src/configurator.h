@@ -298,12 +298,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 	else{///for debug
 		printf("no options\n");
 	}
-	// for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
-	// 	if (*i = g[v1].getAction().getDirection()){
-	// 		g[src].options.erase(i);
-	// 	}
-	// }
-	//return v1;
+
 }
 
 //FOR NEW COLLISIONTREE
@@ -351,6 +346,86 @@ edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _
 		printf("back = %i\n", best);
 	}
 	return e;
+}
+
+void constructWorldRepresentation(b2World & world, State::Direction d, b2Transform start){
+	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
+	switch (d){
+		case State::Direction::NONE:{
+		//FIND BOUNDING BOX FOR POINTS OF INTEREST
+		float mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
+		float mPerp = -1/mHead;
+		float qPerp = start.p.y- mPerp*start.p.x; 
+		Point positionVector, radiusVector, maxFromStart; 
+		float minX, minY, maxX, maxY;
+		positionVector.polarInit(0, atan2(start.p.y, start.p.x));
+		radiusVector.polarInit(BOX2DRANGE, 0);
+		maxFromStart = positionVector + radiusVector;
+		float qParallel = maxFromStart.y - mPerp*maxFromStart.x;
+		b2Vec2 unitPerpR(cos(start.q.GetAngle()), -sin(start.q.GetAngle()));
+		b2Vec2 unitPerpL(-cos(start.q.GetAngle()), sin(start.q.GetAngle()));
+		float halfWindowWidth = .1;
+		std::vector <Point> bounds;
+		bounds.push_back(Point(start.p)+Point(unitPerpL));
+		bounds.push_back(Point(start.p)+Point(unitPerpR));
+		bounds.push_back(maxFromStart+Point(unitPerpL));
+		bounds.push_back(maxFromStart+Point(unitPerpR));
+		minX = maxX = bounds[0].x;
+		minY = maxY = bounds[0].y;
+		for (Point &p:bounds){
+			if (p.x<minX){
+				minX = p.x;
+			}
+			else if (p.x >maxX){
+				maxX = p.x;
+			}
+			if (p.y <minY){
+				minY = p.y;
+			}
+			else if (p.y >maxY){
+				maxY = p.y;
+			}
+		}
+		//CREATE POINTS
+		for (Point &p:current){
+			if (p != *(&p-1)&& p.y >= minY &&p.y <=maxY && p.x >=minX && p.x <= maxX){ //y range less than 20 cm only to ensure that robot can pass + account for error
+				b2Body * body;
+				b2BodyDef bodyDef;
+				b2FixtureDef fixtureDef;
+				bodyDef.type = b2_dynamicBody;
+				b2PolygonShape fixture; //giving the point the shape of a box
+				fixtureDef.shape = &fixture;
+				fixture.SetAsBox(.001f, .001f); 
+				//if (p.x !=0 && p.y!=0){
+				bodyDef.position.Set(p.x, p.y); 
+				body = world.CreateBody(&bodyDef);
+				body->CreateFixture(&fixtureDef);
+				//}
+
+			}
+		}
+		break;
+		}
+		default:
+		for (Point &p:current){
+			if (p != *(&p-1)&& p.isInRadius(start.p), .1){ //y range less than 20 cm only to ensure that robot can pass + account for error
+				b2Body * body;
+				b2BodyDef bodyDef;
+				b2FixtureDef fixtureDef;
+				bodyDef.type = b2_dynamicBody;
+				b2PolygonShape fixture; //giving the point the shape of a box
+				fixtureDef.shape = &fixture;
+				fixture.SetAsBox(.001f, .001f); 
+				//if (p.x !=0 && p.y!=0){
+				bodyDef.position.Set(p.x, p.y); 
+				body = world.CreateBody(&bodyDef);
+				body->CreateFixture(&fixtureDef);
+				//}
+			}
+		}
+		break;
+
+	}
 }
 
 };

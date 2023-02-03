@@ -14,7 +14,7 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
-    float box2dRange = 0.5;
+    float box2dRange = BOX2DRANGE;
     enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;

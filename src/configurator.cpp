@@ -100,7 +100,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		//CHECK IF BODIES ARE OBSERVED IN THE GENERAL AREA WHERE THE OBSTACLE SHOULD BE 
 			if (state.obstacle.isValid()){
-				if (p.isInSquare(state.obstacle.getPosition())){
+				if (p.isInRadius(state.obstacle.getPosition())){
 					isObstacleStillThere =1;
 				}
 			}
@@ -164,7 +164,6 @@ void Configurator::NewScan(std::vector <Point> & data){
 				printf("now finding best branch\n");
 				edgeDescriptor e = findBestBranch(tree, leaves);
 				State::Direction dir = tree[e].direction;
-				//v0 = e.m_target;
 				//printf("new state from v %i\n", v0);
 				state = State(tree[v0].obstacle, dir); //new state has the obstacle of the previous and the direction of the edge remaining 
 				//no pruning yet, no choosing optimal action
@@ -294,7 +293,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 // 		printf("crashed\n");
 // 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
 // 		Point p(result.collision.getPosition());
-// 		if (!s.obstacle.isValid() || !(p.isInSquare(s.obstacle.getPosition()))){
+// 		if (!s.obstacle.isValid() || !(p.isInRadius(s.obstacle.getPosition()))){
 // 			//BUILD TREE HERE?
 // 			CollisionTree tree;
 // 			s = State(result.collision, d);
@@ -313,7 +312,7 @@ bool Configurator::eliminateDisturbance(b2World & world, vertexDescriptor & v, G
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW STATE TO THE PLAN
 		Point p(result.collision.getPosition());
-		if (!g[v].obstacle.isValid() || !(p.isInSquare(g[v].obstacle.getPosition()))){
+		if (!g[v].obstacle.isValid() || !(p.isInRadius(g[v].obstacle.getPosition()))){
 			std::vector <State::Direction> possibleDirections ={State::Direction::LEFT, State::Direction::RIGHT};
 			//for (State::Direction dir: possibleDirections){
 				auto newV = boost::add_vertex(g);
@@ -639,7 +638,8 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 
 bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w, std::vector <vertexDescriptor> &_leaves){
-	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves);
+	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
+	w.~b2World();
     while (v1!= v){
 		printf("v1 = %i\n", v1);
 		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
