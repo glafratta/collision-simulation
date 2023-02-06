@@ -14,7 +14,7 @@
 #include "state.h"
 #include "general.h" //general functions + point class + typedefs + state.h + boost includes
 #include <boost/graph/depth_first_search.hpp>
-
+#include <algorithm>
 
 class Configurator{
 protected:
@@ -355,40 +355,45 @@ void constructWorldRepresentation(b2World & world, State::Direction d, b2Transfo
 		//FIND BOUNDING BOX FOR POINTS OF INTEREST
 		float mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
 		float mPerp = -1/mHead;
-		float qPerp = start.p.y- mPerp*start.p.x; 
 		Point positionVector, radiusVector, maxFromStart; 
 		float minX, minY, maxX, maxY;
-		positionVector.polarInit(0, atan2(start.p.y, start.p.x));
-		radiusVector.polarInit(BOX2DRANGE, 0);
-		maxFromStart = positionVector + radiusVector;
-		float qParallel = maxFromStart.y - mPerp*maxFromStart.x;
-		b2Vec2 unitPerpR(cos(start.q.GetAngle()), -sin(start.q.GetAngle()));
-		b2Vec2 unitPerpL(-cos(start.q.GetAngle()), sin(start.q.GetAngle()));
+		radiusVector.polarInit(BOX2DRANGE, start.q.GetAngle());
+		maxFromStart = Point(start.p) + radiusVector;
+		printf("maxfrom start = x= %f, y= %f\n", maxFromStart.x, maxFromStart.y);
+		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
+		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
+		printf("start angle %f\tangle for perpL = %f pi, for perpR = %f pi\n", start.q.GetAngle(), atan2(unitPerpL.y, unitPerpL.x)/M_PI, atan2(unitPerpR.y, unitPerpR.x)/M_PI);
 		float halfWindowWidth = .1;
 		std::vector <Point> bounds;
-		bounds.push_back(Point(start.p)+Point(unitPerpL));
-		bounds.push_back(Point(start.p)+Point(unitPerpR));
-		bounds.push_back(maxFromStart+Point(unitPerpL));
-		bounds.push_back(maxFromStart+Point(unitPerpR));
-		minX = maxX = bounds[0].x;
-		minY = maxY = bounds[0].y;
+		bounds.push_back(Point(start.p)+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
+		bounds.push_back(Point(start.p)+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
+		bounds.push_back(maxFromStart+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
+		bounds.push_back(maxFromStart+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
+		printf("bounds: \t");
 		for (Point &p:bounds){
-			if (p.x<minX){
-				minX = p.x;
-			}
-			else if (p.x >maxX){
-				maxX = p.x;
-			}
-			if (p.y <minY){
-				minY = p.y;
-			}
-			else if (p.y >maxY){
-				maxY = p.y;
-			}
+			printf("%f, %f\t", p.x, p.y);
+
 		}
+		printf("\n");
+		Point top, bottom;
+		comparator compPoint;
+		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
+		bottom = bounds[0];
+		top = bounds[3];
+		printf("new bounds: \t");
+		for (Point &p:bounds){
+			printf("%f, %f\t", p.x, p.y);
+		}
+		printf("\n");
+		printf("top = %f, %f\t bottom = %f, %f\n", top.x, top.y, bottom.x, bottom.y);
+		float qBottomH, qTopH, qBottomP, qTopP;
+		qBottomH = bottom.y - mHead*bottom.x;
+		qTopH = top.y - mHead*top.x;
+		qBottomP = bottom.y -mPerp*bottom.x;
+		qTopP = top.y - mPerp*top.x;
 		//CREATE POINTS
 		for (Point &p:current){
-			if (p != *(&p-1)&& p.y >= minY &&p.y <=maxY && p.x >=minX && p.x <= maxX){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			if (p != *(&p-1)&& p.y >= (mHead*p.x +qBottomH)&& p.y <= (mHead*p.x +qTopH)&& p.y >=(mPerp*p.x+qBottomP)&&p.y <=(mPerp*p.x+qTopP)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;
@@ -407,8 +412,10 @@ void constructWorldRepresentation(b2World & world, State::Direction d, b2Transfo
 		break;
 		}
 		default:
-		for (Point &p:current){
-			if (p != *(&p-1)&& p.isInRadius(start.p), .1){ //y range less than 20 cm only to ensure that robot can pass + account for error
+		printf("default case\n");
+		for (Point &p:current){			
+			//printf("is in radius %i\n", p.isInRadius(start.p));
+			if (p != *(&p-1)&& p.isInRadius(start.p, 0.1)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;

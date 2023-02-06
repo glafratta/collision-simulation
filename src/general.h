@@ -107,7 +107,8 @@ struct Point{
 
 
 	bool isInRadius(b2Vec2 point, float radius = 0.05){ //check if this point is within a certain radius from another given point
-		if (this->x < point.x+radius && this->x >point.y-radius && this->y < point.y+radius && this->y >point.y-radius){
+		//printf("%f < x = %f <%f , %f <y= %f<%f\n", point.x-radius, point.x, point.x+radius, point.y-radius, point.y, point.y+radius );
+		if (this->x <= point.x+radius && this->x >=point.y-radius && this->y <= point.y+radius && this->y >=point.y-radius){
 			return true;
 		}
 		else{
@@ -127,6 +128,11 @@ struct Point{
 	}
 
 };
+struct comparator{
+    bool operator() ( Point a, Point b ){ //
+        return a.y <=b.y;
+	}
+}; 
 
 class Pruner : public boost::default_dfs_visitor{
 	public:
