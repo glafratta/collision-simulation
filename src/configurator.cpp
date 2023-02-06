@@ -639,16 +639,20 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
-	w.~b2World();
+	//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
+		printf("reset world\n");
+		b2World newWorld({0.0f, 0.0f});
 		printf("v1 = %i\n", v1);
 		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
 		printf("direction = %i\n", static_cast<int>(d));
 		s = State(g[v].obstacle, d);
+		constructWorldRepresentation(newWorld, d, g[v1].endPose);
 		v= v1;
 		//printf("v = %i\n", v);
-		v1 = eliminateDisturbance(v,g,s, w, _leaves);
+		v1 = eliminateDisturbance(v,g,s, newWorld, _leaves);
 	}
+	printf("end buildtree\n");
 	return !g[0].obstacle.safeForNow;
 
 }
