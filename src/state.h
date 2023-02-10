@@ -22,7 +22,7 @@ protected:
     stateType type;
     float maxSpeed = 0.125f; //this needs to be defined better
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
-    float simDuration =int(box2dRange*2 /maxSpeed); //in seconds
+    int simDuration =int(BOX2DRANGE*2 /maxSpeed); //in seconds
     float pGain=0.1;
 
 
@@ -461,9 +461,12 @@ State(Object ob, Direction direction = Direction::NONE){
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;
-    if (ob.getType()== ObjectType::obstacle){ //og obstacle.getTYpe()
+    if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
         type =stateType::AVOID;
+    }
+    else{
+        type =stateType::BASELINE;
     }
     //printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 

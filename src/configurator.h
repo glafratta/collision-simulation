@@ -75,6 +75,7 @@ Configurator(){
 Configurator(State &_state): desiredState(_state), state(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
+	printf("simduration = %i\n", state.getSimDuration());
 
 }
 
@@ -262,20 +263,24 @@ State::Direction getOppositeDirection(State::Direction d){
 
 template <typename V, typename G>
 // bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
-bool isFullLength(V v, G &g, float length=0, int edgesTotal =0){
+bool isFullLength(V v, const G & g, float length=0, int edgesTotal =0){
+	printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
 	//length = stepdur/hz *linvel
-    if (boost::in_degree(v, g)<=0 && length < desiredState.box2dRange){
+    if (boost::in_degree(v, g)==0 && length < desiredState.box2dRange){
+		printf("ended isFullLength, is root\n");
         return false;
     }
     else if (length >=desiredState.box2dRange){
+		printf("reached full length\n");
         return true;
     }
     else{
         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-		printf("distance = %f\n", g[inEdge].distanceCovered);
+		//printf("distance = %f\t", g[inEdge].distanceCovered);
         length += g[inEdge].distanceCovered;
-		printf("length = %f\n", length);
+		//printf("length = %f\t", length);
         vertexDescriptor newV = boost::source(inEdge, g);
+		printf("newVertex = %i\n", newV);
 		edgesTotal++;
         return isFullLength(newV, g, length, edgesTotal);
     }
@@ -289,7 +294,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		d = g[src].options[0];
-		printf("option = %i\n", d);
+		//printf("option = %i\n", d);
 		g[src].options.erase(g[src].options.begin());
 		g[v1]= State(obs, d);
 		add_edge(src, v1, g).first;
@@ -359,33 +364,33 @@ void constructWorldRepresentation(b2World & world, State::Direction d, b2Transfo
 		float minX, minY, maxX, maxY;
 		radiusVector.polarInit(BOX2DRANGE, start.q.GetAngle());
 		maxFromStart = Point(start.p) + radiusVector;
-		printf("maxfrom start = x= %f, y= %f\n", maxFromStart.x, maxFromStart.y);
+		//printf("maxfrom start = x= %f, y= %f\n", maxFromStart.x, maxFromStart.y);
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
 		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
-		printf("start angle %f\tangle for perpL = %f pi, for perpR = %f pi\n", start.q.GetAngle(), atan2(unitPerpL.y, unitPerpL.x)/M_PI, atan2(unitPerpR.y, unitPerpR.x)/M_PI);
+		//printf("start angle %fpi\ttangle for perpL = %f pi, for perpR = %f pi\n", start.q.GetAngle()/M_PI, atan2(unitPerpL.y, unitPerpL.x)/M_PI, atan2(unitPerpR.y, unitPerpR.x)/M_PI);
 		float halfWindowWidth = .1;
 		std::vector <Point> bounds;
 		bounds.push_back(Point(start.p)+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
 		bounds.push_back(Point(start.p)+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
 		bounds.push_back(maxFromStart+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
 		bounds.push_back(maxFromStart+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
-		printf("bounds: \t");
-		for (Point &p:bounds){
-			printf("%f, %f\t", p.x, p.y);
+		//printf("bounds: \t");
+		// for (Point &p:bounds){
+		// 	printf("%f, %f\t", p.x, p.y);
 
-		}
-		printf("\n");
+		// }
+		// printf("\n");
 		Point top, bottom;
 		comparator compPoint;
 		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
 		bottom = bounds[0];
 		top = bounds[3];
-		printf("new bounds: \t");
-		for (Point &p:bounds){
-			printf("%f, %f\t", p.x, p.y);
-		}
-		printf("\n");
-		printf("top = %f, %f\t bottom = %f, %f\n", top.x, top.y, bottom.x, bottom.y);
+		// printf("new bounds: \t");
+		// for (Point &p:bounds){
+		// 	printf("%f, %f\t", p.x, p.y);
+		// }
+		// printf("\n");
+		// printf("top = %f, %f\t bottom = %f, %f\n", top.x, top.y, bottom.x, bottom.y);
 		float qBottomH, qTopH, qBottomP, qTopP;
 		qBottomH = bottom.y - mHead*bottom.x;
 		qTopH = top.y - mHead*top.x;
@@ -412,7 +417,7 @@ void constructWorldRepresentation(b2World & world, State::Direction d, b2Transfo
 		break;
 		}
 		default:
-		printf("default case\n");
+		//printf("default case: circle\n");
 		for (Point &p:current){			
 			//printf("is in radius %i\n", p.isInRadius(start.p));
 			if (p != *(&p-1)&& p.isInRadius(start.p, 0.1)){ //y range less than 20 cm only to ensure that robot can pass + account for error

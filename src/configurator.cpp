@@ -549,11 +549,15 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 			moreCostlyThanLeaf=1;
 		}
 	}
+	printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);
+	printf("result obstacle valid %i\n", result.collision.isValid());
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE STATE/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf){
 		switch (result.resultCode){
 				case State::simResult::resultType::crashed:
+				printf("v %i is crashed in option, state code = %i\n",v, s.getType());
 					if (s.getType()==State::stateType::BASELINE){
+						printf("adding L/R");
 						State::Action reflex;
 						reflex.__init__(result.collision, State::Direction::NONE);
 						State::Direction reflexDirection = reflex.getDirection();
@@ -562,12 +566,15 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					}
 					break;
 				case State::simResult::resultType::successful:
+				printf("v %i is successful in option, state code = %i\n",v,  s.getType());
 					if (s.getType()==State::stateType::AVOID){
+						printf("adding str");
 						g[v].options.push_back(State::Direction::NONE);
 					}
 					break;
 				default: break;
 			}
+		printf("created options\n");
 	}
 
 	for (State::Direction d:g[v].options){
@@ -586,6 +593,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 			//DEFINE POSSIBLE NEXT STATES DEPENDING ON OUTCOME, only if it's not a leaf
 	if (g[v].options.size()>0){
 		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
+		return v1; //added now	
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
@@ -595,7 +603,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
                     if(boost::in_degree(v, g)>0){
 						printf("in degree >0\n");
 	                    inEdge = boost::in_edges(v, g).first.dereference();
-						printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
+						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
 						v = source(inEdge, g); //go back a node
 					    printf("new src = %i, in degree = %i\n", v, boost::in_degree(v, g));
                     }
@@ -641,15 +649,25 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2Wo
 	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
 	//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
-		printf("reset world\n");
+		//printf("reset world\n");
 		b2World newWorld({0.0f, 0.0f});
-		printf("v1 = %i\n", v1);
+		printf("v1 = %i, v = %i\n", v1, v);
 		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
 		printf("direction = %i\n", static_cast<int>(d));
 		s = State(g[v].obstacle, d);
-		constructWorldRepresentation(newWorld, d, g[v1].endPose);
+		printf("in build tree, state code = %i, obstacle valid = %i\n", s.getType(), s.obstacle.isValid());
+		constructWorldRepresentation(newWorld, d, g[v].endPose);
+		//DEBUG
+		// char filename[256];
+		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
+		// FILE * dump = fopen(filename, "w");
+		// for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
+		// 	fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
+		// }
+		// fclose(dump);
+		//END DEBUG
 		v= v1;
-		//printf("v = %i\n", v);
+		printf("v = %i\n", v);
 		v1 = eliminateDisturbance(v,g,s, newWorld, _leaves);
 	}
 	printf("end buildtree\n");

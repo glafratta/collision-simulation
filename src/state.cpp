@@ -40,16 +40,21 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 				}
 			}
 			if (listener.collisions.size()>0){ //
+			printf("crash\n");
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
 				if (type == State::stateType::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
 					if (step/hz >2){
-						start.x += instVelocity.x*(step/hz-2);
-						start.y += instVelocity.y*(step/hz-2);
-						//robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+						// start.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
+						// start.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);
+						b2Vec2 pos2SecAgo;
+						pos2SecAgo.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
+						pos2SecAgo.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);						
+						robot.body->SetTransform(pos2SecAgo, _theta); //if the simulation crashes reset position for 
 					}
 					else{
+						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 					}
 					
@@ -61,14 +66,15 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 
 		}	
 		//result.distanceCovered = robot.body->GetPosition().Length() - start.Length();
-		if (result.resultCode==simResult::resultType::crashed){
-			robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
-		}
-		b2Vec2 distance = robot.body->GetPosition();
-		distance -= start;
+		// if (result.resultCode==simResult::resultType::crashed){
+		// 	robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+		// }
+		b2Vec2 distance; //= robot.body->GetPosition();
+		distance.x = robot.body->GetPosition().x - start.x;
+		distance.y = robot.body->GetPosition().y - start.y;
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
-		endPose = robot.body->GetTransform();
+		//endPose = robot.body->GetTransform();
 		_world.DestroyBody(robot.body);		
 		fclose(robotPath);
 		printf("end pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
