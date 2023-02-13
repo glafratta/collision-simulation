@@ -522,6 +522,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		//FIND IF THE PRESENT STATE WILL COLLIDE
 	printf("add to vertex %i, ", v);
 	State::simResult result; 
+	//b2Transform startTransform;(g[srcVertex].endPose.p, g[srcVertex].endPose.q);
 
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
@@ -552,7 +553,9 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);
 	printf("result obstacle valid %i\n", result.collision.isValid());
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE STATE/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!fl&& !moreCostlyThanLeaf){
+		//(srcVertex==v ^ g[srcVertex].endPose !=g[v].endPose) this part makes sure options are only added to the current vertex if it is root XOR if it has advanced the robot at all
+	printf("((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose)) = %i\n", ((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose)));
+	if(!fl&& !moreCostlyThanLeaf && ((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose))){
 		switch (result.resultCode){
 				case State::simResult::resultType::crashed:
 				printf("v %i is crashed in option, state code = %i\n",v, s.getType());
@@ -577,9 +580,9 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		printf("created options\n");
 	}
 
-	for (State::Direction d:g[v].options){
-		printf("action %i\n", static_cast<int>(d));
-	}
+	// for (State::Direction d:g[v].options){
+	// 	printf("action %i\n", static_cast<int>(d));
+	// }
 
 
 	isLeaf = fl ||(g[v].options.size() <=0);
@@ -597,25 +600,27 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
-		printf("seeing if can go back\n");
-                while (g[v].options.size()<=0){ //keep going back until it finds an incomplete node
+		//printf("seeing if can go back\n");
+                while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
 					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
                     if(boost::in_degree(v, g)>0){
-						printf("in degree >0\n");
+						//printf("in degree >0\n");
 	                    inEdge = boost::in_edges(v, g).first.dereference();
 						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
 						v = source(inEdge, g); //go back a node
-					    printf("new src = %i, in degree = %i\n", v, boost::in_degree(v, g));
+					    printf("new src = %i, options = %i\n", v, boost::in_degree(v, g));
+						if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+							addVertex(v,v1,g);
+							printf("added vertex to %i, new = %i\n", v, v1);
+							return v1;
+						}
                     }
                     else{
                         printf("source has no back edge\n");
                         break;
                     }
                 }
-				if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-					addVertex(v,v1,g);
-                    printf("added edge %i, %i\n", v, v1);
-                }
+
 		}
 		return v1;
 	}
@@ -653,9 +658,9 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2Wo
 		b2World newWorld({0.0f, 0.0f});
 		printf("v1 = %i, v = %i\n", v1, v);
 		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
-		printf("direction = %i\n", static_cast<int>(d));
+		//printf("direction = %i\n", static_cast<int>(d));
 		s = State(g[v].obstacle, d);
-		printf("in build tree, state code = %i, obstacle valid = %i\n", s.getType(), s.obstacle.isValid());
+		//printf("in build tree, state code = %i, obstacle valid = %i\n", s.getType(), s.obstacle.isValid());
 		constructWorldRepresentation(newWorld, d, g[v].endPose);
 		//DEBUG
 		// char filename[256];
@@ -667,7 +672,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2Wo
 		// fclose(dump);
 		//END DEBUG
 		v= v1;
-		printf("v = %i\n", v);
+		//printf("v = %i\n", v);
 		v1 = eliminateDisturbance(v,g,s, newWorld, _leaves);
 	}
 	printf("end buildtree\n");

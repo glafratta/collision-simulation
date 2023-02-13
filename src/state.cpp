@@ -32,6 +32,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
+			printf("x");
 			if (obstacle.isValid()){
 				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
 				if (abs(obstacle.getAngle(robot.body->GetAngle()))>=M_PI_2){
@@ -40,7 +41,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 				}
 			}
 			if (listener.collisions.size()>0){ //
-			printf("crash\n");
+				printf("\ncrash\n");
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
@@ -63,7 +64,6 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
 			}
-
 		}	
 		//result.distanceCovered = robot.body->GetPosition().Length() - start.Length();
 		// if (result.resultCode==simResult::resultType::crashed){
@@ -77,7 +77,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		//endPose = robot.body->GetTransform();
 		_world.DestroyBody(robot.body);		
 		fclose(robotPath);
-		printf("end pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
+		printf("\nend pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
 		//result.stepDuration=step;
 		return result;
 		//simulationResult = result;

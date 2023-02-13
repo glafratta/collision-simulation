@@ -39,6 +39,11 @@ struct Node{
 	
 };
 
+//template <class Transform>
+typedef b2Transform Transform;
+bool operator!=(Transform const &, Transform const &);
+
+
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, State::simResult> Graph;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionTree;

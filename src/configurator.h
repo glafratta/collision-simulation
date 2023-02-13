@@ -264,14 +264,14 @@ State::Direction getOppositeDirection(State::Direction d){
 template <typename V, typename G>
 // bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
 bool isFullLength(V v, const G & g, float length=0, int edgesTotal =0){
-	printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
+	//printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
 	//length = stepdur/hz *linvel
     if (boost::in_degree(v, g)==0 && length < desiredState.box2dRange){
-		printf("ended isFullLength, is root\n");
+		//printf("ended isFullLength, is root\n");
         return false;
     }
     else if (length >=desiredState.box2dRange){
-		printf("reached full length\n");
+		//printf("reached full length\n");
         return true;
     }
     else{
@@ -279,10 +279,10 @@ bool isFullLength(V v, const G & g, float length=0, int edgesTotal =0){
 		//printf("distance = %f\t", g[inEdge].distanceCovered);
         length += g[inEdge].distanceCovered;
 		//printf("length = %f\t", length);
-        vertexDescriptor newV = boost::source(inEdge, g);
-		printf("newVertex = %i\n", newV);
+        //vertexDescriptor newV = boost::source(inEdge, g);
+		//printf("newVertex = %i\n", newV);
 		edgesTotal++;
-        return isFullLength(newV, g, length, edgesTotal);
+        return isFullLength(boost::source(inEdge, g), g, length, edgesTotal);
     }
 
 }
@@ -310,6 +310,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 	//v1 = src;
 	//State::Direction d= State::Direction::NONE;
+	printf("vertex %i, options = %i\n", src, g[src].options.size());
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		//d = g[src].options[0];
@@ -439,6 +440,8 @@ void constructWorldRepresentation(b2World & world, State::Direction d, b2Transfo
 
 	}
 }
+
+
 
 };
 
