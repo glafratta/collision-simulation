@@ -130,6 +130,7 @@ struct Action{
 private:
     //trajecotry is a function of the position of the disturbance
     float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
+    b2Vec2 velocity;
     float omega=0; //initial angular velocity is 0  
     //b2Vec2 velocity ={0.5, 0};
     bool valid=0;
@@ -238,6 +239,7 @@ public:
     // }
 
     void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
+    //printf("init action\n");
     direction = d;
     float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
@@ -247,7 +249,7 @@ public:
             if (abs(ob.getAngle(pos))<M_PI_2){
                 //NEW LOOP FOR ABOVE
                 if (direction == State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-                printf("direction in action =none\n");
+                //printf("direction in action =none\n");
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                         direction = State::Direction::LEFT; //go left
                     }
@@ -265,24 +267,10 @@ public:
                 }
             }
             else{
-                ob.invalidate();
-                //printf("invalidated obstacle because angle >pi/2\n");
+                //ob.invalidate();
+               // printf("invalidated obstacle because angle >pi/2\n");
             }
      
-        }
-
-        switch (direction){
-            case State::Direction::LEFT:
-            LeftWheelSpeed = -LeftWheelSpeed;
-            printf("going left\n");
-            break;
-            case State::Direction::RIGHT:
-            printf("going right\n");
-            RightWheelSpeed = - RightWheelSpeed;
-            break;
-            default:
-           // printf("not a valid direction\n");
-            break;
         }
 
         // if (LeftWheelSpeed >1.0f){
@@ -297,6 +285,20 @@ public:
         // if (RightWheelSpeed <-1.0f){
         //     RightWheelSpeed =-1;
         // }
+    }
+
+    switch (direction){
+        case State::Direction::LEFT:
+        LeftWheelSpeed = -LeftWheelSpeed;
+        printf("going left\n");
+        break;
+        case State::Direction::RIGHT:
+        printf("going right\n");
+        RightWheelSpeed = - RightWheelSpeed;
+        break;
+        default:
+        printf("not left or right\n");
+        break;
     }
 
 
@@ -447,6 +449,7 @@ State::stateType getType(){
 // }
 
 State(){
+    //printf("overloaded default constructor\n");
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
     type = stateType::BASELINE;
     // options.push_back(State::Direction::LEFT);
@@ -458,6 +461,34 @@ State(){
 }
 
 State(Object ob, Direction direction = Direction::NONE){
+   // printf("custom constructor\n");
+    action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
+    RecordedVelocity = action.getLinearVelocity();
+    //obstacle = ob;
+    if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
+        obstacle = ob;
+        type =stateType::AVOID;
+    }
+    else{
+        type =stateType::BASELINE;
+    }
+    //printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
+
+}
+
+void __init__(){
+   // printf("default init\n");
+    action.__init__(); //this is a valid trajectory, default going straight at moderate speed
+    type = stateType::BASELINE;
+    // options.push_back(State::Direction::LEFT);
+    // options.push_back(State::Direction::RIGHT);
+    // maxNoChildren = options.size();
+    RecordedVelocity = action.getLinearVelocity();
+    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+
+}
+
+void __init__(Object ob, Direction direction = Direction::NONE){
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;

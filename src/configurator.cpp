@@ -14,7 +14,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	for (Point p:data){
 		current.push_back(p);
 	}
-	printf("data = %i\n", current.size());
+	//printf("data = %i\n", current.size());
 	//printf("current length: %i, previous length%i\n", current.size(), previous.size());
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
@@ -112,7 +112,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}
 	}
-	printf("bodies = %i\n", world.GetBodyCount());
+	//printf("bodies = %i\n", world.GetBodyCount());
 	//printf("is obstacle still there = %i\n", isObstacleStillThere);
 	// if (!isObstacleStillThere && plan.states.size()>0){ 
 	if (!isObstacleStillThere){ 
@@ -175,10 +175,6 @@ void Configurator::NewScan(std::vector <Point> & data){
 	
 
 	//CHOOSE BEXT NEXT STATE BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
-
-
-
-	//GENERAL, DO NOT COMMENT OUT
 
 	
 	//state = State(tree[v0].obstacle);
@@ -515,7 +511,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
 	bool notRoot = boost::in_degree(v, g)>0;
-	printf("degree = %i, is it >0, %i\n", boost::in_degree(v, g), boost::in_degree(v, g) >0);
+	//printf("degree = %i, is it >0, %i\n", boost::in_degree(v, g), boost::in_degree(v, g) >0);
 	bool isLeaf=0;
 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
@@ -526,7 +522,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
-		printf("is not root\n");
+		//printf("is not root\n");
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		result =s.willCollide(w, iteration, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last state ended (if previous state crashes)
@@ -545,20 +541,24 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	bool fl = isFullLength(v,g);
 	bool moreCostlyThanLeaf =0;
-	for (vertexDescriptor leaf: _leaves){
+	for (vertexDescriptor leaf: _leaves){ //establish if the current vertex has a higher cost than any of the leaves
 		if (g[v].costSoFar > g[leaf].costSoFar){
 			moreCostlyThanLeaf=1;
 		}
 	}
+	//
+
+
 	printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);
-	printf("result obstacle valid %i\n", result.collision.isValid());
+	//printf("result obstacle valid %i\n", result.collision.isValid());
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE STATE/TASK/MOTORPLAN ETC i haven't decided a name yet
 		//(srcVertex==v ^ g[srcVertex].endPose !=g[v].endPose) this part makes sure options are only added to the current vertex if it is root XOR if it has advanced the robot at all
-	printf("((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose)) = %i\n", ((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose)));
-	if(!fl&& !moreCostlyThanLeaf && ((srcVertex==v) != (g[srcVertex].endPose !=g[v].endPose))){
+	//printf("v==srcVertex)=%i\t(g[srcVertex].endPose !=g[v].endPose) = %i\t((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))= %i\n", (v==srcVertex), (g[srcVertex].endPose !=g[v].endPose),((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose)));
+
+	if(!fl&& !moreCostlyThanLeaf && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		switch (result.resultCode){
 				case State::simResult::resultType::crashed:
-				printf("v %i is crashed in option, state code = %i\n",v, s.getType());
+				//printf("v %i is crashed in option, state code = %i\n",v, s.getType());
 					if (s.getType()==State::stateType::BASELINE){
 						printf("adding L/R");
 						State::Action reflex;
@@ -571,13 +571,16 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 				case State::simResult::resultType::successful:
 				printf("v %i is successful in option, state code = %i\n",v,  s.getType());
 					if (s.getType()==State::stateType::AVOID){
-						printf("adding str");
+						//printf("adding str");
 						g[v].options.push_back(State::Direction::NONE);
 					}
 					break;
 				default: break;
 			}
-		printf("created options\n");
+		printf("created options for vertex %i\n", v);
+	}
+	else{
+		printf("vertex %i will be a leaf\n",v);
 	}
 
 	// for (State::Direction d:g[v].options){
@@ -656,11 +659,11 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2Wo
     while (v1!= v){
 		//printf("reset world\n");
 		b2World newWorld({0.0f, 0.0f});
-		printf("v1 = %i, v = %i\n", v1, v);
+		//printf("v1 = %i, v = %i\n", v1, v);
 		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
-		//printf("direction = %i\n", static_cast<int>(d));
+		//printf("in build tree, direction = %i\n", static_cast<int>(d));
 		s = State(g[v].obstacle, d);
-		//printf("in build tree, state code = %i, obstacle valid = %i\n", s.getType(), s.obstacle.isValid());
+		printf("in build tree, state code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
 		constructWorldRepresentation(newWorld, d, g[v].endPose);
 		//DEBUG
 		// char filename[256];
@@ -675,7 +678,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2Wo
 		//printf("v = %i\n", v);
 		v1 = eliminateDisturbance(v,g,s, newWorld, _leaves);
 	}
-	printf("end buildtree\n");
+	//printf("end buildtree\n");
 	return !g[0].obstacle.safeForNow;
 
 }

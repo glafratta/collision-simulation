@@ -17,12 +17,12 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		//FILE * robotDebug = fopen(debug, "w");
 		//float theta=0;
 		float theta = _theta;
-		printf("starting from x =%f, y=%f, theta = %fpi \n", start.x, start.y, theta/M_PI);
+		//printf("starting from x =%f, y=%f, theta = %fpi \n", start.x, start.y, theta/M_PI);
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start, theta);
 		//printf("entering for loop\n");
 		int step=0;
-		printf("speed = %f\n", RecordedVelocity.Length());
+		//printf("action type = %i, speed = %f, omega = %f\n", action.getDirection(),RecordedVelocity.Length(), action.getOmega());
 		for (step; step <= (hz*simDuration); step++) {//3 second
 			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
 			instVelocity.y = RecordedVelocity.Length()*sin(theta);
@@ -32,7 +32,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/hz; //= omega *t
-			printf("x");
+			//printf("x");
 			if (obstacle.isValid()){
 				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
 				if (abs(obstacle.getAngle(robot.body->GetAngle()))>=M_PI_2){
@@ -41,7 +41,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 				}
 			}
 			if (listener.collisions.size()>0){ //
-				printf("\ncrash\n");
+				printf("crash\n");
 				int index = int(listener.collisions.size()/2);
 				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
@@ -77,7 +77,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 		//endPose = robot.body->GetTransform();
 		_world.DestroyBody(robot.body);		
 		fclose(robotPath);
-		printf("\nend pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
+		printf("end pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);
 		//result.stepDuration=step;
 		return result;
 		//simulationResult = result;
@@ -102,7 +102,7 @@ State::controlResult State::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
     if (obstacle.isValid()){
-        printf("obstacle valid\n");
+        //printf("obstacle valid\n");
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= M_PI_2){
@@ -114,7 +114,7 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
         accumulatedError += action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
 		float normAccErr = accumulatedError/M_PI;
         if (accumulatedError>=tolerance){
-            printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
+            //printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
             action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
             action.RightWheelSpeed += normAccErr *pGain; //og was + angle
             if (action.LeftWheelSpeed>1.0){
