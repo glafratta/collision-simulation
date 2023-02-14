@@ -7,6 +7,9 @@
 
 
 class Robot {
+private: 
+float halfLength = .085f;
+float halfWidth = .04f;
 public:
 	b2Vec2 velocity = {0,0};
 	b2Body* body;
@@ -18,7 +21,7 @@ public:
 		body = world->CreateBody(&bodyDef);
 		body->SetUserData(this);  
 		b2PolygonShape fixture; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
-		fixture.SetAsBox(.04f, .085f); 
+		fixture.SetAsBox(halfLength, halfWidth); 
 		body->CreateFixture(&fixture, 1.0f);
 		
 	}
@@ -30,13 +33,20 @@ public:
 	// 	body->SetTransform( body->GetPosition(), robotAngle);
 	// }
 
-	b2Vec3 getPose(){
-		b2Vec3 pose;
-		pose.x = body->GetPosition().x;
-		pose.y = body->GetPosition().y;
-		pose.z = body->GetAngle();
-		return pose;
-	}
+	// b2Vec3 getPose(){
+	// 	b2Vec3 pose;
+	// 	pose.x = body->GetPosition().x;
+	// 	pose.y = body->GetPosition().y;
+	// 	pose.z = body->GetAngle();
+	// 	return pose;
+	// }
+
+	// void dumpCorners(int it){ //dumps all corners in one file, for debugging and for me to just see what's happening to robot orientation
+	// 	char name[256];
+	// 	sprintf(name, "corners%04i.txt", iteration);
+	// 	FILE * file = fopen(name, "a+");
+	// 	fprintf(file, "%f\t%f",);
+	// }
 	
 };
 
