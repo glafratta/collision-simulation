@@ -134,10 +134,10 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//creating decision tree object
 	Graph g;
-	vertexDescriptor v = add_vertex(g);
+	vertexDescriptor v = boost::add_vertex(g);
 	g[v]=state;
 	CollisionTree tree;
-	vertexDescriptor v0 = add_vertex(tree);
+	vertexDescriptor v0 = boost::add_vertex(tree);
 	std::vector <vertexDescriptor> leaves;
 	//tree[v0]= state.willCollide(world, iteration, )
 
@@ -653,26 +653,33 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 // }
 
 
-bool Configurator::build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+bool Configurator::build_tree(vertexDescriptor v, CollisionTree& g, State s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
 	//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
 		//printf("reset world\n");
 		b2World newWorld({0.0f, 0.0f});
 		//printf("v1 = %i, v = %i\n", v1, v);
-		State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
+		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
+
+		vertexDescriptor v1Src = v1InEdge.m_source;
+		State::Direction d = g[v1InEdge].direction;
+		//State::Direction d = g[boost::in_edges(v1, g).first.dereference()].direction;
 		//printf("in build tree, direction = %i\n", static_cast<int>(d));
-		s = State(g[v].obstacle, d);
-		printf("in build tree, state code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
+
+//		v = v1;
+
+		s = State(g[v1Src].obstacle, d);
+		printf("in build tree v1Src= %i, v1= %i, state code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
 		constructWorldRepresentation(newWorld, d, g[v].endPose);
 		//DEBUG
-		// char filename[256];
-		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
-		// FILE * dump = fopen(filename, "w");
-		// for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
-		// 	fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
-		// }
-		// fclose(dump);
+		char filename[256];
+		sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
+		FILE * dump = fopen(filename, "w");
+		for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
+			fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
+		}
+		fclose(dump);
 		//END DEBUG
 		v= v1;
 		//printf("v = %i\n", v);
