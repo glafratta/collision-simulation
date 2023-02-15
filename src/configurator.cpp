@@ -161,7 +161,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				//auto e = boost::out_edges(v0, tree).first.dereference();
-				printf("now finding best branch\n");
+				printf("task tree size = %i now finding best branch\n", tree.m_vertices.size());
 				edgeDescriptor e = findBestBranch(tree, leaves);
 				State::Direction dir = tree[e].direction;
 				//printf("new state from v %i\n", v0);
@@ -179,7 +179,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	
 	//state = State(tree[v0].obstacle);
 	//state = State(tree[v].obstacle);
-	printf("new state is vertex %i\t wheel speeds: %f, %f\n", v0, state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
+	printf("new state wheel speeds: %f, %f\n", state.getAction().LeftWheelSpeed, state.getAction().RightWheelSpeed);
 
 
 
@@ -555,7 +555,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	
 
 
-	printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);
+	//printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);
 	//printf("result obstacle valid %i\n", result.collision.isValid());
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE STATE/TASK/MOTORPLAN ETC i haven't decided a name yet
 		//(srcVertex==v ^ g[srcVertex].endPose !=g[v].endPose) this part makes sure options are only added to the current vertex if it is root XOR if it has advanced the robot at all
@@ -566,7 +566,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 				case State::simResult::resultType::crashed:
 				//printf("v %i is crashed in option, state code = %i\n",v, s.getType());
 					if (s.getType()==State::stateType::BASELINE){
-						printf("adding L/R");
+						//printf("adding L/R");
 						State::Action reflex;
 						reflex.__init__(result.collision, State::Direction::NONE);
 						State::Direction reflexDirection = reflex.getDirection();
@@ -575,7 +575,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					}
 					break;
 				case State::simResult::resultType::successful:
-				printf("v %i is successful in option, state code = %i\n",v,  s.getType());
+				//printf("v %i is successful in option, state code = %i\n",v,  s.getType());
 					if (s.getType()==State::stateType::AVOID){
 						//printf("adding str");
 						g[v].options.push_back(State::Direction::NONE);
@@ -583,10 +583,10 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					break;
 				default: break;
 			}
-		printf("created options for vertex %i\n", v);
+		//printf("created options for vertex %i\n", v);
 	}
 	else{
-		printf("vertex %i will be a leaf\n",v);
+		//printf("vertex %i will be a leaf\n",v);
 	}
 
 	// for (State::Direction d:g[v].options){
@@ -595,7 +595,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 
 	isLeaf = fl ||(g[v].options.size() <=0);
-	printf("is leaf? %i full length = %i, options = %i\n", isLeaf, fl, g[v].options.size());
+	//printf("is leaf? %i full length = %i, options = %i\n", isLeaf, fl, g[v].options.size());
 
 	if (isLeaf){ //if this is a leaf save it
 		_leaves.push_back(v);
@@ -617,15 +617,15 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	                    inEdge = boost::in_edges(v, g).first.dereference();
 						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
 						v = source(inEdge, g); //go back a node
-					    printf("new src = %i, options = %i\n", v, boost::in_degree(v, g));
+					    //printf("new src = %i, options = %i\n", v, boost::in_degree(v, g));
 						if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
 							addVertex(v,v1,g);
-							printf("added vertex to %i, new = %i\n", v, v1);
+						//	printf("added vertex to %i, new = %i\n", v, v1);
 							return v1;
 						}
                     }
                     else{
-                        printf("source has no back edge\n");
+                      //  printf("source has no back edge\n");
                         break;
                     }
                 }
@@ -676,16 +676,16 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionTree& g, State s, b2W
 //		v = v1;
 
 		s = State(g[v1Src].obstacle, d);
-		printf("in build tree v1Src= %i, v1= %i, state code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
+		//printf("in build tree v1Src= %i, v1= %i, state code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
 		constructWorldRepresentation(newWorld, d, g[v].endPose);
 		//DEBUG
-		char filename[256];
-		sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
-		FILE * dump = fopen(filename, "w");
-		for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
-			fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
-		}
-		fclose(dump);
+		// char filename[256];
+		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
+		// FILE * dump = fopen(filename, "w");
+		// for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
+		// 	fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
+		// }
+		// fclose(dump);
 		//END DEBUG
 		v= v1;
 		//printf("v = %i\n", v);

@@ -25,7 +25,7 @@ protected:
 	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
-	FILE * dumpDeltaV;
+	//FILE * dumpDeltaV;
 	char fileNameBuffer[50];
 	int maxObstacleWM =3;
 	State state;
@@ -68,14 +68,14 @@ Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
 	state = desiredState;
-	dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
+	//dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 
 }
 
 Configurator(State &_state): desiredState(_state), state(_state){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
-	printf("simduration = %i\n", state.getSimDuration());
+	//printf("simduration = %i\n", state.getSimDuration());
 
 }
 
@@ -115,7 +115,7 @@ void __init__(State & _state){
 void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'state' into a robot000n.txt file.
 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the state
 	sprintf(fileNameBuffer, "%s", str);
-	printf("reading trajectories from: %s\n", fileNameBuffer);
+	//printf("reading trajectories from: %s\n", fileNameBuffer);
 }
 
 void setReadMap(char * str){
@@ -257,7 +257,8 @@ State::Direction getOppositeDirection(State::Direction d){
         case State::Direction::LEFT: return State::Direction::RIGHT;break;
         case State::Direction::RIGHT: return State::Direction::LEFT;break;
         default:
-        return State::Direction::NONE; printf("default direction\n");break;
+        return State::Direction::NONE; //printf("default direction\n");
+		break;
     }
 }
 
@@ -298,10 +299,10 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 		g[src].options.erase(g[src].options.begin());
 		g[v1]= State(obs, d);
 		add_edge(src, v1, g).first;
-		printf("edge %i, %i\n", src, v1);
+		//printf("edge %i, %i\n", src, v1);
 	}
 	else{///for debug
-		printf("no options\n");
+		//printf("no options\n");
 	}
 
 }
@@ -310,7 +311,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 	//v1 = src;
 	//State::Direction d= State::Direction::NONE;
-	printf("vertex %i, options = %i\n", src, g[src].options.size());
+	//printf("vertex %i, options = %i\n", src, g[src].options.size());
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		//d = g[src].options[0];
@@ -319,10 +320,10 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		//g[v1]= State(obs, d);
-		printf("edge %i, %i, direction = %i\n", src, v1, static_cast<int>(g[e].direction));
+	//	printf("edge %i, %i, direction = %i\n", src, v1, static_cast<int>(g[e].direction));
 	}
 	else{///for debug
-		printf("no options\n");
+		//printf("no options\n");
 	}
 	// for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
 	// 	if (*i = g[v1].getAction().getDirection()){
@@ -336,7 +337,7 @@ edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
-		printf("leaf %i, cost = %f\n", leaf, g[leaf].distanceSoFar);
+		//printf("leaf %i, cost = %f\n", leaf, g[leaf].distanceSoFar);
 		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
 			best = leaf;
 		}
@@ -346,15 +347,15 @@ edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _
 			}
 		}
 	}
-	printf("best = %i\n", best);
+	//printf("best = %i\n", best);
 	//FIND FIRST NODE BEFORE ORIGIN
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
-		printf("current = %i\n", best);
+		//printf("current = %i\n", best);
 		e = boost::in_edges(best, g).first.dereference();
-		printf("best direction = %i\n", static_cast<int>(g[e].direction));
+		//printf("best direction = %i\n", static_cast<int>(g[e].direction));
 		best = e.m_source;
-		printf("back = %i\n", best);
+		//printf("back = %i\n", best);
 	}
 	return e;
 }
