@@ -529,7 +529,8 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
 		g[inEdge].outcome = result.resultCode;
 		//g[v].totalDistance = g[srcVertex].totalDistance + result.distanceCovered; // attach total distance to each vertex for easy score calculation
-		g[v].updateCost(g[srcVertex].costSoFar, g[inEdge]);
+		g[v].updateTotalDistance(g[srcVertex].distanceSoFar, g[inEdge]);
+		g[v].predecessors = g[srcVertex].predecessors +1;
 	}
 
 	else{
@@ -539,14 +540,19 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	g[v].obstacle = result.collision;
 	g[v].endPose = result.endPose;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
-	bool fl = isFullLength(v,g);
+	//bool fl = isFullLength(v,g);
+	bool fl = g[v].distanceSoFar >= BOX2DRANGE;
 	bool moreCostlyThanLeaf =0;
-	for (vertexDescriptor leaf: _leaves){ //establish if the current vertex has a higher cost than any of the leaves
-		if (g[v].costSoFar > g[leaf].costSoFar){
-			moreCostlyThanLeaf=1;
-		}
-	}
-	//
+	//FOR STOPPING NON-OPTIMAL BRANCHES FROM GROWING
+	// for (vertexDescriptor leaf: _leaves){ //establish if the current vertex has a higher cost than any of the leaves
+	// 	if (g[v].distanceSoFar < g[leaf].distanceSoFar){
+	// 		moreCostlyThanLeaf=1;
+	// 	}
+	// 	else if (g[v].distanceSoFar == g[leaf].distanceSoFar){
+	// 		moreCostlyThanLeaf = g[v].predecessors > g[leaf].predecessors;
+	// 	}
+	// }
+	
 
 
 	printf("is fil = %i\t is more costly than leaf %i\n", fl, moreCostlyThanLeaf);

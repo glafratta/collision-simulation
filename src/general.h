@@ -24,7 +24,8 @@ struct Node{
 	std::vector <State::Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
-	float costSoFar =0;
+	float distanceSoFar =0; //just negative of the total distance
+	int predecessors =0;
 
 	//the cost of a (state, motor plan, command?, task) is informed by 
 	// 1. the cost of the previous
@@ -32,9 +33,13 @@ struct Node{
 	// 3. how far it allows the robot to go
 	// 4. whether or not it runs the robot into an obstacle (safe distance)
 	//best possible cost = 0
-	void updateCost(float prevCost, Edge  e){
-		float normDistanceCost = 1-e.distanceCovered /BOX2DRANGE;
-		costSoFar = prevCost + normDistanceCost ; //arbitrary weight of 0.1 to task cost 
+
+	//A path is less costly than a leaf if it takes the robot further. If they both take the robot to the same distance, the path with fewer nodes takes precedence. 
+	void updateTotalDistance(float prevDistance, Edge  e){
+		//float normDistanceCost = 1-e.distanceCovered /BOX2DRANGE; //for this node
+		//float negDistance = -e.distanceCovered
+		distanceSoFar = prevDistance + e.distanceCovered; //calculate cumulative cost for all the nodes leading to the present
+		//needs to be revised!!
 	}
 	
 };
@@ -139,39 +144,34 @@ struct comparator{
 	}
 }; 
 
-class Pruner : public boost::default_dfs_visitor{
+
+class BackTraverser{
 	public:
-	// Graph &graph;
+	template <typename T>
+	void traverse(T (*f)(vertexDescriptor, Graph &, float, int)){
 
-	// Pruner(Graph &g){
-	// 	graph = (g);
-	// }
-
-	void discover_vertex(vertexDescriptor v, const Graph & g){
-		//graph = g;
-		printf("%i\n", v);
 	}
+};
 
-	void start_vertex(vertexDescriptor v, const Graph & g){
-		//graph = g;
-		printf("start %i\n", v);
-	}
+class Pruner : public boost::default_dfs_visitor{
+	// public:
+	// // Graph &graph;
 
-	void finish_vertex(vertexDescriptor v, const Graph & g){
-		//graph = g;
-		printf("finish %i\n", v);
-	}
-	// void discover_vertex(vertexDescriptor v, const Gg & g){
+	// // Pruner(Graph &g){
+	// // 	graph = (g);
+	// // }
+
+	// void discover_vertex(vertexDescriptor v, const Graph & g){
 	// 	//graph = g;
 	// 	printf("%i\n", v);
 	// }
 
-	// void start_vertex(vertexDescriptor v, const Gg & g){
+	// void start_vertex(vertexDescriptor v, const Graph & g){
 	// 	//graph = g;
 	// 	printf("start %i\n", v);
 	// }
 
-	// void finish_vertex(vertexDescriptor v, const Gg & g){
+	// void finish_vertex(vertexDescriptor v, const Graph & g){
 	// 	//graph = g;
 	// 	printf("finish %i\n", v);
 	// }

@@ -263,7 +263,7 @@ State::Direction getOppositeDirection(State::Direction d){
 
 template <typename V, typename G>
 // bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
-bool isFullLength(V v, const G & g, float length=0, int edgesTotal =0){
+bool isFullLength(V v, const G & g, float length=0){
 	//printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
 	//length = stepdur/hz *linvel
     if (boost::in_degree(v, g)==0 && length < desiredState.box2dRange){
@@ -281,8 +281,8 @@ bool isFullLength(V v, const G & g, float length=0, int edgesTotal =0){
 		//printf("length = %f\t", length);
         //vertexDescriptor newV = boost::source(inEdge, g);
 		//printf("newVertex = %i\n", newV);
-		edgesTotal++;
-        return isFullLength(boost::source(inEdge, g), g, length, edgesTotal);
+		g[v].predecessors++;
+        return isFullLength(boost::source(inEdge, g), g, length);
     }
 
 }
@@ -336,9 +336,14 @@ edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
-		printf("leaf %i, cost = %f\n", leaf, g[leaf].costSoFar);
-		if (g[leaf].costSoFar<g[best].costSoFar){
+		printf("leaf %i, cost = %f\n", leaf, g[leaf].distanceSoFar);
+		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
 			best = leaf;
+		}
+		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
+			if (g[leaf].predecessors< g[best].predecessors){
+				best = leaf;
+			}
 		}
 	}
 	printf("best = %i\n", best);
