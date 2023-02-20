@@ -18,10 +18,10 @@ Box2D, OpenCV development files can be installed on Linux OS's via dselect ('lib
 ## Build
 
 build with cmake:
-'''
+```
 cd carmelo
 cmake .
 make
-'''
+```
 
 
