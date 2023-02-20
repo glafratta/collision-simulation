@@ -3,15 +3,15 @@
  
 ## Hardware
 
-The robot is controlled by a Raspberry Pi model 3b+ and currently equipped with 2 Parallax continuous rotation servos and a SLAMTEC A1 LIDAR wired and controlled as per the [alphabot] (https://github.com/berndporr/alphabot) and [rplidar_rpi](https://github.com/berndporr/rplidar_rpi) APIs, respectively.
+The robot is controlled by a Raspberry Pi model 3b+ and currently equipped with 2 Parallax continuous rotation servos and a SLAMTEC A1 LIDAR wired and controlled as per the [alphabot](https://github.com/berndporr/alphabot) and [rplidar_rpi](https://github.com/berndporr/rplidar_rpi) APIs, respectively.
  
 ## Software 
 
 - [box2d](https://github.com/erincatto/box2d)
 - OpenCV Core module
 - Boost
-- [cpptimer] (https://github.com/berndporr/cppTimer) for the test program noRobot.h
-- [alphabot] (https://github.com/berndporr/alphabot)
+- [cpptimer](https://github.com/berndporr/cppTimer) for the test program noRobot.h
+- [alphabot](https://github.com/berndporr/alphabot)
 - [rplidar_rpi](https://github.com/berndporr/rplidar_rpi)  
 Box2D, OpenCV development files can be installed on Linux OS's via `dselect` (`libbox2d-dev`, `libopencv-core-dev`).
 
