@@ -13,7 +13,7 @@ The robot is controlled by a Raspberry Pi model 3b+ and currently equipped with 
 - [cpptimer] (https://github.com/berndporr/cppTimer) for the test program noRobot.h
 - [alphabot] (https://github.com/berndporr/alphabot)
 - [rplidar_rpi](https://github.com/berndporr/rplidar_rpi)  
-Box2D, OpenCV development files can be installed on Linux OS's via dselect ('libbox2d-dev', 'libopencv-core-dev').
+Box2D, OpenCV development files can be installed on Linux OS's via `dselect` (`libbox2d-dev`, `libopencv-core-dev`).
 
 ## Build
 
