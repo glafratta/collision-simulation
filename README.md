@@ -22,5 +22,6 @@ build with cmake:
 cd carmelo
 cmake .
 make
+'''
 
 
