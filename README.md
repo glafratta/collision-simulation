@@ -21,4 +21,4 @@ cmake .
 make
 ```
 ## Run 
-Run `main.cpp` program on the robot: `sudo ./collisionAvoidance'
+Run `main.cpp` program on the robot: `sudo ./collisionAvoidance`
