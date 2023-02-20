@@ -1,28 +1,26 @@
 # carmelo
-Under construction. A library to implement "innate" understanding of physics in an obstacle-avoidant robot, and utilise it for planning trajectories and learning about the environment.
-The program turnMaps.sh goes into the selected folders containing maps and turns them 90 degrees.
-the subdirectory "test" contains test cases before the program is actually implemented in a real robot. noRobot.h is a simulation which does not require a robot but illustrates path planning and trajectory correction.
+ A library for real-time planning of optimal trajectories for an indoor robot in completely unseen environments, without requiring any learning. This project utilises 2D physics library [box2d](https://github.com/erincatto/box2d) to implement innate understanding of physics and online assignment of physical properties to the robot's surroundings to inform spatial decision making. In this framework, decision making and path planning are the output of a closed-loop input control process, where the inputs are spatial information about any disturbances to the robot's current state (i.e. obstacles), which the spatial decisions work to eliminate. The robot's state is therefore simply the current task being carried out which corresponds to a stereotyped motor output and a new task or state is created upon detection of a disturbance; this can be used for reflexive obstacle avoidance, but also for more complex, waypoint-based optimal trajectory planning by creating a tree of states and choosing the next task which is predicted to lead to the best outcome.
+ 
+## Hardware
 
-######################################
-## prerequisites
-### install box2d and opencv
-using `dselect` , install `libbox2d-dev` and 'libopencv-core-dev'
+The robot is controlled by a Raspberry Pi model 3b+ and currently equipped with 2 Parallax continuous rotation servos and a SLAMTEC A1 LIDAR wired and controlled as per the [alphabot] (https://github.com/berndporr/alphabot) and [rplidar_rpi](https://github.com/berndporr/rplidar_rpi) APIs, respectively.
+ 
+## Software 
 
-### rplidar_rpi API
-https://github.com/berndporr/rplidar_rpi
+- [box2d](https://github.com/erincatto/box2d)
+- OpenCV Core module
+- Boost
+- [cpptimer] (https://github.com/berndporr/cppTimer) for the test program noRobot.h
+- [alphabot] (https://github.com/berndporr/alphabot)
+- [rplidar_rpi](https://github.com/berndporr/rplidar_rpi)
+Box2D, OpenCV development files can be installed on Linux OS's via dselect ('libbox2d-dev', 'libopencv-core-dev').
 
-###alphabot API
-https://github.com/berndporr/alphabot
+## Build
 
-See here for the wiring of the robot.
-### timer
-cpptimer:https://github.com/berndporr/cppTimer
-
-##build
 build with cmake:
-
-`cd carmelo`
-`cmake .`
-`make`
+'''
+cd carmelo
+cmake .
+make
 
 
