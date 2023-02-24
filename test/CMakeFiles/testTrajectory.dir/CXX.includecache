@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/gula/Desktop/collision-simulation/src/robot.h
+Box2D/Box2D.h
+/home/gula/Desktop/collision-simulation/src/Box2D/Box2D.h
+math.h
+-
+
+/home/gula/Desktop/collision-simulation/src/state.cpp
+state.h
+/home/gula/Desktop/collision-simulation/src/state.h
+robot.h
+/home/gula/Desktop/collision-simulation/src/robot.h
+
+/home/gula/Desktop/collision-simulation/src/state.h
+Box2D/Box2D.h
+/home/gula/Desktop/collision-simulation/src/Box2D/Box2D.h
+vector
+-
+stdio.h
+-
+math.h
+-
+
+/home/gula/Desktop/collision-simulation/test/testTrajectory.cpp
+Box2D/Box2D.h
+/home/gula/Desktop/collision-simulation/test/Box2D/Box2D.h
+vector
+-
+stdio.h
+-
+math.h
+-
+../src/state.cpp
+/home/gula/Desktop/collision-simulation/src/state.cpp
+
