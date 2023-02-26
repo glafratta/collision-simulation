@@ -17,26 +17,26 @@
 
 class LidarInterface : public A1Lidar::DataInterface{
 Configurator * c;
-FILE * dumpPath;
+//FILE * dumpPath;
 //for debugging
-FILE * speed;
-char folder[250];
+//FILE * speed;
+//char folder[250];
 public: 
     int mapCount =0;
 
     LidarInterface(Configurator * _c): c(_c){
-		time_t now =time(0);
-		tm *ltm = localtime(&now);
-		int y,m,d, h, min;
-		y=ltm->tm_year-100;
-		m = ltm->tm_mon +1;
-		d=ltm->tm_mday;
-		h = ltm->tm_hour;
-		min = ltm->tm_min;
-		sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
-		if (mkdir(folder, 0777)!= -1){
-			c->setFolder(folder);
-		}
+		// time_t now =time(0);
+		// tm *ltm = localtime(&now);
+		// int y,m,d, h, min;
+		// y=ltm->tm_year-100;
+		// m = ltm->tm_mon +1;
+		// d=ltm->tm_mday;
+		// h = ltm->tm_hour;
+		// min = ltm->tm_min;
+		// sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
+		// if (mkdir(folder, 0777)!= -1){
+		// 	c->setFolder(folder);
+		// }
         // dumpPath = fopen("/tmp/dumpPath.txt", "w");
         // fclose(dumpPath);
         // speed = fopen("/tmp/speed.txt", "w");
@@ -59,7 +59,7 @@ public:
 		// FILE * map = fopen(name_r, "wt");
 		Point p1, p0;
 		for (A1LidarData &data:data){
-			if (data.valid&& data.r <c->getState()->lidarRange){
+			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
 				float x = round(data.x*100)/100;
 				float y = round(data.y*100)/100;
@@ -122,7 +122,7 @@ void step( AlphaBot &motors){
 
 int main(int argc, char** argv) {
 	//world setup with environment class
-	initscr();
+	//initscr();
 	A1Lidar lidar;
 	AlphaBot motors;
     State desiredState;
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
 
 	do {
 	} while (!getchar());
-	endwin();
+	//endwin();
 
 
 	motors.stop();
