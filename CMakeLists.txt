@@ -11,6 +11,9 @@ find_package(OpenCV REQUIRED)
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 add_subdirectory(test)
 
+add_excutable(navigate main.cpp)
+target_link_libraries(navigate alphabot a1lidarrpi gasolina)
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 ##this is for debugging using gdb
