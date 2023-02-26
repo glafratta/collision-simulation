@@ -8,22 +8,8 @@ find_package(Threads)
 
 find_package(OpenCV REQUIRED)
 
-add_executable(noRobot noRobot.cpp)
-#add_executable(lineFollowingSim lineFollowingSim.cpp)
-add_executable(exampleTrajectories makeTrajectories.cpp)
-add_executable(testTrajectory testTrajectory.cpp)
-#add_executable(testSpeedReadings testSpeedReadings.cpp)
-add_executable(testEnvRep testEnvironmentRepresentation.cpp)
-add_executable(SPF simplifiedPathFiniding.cpp)
-
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
-
-target_link_libraries(noRobot Box2D gasolina ${OpenCV_LIBS} cpptimer rt)
-#target_link_libraries(lineFollowingSim Box2D gasolina ${OpenCV_LIBS} cpptimer rt)
-target_link_libraries(testTrajectory Box2D gasolina)
-target_link_libraries(testEnvRep Box2D gasolina)
-#target_link_libraries(testSpeedReadings gasolina Box2D ${OpenCV_LIBS} cpptimer rt)
-target_link_libraries(SPF Box2D gasolina ${OpenCV_LIBS} cpptimer rt)
+add_subdirectory(test)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
