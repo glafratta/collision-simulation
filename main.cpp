@@ -20,7 +20,7 @@ Configurator * c;
 //FILE * dumpPath;
 //for debugging
 //FILE * speed;
-//char folder[250];
+char folder[250];
 public: 
     int mapCount =0;
 
