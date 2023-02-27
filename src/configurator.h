@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-#include "state.h"
-#include "general.h" //general functions + point class + typedefs + state.h + boost includes
+#include "primitive.h"
+#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <boost/graph/depth_first_search.hpp>
 #include <algorithm>
 
@@ -28,7 +28,7 @@ protected:
 	//FILE * dumpDeltaV;
 	char fileNameBuffer[50];
 	int maxObstacleWM =3;
-	State state;
+	Primitive currentDMP;
 	int maxNoChildren =2;
 public:
 	float affineTransError =0;
@@ -36,7 +36,7 @@ public:
 	char *folder;
 	char readMap[50];
 	char msg[25];
-	State desiredState;
+	Primitive desiredDMP;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
@@ -67,22 +67,22 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	state = desiredState;
+	currentDMP = desiredDMP;
 	//dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 
 }
 
-Configurator(State &_state): desiredState(_state), state(_state){
+Configurator(Primitive &_dmp): desiredDMP(_dmp), currentDMP(_dmp){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
-	//printf("simduration = %i\n", state.getSimDuration());
+	//printf("simduration = %i\n", currentDMP.getSimDuration());
 
 }
 
 void __init__(){
 }
 
-void __init__(State & _state){
+void __init__(Primitive & _currentDMP){
 }
 
 // class MedianFilter{
@@ -112,8 +112,8 @@ void __init__(State & _state){
 
 // };
 
-void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'state' into a robot000n.txt file.
-								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the state
+void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentDMP' into a robot000n.txt file.
+								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentDMP
 	sprintf(fileNameBuffer, "%s", str);
 	//printf("reading trajectories from: %s\n", fileNameBuffer);
 }
@@ -179,12 +179,12 @@ b2Vec2 getAbsPos(){
 // }
 
 
-State * getState(int advance=0){ //returns state being executed
-	return &state;
+Primitive * getDMP(int advance=0){ //returns Primitive being executed
+	return &currentDMP;
 }
 
 
-void applyController(bool, State &);
+void applyController(bool, Primitive &);
 
 int getMaxObstacleWM(){
 	return maxObstacleWM;
@@ -193,23 +193,23 @@ int getMaxObstacleWM(){
 b2Vec2 estimateDisplacementFromWheels();
 
 int getMaxStepDuration(){
-	return state.hz * state.getSimDuration();
+	return currentDMP.hz * currentDMP.getSimDuration();
 }
 
-// State returnBest(State & s1, State & s2){ //returns pointer, remember to dereference
+// Primitive returnBest(Primitive & s1, Primitive & s2){ //returns pointer, remember to dereference
 // 	switch(s1.getType() == s2.getType()){
-// 	//if one of the state is the desired state, return the desired state
+// 	//if one of the Primitive is the desired Primitive, return the desired Primitive
 // 		case 0: 
-// 			if (s1.getType() == desiredState.getType()){
+// 			if (s1.getType() == desiredDMP.getType()){
 // 				return s1;
 // 			}
-// 			else if (s2.getType() == desiredState.getType()){
+// 			else if (s2.getType() == desiredDMP.getType()){
 // 				return s2;
 // 			}
 // 		break;
 // 		case 1:
-// 			switch (s1.getType()== desiredState.getType()){
-// 				//if both states are avoiding, choose the one with the least duration
+// 			switch (s1.getType()== desiredDMP.getType()){
+// 				//if both Primitives are avoiding, choose the one with the least duration
 // 				case 0: 
 // 					if (s1.getStepDuration()< s2.getStepDuration()){
 // 						return s1;
@@ -220,7 +220,7 @@ int getMaxStepDuration(){
 // 					else {
 // 						return s1;
 // 					}
-// 				//if both states are desired, choose the one with the most
+// 				//if both Primitives are desired, choose the one with the most
 // 				case 1:
 // 					if (s1.getStepDuration()> s2.getStepDuration()){
 // 						return s1;
@@ -241,23 +241,23 @@ int getMaxStepDuration(){
 
 // }
 
-void eliminateDisturbance(b2World &, State &, b2Vec2&, float&, State::Direction); //performs reactive avoidance
+//void reactiveAvoidance(b2World &, Primitive &, b2Vec2&, float&, Primitive::Direction); //performs reactive avoidance
 
-bool eliminateDisturbance(b2World &, vertexDescriptor &, Graph &, b2Vec2 &, float &); //adds two states if crashed but always next up is picked
+void reactiveAvoidance(b2World &, Primitive::simResult &, Primitive&, b2Vec2 &, float &); //adds two Primitives if crashed but always next up is picked
 
-vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
+//vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
 
-vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionTree&, State  , b2World & , std::vector <vertexDescriptor> &);
+vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionGraph&, Primitive  , b2World & , std::vector <vertexDescriptor> &);
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
-bool build_tree(vertexDescriptor v, CollisionTree&g, State s, b2World & w, std::vector <vertexDescriptor>&);
+bool build_tree(vertexDescriptor v, CollisionGraph&g, Primitive s, b2World & w, std::vector <vertexDescriptor>&);
 //special case if robot is going in circles
 
-State::Direction getOppositeDirection(State::Direction d){
+Primitive::Direction getOppositeDirection(Primitive::Direction d){
     switch (d){
-        case State::Direction::LEFT: return State::Direction::RIGHT;break;
-        case State::Direction::RIGHT: return State::Direction::LEFT;break;
+        case Primitive::Direction::LEFT: return Primitive::Direction::RIGHT;break;
+        case Primitive::Direction::RIGHT: return Primitive::Direction::LEFT;break;
         default:
-        return State::Direction::NONE; //printf("default direction\n");
+        return Primitive::Direction::NONE; //printf("default direction\n");
 		break;
     }
 }
@@ -267,11 +267,11 @@ template <typename V, typename G>
 bool isFullLength(V v, const G & g, float length=0){
 	//printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
 	//length = stepdur/hz *linvel
-    if (boost::in_degree(v, g)==0 && length < desiredState.box2dRange){
+    if (boost::in_degree(v, g)==0 && length < desiredDMP.box2dRange){
 		//printf("ended isFullLength, is root\n");
         return false;
     }
-    else if (length >=desiredState.box2dRange){
+    else if (length >=desiredDMP.box2dRange){
 		//printf("reached full length\n");
         return true;
     }
@@ -289,15 +289,15 @@ bool isFullLength(V v, const G & g, float length=0){
 }
 
 //FOR OLD STUFF WITH GRAPH
-void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Object obs = State::Object()){
+void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, Primitive::Object obs = Primitive::Object()){
 	//vertexDescriptor v1=src;
-	State::Direction d= State::Direction::NONE;
+	Primitive::Direction d= Primitive::Direction::NONE;
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		d = g[src].options[0];
 		//printf("option = %i\n", d);
 		g[src].options.erase(g[src].options.begin());
-		g[v1]= State(obs, d);
+		g[v1]= Primitive(obs, d);
 		add_edge(src, v1, g).first;
 		//printf("edge %i, %i\n", src, v1);
 	}
@@ -307,10 +307,10 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, State::Ob
 
 }
 
-//FOR NEW COLLISIONTREE
-void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
+//FOR NEW CollisionGraph
+void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g){
 	//v1 = src;
-	//State::Direction d= State::Direction::NONE;
+	//Primitive::Direction d= Primitive::Direction::NONE;
 	//printf("vertex %i, options = %i\n", src, g[src].options.size());
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
@@ -319,7 +319,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
-		//g[v1]= State(obs, d);
+		//g[v1]= Primitive(obs, d);
 	//	printf("edge %i, %i, direction = %i\n", src, v1, static_cast<int>(g[e].direction));
 	}
 	else{///for debug
@@ -333,7 +333,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionTree &g){
 	//return v1;
 }
 
-edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _leaves){
+edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
@@ -360,10 +360,10 @@ edgeDescriptor findBestBranch(CollisionTree &g, std::vector <vertexDescriptor> _
 	return e;
 }
 
-void constructWorldRepresentation(b2World & world, State::Direction d, b2Transform start){
+void constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	switch (d){
-		case State::Direction::NONE:{
+		case Primitive::Direction::NONE:{
 		//FIND BOUNDING BOX FOR POINTS OF INTEREST
 		float mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
 		float mPerp = -1/mHead;

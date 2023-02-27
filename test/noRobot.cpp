@@ -78,8 +78,8 @@ class StepCallback{
 public:
     StepCallback(Configurator * c): box2d(c){}
     void step(){
-        L=box2d->getState()->getAction().getLWheelSpeed();
-        R= box2d->getState()->getAction().getRWheelSpeed();
+        L=box2d->getDMP()->getAction().getLWheelSpeed();
+        R= box2d->getDMP()->getAction().getRWheelSpeed();
         printf("step :R= %f, L = %f\n,", R, L);
 
     }
@@ -183,10 +183,14 @@ int main(int argc, char** argv) {
 
     //DATA INTERCFACE
     bool timerOff=atoi(argv[2]);
-    State desiredState;
-    Configurator box2d(desiredState);
+    Primitive desiredDMP;
+    Configurator box2d(desiredDMP);
     box2d.setReadMap("map");
-    box2d.setFolder(argv[1]);        
+    box2d.setFolder(argv[1]);   
+    if (argc >=4){
+        box2d.planning = atoi(argv[3]);
+        printf("planning = %i\n", box2d.planning);
+    }     
     StepCallback cb(&box2d);
     DataInterface dataInterface(&box2d, argv[1]);
 

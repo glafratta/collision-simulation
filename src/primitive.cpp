@@ -1,10 +1,10 @@
-#include "state.h"
+#include "primitive.h"
 #include "robot.h"
 //#include "opencv2/opencv.hpp"
 
 
 
-State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 start = b2Vec2(), float _theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+Primitive::simResult Primitive::willCollide(b2World & _world, int _iteration, b2Vec2 start = b2Vec2(), float _theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -43,9 +43,8 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 			if (listener.collisions.size()>0){ //
 				//printf("crash\n");
 				int index = int(listener.collisions.size()/2);
-				result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
-				//obstacle = Object(ObjectType::obstacle, listener.collisions[index]);
-				if (type == State::stateType::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
+				//result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
+				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
 					if (step/hz >2){
 						// start.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
 						// start.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);
@@ -53,10 +52,13 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 						pos2SecAgo.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
 						pos2SecAgo.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);						
 						robot.body->SetTransform(pos2SecAgo, _theta); //if the simulation crashes reset position for 
+						result = simResult(simResult::resultType::safeForNow, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
 					else{
+						result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
+
 					}
 					
 				}
@@ -85,7 +87,7 @@ State::simResult State::willCollide(b2World & _world, int _iteration, b2Vec2 sta
 }
 
 
-void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
+void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
 	//returns x, y, angle to the robot
 	//printf("robVel %f, %f, timeelapsed %f\n", robVelocity.x, robVelocity.y, timeElapsed);
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
@@ -98,7 +100,7 @@ void State::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, 
 	object.setAngle(angle); //with respect to robot's velocity
 }
 
-State::controlResult State::controller(){
+Primitive::controlResult Primitive::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
     if (obstacle.isValid()){

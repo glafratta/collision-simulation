@@ -10,24 +10,24 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
-#include "state.h"
+#include "primitive.h"
 
 struct Edge{
-	State::Direction direction;
-	State::simResult::resultType outcome;
+	Primitive::Direction direction;
+	Primitive::simResult::resultType outcome;
 	//int stepDuration =0;
 	float distanceCovered=0;
 };
 
 struct Node{
-	State::Object obstacle;
-	std::vector <State::Direction> options;
+	Primitive::Object obstacle;
+	std::vector <Primitive::Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 
-	//the cost of a (state, motor plan, command?, task) is informed by 
+	//the cost of a (Primitive, motor plan, command?, task) is informed by 
 	// 1. the cost of the previous
 	// 2. whether or not it is baseline (if not baseline robot doesn't move)
 	// 3. how far it allows the robot to go
@@ -50,14 +50,15 @@ bool operator!=(Transform const &, Transform const &);
 
 
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, State::simResult> Graph;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionTree;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, int> G;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Primitive, Primitive::simResult> Graph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Node, Edge> Tree;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Primitive, int> G;
 
-typedef boost::graph_traits<Graph>::vertex_iterator vertexIterator; 
-typedef boost::graph_traits<Graph>::vertex_descriptor vertexDescriptor;
-typedef boost::graph_traits<Graph>::edge_descriptor edgeDescriptor;
-typedef boost::graph_traits<Graph>::edge_iterator edgeIterator;
+typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
+typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
+typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
+typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 
 
 
@@ -145,14 +146,6 @@ struct comparator{
 }; 
 
 
-class BackTraverser{
-	public:
-	template <typename T>
-	void traverse(T (*f)(vertexDescriptor, Graph &, float, int)){
-
-	}
-};
-
 class Pruner : public boost::default_dfs_visitor{
 	// public:
 	// // Graph &graph;
@@ -218,4 +211,33 @@ class Pruner : public boost::default_dfs_visitor{
 //     }
 
 // };
+// template <typename V, typename G, typename E>
+// void add_vertex(V &src, V & v1, G &g){ //to be used with directed graph
+// 	if (g[src].option.size()>0){
+// 		v1 = boost::add_vertex(g);
+// 		edgeDescriptor e = boost::add_edge(src, v1,g).first;
+// 		g[e].direction = g[src].options[0];
+// 		g[src].options.erase(g[src].options.begin());
+// 		g[src].out_edges.push_back(e);
+// 	}
+// }
+
+// template <typename V, typename G, typename E>
+// V nextPrimitive(V v, G g, Primitive s, b2World &w, std::vector <V> & _leaves, int iteration){
+// 	//INIT 
+// 	V v1 = v;
+// 	Primitive::simResult result;
+// 	edgeDescriptor inEdge;
+	
+// 	//EVALUATE THE PRESENT PRIMITIVE
+// 	if (v.predecessors.size()>0){
+// 		result = s.willCollide(w, iteration, v.predecessors[-1].endPose.p, v.predecessors[-1].endPose.q.GetAngle());
+// 		inEdge.distanceCovered = result.distanceCovered;
+
+// 	}
+
+
+
+// }
+
 #endif

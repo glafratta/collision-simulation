@@ -99,18 +99,18 @@ Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
 	// if (c->plan.size()==0){
-	// printf("baseline state\n");
-    // motors.setRightWheelSpeed(-(c->desiredState.getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
-    // motors.setLeftWheelSpeed(-(c->desiredState.getAction().getRWheelSpeed()));
+	// printf("baseline Primitive\n");
+    // motors.setRightWheelSpeed(-(c->desiredPrimitive.getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
+    // motors.setLeftWheelSpeed(-(c->desiredPrimitive.getAction().getRWheelSpeed()));
 	// }
 	// else if ( c->plan.size() >0){   
-	// printf("avoidance state\n"); 
+	// printf("avoidance Primitive\n"); 
 	// motors.setRightWheelSpeed(-(c->plan[0].getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
     // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
 
 	// }
-	L= -(c->getState()->getAction().getRWheelSpeed());
-	R = -(c->getState()->getAction().getLWheelSpeed());
+	L= -(c->getDMP()->getAction().getRWheelSpeed());
+	R = -(c->getDMP()->getAction().getLWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());
@@ -125,8 +125,8 @@ int main(int argc, char** argv) {
 	//initscr();
 	A1Lidar lidar;
 	AlphaBot motors;
-    State desiredState;
-    Configurator configurator(desiredState);
+    Primitive desiredDMP;
+    Configurator configurator(desiredDMP);
     configurator.setReadMap("map");
 	LidarInterface dataInterface(&configurator);
 	//DebugClass db(configurator);

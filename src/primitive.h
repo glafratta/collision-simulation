@@ -8,18 +8,18 @@
 enum ObjectType {obstacle=0, target=1, other=2};  
 
 
-class State{
+class Primitive{
 public:
     float hz =50.0f; //og was 60
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
     float box2dRange = BOX2DRANGE;
-    enum stateType {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
+    enum Type {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
 protected:
-    stateType type;
+    Type type;
     float maxSpeed = 0.125f; //this needs to be defined better
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     int simDuration =int(BOX2DRANGE*2 /maxSpeed); //in seconds
@@ -150,7 +150,7 @@ public:
         direction = Direction::NONE;
     }
 
-    // Action(Object &ob, State::Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
+    // Action(Object &ob, Primitive::Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
     // direction = d;
     // float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     // float maxDistance = maxSpeed*simDuration;
@@ -159,17 +159,17 @@ public:
     //         printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
     //         if (abs(ob.getAngle(pos))<M_PI_2){
     //             //NEW LOOP FOR ABOVE
-    //             if (direction = State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+    //             if (direction = Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
     //             printf("direction =none\n");
     //                 if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-    //                     direction = State::Direction::LEFT; //go left
+    //                     direction = Primitive::Direction::LEFT; //go left
     //                 }
     //                 else if (ob.getPosition().y>0){ //go right
-    //                     direction = State::Direction::RIGHT; //go left
+    //                     direction = Primitive::Direction::RIGHT; //go left
     //                 }   
     //                 else{
     //                     int c = rand() % 2;
-    //                     direction = static_cast<State::Direction>(c);
+    //                     direction = static_cast<Primitive::Direction>(c);
 
     //                 }
     //             }
@@ -185,11 +185,11 @@ public:
     //     }
 
     //     switch (direction){
-    //         case State::Direction::LEFT:
+    //         case Primitive::Direction::LEFT:
     //         LeftWheelSpeed = -LeftWheelSpeed;
     //         printf("going left\n");
     //         break;
-    //         case State::Direction::RIGHT:
+    //         case Primitive::Direction::RIGHT:
     //         printf("going right\n");
     //         RightWheelSpeed = - RightWheelSpeed;
     //         break;
@@ -248,17 +248,17 @@ public:
            // printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
             if (abs(ob.getAngle(pos))<M_PI_2){
                 //NEW LOOP FOR ABOVE
-                if (direction == State::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                if (direction == Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
                 //printf("direction in action =none\n");
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                        direction = State::Direction::LEFT; //go left
+                        direction = Primitive::Direction::LEFT; //go left
                     }
                     else if (ob.getPosition().y>0){ //go right
-                        direction = State::Direction::RIGHT; //go left
+                        direction = Primitive::Direction::RIGHT; //go left
                     }   
                     else{
                         int c = rand() % 2;
-                        direction = static_cast<State::Direction>(c);
+                        direction = static_cast<Primitive::Direction>(c);
 
                     }
                 }
@@ -288,11 +288,11 @@ public:
     }
 
     switch (direction){
-        case State::Direction::LEFT:
+        case Primitive::Direction::LEFT:
         LeftWheelSpeed = -LeftWheelSpeed;
         printf("going left\n");
         break;
-        case State::Direction::RIGHT:
+        case Primitive::Direction::RIGHT:
         printf("going right\n");
         RightWheelSpeed = - RightWheelSpeed;
         break;
@@ -377,7 +377,7 @@ public:
     return omega;
     }
 
-    State::Direction getDirection(){
+    Primitive::Direction getDirection(){
         return direction;
     }
 
@@ -387,7 +387,7 @@ public:
 
 
 struct simResult{
-    enum resultType {successful =0, crashed =1}; //successful means no collisions, finished means target reached, for later
+    enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
     resultType resultCode;
     Object collision;
     bool valid = 0;
@@ -430,61 +430,61 @@ class Listener : public b2ContactListener {
 private:
 Action action;
 public:
-std::vector <State::Direction> options;
+std::vector <Primitive::Direction> options;
 Object obstacle;
 //Object target;
 //simResult simulationResult;
 
 
-State::Action getAction(){
+Primitive::Action getAction(){
     return action;
 }
 
-State::stateType getType(){
+Primitive::Type getType(){
     return type;
 }
 
-// State::Object getObstacle(){
+// Primitive::Object getObstacle(){
 //     return obstacle;
 // }
 
-State(){
+Primitive(){
     //printf("overloaded default constructor\n");
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
-    type = stateType::BASELINE;
-    // options.push_back(State::Direction::LEFT);
-    // options.push_back(State::Direction::RIGHT);
+    type = Type::BASELINE;
+    // options.push_back(Primitive::Direction::LEFT);
+    // options.push_back(Primitive::Direction::RIGHT);
     // maxNoChildren = options.size();
     RecordedVelocity = action.getLinearVelocity();
-    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    //printf("in Primitive: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
-State(Object ob, Direction direction = Direction::NONE){
+Primitive(Object ob, Direction direction = Direction::NONE){
    // printf("custom constructor\n");
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
-        type =stateType::AVOID;
+        type =Type::AVOID;
     }
     else{
-        type =stateType::BASELINE;
+        type =Type::BASELINE;
     }
-    //printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
+    //printf("in Primitive: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 
 void __init__(){
    // printf("default init\n");
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
-    type = stateType::BASELINE;
-    // options.push_back(State::Direction::LEFT);
-    // options.push_back(State::Direction::RIGHT);
+    type = Type::BASELINE;
+    // options.push_back(Primitive::Direction::LEFT);
+    // options.push_back(Primitive::Direction::RIGHT);
     // maxNoChildren = options.size();
     RecordedVelocity = action.getLinearVelocity();
-    //printf("in state: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
+    //printf("in Primitive: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
@@ -494,16 +494,16 @@ void __init__(Object ob, Direction direction = Direction::NONE){
     //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
-        type =stateType::AVOID;
+        type =Type::AVOID;
     }
     else{
-        type =stateType::BASELINE;
+        type =Type::BASELINE;
     }
-    //printf("in state: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
+    //printf("in Primitive: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 
-//other state to set both target and obstacle
+//other Primitive to set both target and obstacle
 
 void setObstacle(Object ob){
     obstacle = ob;
