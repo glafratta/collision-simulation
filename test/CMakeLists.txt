@@ -8,13 +8,14 @@ find_package(Threads)
 
 find_package(OpenCV REQUIRED)
 
+include_directories(../src)
+
 add_executable(noRobot noRobot.cpp)
-#add_executable(lineFollowingSim lineFollowingSim.cpp)
-add_executable(exampleTrajectories makeTrajectories.cpp)
+#add_executable(exampleTrajectories makeTrajectories.cpp)
 add_executable(testTrajectory testTrajectory.cpp)
-#add_executable(testSpeedReadings testSpeedReadings.cpp)
 add_executable(testEnvRep testEnvironmentRepresentation.cpp)
 add_executable(SPF simplifiedPathFiniding.cpp)
+#add_executable(testDirectedTree testDirectedTree.cpp)
 
 #add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 

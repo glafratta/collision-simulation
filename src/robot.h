@@ -45,7 +45,14 @@ public:
 	// 	char name[256];
 	// 	sprintf(name, "corners%04i.txt", iteration);
 	// 	FILE * file = fopen(name, "a+");
-	// 	fprintf(file, "%f\t%f",);
+	// 	//midpoint is position
+	// 	b2Vec2 midFront, midBack, front1, front2, back1, back2;
+	// 	midFront.x = (body->GetPosition().Length()+halfLength) *cos(body->GetTransform().q.GetAngle());
+	// 	midFront.y = (body->GetPosition().Length()+halfLength) *sin(body->GetTransform().q.GetAngle());
+	// 	midBack.x = (body->GetPosition().Length()-halfLength) *cos(body->GetTransform().q.GetAngle());
+	// 	midBack.y = (body->GetPosition().Length()-halfLength) *sin(body->GetTransform().q.GetAngle());
+	// 	front1.x = midFront.x - halfwidth;
+	// 	//fprintf(file, "%f\t%f\n", body.);
 	// }
 	
 };

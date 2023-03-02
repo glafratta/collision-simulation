@@ -11,8 +11,8 @@ find_package(OpenCV REQUIRED)
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 add_subdirectory(test)
 
-add_executable(navigate main.cpp)
-target_link_libraries(navigate alphabot a1lidarrpi gasolina pigpio)
+#add_executable(navigate main.cpp)
+#target_link_libraries(navigate alphabot a1lidarrpi gasolina pigpio)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
