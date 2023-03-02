@@ -1,7 +1,5 @@
 # carmelo
-Under construction. A library to implement "innate" understanding of physics in an obstacle-avoidant robot, and utilise it for planning trajectories and learning about the environment.
-The program turnMaps.sh goes into the selected folders containing maps and turns them 90 degrees.
-the subdirectory "test" contains test cases before the program is actually implemented in a real robot. noRobot.h is a simulation which does not require a robot but illustrates path planning and trajectory correction.
+A library to implement spatial navigation based on homeostatic regulation of navigation mode and forward-chaining reasoning for optimal path planning for an indoor robot
 
 ######################################
 ## prerequisites
