@@ -39,4 +39,5 @@ Warning: the CMakeLists.txt file is built in such a way that it will only build 
 ### Test cases (Simulation
 * `./test/noRobot <your-map-folder> <bool timerOff> optional:<bool planningOn>` : this program allows to test the functionality of the "navigate" executable on any machine. Just provide it with a folder containg TSV files of (x, y) coordinates, whether you'd like the simulation to run in real-time and optionally if you'd like to see navigation with no mode planning
 * `./test/SPF` : this program illustrates in sequence how the mode tree is build using a Boost class
-*`./test/testEnvironmentRepresentation`: this program illustrates the selective object representation in Box2D, tailored to the execution of the mode being simulated
+* `./test/testEnvironmentRepresentation`: this program illustrates the selective object representation in Box2D, tailored to the execution of the mode being simulated
+* `./test/synthData`: allows to generate synthetic data for debug purposes from one single frame of coordinates
