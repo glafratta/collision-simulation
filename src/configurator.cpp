@@ -279,7 +279,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 // }
 
 void Configurator::reactiveAvoidance(b2World & world, Primitive::simResult &r, Primitive &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
-	r =s.willCollide(world, iteration, start, angle);
+	r =s.willCollide(world, iteration, debugOn, start, angle);
 	if (r.resultCode == Primitive::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Primitive TO THE PLAN
@@ -493,7 +493,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		//printf("is not root\n");
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
-		result =s.willCollide(w, iteration, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last Primitive ended (if previous Primitive crashes)
+		result =s.willCollide(w, iteration, debugOn, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last Primitive ended (if previous Primitive crashes)
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
 		g[inEdge].outcome = result.resultCode;
 		//g[v].totalDistance = g[srcVertex].totalDistance + result.distanceCovered; // attach total distance to each vertex for easy score calculation
@@ -502,7 +502,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 
 	else{
-		result =s.willCollide(w, iteration, {0.0, 0.0}, 0); //default start from 0
+		result =s.willCollide(w, iteration, debugOn, {0.0, 0.0}, 0); //default start from 0
 	}
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	g[v].obstacle = result.collision;

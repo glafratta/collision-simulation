@@ -185,6 +185,7 @@ int main(int argc, char** argv) {
     bool timerOff=atoi(argv[2]);
     Primitive desiredDMP;
     Configurator box2d(desiredDMP);
+    box2d.debugOn =1;
     box2d.setReadMap("map");
     box2d.setFolder(argv[1]);   
     if (argc >=4){

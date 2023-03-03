@@ -402,8 +402,8 @@ struct simResult{
         valid =1;
     }
 
-    simResult(resultType code, int it, Object obst): resultCode(code), collision(obst){
-        collision.setIteration(it);
+    simResult(resultType code, Object obst): resultCode(code), collision(obst){
+        //collision.setIteration(it);
         valid =1;
     }
 };
@@ -586,7 +586,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 
-simResult willCollide(b2World &, int, b2Vec2, float);
+simResult willCollide(b2World &, int, bool, b2Vec2, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 

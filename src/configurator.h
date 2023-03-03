@@ -27,10 +27,9 @@ protected:
 	FILE * dumpPath;
 	//FILE * dumpDeltaV;
 	char fileNameBuffer[50];
-	int maxObstacleWM =3;
 	Primitive currentDMP;
-	int maxNoChildren =2;
 public:
+	bool debugOn=0;
 	float affineTransError =0;
 	bool filterOn=1;
 	char *folder;
@@ -186,9 +185,6 @@ Primitive * getDMP(int advance=0){ //returns Primitive being executed
 
 void applyController(bool, Primitive &);
 
-int getMaxObstacleWM(){
-	return maxObstacleWM;
-}
 
 b2Vec2 estimateDisplacementFromWheels();
 
@@ -337,17 +333,15 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
-		//printf("leaf %i, cost = %f\n", leaf, g[leaf].distanceSoFar);
 		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
 			best = leaf;
 		}
 		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
-			if (g[leaf].predecessors< g[best].predecessors){
+			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
 				best = leaf;
 			}
 		}
 	}
-	//printf("best = %i\n", best);
 	//FIND FIRST NODE BEFORE ORIGIN
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
