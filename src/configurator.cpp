@@ -510,12 +510,20 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = isFullLength(v,g);
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE;
-	bool moreCostlyThanLeaf =0;
+	bool moreCostlyThanLeaf =0; 
+
+	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
+	for (auto l: _leaves){
+		if (g[v].distanceSoFar <= g[l].distanceSoFar && g[v].predecessors>= g[l].predecessors){
+			moreCostlyThanLeaf =1;
+		}
+
+	}
 
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Primitive/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-		switch (result.resultCode){
-				case Primitive::simResult::resultType::crashed:
+		//switch (){
+				if (result.resultCode != Primitive::simResult::resultType::successful){ //accounts for simulation also being safe for now
 					if (s.getType()==Primitive::Type::BASELINE){
 						//printf("adding L/R");
 						Primitive::Action reflex;
@@ -524,15 +532,14 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 						g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
 						g[v].options.push_back(getOppositeDirection(reflexDirection));
 					}
-					break;
-				case Primitive::simResult::resultType::successful:
+				}
+				if (result.resultCode != Primitive::simResult::resultType::crashed){
 					if (s.getType()==Primitive::Type::AVOID){
 						//printf("adding str");
 						g[v].options.push_back(Primitive::Direction::NONE);
 					}
-					break;
-				default: break;
-			}
+			}	
+			//}
 	}
 	else{
 	}

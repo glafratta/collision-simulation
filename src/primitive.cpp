@@ -45,13 +45,13 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 				int index = int(listener.collisions.size()/2);
 				//result = simResult(simResult::resultType::crashed, _iteration, Object(ObjectType::obstacle, listener.collisions[index]));
 				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
-					if (step/hz >2){
+					if (step/hz >REACTION_TIME){
 						// start.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
 						// start.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);
-						b2Vec2 pos2SecAgo;
-						pos2SecAgo.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
-						pos2SecAgo.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);						
-						robot.body->SetTransform(pos2SecAgo, _theta); //if the simulation crashes reset position for 
+						b2Vec2 posReadjusted;
+						posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
+						posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);						
+						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
 						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
 					else{
