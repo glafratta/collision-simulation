@@ -415,6 +415,7 @@ class Listener : public b2ContactListener {
     public:
     Listener(){}
     std::vector <b2Vec2> collisions;
+    
 		void BeginContact(b2Contact * contact) {
 			void* bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
 			if (bodyData) {
@@ -427,6 +428,7 @@ class Listener : public b2ContactListener {
                 collisions.push_back(other->GetPosition());
                 }       
 		}
+        
 	};
 private:
 Action action;

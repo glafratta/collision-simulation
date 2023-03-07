@@ -533,7 +533,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 						g[v].options.push_back(getOppositeDirection(reflexDirection));
 					}
 				}
-				if (result.resultCode != Primitive::simResult::resultType::crashed){
+				else if (result.resultCode != Primitive::simResult::resultType::crashed){
 					if (s.getType()==Primitive::Type::AVOID){
 						//printf("adding str");
 						g[v].options.push_back(Primitive::Direction::NONE);
@@ -541,8 +541,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 			}	
 			//}
 	}
-	else{
-	}
+
 
 	isLeaf = fl ||(g[v].options.size() <=0);
 
@@ -563,6 +562,8 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
                     if(boost::in_degree(v, g)>0){
 						//printf("in degree >0\n");
+						bool isVStraight = s.getAction().getDirection()==Primitive::Direction::NONE; //check if g[v] represents goign straight
+						//collision stored in result
 	                    inEdge = boost::in_edges(v, g).first.dereference();
 						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
 						v = source(inEdge, g); //go back a node
@@ -626,7 +627,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Primitive s
 
 		s = Primitive(g[v1Src].obstacle, d);
 		//printf("in build tree v1Src= %i, v1= %i, Primitive code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
-		constructWorldRepresentation(newWorld, d, g[v].endPose);
+		constructWorldRepresentation(newWorld, d, g[v1Src].endPose); //was g[v].endPose
 		//DEBUG
 		// char filename[256];
 		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);

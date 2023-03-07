@@ -304,7 +304,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, Primitive
 }
 
 //FOR NEW CollisionGraph
-void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g){
+void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Primitive::Object obs = Primitive::Object()){
 	//v1 = src;
 	//Primitive::Direction d= Primitive::Direction::NONE;
 	//printf("vertex %i, options = %i\n", src, g[src].options.size());

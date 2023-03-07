@@ -145,6 +145,10 @@ struct comparator{
 	}
 }; 
 
+template <class P>
+P operator+=(P const &, P const &);
+
+
 
 class Pruner : public boost::default_dfs_visitor{
 	// public:
