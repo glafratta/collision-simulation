@@ -484,7 +484,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
 		//FIND IF THE PRESENT STATE WILL COLLIDE
-	printf("add to vertex %i, ", v);
+	//printf("add to vertex %i, ", v);
 	Primitive::simResult result; 
 	//b2Transform startTransform;(g[srcVertex].endPose.p, g[srcVertex].endPose.q);
 
@@ -519,31 +519,43 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		}
 
 	}
-
+	
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Primitive/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!fl&& !moreCostlyThanLeaf && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-		//switch (){
-				if (result.resultCode != Primitive::simResult::resultType::successful){ //accounts for simulation also being safe for now
-					if (s.getType()==Primitive::Type::BASELINE){
-						//printf("adding L/R");
-						Primitive::Action reflex;
-						reflex.__init__(result.collision, Primitive::Direction::NONE);
-						Primitive::Direction reflexDirection = reflex.getDirection();
-						g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
-						g[v].options.push_back(getOppositeDirection(reflexDirection));
+	if(!fl&& !moreCostlyThanLeaf){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+		if (result.resultCode != Primitive::simResult::successful){ //accounts for simulation also being safe for now
+			if (s.getType()==Primitive::Type::BASELINE){
+				if (result.resultCode == Primitive::simResult::safeForNow){
+					//printf("adding L/R");
+					Primitive::Action reflex;
+					reflex.__init__(result.collision, Primitive::Direction::NONE);
+					Primitive::Direction reflexDirection = reflex.getDirection();
+					g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
+					g[v].options.push_back(getOppositeDirection(reflexDirection));
+				}
+				else if (result.resultCode == Primitive::simResult::crashed){
+					Primitive::Direction dir;
+					if (boost::in_degree(srcVertex, g)>0){
+						dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+					}
+					if (dir != Primitive::NONE){
+						g[srcVertex].options.push_back(dir);
 					}
 				}
-				else if (result.resultCode != Primitive::simResult::resultType::crashed){
-					if (s.getType()==Primitive::Type::AVOID){
-						//printf("adding str");
-						g[v].options.push_back(Primitive::Direction::NONE);
-					}
-			}	
+			}
+		}
+		//else if (result.resultCode != Primitive::simResult::resultType::crashed){
+		//else if (result.resultCode != Primitive::simResult::crashed){
+		else { //will only enter if successful
+			if (s.getType()==Primitive::Type::AVOID){
+				//printf("adding str");
+				g[v].options.push_back(Primitive::Direction::NONE);
+			}
+	}	
 			//}
 	}
 
 
-	isLeaf = fl ||(g[v].options.size() <=0);
+	isLeaf = (g[v].options.size() ==0);
 
 	if (isLeaf){ //if this is a leaf save it
 		_leaves.push_back(v);
@@ -562,12 +574,11 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);
                     if(boost::in_degree(v, g)>0){
 						//printf("in degree >0\n");
-						bool isVStraight = s.getAction().getDirection()==Primitive::Direction::NONE; //check if g[v] represents goign straight
+						//bool isVStraight = s.getAction().getDirection()==Primitive::Direction::NONE; //check if g[v] represents goign straight
 						//collision stored in result
 	                    inEdge = boost::in_edges(v, g).first.dereference();
-						//printf("collision from vertex %i, pos %f, %f, valid = %i\n", v, g[v].obstacle.getPosition().x, g[v].obstacle.getPosition().y, g[v].obstacle.isValid());
-						v = source(inEdge, g); //go back a node
-					    //printf("new src = %i, options = %i\n", v, boost::in_degree(v, g));
+						//v = source(inEdge, g); //go back a node
+						v = inEdge.m_source;
 						if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
 							addVertex(v,v1,g);
 						//	printf("added vertex to %i, new = %i\n", v, v1);
