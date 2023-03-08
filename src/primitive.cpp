@@ -49,7 +49,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 				// 	d.y = robot.body->GetPosition().y - c.getPosition().y;
 				// 	if (d.Length()< clos)
 				// }
-				result = simResult(simResult::resultType::crashed,  Object(ObjectType::obstacle, listener.collisions[index]));
+				//result = simResult(simResult::resultType::crashed,  Object(ObjectType::obstacle, listener.collisions[index]));
 				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
 					if (step/hz >REACTION_TIME){
 						// start.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
@@ -58,10 +58,10 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 						posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
 						posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
-						//result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
 					else{
-						//result = simResult(simResult::resultType::crashed, Object(ObjectType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::crashed, Object(ObjectType::obstacle, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 

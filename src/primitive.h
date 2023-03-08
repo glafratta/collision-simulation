@@ -291,14 +291,14 @@ public:
     switch (direction){
         case Primitive::Direction::LEFT:
         LeftWheelSpeed = -LeftWheelSpeed;
-        printf("going left\n");
+        //printf("going left\n");
         break;
         case Primitive::Direction::RIGHT:
-        printf("going right\n");
+        //printf("going right\n");
         RightWheelSpeed = - RightWheelSpeed;
         break;
         default:
-        printf("not left or right\n");
+        //printf("not left or right\n");
         break;
     }
 

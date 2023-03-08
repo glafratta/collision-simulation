@@ -14,8 +14,10 @@ void Configurator::NewScan(std::vector <Point> & data){
 	for (Point p:data){
 		current.push_back(p);
 	}
-	//printf("data = %i\n", current.size());
-	//printf("current length: %i, previous length%i\n", current.size(), previous.size());
+	// previous = current;
+	// current.clear();
+	// current = data;
+	//bool samevec = previous == current;
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -33,6 +35,9 @@ void Configurator::NewScan(std::vector <Point> & data){
 	}
 	else if (timeElapsed >.25){
 		printf("took too long! %f\n", timeElapsed);
+		if (debugOn){
+			timeElapsed = .2;
+		}
 		//return;
 	}
 
@@ -86,6 +91,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	bool isObstacleStillThere=0;
 	for (Point &p:current){
+		p.x = round(p.x*100)/100; //rounding to 2nd decimal place
+		p.y = round(p.y*100)/100;
 		if (p != *(&p-1)&& p.x >=0 && p.r < currentDMP.box2dRange){
 			b2Body * body;
 			b2BodyDef bodyDef;
@@ -237,7 +244,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			if (tmp.y ==0 && tmp.x ==0){
 				tmpAngle =0;
 			}
-			float tmpPi = tmpAngle/M_PI;
+			//float tmpPi = tmpAngle/M_PI;
 			if (tmp.Length()>currentDMP.getMaxSpeed()){
 				affineTransError += tmp.Length()-currentDMP.getMaxSpeed();
 				tmp.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
@@ -497,16 +504,18 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
 		g[inEdge].outcome = result.resultCode;
 		//g[v].totalDistance = g[srcVertex].totalDistance + result.distanceCovered; // attach total distance to each vertex for easy score calculation
-		g[v].updateTotalDistance(g[srcVertex].distanceSoFar, g[inEdge]);
+		//g[v].updateTotalDistance(g[srcVertex].distanceSoFar, g[inEdge]);
+		//g[v].distanceSoFar +=
 		g[v].predecessors = g[srcVertex].predecessors +1;
 	}
-
 	else{
 		result =s.willCollide(w, iteration, debugOn, {0.0, 0.0}, 0); //default start from 0
 	}
+
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	g[v].obstacle = result.collision;
 	g[v].endPose = result.endPose;
+	g[v].distanceSoFar+=result.distanceCovered;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = isFullLength(v,g);
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE;
@@ -514,7 +523,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].distanceSoFar <= g[l].distanceSoFar && g[v].predecessors>= g[l].predecessors){
+		if (g[v].distanceSoFar <= g[l].distanceSoFar && g[v].predecessors> g[l].predecessors){
 			moreCostlyThanLeaf =1;
 		}
 
@@ -536,6 +545,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					Primitive::Direction dir;
 					if (boost::in_degree(srcVertex, g)>0){
 						dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+						//what if I created a state with g[v]'s obstacle
 					}
 					if (dir != Primitive::NONE){
 						g[srcVertex].options.push_back(dir);
@@ -557,18 +567,19 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 	isLeaf = (g[v].options.size() ==0);
 
-	if (isLeaf){ //if this is a leaf save it
-		_leaves.push_back(v);
-	}
+	// if (isLeaf){ //if this is a leaf save it
+	// 	_leaves.push_back(v);
+	// }
 
 	//IF THE Primitive COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT PrimitiveS DEPENDING ON OUTCOME, only if it's not a leaf
-	if (g[v].options.size()>0){
+	if (!isLeaf){
 		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
 		return v1; //added now	
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
+		_leaves.push_back(v);
 		//printf("seeing if can go back\n");
                 while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
 					//printf("is in edge surce = target? %i\n", inEdge.m_source == inEdge.m_target);

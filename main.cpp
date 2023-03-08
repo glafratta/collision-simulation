@@ -61,10 +61,10 @@ public:
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
-				float x = round(data.x*100)/100;
-				float y = round(data.y*100)/100;
-				float r = round(data.r*100)/100;
-				float phi = round(data.phi*100)/100;
+				float x = round(data.x*1000)/1000;
+				float y = round(data.y*1000)/1000;
+				float r = round(data.r*1000)/1000;
+				float phi = round(data.phi*1000)/1000;
 				p1= (Point(x, y, r, phi));
 				if (p1!= p0){
 					current.push_back(p1);

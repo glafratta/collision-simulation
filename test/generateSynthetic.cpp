@@ -39,7 +39,7 @@ float sanityCheck(char * str){
 
 int main(int argc, char ** argv){
     if (get_current_dir_name()!= "test" || get_current_dir_name()!="test/"){
-        assert(chdir("test")>-1);
+        chdir("test");
     }
     printf("cwd = %s\n", get_current_dir_name);
     char fileName[256], folderName[256], fileRoot[256];
@@ -107,9 +107,10 @@ int main(int argc, char ** argv){
     char debugFile[256];
     sprintf(debugFile, "%s_debug.txt", fileRoot);
     FILE * dump = fopen(debugFile, "w+");
-    while(file>>tmpX>>tmpY){
-        x = sanityCheck(tmpX);
-        y= sanityCheck(tmpY);
+    // while(file>>tmpX>>tmpY){
+    //     x = sanityCheck(tmpX);
+    //     y= sanityCheck(tmpY);
+    while(file>>x>>y){
         points.push_back(cv::Point2f(x,y));
         fprintf(dump, "%f\t%f\n", x, y);
     }
@@ -128,7 +129,7 @@ int main(int argc, char ** argv){
     cv::Mat transformMatrix = (cv::Mat_<double>(2,3)<<cos(DeltaW), -sin(DeltaW), DeltaX, sin(DeltaW), cos(DeltaW), DeltaY);
     for (int j=0; j<=nMaps; j++){ //create 40 data points corresponding to 40 transformations
         char filePath[256];
-        sprintf(filePath,"%s/%s_%04i.txt",folderName, fileRoot, j);
+        sprintf(filePath,"%s/map%04i.dat",folderName, j);
         FILE *  f=fopen(filePath, "w+");
         //printf("xshift = %f, yshift = %f, theta = %f", xShift, yShift, theta);
         // cv::Mat transformMatrix = (cv::Mat_<double>(2,3)<<cos(theta), -sin(theta), xShift, sin(theta), cos(theta), yShift);
