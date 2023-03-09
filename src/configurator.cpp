@@ -543,11 +543,14 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 				}
 				else if (result.resultCode == Primitive::simResult::crashed){
 					Primitive::Direction dir;
+					edgeDescriptor srcInEdge = boost::in_edges(srcVertex, g).first.dereference();
+					edgeDescriptor srcSourceInEdge = boost::in_edges(srcInEdge.m_source, g).first.dereference();
+					bool wouldSpin = g[srcSourceInEdge].direction != Primitive::NONE;
 					if (boost::in_degree(srcVertex, g)>0){
-						dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+						dir = g[srcInEdge].direction;
 						//what if I created a state with g[v]'s obstacle
 					}
-					if (dir != Primitive::NONE){
+					if (dir != Primitive::NONE && !wouldSpin ){
 						g[srcVertex].options.push_back(dir);
 					}
 				}
