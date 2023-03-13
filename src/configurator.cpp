@@ -91,8 +91,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	bool isObstacleStillThere=0;
 	for (Point &p:current){
-		p.x = round(p.x*100)/100; //rounding to 2nd decimal place
-		p.y = round(p.y*100)/100;
+		//p.x = round(p.x*100)/100; //rounding to 2nd decimal place
+		//p.y = round(p.y*100)/100;
 		if (p != *(&p-1)&& p.x >=0 && p.r < currentDMP.box2dRange){
 			b2Body * body;
 			b2BodyDef bodyDef;
@@ -116,11 +116,21 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}
 	}
-	//printf("bodies = %i\n", world.GetBodyCount());
-	//printf("is obstacle still there = %i\n", isObstacleStillThere);
+	if (debugOn){
+		char n[250];
+		sprintf(n, "/tmp/bodies%04i.txt", iteration);
+		FILE *f = fopen(n, "w"); //erase contents from previous run
+		fclose(f);
+		f = fopen(n, "a+");
+		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
+			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+		}
+		fclose(f);
+	}
 	if (!isObstacleStillThere){ 
 		currentDMP = desiredDMP;
 	}
+	int bodyCount = world.GetBodyCount();
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
 	// Tree decisionTree;
@@ -153,7 +163,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				//auto e = boost::out_edges(v0, tree).first.dereference();
-				printf("task tree size = %i now finding best branch\n", g.m_vertices.size());
+				//printf("task tree size = %i now finding best branch\n", g.m_vertices.size());
 				edgeDescriptor e = findBestBranch(g, leaves);
 				Primitive::Direction dir = g[e].direction;
 				//printf("new currentDMP from v %i\n", v0);
@@ -502,7 +512,6 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		srcVertex = boost::source(inEdge, g);
 		result =s.willCollide(w, iteration, debugOn, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last Primitive ended (if previous Primitive crashes)
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
-		g[inEdge].outcome = result.resultCode;
 		//g[v].totalDistance = g[srcVertex].totalDistance + result.distanceCovered; // attach total distance to each vertex for easy score calculation
 		//g[v].updateTotalDistance(g[srcVertex].distanceSoFar, g[inEdge]);
 		//g[v].distanceSoFar +=
@@ -513,9 +522,16 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
+	if (result.distanceCovered ==0){
+		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
+	}
+	else{
+		g[v].nodesInSameSpot =0; //reset if robot is moving
+	}
 	g[v].obstacle = result.collision;
 	g[v].endPose = result.endPose;
 	g[v].distanceSoFar+=result.distanceCovered;
+	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = isFullLength(v,g);
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE;
@@ -523,7 +539,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].distanceSoFar <= g[l].distanceSoFar && g[v].predecessors> g[l].predecessors){
+		if (g[v].distanceSoFar <= g[l].distanceSoFar && (g[v].outcome == g[l].outcome && g[v].predecessors>g[l].predecessors)){
 			moreCostlyThanLeaf =1;
 		}
 
@@ -533,7 +549,25 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	if(!fl&& !moreCostlyThanLeaf){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		if (result.resultCode != Primitive::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getType()==Primitive::Type::BASELINE){
-				if (result.resultCode == Primitive::simResult::safeForNow){
+				Primitive::Direction dir = Primitive::Direction::NONE;
+				// edgeDescriptor srcInEdge = boost::in_edges(srcVertex, g).first.dereference();
+				// edgeDescriptor srcSourceInEdge = boost::in_edges(srcInEdge.m_source, g).first.dereference();
+				// bool wouldSpin = g[srcSourceInEdge].direction != Primitive::NONE;
+				if (boost::in_degree(srcVertex, g)>0){
+					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+				}
+				if (result.resultCode == Primitive::simResult::crashed && dir != Primitive::NONE && g[v].nodesInSameSpot<maxNodesOnSpot){
+					// Primitive::Direction dir;
+					// // edgeDescriptor srcInEdge = boost::in_edges(srcVertex, g).first.dereference();
+					// // edgeDescriptor srcSourceInEdge = boost::in_edges(srcInEdge.m_source, g).first.dereference();
+					// // bool wouldSpin = g[srcSourceInEdge].direction != Primitive::NONE;
+					// if (boost::in_degree(srcVertex, g)>0){
+					// 	dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+					// }
+					//if (dir != Primitive::NONE && g[v].nodesInSameSpot<maxNodesOnSpot){ //adding node to this which avoids the obstacle encountered
+						g[v].options.push_back(dir);
+					}
+				else if (result.resultCode == Primitive::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
 					//printf("adding L/R");
 					Primitive::Action reflex;
 					reflex.__init__(result.collision, Primitive::Direction::NONE);
@@ -541,21 +575,8 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
 					g[v].options.push_back(getOppositeDirection(reflexDirection));
 				}
-				else if (result.resultCode == Primitive::simResult::crashed){
-					Primitive::Direction dir;
-					edgeDescriptor srcInEdge = boost::in_edges(srcVertex, g).first.dereference();
-					edgeDescriptor srcSourceInEdge = boost::in_edges(srcInEdge.m_source, g).first.dereference();
-					bool wouldSpin = g[srcSourceInEdge].direction != Primitive::NONE;
-					if (boost::in_degree(srcVertex, g)>0){
-						dir = g[srcInEdge].direction;
-						//what if I created a state with g[v]'s obstacle
-					}
-					if (dir != Primitive::NONE && !wouldSpin ){
-						g[srcVertex].options.push_back(dir);
-					}
 				}
 			}
-		}
 		//else if (result.resultCode != Primitive::simResult::resultType::crashed){
 		//else if (result.resultCode != Primitive::simResult::crashed){
 		else { //will only enter if successful
@@ -636,6 +657,11 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Primitive s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
+	
+	// for (b2Body * b = w.GetBodyList(); b!=NULL; b = b->GetNext()){
+	// 	w.DestroyBody(b);
+
+	// }
 	//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
 		//printf("reset world\n");
@@ -651,8 +677,9 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Primitive s
 //		v = v1;
 
 		s = Primitive(g[v1Src].obstacle, d);
-		//printf("in build tree v1Src= %i, v1= %i, Primitive code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
+		//printf("in build tree eletv1Src= %i, v1= %i, Primitive code = %i, obstacle valid = %i, wheel speeds = L %f, R= %f, action type = %i\n",v1Src, v1, s.getType(), s.obstacle.isValid(), s.getAction().LeftWheelSpeed, s.getAction().RightWheelSpeed, s.getAction().getDirection());
 		constructWorldRepresentation(newWorld, d, g[v1Src].endPose); //was g[v].endPose
+		int bodyCount = newWorld.GetBodyCount();
 		//DEBUG
 		// char filename[256];
 		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
