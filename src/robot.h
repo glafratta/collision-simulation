@@ -3,7 +3,15 @@
 
 #include "Box2D/Box2D.h"
 #include <math.h>
-
+#define SAFE_ANGLE M_PI_2
+#define MAX_TURN M_PI
+#define ROBOT_HALFLENGTH 0.085
+#define ROBOT_HALFWIDTH 0.04
+const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
+										//this is the angle that the robot would have to turn
+										//to be at a safe distance from an obstacle in the worst
+										//case scenario, provided that the position of the obstacle
+										//refers to the centre of mass of the robot
 
 
 class Robot {

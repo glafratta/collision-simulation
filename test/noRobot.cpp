@@ -56,7 +56,7 @@ char * folder;
 			y = round(y*100)/100;
             Point p(x,y);
             //Point pp = *(&p-1);
-            if (p.r<1.5 && p!=*(&p-1)){
+            if (p.r<1.0 && p!=*(&p-1)){
             	//current.push_back(cv::Point2f(x, y));
                 current.push_back(p);
             }
@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
     }
     else if (timerOff){
                 // b2Vec2 velocity = {0,0};
-        for (int i=0; i<20;i++){
+        for (int i=0; i<40;i++){
             dataInterface.newScanAvail();
             cb.step();
 

@@ -14,7 +14,6 @@
 
 struct Edge{
 	Primitive::Direction direction;
-	Primitive::simResult::resultType outcome;
 	//int stepDuration =0;
 	float distanceCovered=0;
 };
@@ -26,6 +25,8 @@ struct Node{
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
+	int nodesInSameSpot =0;
+	Primitive::simResult::resultType outcome;
 
 	//the cost of a (Primitive, motor plan, command?, task) is informed by 
 	// 1. the cost of the previous
@@ -35,12 +36,12 @@ struct Node{
 	//best possible cost = 0
 
 	//A path is less costly than a leaf if it takes the robot further. If they both take the robot to the same distance, the path with fewer nodes takes precedence. 
-	void updateTotalDistance(float newDistance, float prevDistance){
-		//float normDistanceCost = 1-e.distanceCovered /BOX2DRANGE; //for this node
-		//float negDistance = -e.distanceCovered
-		distanceSoFar = prevDistance + newDistance; //calculate cumulative cost for all the nodes leading to the present
-		//needs to be revised!!
-	}
+	// void updateTotalDistance(float newDistance, float prevDistance){
+	// 	//float normDistanceCost = 1-e.distanceCovered /BOX2DRANGE; //for this node
+	// 	//float negDistance = -e.distanceCovered
+	// 	distanceSoFar = prevDistance + newDistance; //calculate cumulative cost for all the nodes leading to the present
+	// 	//needs to be revised!!
+	// }
 	
 };
 
