@@ -35,6 +35,10 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			//printf("x");
 			if (obstacle.isValid()){
 				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
+				if (debugOn){
+					float bodyAngle = robot.body->GetAngle();
+					float pointVAngle = obstacle.getAngle(robot.body->GetLinearVelocityFromLocalPoint({0, 0}));
+				}
 				if (abs(obstacle.getAngle(robot.body->GetAngle()))>=M_PI_2){
 				//printf("obstacle successfully avoided after %i steps\n", step);
 				break;
