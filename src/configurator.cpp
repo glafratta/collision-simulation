@@ -7,16 +7,16 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	std::vector <Point> previous;
-	for (Point p:current){
-		previous.push_back(p);
-	}
-	current.clear();
-	for (Point p:data){
-		current.push_back(p);
-	}
-	// previous = current;
+	// for (Point p:current){
+	// 	previous.push_back(p);
+	// }
 	// current.clear();
-	// current = data;
+	// for (Point p:data){
+	// 	current.push_back(p);
+	// }
+	previous = current;
+	current.clear();
+	current = data;
 	//bool samevec = previous == current;
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
@@ -93,7 +93,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	for (Point &p:current){
 		//p.x = round(p.x*100)/100; //rounding to 2nd decimal place
 		//p.y = round(p.y*100)/100;
-		if (p != *(&p-1)&& p.x >=0 && p.r < currentDMP.box2dRange){
+		if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
 			b2Body * body;
 			b2BodyDef bodyDef;
 			b2FixtureDef fixtureDef;
@@ -148,27 +148,21 @@ void Configurator::NewScan(std::vector <Point> & data){
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
-	//tree[v0]= currentDMP.willCollide(world, iteration, )
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentDMP
 	switch (planning){
 		case 0:
 			printf("reacting\n");
 			reactiveAvoidance(world, result, currentDMP, start, theta);
+			break;
 		case 1:
-			//printf("planning on\n");
-			//currentDMP.change =build_tree(v, g, world); //for now should produce the same behaviour because the tree is not being pruned
 			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentDMP.change is changed directly
 			if (currentDMP.change){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
-				//auto e = boost::out_edges(v0, tree).first.dereference();
-				//printf("task tree size = %i now finding best branch\n", g.m_vertices.size());
 				edgeDescriptor e = findBestBranch(g, leaves);
 				Primitive::Direction dir = g[e].direction;
-				//printf("new currentDMP from v %i\n", v0);
 				currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
-				//no pruning yet, no choosing optimal action
 			}
 			break;
 		default: break;
