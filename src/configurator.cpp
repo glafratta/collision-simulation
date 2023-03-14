@@ -524,7 +524,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 	g[v].obstacle = result.collision;
 	g[v].endPose = result.endPose;
-	g[v].distanceSoFar+=result.distanceCovered;
+	g[v].distanceSoFar = g[srcVertex].distanceSoFar + result.distanceCovered;
 	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = isFullLength(v,g);
