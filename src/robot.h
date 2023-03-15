@@ -16,8 +16,9 @@ const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLEN
 
 class Robot {
 private: 
-float halfLength = .085f;
-float halfWidth = .04f;
+// float halfLength = .085f;
+// float halfWidth = .04f;
+	b2FixtureDef fixtureDef;
 public:
 	b2Vec2 velocity = {0,0};
 	b2Body* body;
@@ -28,9 +29,11 @@ public:
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world->CreateBody(&bodyDef);
 		body->SetUserData(this);  
-		b2PolygonShape fixture; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
-		fixture.SetAsBox(halfLength, halfWidth); 
-		body->CreateFixture(&fixture, 1.0f);
+		b2PolygonShape box; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
+		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH); 
+		fixtureDef.shape = &box;
+		fixtureDef.friction =0;
+		body->CreateFixture(&fixtureDef);
 		
 	}
 

@@ -21,7 +21,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 		//printf("entering for loop\n");
 		int step=0;
 		//printf("action type = %i, speed = %f, omega = %f\n", action.getDirection(),RecordedVelocity.Length(), action.getOmega());
-		for (step; step <= (hz*simDuration); step++) {//3 second
+		for (step; step < (hz*simDuration); step++) {//3 second
 			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
 			instVelocity.y = RecordedVelocity.Length()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
@@ -36,28 +36,29 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			if (obstacle.isValid()){
 				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
 				if (debugOn){
-					float bodyAngle = robot.body->GetAngle();
-					float pointVAngle = obstacle.getAngle(robot.body->GetLinearVelocityFromLocalPoint({0, 0}));
+					float robotAngle = robot.body->GetAngle();
+					b2Vec2 v = robot.body->GetLinearVelocityFromLocalPoint({0, 0});
+					float pointVAngle = obstacle.getAngle(v);
 				}
-				if (abs(obstacle.getAngle(robot.body->GetAngle()))>=M_PI_2){
+				float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
+				if (absAngleToObstacle>=M_PI_2){
 				//printf("obstacle successfully avoided after %i steps\n", step);
 				break;
 				}
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				// Object closestCollision = listener.collisions[0];
-				// for (Object c: listener.collisions){
+				// b2Vec2 closestCollision = listener.collisions[0];
+				// for (b2Vec2 c: listener.collisions){
 				// 	b2Vec2 d;
 				// 	d.x = robot.body->GetPosition().x - c.getPosition().x;
 				// 	d.y = robot.body->GetPosition().y - c.getPosition().y;
-				// 	if (d.Length()< clos)
+				// 	if (d.Length()< closestCollision.Length()){
+					//closestCollision = c;
 				// }
 				//result = simResult(simResult::resultType::crashed,  Object(ObjectType::obstacle, listener.collisions[index]));
 				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
-					if (step/hz >REACTION_TIME){
-						// start.x = robot.body->GetPosition().x- instVelocity.x*(step/hz-2);
-						// start.y = robot.body->GetPosition().y -instVelocity.y*(step/hz-2);
+					if (step/hz >=REACTION_TIME){
 						b2Vec2 posReadjusted;
 						posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
 						posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);						
