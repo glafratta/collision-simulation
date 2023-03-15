@@ -27,6 +27,6 @@ endif()
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 ##this is for debugging using gdb
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 
 #set(CMAKE_BUILD_TYPE RelWithDebInfo)

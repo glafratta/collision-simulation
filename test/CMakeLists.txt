@@ -26,7 +26,7 @@ target_link_libraries(testEnvRep Box2D gasolina)
 target_link_libraries(SPF Box2D gasolina ${OpenCV_LIBS} cpptimer rt)
 target_link_libraries(synthData gasolina ${OpenCV_LIBS})
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -g3 -gdwarf-2") #last two flags include preprocessor info for gdb
 
 ##this is for debugging using gdb
 set(CMAKE_BUILD_TYPE Debug)
