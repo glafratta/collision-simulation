@@ -1,6 +1,6 @@
-set(SRC configurator.cpp state.cpp general.cpp)
+set(SRC configurator.cpp primitive.cpp general.cpp)
 
-set(HEAD configurator.h robot.h state.h general.h)
+set(HEAD configurator.h robot.h primitive.h general.h)
 
 add_library(gasolina ${SRC} ${HEAD})
 

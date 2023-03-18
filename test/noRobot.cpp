@@ -56,7 +56,7 @@ char * folder;
 			y = round(y*100)/100;
             Point p(x,y);
             //Point pp = *(&p-1);
-            if (p.r<1.5 && p!=*(&p-1)){
+            if (p.r<1.0 && p!=*(&p-1)){
             	//current.push_back(cv::Point2f(x, y));
                 current.push_back(p);
             }
@@ -78,8 +78,8 @@ class StepCallback{
 public:
     StepCallback(Configurator * c): box2d(c){}
     void step(){
-        L=box2d->getState()->getAction().getLWheelSpeed();
-        R= box2d->getState()->getAction().getRWheelSpeed();
+        L=box2d->getDMP()->getAction().getLWheelSpeed();
+        R= box2d->getDMP()->getAction().getRWheelSpeed();
         printf("step :R= %f, L = %f\n,", R, L);
 
     }
@@ -183,10 +183,15 @@ int main(int argc, char** argv) {
 
     //DATA INTERCFACE
     bool timerOff=atoi(argv[2]);
-    State desiredState;
-    Configurator box2d(desiredState);
+    Primitive desiredDMP;
+    Configurator box2d(desiredDMP);
+    box2d.debugOn =1;
     box2d.setReadMap("map");
-    box2d.setFolder(argv[1]);        
+    box2d.setFolder(argv[1]);   
+    if (argc >=4){
+        box2d.planning = atoi(argv[3]);
+        printf("planning = %i\n", box2d.planning);
+    }     
     StepCallback cb(&box2d);
     DataInterface dataInterface(&box2d, argv[1]);
 
@@ -203,7 +208,7 @@ int main(int argc, char** argv) {
     }
     else if (timerOff){
                 // b2Vec2 velocity = {0,0};
-        for (int i=0; i<20;i++){
+        for (int i=0; i<40;i++){
             dataInterface.newScanAvail();
             cb.step();
 

@@ -1,4 +1,4 @@
-#include "../src/state.h"
+#include "../src/primitive.h"
 #include <utility>                   // for std::pair
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
@@ -11,13 +11,13 @@
 using namespace boost;
 
 
-// typedgeDescriptoref std::pair<State &, State&> edgeDescriptorge; //can
+// typedgeDescriptoref std::pair<Primitive &, Primitive&> edgeDescriptorge; //can
 // typedgeDescriptoref graph_traits<Graph>::vertex_iterator vertexIterator;
 // typedef graph_traits<Graph>::vertex_descriptor vertexDescriptor;
 // typedef graph_traits<Graph>::edge_descriptor edgeDescriptor;
 // typedef graph_traits<Graph>::edge_iterator edgeIterator;
-typedef std::pair <State::Object, State::Direction> stateIdentifier;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, stateIdentifier, State::simResult> DecisionTree;
+typedef std::pair <Primitive::Object, Primitive::Direction> PrimitiveIdentifier;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, PrimitiveIdentifier, Primitive::simResult> DecisionTree;
 
 
 
@@ -59,10 +59,10 @@ bool isFullLength(vertexDescriptor v, G&g, int length=0){
                 g[e]= 2;
             }
             //CHECK ALL BACK EDGES
-            if (!isFullLength(v, g)){ //if max length has not been reached, add an avoidance state
+            if (!isFullLength(v, g)){ //if max length has not been reached, add an avoidance Primitive
             printf("not full length\n");
                     v1 =add_vertex(g);
-                    g[v1] = State();
+                    g[v1] = Primitive();
                     add_edge(v, v1, g).first;
                     printf("added edge %i, %i\n", v, v1);
             }
@@ -78,7 +78,7 @@ bool isFullLength(vertexDescriptor v, G&g, int length=0){
             if (sourceOutDegree ==1) { //add another vertex to source node
             v1 =add_vertex(g);
             printf("source degree 1, src = %i\n", srcV);
-            g[v1] = State();
+            g[v1] = Primitive();
             add_edge(srcV, v1, g).first;
             printf("added edge %i, %i\n", srcV, v1);
             //addV(v1, g);
@@ -105,8 +105,8 @@ bool isFullLength(vertexDescriptor v, G&g, int length=0){
                 if (sourceOutDegree <2){
                     v1 =add_vertex(g);
                     //auto v2 = add_vertex(g);
-                    g[v1] = State();
-                    //g[v2] = State();
+                    g[v1] = Primitive();
+                    //g[v2] = Primitive();
                     add_edge(srcV, v1, g).first;
                     printf("added edge %i, %i\n", srcV, v1);
                     //addV(v1, g);
@@ -123,7 +123,7 @@ void build_tree(vertexDescriptor v, G&g){
     printf("v=%i\n", v);
     for (vertexDescriptor d: listCollided){
         if (v==d){
-            g[v].setObstacle(State::Object(ObjectType::obstacle, b2Vec2(0.12, 0)));
+            g[v].setObstacle(Primitive::Object(ObjectType::obstacle, b2Vec2(0.12, 0)));
             printf("added ob to %i\n", v);
         }
     }
@@ -142,7 +142,7 @@ void build_tree(vertexDescriptor v, G&g){
 
 
  int main(){
-    State s1;
+    Primitive s1;
     G tree;
     Pruner p;
 
