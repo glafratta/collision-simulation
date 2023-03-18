@@ -27,13 +27,20 @@ void Configurator::NewScan(std::vector <Point> & data){
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
+	if (debugOn){
+		printf("time elapsed: %f\n", timeElapsed);
+	}
+
 	//timeElapsed = samplingRate;
 	//DISCARD BAD SCANS
-	if ( timeElapsed< .15){
+	if ( timeElapsed< .19){
 		//timeElapsed= samplingRate;
 		//return;
+		if (debugOn){
+			timeElapsed = .2;
+		}
 	}
-	else if (timeElapsed >.25){
+	else if (timeElapsed >.21){
 		printf("took too long! %f\n", timeElapsed);
 		if (debugOn){
 			timeElapsed = .2;
@@ -167,6 +174,9 @@ void Configurator::NewScan(std::vector <Point> & data){
 			break;
 		default: break;
 
+	}
+	if (debugOn){
+		printf("tree size = %i\n", g.m_vertices.size());
 	}
 	
 
@@ -516,7 +526,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
-	if (result.distanceCovered ==0){
+	if (result.distanceCovered <=.01){
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
 	}
 	else{

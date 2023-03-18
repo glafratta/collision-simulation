@@ -342,6 +342,9 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 			}
 		}
 	}
+	if (debugOn){
+		printf("best branch has endpose: x = %f, y= %f, angle = %f", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
+	}
 	//FIND FIRST NODE BEFORE ORIGIN
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
