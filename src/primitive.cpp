@@ -58,10 +58,14 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 				// }
 				//result = simResult(simResult::resultType::crashed,  Object(ObjectType::obstacle, listener.collisions[index]));
 				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
-					if (step/hz >=REACTION_TIME){
+					if (step/hz >REACTION_TIME){
 						b2Vec2 posReadjusted;
-						posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
-						posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);						
+						//OG
+						//posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
+						//posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);
+						//NEW: 
+						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
+						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
 						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
@@ -89,6 +93,9 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 		result.endPose = robot.body->GetTransform();
 		//endPose = robot.body->GetTransform();
 		_world.DestroyBody(robot.body);		
+		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
+			_world.DestroyBody(b);
+		}
 		if (robotPath!=NULL){
 			fclose(robotPath);
 		}
