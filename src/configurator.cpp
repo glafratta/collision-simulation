@@ -132,6 +132,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
+	edgeDescriptor e;
+	Primitive::Direction dir;
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentDMP
 	switch (planning){
@@ -141,15 +143,16 @@ void Configurator::NewScan(std::vector <Point> & data){
 			break;
 		case 1:
 			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentDMP.change is changed directly
-			edgeDescriptor e = findBestBranch(g, leaves);
-			Primitive::Direction dir = g[e].direction;
+			e = findBestBranch(g, leaves);
+//			dir = g[e].direction;
 			if (currentDMP.change){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
-				currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
+				currentDMP = Primitive(g[v0].obstacle, g[e].direction); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
 			}
 			break;
-		default: break;
+		default: 
+		break;
 
 	}
 	if (debugOn){
