@@ -123,17 +123,6 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 		}
 	}
-	if (debugOn){
-		char n[250];
-		sprintf(n, "/tmp/bodies%04i.txt", iteration);
-		FILE *f = fopen(n, "w"); //erase contents from previous run
-		fclose(f);
-		f = fopen(n, "a+");
-		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
-			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-		}
-		fclose(f);
-	}
 	if (!isObstacleStillThere){ 
 		currentDMP = desiredDMP;
 	}
@@ -660,6 +649,19 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 
 bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Primitive s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+	char n[250];
+	sprintf(n, "/tmp/bodies%04i.txt", iteration);
+	if (debugOn){
+			FILE *f = fopen(n, "w"); //erase contents from previous run
+			fclose(f);
+	}
+	if (debugOn){
+		FILE *f = fopen(n, "a+");
+		for (b2Body * b = w.GetBodyList(); b!=NULL; b= b->GetNext()){
+			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+		}
+		fclose(f);
+	}
 	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
 	
 	// for (b2Body * b = w.GetBodyList(); b!=NULL; b = b->GetNext()){
@@ -685,13 +687,13 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Primitive s
 		constructWorldRepresentation(newWorld, d, g[v1Src].endPose); //was g[v].endPose
 		int bodyCount = newWorld.GetBodyCount();
 		//DEBUG
-		// char filename[256];
-		// sprintf(filename, "/tmp/dumpbodies%04i_%i.txt", iteration, v1);
-		// FILE * dump = fopen(filename, "w");
-		// for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b=b->GetNext()){
-		// 	fprintf(dump, "%.2f\t%.2f\n", b->GetPosition().x, b->GetPosition().y);
-		// }
-		// fclose(dump);
+		if (debugOn){
+			FILE *f = fopen(n, "a+");
+			for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
+				fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+			}
+			fclose(f);
+		}
 		//END DEBUG
 		v= v1;
 		//printf("v = %i\n", v);
