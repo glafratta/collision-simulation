@@ -35,14 +35,15 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			//printf("x");
 			if (obstacle.isValid()){
 				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
-				if (debugOn){
-					float robotAngle = robot.body->GetAngle();
-					b2Vec2 v = robot.body->GetLinearVelocityFromLocalPoint({0, 0});
-					float pointVAngle = obstacle.getAngle(v);
-				}
 				float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
 				if (absAngleToObstacle>=M_PI_2){
+					//float pointVAngle;
 				//printf("obstacle successfully avoided after %i steps\n", step);
+					// if (debugOn){
+					// 	float robotAngle = robot.body->GetAngle();
+					// 	b2Vec2 v = robot.body->GetLinearVelocityFromLocalPoint({0, 0});
+					// 	pointVAngle = obstacle.getAngle(v);
+					// }
 				break;
 				}
 			}
@@ -69,14 +70,13 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
 						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
-					else{
+				}
+				else{
 						result = simResult(simResult::resultType::crashed, Object(ObjectType::obstacle, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 
 					}
-					
-				}
 				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
@@ -92,9 +92,14 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
 		//endPose = robot.body->GetTransform();
-		_world.DestroyBody(robot.body);		
+		//_world.DestroyBody(robot.body);		
+		int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
+			if (b->GetUserData()!=NULL){
+				roboCount++;
+			}
 			_world.DestroyBody(b);
+
 		}
 		if (robotPath!=NULL){
 			fclose(robotPath);
