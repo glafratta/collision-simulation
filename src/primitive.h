@@ -87,6 +87,16 @@ public:
         return angle;
     }
 
+    float getAngle(b2Body* b){
+        float angle;
+        b2Vec2 thisToB;
+        thisToB.x = bodyDef.position.x-b->GetPosition().x;
+        thisToB.y = bodyDef.position.y - b->GetPosition().y;
+        float cosA = (thisToB.x * cos(b->GetAngle())+ thisToB.y*sin(b->GetAngle()))/thisToB.Length();
+        angle = acos(cosA);
+        return angle;
+    }
+
     void setPosition(b2Vec2 pos){
         bodyDef.position.Set(pos.x, pos.y);
         valid =1;
