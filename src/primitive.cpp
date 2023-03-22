@@ -34,17 +34,11 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			theta += action.getOmega()/hz; //= omega *t
 			//printf("x");
 			if (obstacle.isValid()){
-				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
-				float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
+				//float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
+				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
+
 				if (absAngleToObstacle>=M_PI_2){
-					//float pointVAngle;
-				//printf("obstacle successfully avoided after %i steps\n", step);
-					// if (debugOn){
-					// 	float robotAngle = robot.body->GetAngle();
-					// 	b2Vec2 v = robot.body->GetLinearVelocityFromLocalPoint({0, 0});
-					// 	pointVAngle = obstacle.getAngle(v);
-					// }
-				break;
+					break;
 				}
 			}
 			if (listener.collisions.size()>0){ //
