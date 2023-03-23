@@ -357,52 +357,62 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return e;
 }
 
-void constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start){
+bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
+	bool obStillThere=0;
 	switch (d){
 		case Primitive::Direction::NONE:{
-		//FIND BOUNDING BOX FOR POINTS OF INTEREST
-		float mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
-		float mPerp = -1/mHead;
+		std::vector <Point> bounds;
+		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
+		float ceilingY, floorY, frontX, backX;		
 		Point positionVector, radiusVector, maxFromStart; 
-		float minX, minY, maxX, maxY;
+		//float minX, minY, maxX, maxY;
 		radiusVector.polarInit(BOX2DRANGE, start.q.GetAngle());
 		maxFromStart = Point(start.p) + radiusVector;
-		//printf("maxfrom start = x= %f, y= %f\n", maxFromStart.x, maxFromStart.y);
+		//FIND THE BOUNDS OF THE BOX
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
 		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
-		//printf("start angle %fpi\ttangle for perpL = %f pi, for perpR = %f pi\n", start.q.GetAngle()/M_PI, atan2(unitPerpL.y, unitPerpL.x)/M_PI, atan2(unitPerpR.y, unitPerpR.x)/M_PI);
 		float halfWindowWidth = .1;
-		std::vector <Point> bounds;
 		bounds.push_back(Point(start.p)+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
 		bounds.push_back(Point(start.p)+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
 		bounds.push_back(maxFromStart+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
 		bounds.push_back(maxFromStart+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
-		//printf("bounds: \t");
-		// for (Point &p:bounds){
-		// 	printf("%f, %f\t", p.x, p.y);
-
-		// }
-		// printf("\n");
 		Point top, bottom;
 		comparator compPoint;
 		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
 		bottom = bounds[0];
 		top = bounds[3];
-		// printf("new bounds: \t");
-		// for (Point &p:bounds){
-		// 	printf("%f, %f\t", p.x, p.y);
-		// }
-		// printf("\n");
-		// printf("top = %f, %f\t bottom = %f, %f\n", top.x, top.y, bottom.x, bottom.y);
-		float qBottomH, qTopH, qBottomP, qTopP;
-		qBottomH = bottom.y - mHead*bottom.x;
-		qTopH = top.y - mHead*top.x;
-		qBottomP = bottom.y -mPerp*bottom.x;
-		qTopP = top.y - mPerp*top.x;
+		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
+			//FIND PARAMETERS OF THE LINES CONNECTING THE BOUNDS
+			mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
+			mPerp = -1/mHead;
+			qBottomH = bottom.y - mHead*bottom.x;
+			qTopH = top.y - mHead*top.x;
+			qBottomP = bottom.y -mPerp*bottom.x;
+			qTopP = top.y - mPerp*top.x;
+		}
+		else{
+			ceilingY = std::max(top.y, bottom.y); //top.y
+			floorY = std::min(top.y, bottom.y); //bottom.y
+			frontX = std::min(top.x, bottom.x);
+			backX = std::max(top.x, bottom.x);
+		}
 		//CREATE POINTS
 		for (Point &p:current){
-			if (p != *(&p-1)&& p.y >= (mHead*p.x +qBottomH)&& p.y <= (mHead*p.x +qTopH)&& p.y >=(mPerp*p.x+qBottomP)&&p.y <=(mPerp*p.x+qTopP)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			bool include;
+			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
+				ceilingY = mHead*p.x +qTopH;
+				floorY = mHead*p.x+qBottomH;
+				float frontY= mPerp*p.x+qBottomP;
+				float backY = mPerp*p.x+qTopP;
+				include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
+			}
+			else{
+				include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
+			}
+			//if (p != *(&p-1)&& p.y >= (mHead*p.x +qBottomH)&& p.y <= (mHead*p.x +qTopH)&& p.y >=(mPerp*p.x+qBottomP)&&p.y <=(mPerp*p.x+qTopP)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			//if (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){	
+			if (include){
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;
@@ -410,20 +420,23 @@ void constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				b2PolygonShape fixture; //giving the point the shape of a box
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
-				//if (p.x !=0 && p.y!=0){
+				if (curr !=NULL){ //
+					if (curr->obstacle.isValid()){
+						if (p.isInRadius(currentDMP.obstacle.getPosition())){
+							obStillThere =1;
+						}
+					}
+				}
 				bodyDef.position.Set(p.x, p.y); 
 				body = world.CreateBody(&bodyDef);
 				body->CreateFixture(&fixtureDef);
-				//}
 
 			}
 		}
 		break;
 		}
 		default:
-		//printf("default case: circle\n");
 		for (Point &p:current){			
-			//printf("is in radius %i\n", p.isInRadius(start.p));
 			if (p != *(&p-1)&& p.isInRadius(start.p, 0.1)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
@@ -432,16 +445,23 @@ void constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				b2PolygonShape fixture; //giving the point the shape of a box
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
-				//if (p.x !=0 && p.y!=0){
+				if (curr !=NULL){ //
+					if (curr->obstacle.isValid()){
+						if (p.isInRadius(currentDMP.obstacle.getPosition())){
+							obStillThere =1;
+						}
+					}
+				}
 				bodyDef.position.Set(p.x, p.y); 
 				body = world.CreateBody(&bodyDef);
 				body->CreateFixture(&fixtureDef);
-				//}
 			}
 		}
 		break;
 
 	}
+	int bodyCount = world.GetBodyCount();
+	return obStillThere;
 }
 
 

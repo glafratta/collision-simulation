@@ -27,25 +27,9 @@ struct Node{
 	int predecessors =0;
 	int nodesInSameSpot =0;
 	Primitive::simResult::resultType outcome;
-
-	//the cost of a (Primitive, motor plan, command?, task) is informed by 
-	// 1. the cost of the previous
-	// 2. whether or not it is baseline (if not baseline robot doesn't move)
-	// 3. how far it allows the robot to go
-	// 4. whether or not it runs the robot into an obstacle (safe distance)
-	//best possible cost = 0
-
-	//A path is less costly than a leaf if it takes the robot further. If they both take the robot to the same distance, the path with fewer nodes takes precedence. 
-	// void updateTotalDistance(float newDistance, float prevDistance){
-	// 	//float normDistanceCost = 1-e.distanceCovered /BOX2DRANGE; //for this node
-	// 	//float negDistance = -e.distanceCovered
-	// 	distanceSoFar = prevDistance + newDistance; //calculate cumulative cost for all the nodes leading to the present
-	// 	//needs to be revised!!
-	// }
 	
 };
 
-//template <class Transform>
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 

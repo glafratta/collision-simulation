@@ -87,31 +87,32 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//MAKE BOX2D BODIES 
 
-	bool isObstacleStillThere=0;
-	for (Point &p:current){
-		if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
-			b2Body * body;
-			b2BodyDef bodyDef;
-			b2FixtureDef fixtureDef;
-			bodyDef.type = b2_dynamicBody;
-			b2PolygonShape fixture; //giving the point the shape of a box
-			fixtureDef.shape = &fixture;
-			fixture.SetAsBox(.001f, .001f); 
+	bool isObstacleStillThere=constructWorldRepresentation(world, currentDMP.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentDMP);
 
-		//CHECK IF BODIES ARE OBSERVED IN THE GENERAL AREA WHERE THE OBSTACLE SHOULD BE 
-			if (currentDMP.obstacle.isValid()){
-				if (p.isInRadius(currentDMP.obstacle.getPosition())){
-					isObstacleStillThere =1;
-				}
-			}
-			if (p.x !=0 && p.y!=0){
-				bodyDef.position.Set(p.x, p.y); 
-				body = world.CreateBody(&bodyDef);
-				body->CreateFixture(&fixtureDef);
-			}
+	// for (Point &p:current){
+	// 	if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
+	// 		b2Body * body;
+	// 		b2BodyDef bodyDef;
+	// 		b2FixtureDef fixtureDef;
+	// 		bodyDef.type = b2_dynamicBody;
+	// 		b2PolygonShape fixture; //giving the point the shape of a box
+	// 		fixtureDef.shape = &fixture;
+	// 		fixture.SetAsBox(.001f, .001f); 
 
-		}
-	}
+	// 	//CHECK IF BODIES ARE OBSERVED IN THE GENERAL AREA WHERE THE OBSTACLE SHOULD BE 
+	// 		if (currentDMP.obstacle.isValid()){
+	// 			if (p.isInRadius(currentDMP.obstacle.getPosition())){
+	// 				isObstacleStillThere =1;
+	// 			}
+	// 		}
+	// 		if (p.x !=0 && p.y!=0){
+	// 			bodyDef.position.Set(p.x, p.y); 
+	// 			body = world.CreateBody(&bodyDef);
+	// 			body->CreateFixture(&fixtureDef);
+	// 		}
+
+	// 	}
+	// }
 	if (!isObstacleStillThere){ 
 		currentDMP = desiredDMP;
 	}
