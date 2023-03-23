@@ -95,7 +95,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			_world.DestroyBody(b);
 
 		}
-		if (robotPath!=NULL){
+		if (debugOn){
 			fclose(robotPath);
 		}
 		//printf("end pose x =%f, y=%f, theta = %f pi\n", result.endPose.p.x, result.endPose.p.y, result.endPose.q.GetAngle()/M_PI);

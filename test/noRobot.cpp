@@ -108,6 +108,8 @@ class TimerDI: public CppTimer{
 
 //END THREAD DEBUGGING
 
+//argv: 1. directory to open 2. timeoff (0=timeron) 3. planning on
+
 int main(int argc, char** argv) {
     //BENCHMARK
 //	auto begin = std::chrono::high_resolution_clock::now();
@@ -185,7 +187,12 @@ int main(int argc, char** argv) {
     bool timerOff=atoi(argv[2]);
     Primitive desiredDMP;
     Configurator box2d(desiredDMP);
-    box2d.debugOn =1;
+    if (argc>4){
+        box2d.debugOn = atoi(argv[4]);
+    }
+    else{
+        box2d.debugOn =1;
+    }
     box2d.setReadMap("map");
     box2d.setFolder(argv[1]);   
     if (argc >=4){
