@@ -84,6 +84,9 @@ int main(int argc, char** argv) {
     Primitive desiredDMP;
     Configurator configurator(desiredDMP);
     configurator.setReadMap("map");
+	if (argc>2){
+		configurator.planning= atoi(argv[2]);
+	}
 	LidarInterface dataInterface(&configurator);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
