@@ -34,16 +34,11 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			theta += action.getOmega()/hz; //= omega *t
 			//printf("x");
 			if (obstacle.isValid()){
-				//printf("robot angle = %f pi\n", robot.body->GetAngle()/M_PI);
-				if (debugOn){
-					float robotAngle = robot.body->GetAngle();
-					b2Vec2 v = robot.body->GetLinearVelocityFromLocalPoint({0, 0});
-					float pointVAngle = obstacle.getAngle(v);
-				}
-				float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
+				//float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
+				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
+
 				if (absAngleToObstacle>=M_PI_2){
-				//printf("obstacle successfully avoided after %i steps\n", step);
-				break;
+					break;
 				}
 			}
 			if (listener.collisions.size()>0){ //
@@ -58,21 +53,24 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 				// }
 				//result = simResult(simResult::resultType::crashed,  Object(ObjectType::obstacle, listener.collisions[index]));
 				if (type == Primitive::Type::BASELINE){ //stop 2 seconds before colliding so to allow the robot to explore
-					if (step/hz >=REACTION_TIME){
+					if (step/hz >REACTION_TIME){
 						b2Vec2 posReadjusted;
-						posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
-						posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);						
+						//OG
+						//posReadjusted.x = robot.body->GetPosition().x- instVelocity.x*(REACTION_TIME);
+						//posReadjusted.y = robot.body->GetPosition().y -instVelocity.y*(REACTION_TIME);
+						//NEW: 
+						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
+						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
 						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
 					}
-					else{
+				}
+				else{
 						result = simResult(simResult::resultType::crashed, Object(ObjectType::obstacle, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 
 					}
-					
-				}
 				//printf("collision at %f %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				//fprintf(robotDebug,"%f\t%f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 				break;
@@ -88,7 +86,15 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
 		//endPose = robot.body->GetTransform();
-		_world.DestroyBody(robot.body);		
+		//_world.DestroyBody(robot.body);		
+		int roboCount=0;
+		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
+			if (b->GetUserData()!=NULL){
+				roboCount++;
+			}
+			_world.DestroyBody(b);
+
+		}
 		if (robotPath!=NULL){
 			fclose(robotPath);
 		}

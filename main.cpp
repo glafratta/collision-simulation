@@ -17,34 +17,17 @@
 
 class LidarInterface : public A1Lidar::DataInterface{
 Configurator * c;
-//FILE * dumpPath;
-//for debugging
-//FILE * speed;
+
 char folder[250];
 public: 
     int mapCount =0;
 
     LidarInterface(Configurator * _c): c(_c){
-		// time_t now =time(0);
-		// tm *ltm = localtime(&now);
-		// int y,m,d, h, min;
-		// y=ltm->tm_year-100;
-		// m = ltm->tm_mon +1;
-		// d=ltm->tm_mday;
-		// h = ltm->tm_hour;
-		// min = ltm->tm_min;
-		// sprintf(folder, "%02i%02i%02i_%02i%02i/",d,m,y, h, min );
-		// if (mkdir(folder, 0777)!= -1){
-		// 	c->setFolder(folder);
-		// }
-        // dumpPath = fopen("/tmp/dumpPath.txt", "w");
-        // fclose(dumpPath);
-        // speed = fopen("/tmp/speed.txt", "w");
-        // fclose(speed);   
 		}
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
+<<<<<<< HEAD
 	printf("map %i\n", mapCount);
         // auto now =std::chrono::high_resolution_clock::now();
 	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
@@ -54,10 +37,18 @@ public:
         // if (c->timeElapsed >.25){
         //     return;
         // }
+||||||| cdf1af5
+        // auto now =std::chrono::high_resolution_clock::now();
+	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
+	    // c->timeElapsed=float(diff.count())/1000; //express in seconds	
+        // c->totalTime += c->timeElapsed;
+	    // c->previousTimeScan=now; //update the time of sampling
+        // if (c->timeElapsed >.25){
+        //     return;
+        // }
+=======
+>>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		std::vector <Point> current;
-	    // char name_r[50];
-		// sprintf(name_r, "%s%s%04i.dat", folder,c.getReadMap(), mapCount);
-		// FILE * map = fopen(name_r, "wt");
 		Point p1, p0;
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
@@ -69,16 +60,25 @@ public:
 				p1= (Point(x, y, r, phi));
 				if (p1!= p0){
 					current.push_back(p1);
-				//fprintf(map, "%.2f\t%.2f\n", data.x, data.y);
 				}
 				p0= p1;
            	 }
 		}
+<<<<<<< HEAD
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE
 		printf("current size = %i\n", current.size());
 		printf("is ptr null %i\n", c ==NULL);
+||||||| cdf1af5
+		//fclose(map); //uncomment here - FINISH WRITE TO FILE
+=======
+>>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		c->NewScan(current);
+<<<<<<< HEAD
 		printf("scan\n");
+||||||| cdf1af5
+		//printf("scan\n");
+=======
+>>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		
 
 	}
@@ -101,17 +101,6 @@ public:
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	// if (c->plan.size()==0){
-	// printf("baseline Primitive\n");
-    // motors.setRightWheelSpeed(-(c->desiredPrimitive.getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
-    // motors.setLeftWheelSpeed(-(c->desiredPrimitive.getAction().getRWheelSpeed()));
-	// }
-	// else if ( c->plan.size() >0){   
-	// printf("avoidance Primitive\n"); 
-	// motors.setRightWheelSpeed(-(c->plan[0].getAction().getLWheelSpeed())); //temporary fix because motors on despacito are the wrong way around
-    // motors.setLeftWheelSpeed(-(c->plan[0].getAction().getRWheelSpeed()));
-
-	// }
 	L= -(c->getDMP()->getAction().getRWheelSpeed());
 	R = -(c->getDMP()->getAction().getLWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
@@ -125,7 +114,6 @@ void step( AlphaBot &motors){
 
 int main(int argc, char** argv) {
 	//world setup with environment class
-	//initscr();
 	A1Lidar lidar;
 	AlphaBot motors;
     Primitive desiredDMP;
@@ -140,18 +128,11 @@ int main(int argc, char** argv) {
 
 	do {
 	} while (!getchar());
-	//endwin();
 
 
 	motors.stop();
 	lidar.stop();
-	//db.stop();
 
-
-	
-
-
-//	delete listener;
 }
 	
 	

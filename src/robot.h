@@ -16,8 +16,6 @@ const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLEN
 
 class Robot {
 private: 
-// float halfLength = .085f;
-// float halfWidth = .04f;
 	b2FixtureDef fixtureDef;
 public:
 	b2Vec2 velocity = {0,0};
@@ -37,20 +35,6 @@ public:
 		
 	}
 
-	// void setVelocity(b2Vec2 _velocity) { //apply a vector to robot
-	// 	velocity = _velocity;
-	// 	float robotAngle = -atan(velocity.y/velocity.x);
-	// 	body->SetLinearVelocity( velocity );
-	// 	body->SetTransform( body->GetPosition(), robotAngle);
-	// }
-
-	// b2Vec3 getPose(){
-	// 	b2Vec3 pose;
-	// 	pose.x = body->GetPosition().x;
-	// 	pose.y = body->GetPosition().y;
-	// 	pose.z = body->GetAngle();
-	// 	return pose;
-	// }
 
 	// void dumpCorners(int it){ //dumps all corners in one file, for debugging and for me to just see what's happening to robot orientation
 	// 	char name[256];
