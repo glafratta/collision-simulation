@@ -143,14 +143,21 @@ void Configurator::NewScan(std::vector <Point> & data){
 			break;
 		case 1:
 			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentDMP.change is changed directly
-			printf("tree size = %i\n", g.m_vertices.size());
+			//printf("tree size = %i\n", g.m_vertices.size());
 			e = findBestBranch(g, leaves);
-//			dir = g[e].direction;
+			//dir = g[e].direction;
 			if (currentDMP.change){
-				printf("planning, change=1");
+				//printf("planning, change=1\n");
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
-				currentDMP = Primitive(g[v0].obstacle, g[e].direction); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
+				if (g.m_vertices.size()>1){
+					dir =g[e].direction;
+					//printf("bestdirection = %i\n", dir);
+					currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
+				}
+				else{ //FALLBACK, ensure it's still operating even if tree building fails
+					currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::NONE);
+				}
 			}
 			break;
 		default: 
