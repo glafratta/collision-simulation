@@ -45,6 +45,7 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
+	printf("map %i\n", mapCount);
         // auto now =std::chrono::high_resolution_clock::now();
 	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
 	    // c->timeElapsed=float(diff.count())/1000; //express in seconds	
@@ -71,11 +72,13 @@ public:
 				//fprintf(map, "%.2f\t%.2f\n", data.x, data.y);
 				}
 				p0= p1;
-            }
+           	 }
 		}
 		//fclose(map); //uncomment here - FINISH WRITE TO FILE
+		printf("current size = %i\n", current.size());
+		printf("is ptr null %i\n", c ==NULL);
 		c->NewScan(current);
-		//printf("scan\n");
+		printf("scan\n");
 		
 
 	}
@@ -129,7 +132,6 @@ int main(int argc, char** argv) {
     Configurator configurator(desiredDMP);
     configurator.setReadMap("map");
 	LidarInterface dataInterface(&configurator);
-	//DebugClass db(configurator);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
