@@ -27,27 +27,6 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
-<<<<<<< HEAD
-	printf("map %i\n", mapCount);
-        // auto now =std::chrono::high_resolution_clock::now();
-	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
-	    // c->timeElapsed=float(diff.count())/1000; //express in seconds	
-        // c->totalTime += c->timeElapsed;
-	    // c->previousTimeScan=now; //update the time of sampling
-        // if (c->timeElapsed >.25){
-        //     return;
-        // }
-||||||| cdf1af5
-        // auto now =std::chrono::high_resolution_clock::now();
-	    // std::chrono::duration<float, std::milli>diff= now - c->previousTimeScan; //in seconds
-	    // c->timeElapsed=float(diff.count())/1000; //express in seconds	
-        // c->totalTime += c->timeElapsed;
-	    // c->previousTimeScan=now; //update the time of sampling
-        // if (c->timeElapsed >.25){
-        //     return;
-        // }
-=======
->>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		std::vector <Point> current;
 		Point p1, p0;
 		for (A1LidarData &data:data){
@@ -62,23 +41,9 @@ public:
 					current.push_back(p1);
 				}
 				p0= p1;
-           	 }
+            }
 		}
-<<<<<<< HEAD
-		//fclose(map); //uncomment here - FINISH WRITE TO FILE
-		printf("current size = %i\n", current.size());
-		printf("is ptr null %i\n", c ==NULL);
-||||||| cdf1af5
-		//fclose(map); //uncomment here - FINISH WRITE TO FILE
-=======
->>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		c->NewScan(current);
-<<<<<<< HEAD
-		printf("scan\n");
-||||||| cdf1af5
-		//printf("scan\n");
-=======
->>>>>>> 009791de97438fa942fb34d03c08651b0588cf33
 		
 
 	}
