@@ -146,6 +146,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 			e = findBestBranch(g, leaves);
 //			dir = g[e].direction;
 			if (currentDMP.change){
+				printf("planning, change=1");
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				currentDMP = Primitive(g[v0].obstacle, g[e].direction); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
