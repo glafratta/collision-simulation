@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h> //recommended cmath?
 #define BOX2DRANGE 0.5
-const float REACTION_TIME =1.0;
+const float REACTION_TIME =2.0;
 
 enum ObjectType {obstacle=0, target=1, other=2};  
 
