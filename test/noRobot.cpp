@@ -108,7 +108,7 @@ class TimerDI: public CppTimer{
 
 //END THREAD DEBUGGING
 
-//argv: 1. directory to open 2. timeoff (0=timeron) 3. planning on
+//argv: 1. directory to open 2. timeoff (0=timeron) 3. planning on 4. debug on
 
 int main(int argc, char** argv) {
     //BENCHMARK
@@ -186,16 +186,14 @@ int main(int argc, char** argv) {
     //DATA INTERCFACE
     bool timerOff=atoi(argv[2]);
     Primitive desiredDMP;
-    Configurator box2d(desiredDMP);
+    bool debug =1;
     if (argc>4){
-        box2d.debugOn = atoi(argv[4]);
+        debug = atoi(argv[4]);
     }
-    else{
-        box2d.debugOn =1;
-    }
+    Configurator box2d(desiredDMP, debug, timerOff);
     box2d.setReadMap("map");
     box2d.setFolder(argv[1]);   
-    if (argc >=4){
+    if (argc >3){
         box2d.planning = atoi(argv[3]);
         printf("planning = %i\n", box2d.planning);
     }     

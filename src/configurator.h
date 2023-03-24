@@ -13,15 +13,17 @@
 #include <fstream>
 #include "primitive.h"
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
-#include <boost/graph/depth_first_search.hpp>
+//#include <boost/graph/depth_first_search.hpp>
 #include <algorithm>
+#include<sys/stat.h>
+
+
 
 class Configurator{
 protected:
 	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	bool crashed=0;
 	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
@@ -31,16 +33,19 @@ protected:
 public:
 	bool debugOn=0;
 	float affineTransError =0;
-	bool filterOn=1;
+//	bool filterOn=1;
 	char *folder;
 	char readMap[50];
-	char msg[25];
+//	char msg[25];
 	Primitive desiredDMP;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
 	std::vector <Point> current;
 	bool planning =1;
+	char statFile[100];
+	bool timerOff=0;
+
 
 	struct getVelocityResult{
 		bool valid =0;
@@ -64,16 +69,68 @@ public:
 // 1:  new scan available: box2d world is rebuilt with objects, current Action is checked#
 
 Configurator(){
+	printf("hi\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
 	currentDMP = desiredDMP;
 	//dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
+	if (debugOn){
+	char dirName[50];
+	sprintf(dirName, "bodiesSpeedStats");
+	if (!opendir(dirName)){
+		mkdir(dirName, 0777);
+		printf("made stats directory\n");
+	}
+	else{
+		printf("opened stats directory\n");
+	}
+	//TODAYS DATE AND TIME
+	time_t now =time(0);
+	tm *ltm = localtime(&now);
+	int y,m,d, h, min;
+	y=ltm->tm_year-100;
+	m = ltm->tm_mon +1;
+	d=ltm->tm_mday;
+	h= ltm->tm_hour;
+	min = ltm->tm_min;
+	sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,m);
+	FILE * f = fopen(statFile, "w");
+	fprintf(f,"Bodies\tBranches\tTime\n");
+	fclose(f);
+}
 
 }
 
-Configurator(Primitive &_dmp): desiredDMP(_dmp), currentDMP(_dmp){
+Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), currentDMP(_dmp), debugOn(debug), timerOff(noTimer){
+	printf("hey\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
+	if (timerOff){
+		char dirName[50];
+		sprintf(dirName, "bodiesSpeedStats");
+		if (!opendir(dirName)){
+			mkdir(dirName, 0777);
+			printf("made stats directory\n");
+		}
+		else{
+			printf("opened stats directory\n");
+		}
+		//TODAYS DATE AND TIME
+		time_t now =time(0);
+		tm *ltm = localtime(&now);
+		int y,m,d, h, min;
+		y=ltm->tm_year-100;
+		m = ltm->tm_mon +1;
+		d=ltm->tm_mday;
+		h= ltm->tm_hour;
+		min = ltm->tm_min;
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,m);
+		FILE * f = fopen(statFile, "w");
+		fprintf(f,"Bodies\tBranches\tTime\n");
+		fclose(f);
+	}
+
+
 	//printf("simduration = %i\n", currentDMP.getSimDuration());
 
 }
@@ -259,74 +316,30 @@ Primitive::Direction getOppositeDirection(Primitive::Direction d){
 }
 
 template <typename V, typename G>
-// bool isFullLength(vertexDescriptor v, Graph &g, float length=0, int edgesTotal =0){
 bool isFullLength(V v, const G & g, float length=0){
-	//printf("vertex = %i\tlength so far = %f, in edges = %i\n", v,length, boost::in_degree(v,g));
-	//length = stepdur/hz *linvel
     if (boost::in_degree(v, g)==0 && length < desiredDMP.box2dRange){
-		//printf("ended isFullLength, is root\n");
         return false;
     }
     else if (length >=desiredDMP.box2dRange){
-		//printf("reached full length\n");
         return true;
     }
     else{
         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-		//printf("distance = %f\t", g[inEdge].distanceCovered);
         length += g[inEdge].distanceCovered;
-		//printf("length = %f\t", length);
-        //vertexDescriptor newV = boost::source(inEdge, g);
-		//printf("newVertex = %i\n", newV);
 		g[v].predecessors++;
         return isFullLength(boost::source(inEdge, g), g, length);
     }
 
 }
 
-//FOR OLD STUFF WITH GRAPH
-void addVertex(vertexDescriptor & src, vertexDescriptor& v1, Graph &g, Primitive::Object obs = Primitive::Object()){
-	//vertexDescriptor v1=src;
-	Primitive::Direction d= Primitive::Direction::NONE;
-	if (g[src].options.size()>0){
-		v1 = boost::add_vertex(g);
-		d = g[src].options[0];
-		//printf("option = %i\n", d);
-		g[src].options.erase(g[src].options.begin());
-		g[v1]= Primitive(obs, d);
-		add_edge(src, v1, g).first;
-		//printf("edge %i, %i\n", src, v1);
-	}
-	else{///for debug
-		//printf("no options\n");
-	}
-
-}
-
 //FOR NEW CollisionGraph
 void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Primitive::Object obs = Primitive::Object()){
-	//v1 = src;
-	//Primitive::Direction d= Primitive::Direction::NONE;
-	//printf("vertex %i, options = %i\n", src, g[src].options.size());
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
-		//d = g[src].options[0];
-		//printf("option = %i\n", d);
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
-		//g[v1]= Primitive(obs, d);
-	//	printf("edge %i, %i, direction = %i\n", src, v1, static_cast<int>(g[e].direction));
 	}
-	else{///for debug
-		//printf("no options\n");
-	}
-	// for (auto i =g[src].options.begin(); i!=g[src].options.end(); i++){
-	// 	if (*i = g[v1].getAction().getDirection()){
-	// 		g[src].options.erase(i);
-	// 	}
-	// }
-	//return v1;
 }
 
 edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
@@ -348,16 +361,13 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	//FIND FIRST NODE BEFORE ORIGIN
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
-		//printf("current = %i\n", best);
 		e = boost::in_edges(best, g).first.dereference();
-		//printf("best direction = %i\n", static_cast<int>(g[e].direction));
 		best = e.m_source;
-		//printf("back = %i\n", best);
 	}
 	return e;
 }
 
-bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL){
+bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL, int * totBodies = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	switch (d){
@@ -410,8 +420,6 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 			else{
 				include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
 			}
-			//if (p != *(&p-1)&& p.y >= (mHead*p.x +qBottomH)&& p.y <= (mHead*p.x +qTopH)&& p.y >=(mPerp*p.x+qBottomP)&&p.y <=(mPerp*p.x+qTopP)){ //y range less than 20 cm only to ensure that robot can pass + account for error
-			//if (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){	
 			if (include){
 				b2Body * body;
 				b2BodyDef bodyDef;
@@ -460,7 +468,9 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 		break;
 
 	}
-	int bodyCount = world.GetBodyCount();
+	if (totBodies!= NULL){
+		*totBodies +=world.GetBodyCount();
+	}
 	return obStillThere;
 }
 

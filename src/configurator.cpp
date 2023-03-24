@@ -1,22 +1,21 @@
 #pragma once
 #include "configurator.h"
 #include <chrono>
-#include <iostream>
 
 void Configurator::NewScan(std::vector <Point> & data){ 
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	std::vector <Point> previous;
-	for (Point p:current){
-		previous.push_back(p);
-	}
-	current.clear();
-	for (Point p:data){
-		current.push_back(p);
-	}
-	// previous = current;
+	// for (Point p:current){
+	// 	previous.push_back(p);
+	// }
 	// current.clear();
-	// current = data;
+	// for (Point p:data){
+	// 	current.push_back(p);
+	// }
+	previous = current;
+	current.clear();
+	current = data;
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -25,8 +24,13 @@ void Configurator::NewScan(std::vector <Point> & data){
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
-	if (debugOn){
+	if (timerOff){
 		printf("time elapsed: %f\n", timeElapsed);
+		if (iteration>1){
+			FILE * f = fopen(statFile, "a+");
+			fprintf(f,"%.05f\n", timeElapsed);
+			fclose(f);
+		}
 	}
 
 	//DISCARD BAD SCANS
@@ -46,7 +50,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//CREATE BOX2D ENVIRONMENT
 	b2World world = b2World({0.0f,0.0f});
 	char name[256];
-
+	int bodies=0;
 	
 	//CALCULATE VELOCITY 
 	
@@ -87,7 +91,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//MAKE BOX2D BODIES 
 
-	bool isObstacleStillThere=constructWorldRepresentation(world, currentDMP.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentDMP);
+	bool isObstacleStillThere=constructWorldRepresentation(world, currentDMP.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentDMP, &bodies);
 
 	// for (Point &p:current){
 	// 	if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
@@ -146,9 +150,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentDMP.change is changed directly
 			//printf("tree size = %i\n", g.m_vertices.size());
 			e = findBestBranch(g, leaves);
-			//dir = g[e].direction;
 			if (currentDMP.change){
-				//printf("planning, change=1\n");
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				if (g.m_vertices.size()>1){
@@ -165,8 +167,11 @@ void Configurator::NewScan(std::vector <Point> & data){
 		break;
 
 	}
-	if (debugOn){
+	if (timerOff){
 		printf("tree size = %i\n", g.m_vertices.size());
+		FILE * f = fopen(statFile, "a+");
+		fprintf(f,"%i\t%i\t", bodies, g.m_vertices.size());
+		fclose(f);
 	}
 	
 
