@@ -50,7 +50,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//CREATE BOX2D ENVIRONMENT
 	b2World world = b2World({0.0f,0.0f});
 	char name[256];
-	int bodies=0;
+	//int bodies=0;
 	
 	//CALCULATE VELOCITY 
 	
@@ -91,7 +91,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//MAKE BOX2D BODIES 
 
-	bool isObstacleStillThere=constructWorldRepresentation(world, currentDMP.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentDMP, &bodies);
+	bool isObstacleStillThere=0;
+	isObstacleStillThere=constructWorldRepresentation(world, currentDMP.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentDMP);
 
 	// for (Point &p:current){
 	// 	if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
@@ -113,14 +114,15 @@ void Configurator::NewScan(std::vector <Point> & data){
 	// 			bodyDef.position.Set(p.x, p.y); 
 	// 			body = world.CreateBody(&bodyDef);
 	// 			body->CreateFixture(&fixtureDef);
+	// 			bodies++;
 	// 		}
 
-	// 	}
-	// }
+	//  	}
+	//  }
 	if (!isObstacleStillThere){ 
 		currentDMP = desiredDMP;
 	}
-	int bodyCount = world.GetBodyCount();
+	//int bodyCount = world.GetBodyCount();
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
 	b2Vec2 start(0.0f, 0.0f);
@@ -173,7 +175,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		fprintf(f,"%i\t%i\t", bodies, g.m_vertices.size());
 		fclose(f);
 	}
-	
+	bodies =0;
 
 	//CHOOSE BEXT NEXT currentDMP BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 

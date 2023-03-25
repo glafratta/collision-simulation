@@ -45,6 +45,7 @@ public:
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
+	int bodies=0;
 
 
 	struct getVelocityResult{
@@ -93,7 +94,7 @@ Configurator(){
 	d=ltm->tm_mday;
 	h= ltm->tm_hour;
 	min = ltm->tm_min;
-	sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,m);
+	sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 	FILE * f = fopen(statFile, "w");
 	fprintf(f,"Bodies\tBranches\tTime\n");
 	fclose(f);
@@ -124,7 +125,8 @@ Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), 
 		d=ltm->tm_mday;
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
-		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,m);
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
+		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		fprintf(f,"Bodies\tBranches\tTime\n");
 		fclose(f);
@@ -367,7 +369,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return e;
 }
 
-bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL, int * totBodies = NULL){
+bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	switch (d){
@@ -436,6 +438,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 					}
 				}
 				bodyDef.position.Set(p.x, p.y); 
+				bodies++;
 				body = world.CreateBody(&bodyDef);
 				body->CreateFixture(&fixtureDef);
 
@@ -462,15 +465,14 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				}
 				bodyDef.position.Set(p.x, p.y); 
 				body = world.CreateBody(&bodyDef);
+				bodies++;
 				body->CreateFixture(&fixtureDef);
 			}
 		}
 		break;
 
 	}
-	if (totBodies!= NULL){
-		*totBodies +=world.GetBodyCount();
-	}
+	//bodies+=world.GetBodyCount();
 	return obStillThere;
 }
 
