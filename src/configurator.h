@@ -41,7 +41,7 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	std::vector <Point> current;
+	std::vector <Point> current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
@@ -86,18 +86,18 @@ Configurator(){
 		printf("opened stats directory\n");
 	}
 	//TODAYS DATE AND TIME
-	time_t now =time(0);
-	tm *ltm = localtime(&now);
-	int y,m,d, h, min;
-	y=ltm->tm_year-100;
-	m = ltm->tm_mon +1;
-	d=ltm->tm_mday;
-	h= ltm->tm_hour;
-	min = ltm->tm_min;
-	sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-	FILE * f = fopen(statFile, "w");
-	fprintf(f,"Bodies\tBranches\tTime\n");
-	fclose(f);
+		time_t now =time(0);
+		tm *ltm = localtime(&now);
+		int y,m,d, h, min;
+		y=ltm->tm_year-100;
+		m = ltm->tm_mon +1;
+		d=ltm->tm_mday;
+		h= ltm->tm_hour;
+		min = ltm->tm_min;
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
+		FILE * f = fopen(statFile, "w");
+		fprintf(f,"Bodies\tBranches\tTime\n");
+		fclose(f);
 }
 
 }
@@ -410,7 +410,8 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 			backX = std::max(top.x, bottom.x);
 		}
 		//CREATE POINTS
-		for (Point &p:current){
+
+		for (Point &p:currentBox2D){
 			bool include;
 			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
 				ceilingY = mHead*p.x +qTopH;
@@ -447,7 +448,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 		break;
 		}
 		default:
-		for (Point &p:current){			
+		for (Point &p:currentBox2D){	
 			if (p != *(&p-1)&& p.isInRadius(start.p, 0.1)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;

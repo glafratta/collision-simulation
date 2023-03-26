@@ -6,16 +6,21 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	std::vector <Point> previous;
-	// for (Point p:current){
-	// 	previous.push_back(p);
-	// }
-	// current.clear();
-	// for (Point p:data){
-	// 	current.push_back(p);
-	// }
 	previous = current;
 	current.clear();
 	current = data;
+
+	// //ROUND TO 2 decimal PLACES FOR BOX2D
+	// for (Point &d: data){
+	// 	float x = round(d.x*100)/100;
+	// 	float y= round(d.y*100)/100;
+	// 	Point p(x,y)
+	// 	if (p!=*(&p-1) && p !=*(&p-2)){
+	// 		currentBox2D.push_back(p);
+	// 	}
+
+	// }
+
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -176,6 +181,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		fclose(f);
 	}
 	bodies =0;
+	currentBox2D.clear();
 
 	//CHOOSE BEXT NEXT currentDMP BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 

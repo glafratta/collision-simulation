@@ -28,19 +28,25 @@ public:
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
 		std::vector <Point> current;
-		Point p1, p0;
+		Point p1, p0, p1B2D, p0B2D;
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
-				float x = round(data.x*100)/100;
-				float y = round(data.y*100)/100;
-				float r = round(data.r*100)/100;
-				float phi = round(data.phi*100)/100;
-				p1= (Point(x, y, r, phi));
+				float x = round(data.x*1000)/1000;
+				float y = round(data.y*1000)/1000;
+				float x2 = round(data.x*100)/100;
+				float y2 = round(data.y*100)/100;
+				p1= (Point(x, y));
+				p1B2D=Point(x2, y2);
 				if (p1!= p0){
 					current.push_back(p1);
 				}
+				if (p1B2D!= p0B2D){
+					c->currentBox2D.push_back(p1B2D);
+				}
+				
 				p0= p1;
+				p0B2D=p1B2D;
             }
 		}
 		c->NewScan(current);

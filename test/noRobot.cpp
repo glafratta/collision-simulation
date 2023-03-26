@@ -45,26 +45,32 @@ char * folder;
 		sprintf(filePath, "%smap%04d.dat", folderName, iteration);
         printf("%s\n", filePath);
         //std::vector <cv::Point2f> current;
-        std::vector <Point> current;
+        std::vector <Point> data;
 		std::ifstream file(filePath);
 
-        float x, y;
+        float x, y, x2, y2;
 		//box2d->previous = box2d->current;
 		//box2d->current.clear();
 		while (file>>x>>y){
-            x = round(x*100)/100;
-			y = round(y*100)/100;
+            x = round(x*1000)/1000;
+			y = round(y*1000)/1000;
+            x2 = round(x*100)/100;
+			y2 = round(y*100)/100;
             Point p(x,y);
+            Point p2(x2,y2);
             //Point pp = *(&p-1);
             if (p.r<1.0 && p!=*(&p-1)){
             	//current.push_back(cv::Point2f(x, y));
-                current.push_back(p);
+                data.push_back(p);
+            }
+            if (p2.r<1.0 && p2!=*(&p2-1)){
+                box2d->currentBox2D.push_back(p2);
             }
 			
 		}
 		file.close();
        // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
-        box2d->NewScan(current);
+        box2d->NewScan(data);
 
 		
 		
