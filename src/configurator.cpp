@@ -174,8 +174,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 		break;
 
 	}
+	printf("tree size = %i\n", g.m_vertices.size());
 	if (timerOff){
-		printf("tree size = %i\n", g.m_vertices.size());
 		FILE * f = fopen(statFile, "a+");
 		fprintf(f,"%i\t%i\t", bodies, g.m_vertices.size());
 		fclose(f);
