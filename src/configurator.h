@@ -51,16 +51,11 @@ public:
 	struct getVelocityResult{
 		bool valid =0;
 		b2Vec2 vector = {0.0f, 0.0f};
-		float angle;
+		b2Vec2 affineResult = {0.0f, 0.0f};
+		//float angle;
 		getVelocityResult(){}
-		getVelocityResult(b2Vec2 disp, float maxSpeed = 0.125):vector(disp){
+		getVelocityResult(b2Vec2 disp):vector(disp){
 			valid=1;
-			if (disp.y ==0 && disp.x==0){
-				angle =0;
-			}
-			else{
-				angle= atan(disp.y/disp.x);
-			}
 		}
 
 	};

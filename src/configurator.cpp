@@ -252,31 +252,32 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
 		if (!transformMatrix.empty()){
-			b2Vec2 tmp;
-			tmp.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
-			tmp.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-			float tmpAngle = atan(tmp.y/tmp.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
-			if (tmp.y ==0 && tmp.x ==0){
+			result.affineResult;
+			result.affineResult.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
+			result.affineResult.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+			float tmpAngle = atan(result.affineResult.y/result.affineResult.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
+			if (result.affineResult.y ==0 && result.affineResult.x ==0){
 				tmpAngle =0;
 			}
-			if (tmp.Length()>currentDMP.getMaxSpeed()){
-				affineTransError += tmp.Length()-currentDMP.getMaxSpeed();
-				tmp.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
-				tmp.y = currentDMP.getAction().getLinearSpeed() *sin(tmpAngle);
+			if (result.affineResult.Length()>currentDMP.getMaxSpeed()){
+				affineTransError += result.affineResult.Length()-currentDMP.getMaxSpeed();
+				result.vector.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
+				result.vector.y = currentDMP.getAction().getLinearSpeed() *sin(tmpAngle);
 			}
-			return getVelocityResult(tmp);
+			//return getVelocityResult(tmp);
 		}
 		else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
 			b2Vec2 estimatedVel;
 			theta = currentDMP.getAction().getOmega()* timeElapsed;
 			estimatedVel ={currentDMP.getAction().getLinearSpeed()*cos(theta),currentDMP.getAction().getLinearSpeed()*sin(theta)};
 			result = getVelocityResult(estimatedVel);
-			return result;
+			//return result;
 		}
 		else{
 			printf("could not find velocity\n");
-			return result;
+			//return result;
 		}
+		return result;
 	}
 
 
