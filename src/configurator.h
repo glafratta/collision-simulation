@@ -300,7 +300,8 @@ void reactiveAvoidance(b2World &, Primitive::simResult &, Primitive&, b2Vec2 &, 
 vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionGraph&, Primitive  , b2World & , std::vector <vertexDescriptor> &);
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
 bool build_tree(vertexDescriptor v, CollisionGraph&g, Primitive s, b2World & w, std::vector <vertexDescriptor>&);
-//special case if robot is going in circles
+
+
 
 Primitive::Direction getOppositeDirection(Primitive::Direction d){
     switch (d){
@@ -356,11 +357,26 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		printf("best branch has endpose: x = %f, y= %f, angle = %f", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
 	}
 	//FIND FIRST NODE BEFORE ORIGIN
+	std::vector <edgeDescriptor> bestEdges;
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
 		e = boost::in_edges(best, g).first.dereference();
+		bestEdges.push_back(e);
 		best = e.m_source;
 	}
+	std::sort(bestEdges.begin(), bestEdges.end());
+	printf("plan to go: ");
+	for (auto edge:bestEdges){
+		switch (g[edge].direction){
+			case Primitive::NONE: printf("STRAIGHT, "); break;
+			case Primitive::LEFT: printf("LEFT, "); break;
+			case Primitive::RIGHT: printf("RIGHT, "); break;
+			default: break;
+
+		}
+	}
+	printf("\n");
+	
 	return e;
 }
 
