@@ -162,11 +162,12 @@ void Configurator::NewScan(std::vector <Point> & data){
 				//FIND BEST OPTION FOR CHANGING
 				if (g.m_vertices.size()>1){
 					dir =g[e].direction;
-					//printf("bestdirection = %i\n", dir);
+					printf("bestdirection = %i\n", dir);
 					currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
 					currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::NONE);
+					printf("using fallback\n");
 				}
 			}
 			break;
