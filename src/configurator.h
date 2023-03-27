@@ -337,6 +337,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
+		g[v1].totObstacles=g[src].totObstacles;
 	}
 }
 
@@ -354,7 +355,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		}
 	}
 	if (debugOn){
-		printf("best branch has endpose: x = %f, y= %f, angle = %f", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
+		printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
 	}
 	//FIND FIRST NODE BEFORE ORIGIN
 	std::vector <edgeDescriptor> bestEdges;
@@ -364,9 +365,11 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		bestEdges.push_back(e);
 		best = e.m_source;
 	}
-	std::sort(bestEdges.begin(), bestEdges.end());
+	//std::sort(bestEdges.begin(), bestEdges.end());
+
 	printf("plan to go: ");
-	for (auto edge:bestEdges){
+	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
+		edgeDescriptor edge = *eIt;
 		switch (g[edge].direction){
 			case Primitive::NONE: printf("STRAIGHT, "); break;
 			case Primitive::LEFT: printf("LEFT, "); break;
@@ -406,7 +409,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 		bottom = bounds[0];
 		top = bounds[3];
 		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
-			//FIND PARAMETERS OF THE LINES CONNECTING THE BOUNDS
+			//FIND PARAMETERS OF THE LINES CONNECTING THE a
 			mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
 			mPerp = -1/mHead;
 			qBottomH = bottom.y - mHead*bottom.x;

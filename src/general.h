@@ -26,6 +26,7 @@ struct Node{
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 	int nodesInSameSpot =0;
+	int totObstacles=0;
 	Primitive::simResult::resultType outcome;
 	
 };

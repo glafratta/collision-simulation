@@ -327,11 +327,15 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
 	g[v].obstacle = result.collision;
+	if (result.collision.isValid()){
+		g[v].totObstacles++;
+	}
 	g[v].endPose = result.endPose;
 	g[v].distanceSoFar = g[srcVertex].distanceSoFar + result.distanceCovered;
 	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
-	bool fl = g[v].distanceSoFar >= BOX2DRANGE;
+	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
+	bool fullMemory = g[v].totObstacles >=4;
 	bool moreCostlyThanLeaf =0; 
 
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
@@ -343,11 +347,11 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 	}
 	
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Primitive/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!fl&& !moreCostlyThanLeaf){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		if (result.resultCode != Primitive::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getType()==Primitive::Type::BASELINE){
 				Primitive::Direction dir = Primitive::Direction::NONE;
-				if (boost::in_degree(srcVertex, g)>0){
+				if (boost::in_degree(srcVertex, g)>0){ //was >
 					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
 				}
 				if (result.resultCode == Primitive::simResult::crashed && dir != Primitive::NONE && g[v].nodesInSameSpot<maxNodesOnSpot){
@@ -356,9 +360,9 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 				else if (result.resultCode == Primitive::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
 					Primitive::Action reflex;
 					reflex.__init__(result.collision, Primitive::Direction::NONE);
-					Primitive::Direction reflexDirection = reflex.getDirection();
-					g[v].options.push_back(reflexDirection);// the first branch is the actions generating from a reflex to the collision
-					g[v].options.push_back(getOppositeDirection(reflexDirection));
+					dir= reflex.getDirection();
+					g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
+					g[v].options.push_back(getOppositeDirection(dir));
 				}
 				}
 			}
@@ -375,6 +379,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 	//IF THE Primitive COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT PrimitiveS DEPENDING ON OUTCOME, only if it's not a leaf
+	bool straightFollowStraight=0;
 	if (!isLeaf){
 		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
 		return v1; //added now	
