@@ -37,13 +37,20 @@ char * folder;
 
 	}
 
-	void newScanAvail(){ //uncomment sections to write x and y to files		
+	bool newScanAvail(){ //uncomment sections to write x and y to files		
         iteration++;
 		char filePath[256];
         char folderName[256];
         sprintf(folderName,"%s", folder);
 		sprintf(filePath, "%smap%04d.dat", folderName, iteration);
         printf("%s\n", filePath);
+        FILE *f;
+        if (!(f=fopen(filePath, "r"))){
+            return false;
+        }
+        else {
+            fclose(f);
+        }
         //std::vector <cv::Point2f> current;
         std::vector <Point> data;
 		std::ifstream file(filePath);
@@ -71,7 +78,7 @@ char * folder;
 		file.close();
        // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
         box2d->NewScan(data);
-
+        return true;
 		
 		
 
@@ -108,7 +115,9 @@ class TimerDI: public CppTimer{
     public:
     TimerDI(DataInterface & _di): di(_di){}
     void timerEvent(){
-        di.newScanAvail();
+        if (!di.newScanAvail()){
+            this->stop();
+        }
     }
 };
 
@@ -143,16 +152,21 @@ int main(int argc, char** argv) {
     char filePrefix[5];
     sprintf(filePrefix, "map");
     int fileCount =1;
-    bool fileExists = true;
-    char fileName[250];
-    sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
-    std::ifstream file(fileName);
-    while (file){   
+    // bool fileExists = true;
+    // char fileName[250];
+    // sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
+   // std::ifstream file(fileName);
+   char file[256];
+   FILE *f;
+    while ( sprintf(file, "%s%s%04i.dat", argv[1], filePrefix, fileCount)>-1 &&(f = fopen(file, "r"))!=NULL){   
         //printf("* ");
-        file.close();
+        //file.close();
         fileCount++;
-        sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
-        file = std::ifstream(fileName);
+        memset(file, 0, sizeof(file));
+        //sprintf(file, "%s%s%04i.dat", argv[1], filePrefix, fileCount);
+        //sprintf(fileName, "%s%s%04i.dat", argv[2], filePrefix, fileCount);
+        //file = std::ifstream(fileName);
+        fclose(f);
     }
     printf("\n%i files\n", fileCount);
 
@@ -213,14 +227,14 @@ int main(int argc, char** argv) {
         TimerStep motors(cb);
         lidar.startms(200);
         motors.startms(100);
-        std::this_thread::sleep_for(std::chrono::milliseconds(200*30)); //simulates lidar
+        std::this_thread::sleep_for(std::chrono::milliseconds(200*fileCount)); //simulates lidar
         lidar.stop();
         motors.stop();
     }
     else if (timerOff){
                 // b2Vec2 velocity = {0,0};
-        for (int i=0; i<40;i++){
-            dataInterface.newScanAvail();
+        //for (int i=0; i<40;i++){
+          while  (dataInterface.newScanAvail()){
             cb.step();
 
         }
