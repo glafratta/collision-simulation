@@ -242,8 +242,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			else{
 				for (int i=0; i<abs(diff); i++){
 			currentTmp.push_back(currentTmp[0]);
-				if (currentTmp[-1].x == 0 && currentTmp[-1].y ==0){
-				}
 
 				}
 		}
