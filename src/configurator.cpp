@@ -246,7 +246,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				}
 		}
 		}
-
+	printf("current Tmp = %i previoustmp %i\n", currentTmp.size(), previousTmp.size());
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
@@ -270,12 +270,14 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			theta = currentDMP.getAction().getOmega()* timeElapsed;
 			estimatedVel ={currentDMP.getAction().getLinearSpeed()*cos(theta),currentDMP.getAction().getLinearSpeed()*sin(theta)};
 			result = getVelocityResult(estimatedVel);
+			printf("empty mat\n");
 			//return result;
 		}
 		else{
 			printf("could not find velocity\n");
 			//return result;
 		}
+		printf("returning v = (%f,%f)", result.vector.x, result.vector.y);
 		return result;
 	}
 
