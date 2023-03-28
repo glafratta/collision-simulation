@@ -51,7 +51,9 @@ public:
 		}
 		//c->NewScan(current);
 		c->addIteration();
-		c->GetRealVelocity(current, previous);
+		Configurator::getVelocityResult r =c->GetRealVelocity(current, previous);
+		c->currentDMP.setRecordedVelocity(r.vector);
+		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", )
 		previous = current;
 		current.clear();
 		c->applyController(1, c->desiredDMP);
