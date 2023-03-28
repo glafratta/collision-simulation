@@ -56,6 +56,7 @@ char * folder;
 		std::ifstream file(filePath);
 
         float x, y, x2, y2;
+        Point p1, p2_1;
 		//box2d->previous = box2d->current;
 		//box2d->current.clear();
 		while (file>>x>>y){
@@ -66,21 +67,23 @@ char * folder;
             Point p(x,y);
             Point p2(x2,y2);
             //Point pp = *(&p-1);
-            if (p.r<1.0 && p!=*(&p-1)){
-            	//current.push_back(cv::Point2f(x, y));
+            if (p!=p1){
                 data.push_back(p);
+            	//current.push_back(cv::Point2f(x, y));
             }
-            if (p2.r<1.0 && p2!=*(&p2-1)){
+            //if (p2.r<1.0 && p2!=*(&p2-1)){
+            if (p2.r<1.0 && p2!=p2_1){
                 box2d->currentBox2D.push_back(p2);
             }
-			
+			p1=p;
+            p2_1 = p2;
 		}
 		file.close();
        // printf("current: %i, previous: %i\n", box2d->current.size(), box2d->previous.size());
         box2d->NewScan(data);
         return true;
 		
-		
+
 
 	}
 };

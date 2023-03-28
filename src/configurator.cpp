@@ -283,6 +283,94 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 
 
 
+Configurator::getVelocityResult Configurator::GetVelocityFromReference(std::vector <Point> &_current, std::vector <Point> &_previous){	 //does not modify current vector, creates copy	
+		getVelocityResult result;
+
+        //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
+		std::vector <cv::Point2f> currentTmp, previousTmp;
+		//MAKE OPENCV VECTORS
+		for (Point p: _current){
+			if(p.y<=0.1 && p.y >=-0.1 && p.x >=0){
+				currentTmp.push_back(cv::Point2f(p.x, p.y));
+			}
+		}
+		for (Point p: _previous){
+//			previousTmp.push_back(cv::Point2f(p.x, p.y));
+			if(p.y<=0.1 && p.y >=-0.1 && p.x >=0){
+				previousTmp.push_back(cv::Point2f(p.x, p.y));
+			}
+		}
+		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
+
+
+		if(diff>0){ //(current.size()>previous.size()){
+			if (previousTmp.empty()){
+				previousTmp = currentTmp;
+				}
+			else{
+				for (int i=0; i<abs(diff); i++){
+					previousTmp.push_back(previousTmp[0]); //before it was [-1]
+				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
+					printf("can't get previous data\n");
+				}
+
+			}
+			}
+		}
+	
+		else if (diff<0){//(current.size()<previous.size()){
+			if (currentTmp.empty()){
+				printf("no data\n");
+				for (cv::Point2f p:previousTmp){
+					return result;
+				} 
+				}
+			else{
+				for (int i=0; i<abs(diff); i++){
+			currentTmp.push_back(currentTmp[0]);
+				if (currentTmp[-1].x == 0 && currentTmp[-1].y ==0){
+				}
+
+				}
+		}
+		}
+
+	//use partial affine transformation to estimate displacement
+	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
+	float theta;
+		if (!transformMatrix.empty()){
+			result.affineResult;
+			result.affineResult.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
+			result.affineResult.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+			float tmpAngle = atan(result.affineResult.y/result.affineResult.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
+			if (result.affineResult.y ==0 && result.affineResult.x ==0){
+				tmpAngle =0;
+			}
+			if (result.affineResult.Length()>currentDMP.getMaxSpeed()){
+				affineTransError += result.affineResult.Length()-currentDMP.getMaxSpeed();
+				result.vector.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
+				result.vector.y = currentDMP.getAction().getLinearSpeed() *sin(tmpAngle);
+			}
+			//return getVelocityResult(tmp);
+		}
+		else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
+			b2Vec2 estimatedVel;
+			theta = currentDMP.getAction().getOmega()* timeElapsed;
+			estimatedVel ={currentDMP.getAction().getLinearSpeed()*cos(theta),currentDMP.getAction().getLinearSpeed()*sin(theta)};
+			result = getVelocityResult(estimatedVel);
+			//return result;
+		}
+		else{
+			printf("could not find velocity\n");
+			//return result;
+		}
+		return result;
+	}
+
+
+
+
+
 void Configurator::reactiveAvoidance(b2World & world, Primitive::simResult &r, Primitive &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
 	r =s.willCollide(world, iteration, debugOn, start, angle);
 	if (r.resultCode == Primitive::simResult::crashed){

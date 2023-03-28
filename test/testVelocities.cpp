@@ -19,38 +19,49 @@ int main(int argc, char**argv){
     char filePath[256];
     sprintf(filePath, "%s/vel%02i%02i%02i_%02i%02i.txt", dirDump, d,m,y,h, min);
     FILE * f = fopen(filePath, "w");
-    fprintf(f, "Vector\tAffineResult\nNOTE: %s", argv[2]);
+    fprintf(f, "%s\nW=window 0.2h, x>0 w\nCorrected(r, angle)\tRaw Affine(r, angle)\tCorrected_W\tRaw Affine_W\nNOTE: %s\n", argv[1], argv[2]);
     fclose(f);
     Configurator c;
     char folder[256];
     sprintf(folder, "%s", argv[1]);
     std::vector <Point> data, prevData;
     while (1){
-        iteration++;
-            char readPath[256];
-            sprintf(readPath, "%smap%04d.dat", folder, iteration);
-            std::ifstream file(readPath);
+    iteration++;
+    char readPath[256];
+    sprintf(readPath, "%smap%04d.dat", folder, iteration);
+    std::ifstream file(readPath);
+    if (!(f=fopen(readPath, "r"))){
+        return 0;
+    }
+    else {
+        fclose(f);
+    }
+    
 
-            float x, y, x2, y2;
+        float x, y, x2, y2;
+        Point p1;
             //box2d->previous = box2d->current;
             //box2d->current.clear();
             while (file>>x>>y){
                 x = round(x*1000)/1000;
                 y = round(y*1000)/1000;
                 Point p(x,y);
-                //Point pp = *(&p-1);
-                if (p.r<1.0 && p!=*(&p-1)){
-                    //current.push_back(cv::Point2f(x, y));
-                    data.push_back(p);
-                }
+                if (p!=p1){
+                data.push_back(p);
+            }
+            p1=p;
                 
             }
             file.close();
+            c.timeElapsed=0.2;
             Configurator::getVelocityResult r =c.GetRealVelocity(data, prevData);
+            Configurator::getVelocityResult r_w =c.GetVelocityFromReference(data, prevData);           
             prevData = data;
             data.clear();
             f = fopen(filePath, "a");
-            fprintf(f,"%f,%f\t%f, %f\n", r.vector.x, r.vector.y, r.affineResult.x, r.affineResult.y);
+            fprintf(f,"%.3f,   %.3f pi\t\t%.3f,   %.3f pi\t\t%.3f,    %.3f pi\t\t%.3f,   %.3f pi\n", r.vector.Length(), atan(r.vector.y/r.vector.x)/M_PI, r.affineResult.Length(), 
+            atan(r.affineResult.y/r.affineResult.x)/M_PI, r_w.vector.Length(), atan(r_w.vector.y/r_w.vector.x)/M_PI, r_w.affineResult.Length(), 
+            atan(r_w.affineResult.y/r_w.affineResult.x)/M_PI);
             fclose(f);
 
     }
