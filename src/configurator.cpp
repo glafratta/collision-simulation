@@ -254,9 +254,11 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			result.affineResult;
 			result.affineResult.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 			result.affineResult.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+			result.vector = result.affineResult;
 			float tmpAngle = atan(result.affineResult.y/result.affineResult.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
 			if (result.affineResult.y ==0 && result.affineResult.x ==0){
 				tmpAngle =0;
+				printf("angle =0");
 			}
 			if (result.affineResult.Length()>currentDMP.getMaxSpeed()){
 				affineTransError += result.affineResult.Length()-currentDMP.getMaxSpeed();
@@ -265,7 +267,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				printf("corrected != raw\n");
 			}
 			else{
-				result.vector = result.affineResult;
+				//result.vector = result.affineResult;
 				printf("corrected = raw\n");
 			}
 			//return getVelocityResult(tmp);

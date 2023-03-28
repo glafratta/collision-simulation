@@ -53,7 +53,7 @@ public:
 		
 		previous = current;
 		//current.clear();
-		c->applyController(1, c->desiredDMP);
+		c->applyController(1, *c->getDMP());
 
 	}
 
