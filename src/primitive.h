@@ -24,7 +24,7 @@ protected:
     float maxSpeed = 0.125f; //this needs to be defined better
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
     int simDuration =int(BOX2DRANGE*2 /maxSpeed); //in seconds
-    float pGain=0.1;
+    float pGain=0.05;
 
 
 
