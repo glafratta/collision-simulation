@@ -50,6 +50,7 @@ public:
             }
 		}
 		//c->NewScan(current);
+		c->addIteration();
 		c->GetRealVelocity(current, previous);
 		previous = current;
 		current.clear();
