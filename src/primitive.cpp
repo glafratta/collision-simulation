@@ -132,9 +132,11 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
         }
     }
     else {
-        accumulatedError += action.getOmega()*0.2 - recordedAngle; //og was new variable angleerror
+		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
+        accumulatedError += timeStepError; //og was new variable angleerror
 		float normAccErr = accumulatedError/M_PI;
         if (accumulatedError>=tolerance){
+			print("error at time step = %f, accumulated error = %f\n", timeStepErrror, accumulatedError);
             //printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
             action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
             action.RightWheelSpeed += normAccErr *pGain; //og was + angle
