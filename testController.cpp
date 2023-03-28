@@ -53,6 +53,7 @@ public:
 		c->GetRealVelocity(current, previous);
 		previous = current;
 		current.clear();
+		c->applyController(1, c->desiredDMP);
 
 	}
 
