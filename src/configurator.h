@@ -210,6 +210,7 @@ int getIteration(){
 // Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f> &, std::vector <cv::Point2f> &);
 
 Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
+Configurator::getVelocityResult GetVelocityFromReference(std::vector <Point> &, std::vector <Point> &);
 
 void controller();
 

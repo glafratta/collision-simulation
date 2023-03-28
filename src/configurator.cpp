@@ -234,8 +234,8 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 	
 		else if (diff<0){//(current.size()<previous.size()){
 			if (currentTmp.empty()){
+				printf("no data\n");
 				for (cv::Point2f p:previousTmp){
-					printf("no data\n");
 					return result;
 				} 
 				}
