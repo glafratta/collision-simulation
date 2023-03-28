@@ -386,6 +386,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
+	const float halfWindowWidth = .1;
 	switch (d){
 		case Primitive::Direction::NONE:{
 		std::vector <Point> bounds;
@@ -398,7 +399,6 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 		//FIND THE BOUNDS OF THE BOX
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
 		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
-		float halfWindowWidth = .1;
 		bounds.push_back(Point(start.p)+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
 		bounds.push_back(Point(start.p)+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
 		bounds.push_back(maxFromStart+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
@@ -463,7 +463,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 		}
 		default:
 		for (Point &p:currentBox2D){	
-			if (p != *(&p-1)&& p.isInRadius(start.p, 0.1)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			if (p != *(&p-1)&& p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;
@@ -483,6 +483,24 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				bodies++;
 				body->CreateFixture(&fixtureDef);
 			}
+			else if (curr!=NULL){
+			if (curr->obstacle.isValid()){
+				if (p.isInRadius(currentDMP.obstacle.getPosition()) & p !=*(&p-1)){
+					obStillThere =1;
+					b2Body * body;
+					b2BodyDef bodyDef;
+					b2FixtureDef fixtureDef;
+					bodyDef.type = b2_dynamicBody;
+					b2PolygonShape fixture; //giving the point the shape of a box
+					fixtureDef.shape = &fixture;
+					fixture.SetAsBox(.001f, .001f); 
+					bodyDef.position.Set(p.x, p.y); 
+					body = world.CreateBody(&bodyDef);
+					bodies++;
+					body->CreateFixture(&fixtureDef);
+				}
+			}
+		}
 		}
 		break;
 
