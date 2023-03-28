@@ -262,6 +262,11 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				affineTransError += result.affineResult.Length()-currentDMP.getMaxSpeed();
 				result.vector.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
 				result.vector.y = currentDMP.getAction().getLinearSpeed() *sin(tmpAngle);
+				printf("corrected != raw\n");
+			}
+			else{
+				result.vector = result.affineResult;
+				printf("corrected = raw\n");
 			}
 			//return getVelocityResult(tmp);
 		}
