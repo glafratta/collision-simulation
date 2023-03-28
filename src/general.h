@@ -34,6 +34,11 @@ struct Node{
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 
+// typedef b2Vec2 P;
+// bool isInRedius(P const &, P const&, float const &);
+
+// typedef b2Vec2 P;
+// P& P::operator-(P const &);
 
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Primitive, Primitive::simResult> Graph;

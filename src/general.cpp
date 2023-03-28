@@ -9,3 +9,10 @@ bool operator!=(Transform const &t1, Transform const& t2){
 // 	P result;
 // 	result.x = p.
 // }
+
+// P& P::operator-(P const & p){
+// 	P result;
+// 	result.x = this->x-p.x;
+// 	result.y = this->y-p.y;
+// 	return result;
+// }
