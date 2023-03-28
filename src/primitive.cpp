@@ -134,6 +134,7 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     else {
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; //og was new variable angleerror
+		printf("acc error = %f, desired angle = %f\n", accumulatedError, action.getOmega()*0.2);
 		float normAccErr = accumulatedError/M_PI;
         if (accumulatedError>=tolerance){
 			printf("error at time step = %f, accumulated error = %f\n", timeStepError, accumulatedError);
