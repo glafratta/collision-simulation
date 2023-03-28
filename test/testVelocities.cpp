@@ -63,6 +63,8 @@ int main(int argc, char**argv){
             atan(r.affineResult.y/r.affineResult.x)/M_PI, r_w.vector.Length(), atan(r_w.vector.y/r_w.vector.x)/M_PI, r_w.affineResult.Length(), 
             atan(r_w.affineResult.y/r_w.affineResult.x)/M_PI);
             fclose(f);
+            // c.getDMP()->setRecordedVelocity(r.vector);
+            // c.applyController(1, *c.getDMP())
 
     }
 

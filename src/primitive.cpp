@@ -120,9 +120,9 @@ void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVeloci
 }
 
 Primitive::controlResult Primitive::controller(){
-printf("Rec velocity = %f, %f\n", RecordedVelocity.x, RecordedVelocity.y);
+//printf("Rec velocity = %f, %f\n", RecordedVelocity.x, RecordedVelocity.y);
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
-float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
+float tolerance = 0.03; //tolerance in radians/pi = 6 degrees
     if (obstacle.isValid()){
         //printf("obstacle valid\n");
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
@@ -136,8 +136,9 @@ float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; //og was new variable angleerror
 		printf("acc error = %f, desired angle = %f, recorded angle = %f\n", accumulatedError, action.getOmega()*0.2);
-		float normAccErr = accumulatedError/M_PI;
-        if (accumulatedError>=tolerance){
+		//float normAccErr = accumulatedError/M_PI;
+        //if (accumulatedError>=tolerance){
+		float normAccErr = timeStepError/M_PI_2;
 			printf("error at time step = %f, accumulated error = %f\n", timeStepError, accumulatedError);
             //printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
             action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
@@ -155,7 +156,7 @@ float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
                 action.RightWheelSpeed=-1;
             }
 
-        }
+        //}
     }
     return CONTINUE;
 }

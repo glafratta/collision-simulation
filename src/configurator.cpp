@@ -246,7 +246,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				}
 		}
 		}
-	printf("current Tmp = %i previoustmp %i\n", currentTmp.size(), previousTmp.size());
+//	printf("current Tmp = %i previoustmp %i\n", currentTmp.size(), previousTmp.size());
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
@@ -258,17 +258,17 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			float tmpAngle = atan(result.affineResult.y/result.affineResult.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
 			if (result.affineResult.y ==0 && result.affineResult.x ==0){
 				tmpAngle =0;
-				printf("angle =0");
+				//printf("angle =0");
 			}
 			if (result.affineResult.Length()>currentDMP.getMaxSpeed()){
 				affineTransError += result.affineResult.Length()-currentDMP.getMaxSpeed();
 				result.vector.x = currentDMP.getAction().getLinearSpeed() *cos(tmpAngle);
 				result.vector.y = currentDMP.getAction().getLinearSpeed() *sin(tmpAngle);
-				printf("corrected != raw\n");
+				//printf("corrected != raw\n");
 			}
 			else{
 				//result.vector = result.affineResult;
-				printf("corrected = raw\n");
+				//printf("corrected = raw\n");
 			}
 			//return getVelocityResult(tmp);
 		}
@@ -277,14 +277,14 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			theta = currentDMP.getAction().getOmega()* timeElapsed;
 			estimatedVel ={currentDMP.getAction().getLinearSpeed()*cos(theta),currentDMP.getAction().getLinearSpeed()*sin(theta)};
 			result = getVelocityResult(estimatedVel);
-			printf("empty mat\n");
+			//printf("empty mat\n");
 			//return result;
 		}
 		else{
 			printf("could not find velocity\n");
 			//return result;
 		}
-		printf("returning v = (%f,%f)", result.vector.x, result.vector.y);
+		//printf("returning v = (%f,%f)", result.vector.x, result.vector.y);
 		return result;
 	}
 
