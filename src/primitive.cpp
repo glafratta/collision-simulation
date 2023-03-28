@@ -122,7 +122,7 @@ void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVeloci
 Primitive::controlResult Primitive::controller(){
 //printf("Rec velocity = %f, %f\n", RecordedVelocity.x, RecordedVelocity.y);
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
-float tolerance = 0.03; //tolerance in radians/pi = 6 degrees
+float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
     if (obstacle.isValid()){
         //printf("obstacle valid\n");
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
@@ -135,27 +135,34 @@ float tolerance = 0.03; //tolerance in radians/pi = 6 degrees
     else {
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; //og was new variable angleerror
-		printf("acc error = %f, desired angle = %f, recorded angle = %f\n", accumulatedError, action.getOmega()*0.2);
+		//printf("acc error = %f, desired angle = %f, recorded angle = %f\n", accumulatedError, action.getOmega()*0.2);
 		//float normAccErr = accumulatedError/M_PI;
         //if (accumulatedError>=tolerance){
-		float normAccErr = timeStepError/M_PI_2;
-			printf("error at time step = %f, accumulated error = %f\n", timeStepError, accumulatedError);
-            //printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
-            action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
-            action.RightWheelSpeed += normAccErr *pGain; //og was + angle
-            if (action.LeftWheelSpeed>1.0){
-            action.LeftWheelSpeed=1.0;
-            }
-            if (action.RightWheelSpeed>1.0){
-                action.RightWheelSpeed=1;
-            }
-            if (action.LeftWheelSpeed<(-1.0)){
-                action.LeftWheelSpeed=-1;
-            }
-            if (action.RightWheelSpeed<(-1.0)){
-                action.RightWheelSpeed=-1;
-            }
+		if (timeStepError<tolerance){
+			action.LeftWheelSpeed = 0.5;
+			action.RightWheelSpeed = 0.5;
+		}
+		else{
+			float normAccErr = timeStepError/M_PI_2;
+				//printf("error at time step = %f, accumulated error = %f\n", timeStepError, accumulatedError);
+				//printf("accumulated error: %f pi; correcting straight path\n\n", accumulatedError);
+				action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
+				action.RightWheelSpeed += normAccErr *pGain; //og was + angle
+				if (action.LeftWheelSpeed>1.0){
+				action.LeftWheelSpeed=1.0;
+				}
+				if (action.RightWheelSpeed>1.0){
+					action.RightWheelSpeed=1;
+				}
+				if (action.LeftWheelSpeed<(-1.0)){
+					action.LeftWheelSpeed=-1;
+				}
+				if (action.RightWheelSpeed<(-1.0)){
+					action.RightWheelSpeed=-1;
+				}
 
+
+		}
         //}
     }
     return CONTINUE;
