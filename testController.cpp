@@ -46,6 +46,7 @@ public:
 		//c->NewScan(current);
 		c->addIteration();
 		Configurator::getVelocityResult r =c->GetRealVelocity(current, previous);
+		c->timeElapsed = 0.2;
 		c->getDMP()->setRecordedVelocity(r.vector);
 		printf("current = %i, previous = %i\n", current.size(), previous.size());
 		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.x, r.vector.y, atan(r.vector.y/r.vector.x)/M_PI, r.vector.Length());
