@@ -35,7 +35,6 @@ public:
 				float x = round(data.x*1000)/1000;
 				float y = round(data.y*1000)/1000;
 				p1= (Point(x, y));
-				p1B2D=Point(x2, y2);
 				if (p1!= p0){
 					current.push_back(p1);
 				}
