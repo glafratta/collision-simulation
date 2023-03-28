@@ -53,7 +53,7 @@ public:
 		c->addIteration();
 		Configurator::getVelocityResult r =c->GetRealVelocity(current, previous);
 		c->getDMP().setRecordedVelocity(r.vector);
-		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", )
+		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.x, r.vector.y, atan(r.vector.y/r.vector.x)/M_PI, r.vector.Length());
 		previous = current;
 		current.clear();
 		c->applyController(1, c->desiredDMP);
