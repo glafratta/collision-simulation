@@ -120,6 +120,7 @@ void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVeloci
 }
 
 Primitive::controlResult Primitive::controller(){
+print("Rec velocity = %f, %f\n", RecordedVelocity.x, RecordedVelocity.y);
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     float tolerance = 0.2; //tolerance in radians (angle): 5.8 degrees circa
     if (obstacle.isValid()){
@@ -134,7 +135,7 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
     else {
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; //og was new variable angleerror
-		printf("acc error = %f, desired angle = %f\n", accumulatedError, action.getOmega()*0.2);
+		printf("acc error = %f, desired angle = %f, recorded angle = %f\n", accumulatedError, action.getOmega()*0.2);
 		float normAccErr = accumulatedError/M_PI;
         if (accumulatedError>=tolerance){
 			printf("error at time step = %f, accumulated error = %f\n", timeStepError, accumulatedError);
