@@ -17,6 +17,7 @@
 
 class LidarInterface : public A1Lidar::DataInterface{
 Configurator * c;
+std::vector <Point> previous;
 
 char folder[250];
 public: 
@@ -27,7 +28,7 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
-		std::vector <Point> current, previous;
+		std::vector <Point> current;
 		Point p1, p0;
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
@@ -49,8 +50,9 @@ public:
 		c->getDMP()->setRecordedVelocity(r.vector);
 		printf("current = %i, previous = %i\n", current.size(), previous.size());
 		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.x, r.vector.y, atan(r.vector.y/r.vector.x)/M_PI, r.vector.Length());
+		
 		previous = current;
-		current.clear();
+		//current.clear();
 		c->applyController(1, c->desiredDMP);
 
 	}
