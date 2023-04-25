@@ -91,11 +91,11 @@ int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
     Primitive desiredDMP;
-    Configurator configurator(desiredDMP);
-    configurator.setReadMap("map");
 	if (argc>2){
-		configurator.planning= atoi(argv[2]);
+		desiredDMP.pGain = (atof(argv[2]));
+		printf("pgain = %f\n", desiredDMp.pGain);
 	}
+    Configurator configurator(desiredDMP);
 	LidarInterface dataInterface(&configurator);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
