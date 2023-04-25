@@ -102,12 +102,13 @@ int main(int argc, char** argv) {
     Primitive desiredDMP;
     Configurator configurator(desiredDMP);
     configurator.setReadMap("map");
+	if (argc>1){
+		configurator.debugOn= atoi(argv[1]);
+	}
 	if (argc>2){
-		configurator.debugOn= atoi(argv[2]);
+		configurator.planning= atoi(argv[2]);
 	}
-	if (argc>3){
-		configurator.planning= atoi(argv[3]);
-	}
+	printf("debugon = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	LidarInterface dataInterface(&configurator);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
