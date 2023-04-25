@@ -94,6 +94,7 @@ int main(int argc, char** argv) {
 	printf("argc = %i", argc);
 	if (argc>2){
 		desiredDMP.pGain = (atof(argv[2]));
+		printf("%d\n", argv[2]);
 	}
 	printf("pgain = %f\n", desiredDMP.pGain);
     Configurator configurator(desiredDMP);
