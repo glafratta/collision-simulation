@@ -367,7 +367,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		best = e.m_source;
 	}
 	//std::sort(bestEdges.begin(), bestEdges.end());
-
+	if (currentDMP.change){
 	printf("plan to go: ");
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
@@ -378,6 +378,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 			default: break;
 
 		}
+	}
 	}
 	printf("\n");
 	

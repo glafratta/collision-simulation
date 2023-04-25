@@ -186,7 +186,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//CHOOSE BEXT NEXT currentDMP BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
-	printf("new currentDMP wheel speeds: %f, %f\n", currentDMP.getAction().LeftWheelSpeed, currentDMP.getAction().RightWheelSpeed);
+	printf("new currentDMP wheel speeds: L= %f, R=%f\n", currentDMP.getAction().LeftWheelSpeed, currentDMP.getAction().RightWheelSpeed);
 
 	//IF THE currentDMP DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameDMP, currentDMP);
@@ -433,7 +433,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		g[v].totObstacles++;
 	}
 	g[v].endPose = result.endPose;
-	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point error
+	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
