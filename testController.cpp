@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     Primitive desiredDMP;
 	printf("argc = %i", argc);
 	if (argc>1){
-		desiredDMP.pGain = (atof(argv[2]));
+		desiredDMP.pGain = float(atof(argv[2]));
 		printf("%d\n", argv[2]);
 	}
 	printf("pgain = %f\n", desiredDMP.pGain);
