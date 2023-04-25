@@ -379,7 +379,7 @@ Configurator::getVelocityResult Configurator::GetVelocityFromReference(std::vect
 
 
 void Configurator::reactiveAvoidance(b2World & world, Primitive::simResult &r, Primitive &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
-	r =s.willCollide(world, iteration, debugOn, start, angle);
+	r =s.willCollide(world, iteration, debugOn, start, angle, s.getSimDuration());
 	if (r.resultCode == Primitive::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Primitive TO THE PLAN
@@ -401,17 +401,24 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 
 		//FIND IF THE PRESENT STATE WILL COLLIDE
 	Primitive::simResult result; 
-
+	float remaining=s.getSimDuration();
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
-		result =s.willCollide(w, iteration, debugOn, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle()); //start from where the last Primitive ended (if previous Primitive crashes)
+		//find remaining distance to calculate
+		if(g[inEdge].direction == Primitive::NONE){
+			remaining= (BOX2DRANGE-g[srcVertex].distanceSoFar)*2/s.getMaxSpeed();
+		} 
+		if (remaining<0){
+			remaining=0;
+		}
+		result =s.willCollide(w, iteration, debugOn, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle(), remaining); //start from where the last Primitive ended (if previous Primitive crashes)
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
 		g[v].predecessors = g[srcVertex].predecessors +1;
 	}
 	else{
-		result =s.willCollide(w, iteration, debugOn, {0.0, 0.0}, 0); //default start from 0
+		result =s.willCollide(w, iteration, debugOn, {0.0, 0.0}, 0, remaining); //default start from 0
 	}
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
@@ -426,7 +433,7 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 		g[v].totObstacles++;
 	}
 	g[v].endPose = result.endPose;
-	g[v].distanceSoFar = g[srcVertex].distanceSoFar + result.distanceCovered;
+	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point error
 	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length

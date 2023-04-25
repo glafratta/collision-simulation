@@ -4,7 +4,7 @@
 
 
 
-Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, bool debugOn=0, b2Vec2 start = b2Vec2(), float _theta=0.0){ //CLOSED LOOP CONTROL, og return simreult
+Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, bool debugOn=0, b2Vec2 start = b2Vec2(), float _theta=0.0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -21,7 +21,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 		//printf("entering for loop\n");
 		int step=0;
 		//printf("action type = %i, speed = %f, omega = %f\n", action.getDirection(),RecordedVelocity.Length(), action.getOmega());
-		for (step; step < (hz*simDuration); step++) {//3 second
+		for (step; step < (hz*remaining); step++) {//3 second
 			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
 			instVelocity.y = RecordedVelocity.Length()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);

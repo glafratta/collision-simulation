@@ -6,6 +6,7 @@
 #define BOX2DRANGE 0.5
 const float REACTION_TIME =2.0;
 
+
 enum ObjectType {obstacle=0, target=1, other=2};  
 
 
@@ -599,7 +600,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
 
 void trackObject(Object &, float, b2Vec2, b2Vec2);
 
-simResult willCollide(b2World &, int, bool, b2Vec2, float);
+simResult willCollide(b2World &, int, bool, b2Vec2, float, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 
