@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 	AlphaBot motors;
     Primitive desiredDMP;
 	printf("argc = %i", argc);
-	if (argc>2){
+	if (argc>1){
 		desiredDMP.pGain = (atof(argv[2]));
 		printf("%d\n", argv[2]);
 	}
