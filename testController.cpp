@@ -92,11 +92,11 @@ int main(int argc, char** argv) {
 	AlphaBot motors;
     Primitive desiredDMP;
 	printf("argc = %i", argc);
-	// if (argc>1){
-	// 	desiredDMP.pGain = (atoi(argv[2]))/100;
-	// 	printf("%d\n", argv[2]);
-	// }
-	desiredDMP.pGain = 0.06;
+	if (argc>1){
+	desiredDMP.pGain = (stf(argv[2]));
+	 	printf("%d\n", argv[2]);
+	 }
+	desiredDMP.pGain = 0.068;
 	printf("pgain = %f\n", desiredDMP.pGain);
     Configurator configurator(desiredDMP);
 	LidarInterface dataInterface(&configurator);
