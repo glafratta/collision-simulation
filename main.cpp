@@ -29,6 +29,9 @@ public:
 	    mapCount++;
 		std::vector <Point> current;
 		Point p1, p0, p1B2D, p0B2D;
+		FILE *f;
+		char name[256];
+		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -43,8 +46,17 @@ public:
 				}
 				if (p1B2D!= p0B2D){
 					c->currentBox2D.push_back(p1B2D);
+					if (c->debugOn){
+						if (f==NULL){
+							f=fopen(name, "w");
+						}
+						fprintf(f, "%.2f\t%.2f\n", p1B2D.x, p1B2D.y);
+
+					}
 				}
-				
+				if (f !=NULL){
+					fclose(f);
+				}
 				p0= p1;
 				p0B2D=p1B2D;
             }
