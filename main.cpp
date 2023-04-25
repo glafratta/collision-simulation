@@ -30,11 +30,11 @@ public:
 		std::vector <Point> current;
 		Point p1, p0, p1B2D, p0B2D;
 		FILE *f;
+		char name[256];
+		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		if (c->debugOn){
 			f=fopen(name, "w");
 		}
-		char name[256];
-		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
