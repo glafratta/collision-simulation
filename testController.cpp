@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 	desiredDMP.pGain = (std::stof(argv[2]));
 	 	printf("%d\n", argv[2]);
 	 }
-	desiredDMP.pGain = 0.065;
+	desiredDMP.pGain = 0.063;
 	printf("pgain = %f\n", desiredDMP.pGain);
     Configurator configurator(desiredDMP);
 	LidarInterface dataInterface(&configurator);
