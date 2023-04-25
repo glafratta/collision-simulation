@@ -32,6 +32,7 @@ public:
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
+		printf("%s", name);
 		if (c->debugOn){
 			f=fopen(name, "w");
 		}
@@ -51,7 +52,6 @@ public:
 					c->currentBox2D.push_back(p1B2D);
 					if (c->debugOn){
 						fprintf(f, "%.2f\t%.2f\n", p1B2D.x, p1B2D.y);
-
 					}
 				}
 				p0= p1;
