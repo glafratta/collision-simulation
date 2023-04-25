@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     Primitive desiredDMP;
 	if (argc>2){
 		desiredDMP.pGain = (atof(argv[2]));
-		printf("pgain = %f\n", desiredDMp.pGain);
+		printf("pgain = %f\n", desiredDMP.pGain);
 	}
     Configurator configurator(desiredDMP);
 	LidarInterface dataInterface(&configurator);
