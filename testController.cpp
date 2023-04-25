@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
     Primitive desiredDMP;
 	printf("argc = %i", argc);
 	if (argc>1){
-	desiredDMP.pGain = (stf(argv[2]));
+	desiredDMP.pGain = (std::stof(argv[2]));
 	 	printf("%d\n", argv[2]);
 	 }
 	desiredDMP.pGain = 0.068;
