@@ -91,10 +91,11 @@ int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
     Primitive desiredDMP;
+	printf("argc = %i", argc);
 	if (argc>2){
 		desiredDMP.pGain = (atof(argv[2]));
-		printf("pgain = %f\n", desiredDMP.pGain);
 	}
+	printf("pgain = %f\n", desiredDMP.pGain);
     Configurator configurator(desiredDMP);
 	LidarInterface dataInterface(&configurator);
 	Callback cb(&configurator);
