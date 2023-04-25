@@ -32,10 +32,10 @@ public:
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
-		printf("%s", name);
-		if (c->debugOn){
+		printf("%s\n", name);
+		//if (c->debugOn){
 			f=fopen(name, "w");
-		}
+		//}
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -58,9 +58,9 @@ public:
 				p0B2D=p1B2D;
             }
 		}
-		if (f !=NULL){
+		//if (f !=NULL){
 			fclose(f);
-		}
+		//}
 		c->NewScan(current);
 		
 
