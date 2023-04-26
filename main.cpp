@@ -84,8 +84,8 @@ public:
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	L= -(c->getDMP()->getAction().getLWheelSpeed());
-	R = -(c->getDMP()->getAction().getRWheelSpeed());
+	L= (c->getDMP()->getAction().getLWheelSpeed());
+	R = (c->getDMP()->getAction().getRWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", -R, -L, c->getIteration());
