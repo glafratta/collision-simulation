@@ -89,7 +89,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 		}
 		else{
 			Primitive::Object temp = currentDMP.obstacle;			//otherwise update current state with new obstacle position
-			currentDMP = Primitive(temp);
+			Primitive::Direction dir = currentDMP.getAction().getDirection();
+			currentDMP = Primitive(temp, dir);
 		}
 
 	}

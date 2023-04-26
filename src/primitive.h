@@ -253,7 +253,7 @@ public:
     void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
     //printf("init action\n");
     direction = d;
-    float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
+//float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
