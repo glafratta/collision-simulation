@@ -5,8 +5,8 @@
 #include <math.h>
 #define SAFE_ANGLE M_PI_2
 #define MAX_TURN M_PI
-#define ROBOT_HALFLENGTH 0.085
-#define ROBOT_HALFWIDTH 0.04
+#define ROBOT_HALFLENGTH 0.11
+#define ROBOT_HALFWIDTH 0.09
 const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn
 										//to be at a safe distance from an obstacle in the worst
@@ -28,7 +28,7 @@ public:
 		body = world->CreateBody(&bodyDef);
 		body->SetUserData(this);  
 		b2PolygonShape box; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
-		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH); 
+		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH,b2Vec2(-5, 0), 0); 
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;
 		body->CreateFixture(&fixtureDef);
