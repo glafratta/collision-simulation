@@ -37,7 +37,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 				//float absAngleToObstacle = abs(obstacle.getAngle(robot.body->GetAngle()));
 				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
 
-				if (absAngleToObstacle>=M_PI_2){
+				if (absAngleToObstacle>=endAvoid){
 					break;
 				}
 			}
@@ -127,7 +127,7 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
         //printf("obstacle valid\n");
         float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
-        if (abs(angleDifference) >= M_PI_2){
+        if (abs(angleDifference) >= endAvoid){
 			obstacle.invalidate();
             return DONE;
         }

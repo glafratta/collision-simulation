@@ -316,10 +316,10 @@ Primitive::Direction getOppositeDirection(Primitive::Direction d){
 
 template <typename V, typename G>
 bool isFullLength(V v, const G & g, float length=0){
-    if (boost::in_degree(v, g)==0 && length < desiredDMP.box2dRange){
+    if (boost::in_degree(v, g)==0 && length < BOX2DRANGE){
         return false;
     }
-    else if (length >=desiredDMP.box2dRange){
+    else if (length >=BOX2DRANGE){
         return true;
     }
     else{

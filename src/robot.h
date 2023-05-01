@@ -28,7 +28,7 @@ public:
 		body = world->CreateBody(&bodyDef);
 		body->SetUserData(this);  
 		b2PolygonShape box; //giving the ground the shape of a box. useful to know if collision can be detected without fixture
-		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH,b2Vec2(-.05, 0), 0); 
+		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH); 
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;
 		body->CreateFixture(&fixtureDef);

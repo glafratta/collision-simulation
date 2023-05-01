@@ -7,6 +7,7 @@
 const float REACTION_TIME =2.0;
 
 
+
 enum ObjectType {obstacle=0, target=1, other=2};  
 
 
@@ -16,11 +17,12 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
-    float box2dRange = BOX2DRANGE;
+    //float box2dRange = BOX2DRANGE;
     enum Type {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
+    float endAvoid = M_PI_2;
 protected:
     Type type;
     float maxSpeed = 0.125f; //this needs to be defined better
@@ -250,7 +252,7 @@ public:
     // valid=1;
     // }
 
-    void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
+    void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
     //printf("init action\n");
     direction = d;
 //float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
@@ -258,7 +260,7 @@ public:
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
            // printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
-            if (abs(ob.getAngle(pos))<M_PI_2){
+            if (abs(ob.getAngle(pos))<end){
                 //NEW LOOP FOR ABOVE
                 if (direction == Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
                 //printf("direction in action =none\n");

@@ -83,7 +83,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 		wasAvoiding =1; //remember that the robot was avoiding an obstacle
 		//printf("old untracked obstacle position: %f\t%f\n", plan[0].obstacle.getPosition().x, plan[0].obstacle.getPosition().y);
 		currentDMP.trackObject(currentDMP.obstacle, timeElapsed, estimatedVelocity, {0.0f, 0.0f}); //robot default position is 0,0
-		if (currentDMP.obstacle.getAngle(estimatedVelocity) >= M_PI_2){ 		//if obstacle (pos) and robot (vel) are perpendicular
+		if (currentDMP.obstacle.getAngle(estimatedVelocity) >= currentDMP.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
 			currentDMP.obstacle.invalidate();
 			currentDMP = desiredDMP;
 		}
