@@ -168,7 +168,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 					currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
-					currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::NONE);
+					currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::STOP);
 					printf("using fallback\n");
 				}
 			}
@@ -460,6 +460,8 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 				}
 				if (result.resultCode == Primitive::simResult::crashed && dir != Primitive::NONE && g[v].nodesInSameSpot<maxNodesOnSpot){
 						g[v].options.push_back(dir);
+						//g[v].options.push_back(Primitive::Direction::BACK); //NEWLY ADDED
+
 					}
 				else if (result.resultCode == Primitive::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
 					Primitive::Action reflex;
@@ -469,6 +471,10 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					g[v].options.push_back(getOppositeDirection(dir));
 				}
 				}
+			// else if (s.getAction().getDirection()==Primitive::Direction::BACK){//NEWLY ADDED
+				
+//			}
+
 			}
 		else { //will only enter if successful
 			if (s.getType()==Primitive::Type::AVOID){
