@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h> //recommended cmath?
 #define BOX2DRANGE 0.5
-const float REACTION_TIME =2.0;
+const float REACTION_TIME =3.0;
 
 
 
@@ -138,7 +138,7 @@ public:
 }; //sub action f
 
 
-enum Direction{LEFT, RIGHT, NONE};
+enum Direction{LEFT, RIGHT, NONE, BACK, STOP};
 
 struct Action{
 private:
@@ -310,6 +310,13 @@ public:
         //printf("going right\n");
         RightWheelSpeed = - RightWheelSpeed;
         break;
+        case Primitive::Direction::BACK:
+        LeftWheelSpeed = - LeftWheelSpeed;
+        RightWheelSpeed = -RightWheelSpeed;
+        break;
+        case Primitive::Direction::STOP:
+        LeftWheelSpeed=0;
+        RightWheelSpeed=0;
         default:
         //printf("not left or right\n");
         break;
