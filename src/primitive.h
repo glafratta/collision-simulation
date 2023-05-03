@@ -17,7 +17,6 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
-    //float box2dRange = BOX2DRANGE;
     enum Type {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
@@ -36,13 +35,10 @@ public:
 
 struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
 private:
-    //b2Vec2 where;
-    //float step;
     bool valid= 0;
     ObjectType type;
     int iteration;
     float angleToRobot=0;
-    //b2Vec2 distance;
 public:
 	b2FixtureDef fixtureDef;
     b2BodyDef bodyDef;
@@ -75,7 +71,6 @@ public:
         if (posVector.y != 0 && posVector.y !=0){
             angle2 = atan(posVector.y/posVector.x);
         }
-        //printf("angle1 =%f, angle2 =%f\n", angle1, angle2);
 	    float angle = angle1-angle2;
         return angle;
     }
@@ -118,10 +113,6 @@ public:
     void setIteration(int _it){
         iteration=_it;
     }
-    // void setTimestamp(int _step, int _it){
-    //     step=_step;
-    //     iteration=_it;
-    // }
 
 
     bool isValid(){
@@ -164,104 +155,14 @@ public:
         direction = Direction::NONE;
     }
 
-    // Action(Object &ob, Primitive::Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}){
-    // direction = d;
-    // float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
-    // float maxDistance = maxSpeed*simDuration;
-    // if (ob.isValid()==true){
-    //     if (ob.getType()==ObjectType::obstacle){
-    //         printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
-    //         if (abs(ob.getAngle(pos))<M_PI_2){
-    //             //NEW LOOP FOR ABOVE
-    //             if (direction = Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-    //             printf("direction =none\n");
-    //                 if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-    //                     direction = Primitive::Direction::LEFT; //go left
-    //                 }
-    //                 else if (ob.getPosition().y>0){ //go right
-    //                     direction = Primitive::Direction::RIGHT; //go left
-    //                 }   
-    //                 else{
-    //                     int c = rand() % 2;
-    //                     direction = static_cast<Primitive::Direction>(c);
-
-    //                 }
-    //             }
-    //             else{
-    //                 printf("direction = %i\n", static_cast<int>(direction));
-    //             }
-    //         }
-    //         else{
-    //             ob.invalidate();
-    //             //printf("invalidated obstacle because angle >pi/2\n");
-    //         }
-     
-    //     }
-S:Direction::LEFT:
-    //         LeftWheelSpeed = -LeftWheelSpeed;
-    //         printf("going left\n");
-    //         break;
-    //         case Primitive::Direction::RIGHT:
-    //         printf("going right\n");
-    //         RightWheelSpeed = - RightWheelSpeed;
-    //         break;
-    //         default:
-    //         printf("not a valid direction\n");
-    //         break;
-    //     }
-
-    //     if (LeftWheelSpeed >1.0f){
-    //         LeftWheelSpeed=1;
-    //     }
-    //     if (RightWheelSpeed >1.0f){
-    //         RightWheelSpeed =1;
-    //     }
-    //     if (LeftWheelSpeed <-1.0f){
-    //         LeftWheelSpeed=-1;
-    //     }
-    //     if (RightWheelSpeed <-1.0f){
-    //         RightWheelSpeed =-1;
-    //     }
-    // }
-
-
-    // omega = (maxSpeed*(LeftWheelSpeed-RightWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
-    //     //printf("omega = %f pi\n", omega/M_PI);
-    //     if (abs(omega)>M_PI){ //max turning angle in one second
-    //         float multiplier=1;
-    //         if (omega<0){
-    //             multiplier=-1;
-    //         }
-    //         omega=M_PI*multiplier;
-    //     }
-
-    // linearSpeed = maxSpeed*(LeftWheelSpeed+RightWheelSpeed)/2;
-    // //linearSpeed = distanceBetweenWheels*omega;
-    // if (abs(linearSpeed)>maxSpeed){
-    //     float multiplier=1;
-    // if (linearSpeed<0){
-    //     multiplier=-1;
-    // }
-    // linearSpeed=maxSpeed*multiplier;
-    // }
-    // //printf("linear speed = %f\n", linearSpeed);
-
-
-    // valid=1;
-    // }
-
     void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
-    //printf("init action\n");
     direction = d;
-//float minWheelSpeedIncrement =0.01; //gives an omega of around .9 degrees/s given a maxSpeed of .125
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==ObjectType::obstacle){
-           // printf("angle to robot: %f pi\n", abs(ob.getAngle(pos))/M_PI);
             if (abs(ob.getAngle(pos))<end){
                 //NEW LOOP FOR ABOVE
                 if (direction == Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
-                //printf("direction in action =none\n");
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
                         direction = Primitive::Direction::LEFT; //go left
                     }
@@ -274,38 +175,18 @@ S:Direction::LEFT:
 
                     }
                 }
-                else{
-                   // printf("direction = %i\n", static_cast<int>(direction));
-                }
+
             }
             else{
-                //ob.invalidate();
-               // printf("invalidated obstacle because angle >pi/2\n");
-            }
-     
+            }     
         }
-
-        // if (LeftWheelSpeed >1.0f){
-        //     LeftWheelSpeed=1;
-        // }
-        // if (RightWheelSpeed >1.0f){
-        //     RightWheelSpeed =1;
-        // }
-        // if (LeftWheelSpeed <-1.0f){
-        //     LeftWheelSpeed=-1;
-        // }
-        // if (RightWheelSpeed <-1.0f){
-        //     RightWheelSpeed =-1;
-        // }
     }
 
     switch (direction){
         case Primitive::Direction::LEFT:
         LeftWheelSpeed = -LeftWheelSpeed;
-        //printf("going left\n");
         break;
         case Primitive::Direction::RIGHT:
-        //printf("going right\n");
         RightWheelSpeed = - RightWheelSpeed;
         break;
         case Primitive::Direction::BACK:
@@ -316,7 +197,6 @@ S:Direction::LEFT:
         LeftWheelSpeed=0;
         RightWheelSpeed=0;
         default:
-        //printf("not left or right\n");
         break;
     }
 
@@ -349,21 +229,6 @@ S:Direction::LEFT:
 
     b2Vec2 getLinearVelocity(float maxV = 0.125){
         b2Vec2 vel;
-        // float realL = maxV*LeftWheelSpeed;
-        // float realR = maxV*RightWheelSpeed;
-        //     //find angle theta in the pose:
-        // float W = (realL-realR)/distanceBetweenWheels; //rad/s, final angle at end of 1s
-        // //find absolute speed
-        // float V =(realL+realR)/2; //velocity
-        // if (realR-realL == 0){
-        //     vel.x = realL;
-        //     vel.y = 0;
-        //     }
-        // else {
-        //     vel.x = (distanceBetweenWheels/2)* sin(distanceBetweenWheels/(realR-realL));
-        //     vel.y = -(distanceBetweenWheels/2)* cos(distanceBetweenWheels/(realR-realL));
-
-        //}
         vel.x = linearSpeed *cos(omega);
         vel.y = linearSpeed *sin(omega);
         return vel;
@@ -410,7 +275,6 @@ struct simResult{
     resultType resultCode;
     Object collision;
     bool valid = 0;
-   // int stepDuration=0;
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 
@@ -453,9 +317,6 @@ Action action;
 public:
 std::vector <Primitive::Direction> options;
 Object obstacle;
-//Object target;
-//simResult simulationResult;
-
 
 Primitive::Action getAction(){
     return action;
@@ -465,19 +326,12 @@ Primitive::Type getType(){
     return type;
 }
 
-// Primitive::Object getObstacle(){
-//     return obstacle;
-// }
+
 
 Primitive(){
-    //printf("overloaded default constructor\n");
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
     type = Type::BASELINE;
-    // options.push_back(Primitive::Direction::LEFT);
-    // options.push_back(Primitive::Direction::RIGHT);
-    // maxNoChildren = options.size();
     RecordedVelocity = action.getLinearVelocity();
-    //printf("in Primitive: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
@@ -498,21 +352,15 @@ Primitive(Object ob, Direction direction = Direction::NONE){
 }
 
 void __init__(){
-   // printf("default init\n");
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
     type = Type::BASELINE;
-    // options.push_back(Primitive::Direction::LEFT);
-    // options.push_back(Primitive::Direction::RIGHT);
-    // maxNoChildren = options.size();
     RecordedVelocity = action.getLinearVelocity();
-    //printf("in Primitive: L=%f\t R=%f\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed());
 
 }
 
 void __init__(Object ob, Direction direction = Direction::NONE){
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
-    //obstacle = ob;
     if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
         type =Type::AVOID;
@@ -520,11 +368,9 @@ void __init__(Object ob, Direction direction = Direction::NONE){
     else{
         type =Type::BASELINE;
     }
-    //printf("in Primitive: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 
-//other Primitive to set both target and obstacle
 
 void setObstacle(Object ob){
     obstacle = ob;
@@ -556,7 +402,7 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
-// int getStepDuration(){
+
 //     return stepDuration;
 // }
 
@@ -612,11 +458,6 @@ simResult willCollide(b2World &, int, bool, b2Vec2, float, float);
 enum controlResult{DONE =0, CONTINUE =1};
 
 controlResult controller();
-
-// void tunePGain(float yError){ //unused, not tested
-//     float learningRate = 0.01;
-//     pGain -= yError*learningRate;
-// }
 
 void setGain(float f){
     pGain=f;
