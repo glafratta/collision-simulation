@@ -197,9 +197,7 @@ public:
     //         }
      
     //     }
-
-    //     switch (direction){
-    //         case Primitive::Direction::LEFT:
+S:Direction::LEFT:
     //         LeftWheelSpeed = -LeftWheelSpeed;
     //         printf("going left\n");
     //         break;
