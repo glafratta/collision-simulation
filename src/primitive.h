@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h> //recommended cmath?
 #define BOX2DRANGE 0.5
-const float REACTION_TIME =3.0;
+const float REACTION_TIME =2.3;
 
 
 
