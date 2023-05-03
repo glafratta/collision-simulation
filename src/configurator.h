@@ -91,7 +91,7 @@ Configurator(){
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		FILE * f = fopen(statFile, "w");
-		fprintf(f,"Bodies\tBranches\tTime\n");
+		//fprintf(f,"Bodies\tBranches\tTime\n");
 		fclose(f);
 }
 
@@ -101,7 +101,7 @@ Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), 
 	printf("hey\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
-	if (timerOff){
+	if (debugOn){
 		char dirName[50];
 		sprintf(dirName, "bodiesSpeedStats");
 		if (!opendir(dirName)){
@@ -123,7 +123,6 @@ Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), 
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
-		fprintf(f,"Bodies\tBranches\tTime\n");
 		fclose(f);
 	}
 

@@ -29,14 +29,14 @@ void Configurator::NewScan(std::vector <Point> & data){
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
-	if (timerOff){
-		printf("time elapsed: %f\n", timeElapsed);
-		if (iteration>1){
-			FILE * f = fopen(statFile, "a+");
-			fprintf(f,"%.05f\n", timeElapsed);
-			fclose(f);
-		}
-	}
+	// if (debugOn){
+	// 	//printf("time elapsed: %f\n", timeElapsed);
+	// 	if (iteration>1){
+	// 		FILE * f = fopen(statFile, "a+");
+	// 		fprintf(f,"%.05f\n", timeElapsed);
+	// 		fclose(f);
+	// 	}
+	// }
 
 	//DISCARD BAD SCANS
 	if ( timeElapsed< .19){		
@@ -149,6 +149,8 @@ void Configurator::NewScan(std::vector <Point> & data){
 	edgeDescriptor e;
 	Primitive::Direction dir;
 
+	auto startTime =std::chrono::high_resolution_clock::now();
+
 	/////////////REACTIVE AVOIDANCE: substitute the currentDMP
 	switch (planning){
 		case 0:
@@ -178,9 +180,12 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	}
 	printf("tree size = %i\n", g.m_vertices.size());
-	if (timerOff){
+	if (debugOn){
+		auto endTime =std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
+		float duration=float(d.count())/1000; //express in seconds
 		FILE * f = fopen(statFile, "a+");
-		fprintf(f,"%i\t%i\t", bodies, g.m_vertices.size());
+		fprintf(f,"%i\t%i\t%f\n", bodies, g.m_vertices.size(), duration);
 		fclose(f);
 	}
 	bodies =0;
