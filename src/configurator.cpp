@@ -158,7 +158,9 @@ void Configurator::NewScan(std::vector <Point> & data){
 			reactiveAvoidance(world, result, currentDMP, start, theta);
 			break;
 		case 1:
-			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); 
+			currentDMP.change = build_tree(v0, g, currentDMP, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentDMP.change is changed directly
+			//printf("tree size = %i\n", g.m_vertices.size());
+			e = findBestBranch(g, leaves);
 			if (currentDMP.change){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
@@ -166,6 +168,10 @@ void Configurator::NewScan(std::vector <Point> & data){
 					dir =g[e].direction;
 					printf("bestdirection = %i\n", dir);
 					currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
+				}
+				else{ //FALLBACK, ensure it's still operating even if tree building fails
+					currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::STOP);
+					printf("using fallback\n");
 				}
 			}
 			break;
