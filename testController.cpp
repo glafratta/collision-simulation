@@ -49,7 +49,7 @@ public:
 		Configurator::getVelocityResult r =c->GetRealVelocity(current, previous);
 		c->getDMP()->setRecordedVelocity(r.vector);
 		printf("current = %i, previous = %i\n", current.size(), previous.size());
-		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.x, r.vector.y, atan(r.vector.y/r.vector.x)/M_PI, r.vector.Length());
+		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.p.x, r.vector.p.y, atan(r.vector.p.y/r.vector.p.x)/M_PI, r.vector.p.Length());
 		
 		previous = current;
 		//current.clear();
