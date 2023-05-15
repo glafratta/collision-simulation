@@ -139,7 +139,7 @@ private:
     float omega=0; //initial angular velocity is 0  
     //b2Vec2 velocity ={0.5, 0};
     bool valid=0;
-    float distanceBetweenWheels = 0.08f;
+    float distanceBetweenWheels = 0.15f;
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
     float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
     //float angleAtStart;

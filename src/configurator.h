@@ -50,11 +50,11 @@ public:
 
 	struct getVelocityResult{
 		bool valid =0;
-		b2Vec2 vector = {0.0f, 0.0f};
-		b2Vec2 affineResult = {0.0f, 0.0f};
+		b2Transform vector;
+		b2Transform affineResult;
 		//float angle;
 		getVelocityResult(){}
-		getVelocityResult(b2Vec2 disp):vector(disp){
+		getVelocityResult(b2Transform disp):vector(disp){
 			valid=1;
 		}
 
@@ -209,7 +209,7 @@ int getIteration(){
 // Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f> &, std::vector <cv::Point2f> &);
 
 Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
-Configurator::getVelocityResult GetVelocityFromReference(std::vector <Point> &, std::vector <Point> &);
+//Configurator::getVelocityResult GetVelocityFromReference(std::vector <Point> &, std::vector <Point> &);
 
 void controller();
 
