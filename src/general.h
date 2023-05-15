@@ -10,24 +10,24 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
-#include "primitive.h"
+#include "task.h"
 
 struct Edge{
-	Primitive::Direction direction;
+	Task::Direction direction;
 	//int stepDuration =0;
 	float distanceCovered=0;
 };
 
 struct Node{
-	Primitive::Object obstacle;
-	std::vector <Primitive::Direction> options;
+	Task::Object obstacle;
+	std::vector <Task::Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 	int nodesInSameSpot =0;
 	int totObstacles=0;
-	Primitive::simResult::resultType outcome;
+	Task::simResult::resultType outcome;
 	
 };
 
@@ -41,10 +41,10 @@ bool operator!=(Transform const &, Transform const &);
 // P& P::operator-(P const &);
 
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Primitive, Primitive::simResult> Graph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Task, Task::simResult> Graph;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Node, Edge> Tree;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Primitive, int> G;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Task, int> G;
 
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
@@ -218,13 +218,13 @@ class Pruner : public boost::default_dfs_visitor{
 // }
 
 // template <typename V, typename G, typename E>
-// V nextPrimitive(V v, G g, Primitive s, b2World &w, std::vector <V> & _leaves, int iteration){
+// V nextTask(V v, G g, Task s, b2World &w, std::vector <V> & _leaves, int iteration){
 // 	//INIT 
 // 	V v1 = v;
-// 	Primitive::simResult result;
+// 	Task::simResult result;
 // 	edgeDescriptor inEdge;
 	
-// 	//EVALUATE THE PRESENT PRIMITIVE
+// 	//EVALUATE THE PRESENT Task
 // 	if (v.predecessors.size()>0){
 // 		result = s.willCollide(w, iteration, v.predecessors[-1].endPose.p, v.predecessors[-1].endPose.q.GetAngle());
 // 		inEdge.distanceCovered = result.distanceCovered;

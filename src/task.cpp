@@ -1,9 +1,9 @@
-#include "primitive.h"
+#include "task.h"
 #include "robot.h"
 
 
 
-Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, bool debugOn=0, b2Vec2 start = b2Vec2(), float _theta=0.0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
+Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, b2Vec2 start = b2Vec2(), float _theta=0.0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -37,7 +37,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				if (type == Primitive::Type::BASELINE && step/hz >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (type == Task::Type::BASELINE && step/hz >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 						b2Vec2 posReadjusted;
 						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
 						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
@@ -75,7 +75,7 @@ Primitive::simResult Primitive::willCollide(b2World & _world, int iteration, boo
 }
 
 
-void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
+void Task::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
 	b2Vec2 newPos(object.getPosition().x+shift.x,object.getPosition().y + shift.y);
 	object.setPosition(newPos);
@@ -83,7 +83,7 @@ void Primitive::trackObject(Object & object, float timeElapsed, b2Vec2 robVeloci
 	object.setAngle(angle); //with respect to robot's velocity
 }
 
-Primitive::controlResult Primitive::controller(){
+Task::controlResult Task::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
     if (obstacle.isValid()){

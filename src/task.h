@@ -11,7 +11,7 @@ const float REACTION_TIME =2.0;
 enum ObjectType {obstacle=0, target=1, other=2};  
 
 
-class Primitive{
+class Task{
 public:
     float hz =50.0f; //og was 60
     float accumulatedError=0;
@@ -162,16 +162,16 @@ public:
         if (ob.getType()==ObjectType::obstacle){
             if (abs(ob.getAngle(pos))<end){
                 //NEW LOOP FOR ABOVE
-                if (direction == Primitive::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
+                if (direction == Task::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
                     if (ob.getPosition().y<0){ //obstacle is to the right, vehicle goes left; ipsilateral excitatory, contralateral inhibitory
-                        direction = Primitive::Direction::LEFT; //go left
+                        direction = Task::Direction::LEFT; //go left
                     }
                     else if (ob.getPosition().y>0){ //go right
-                        direction = Primitive::Direction::RIGHT; //go left
+                        direction = Task::Direction::RIGHT; //go left
                     }   
                     else{
                         int c = rand() % 2;
-                        direction = static_cast<Primitive::Direction>(c);
+                        direction = static_cast<Task::Direction>(c);
 
                     }
                 }
@@ -183,17 +183,17 @@ public:
     }
 
     switch (direction){
-        case Primitive::Direction::LEFT:
+        case Task::Direction::LEFT:
         LeftWheelSpeed = -LeftWheelSpeed;
         break;
-        case Primitive::Direction::RIGHT:
+        case Task::Direction::RIGHT:
         RightWheelSpeed = - RightWheelSpeed;
         break;
-        case Primitive::Direction::BACK:
+        case Task::Direction::BACK:
         LeftWheelSpeed = - LeftWheelSpeed;
         RightWheelSpeed = -RightWheelSpeed;
         break;
-        case Primitive::Direction::STOP:
+        case Task::Direction::STOP:
         LeftWheelSpeed=0;
         RightWheelSpeed=0;
         default:
@@ -261,7 +261,7 @@ public:
     return omega;
     }
 
-    Primitive::Direction getDirection(){
+    Task::Direction getDirection(){
         return direction;
     }
 
@@ -315,27 +315,27 @@ class Listener : public b2ContactListener {
 private:
 Action action;
 public:
-std::vector <Primitive::Direction> options;
+std::vector <Task::Direction> options;
 Object obstacle;
 
-Primitive::Action getAction(){
+Task::Action getAction(){
     return action;
 }
 
-Primitive::Type getType(){
+Task::Type getType(){
     return type;
 }
 
 
 
-Primitive(){
+Task(){
     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
     type = Type::BASELINE;
     RecordedVelocity = action.getLinearVelocity();
 
 }
 
-Primitive(Object ob, Direction direction = Direction::NONE){
+Task(Object ob, Direction direction = Direction::NONE){
    // printf("custom constructor\n");
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
@@ -347,7 +347,7 @@ Primitive(Object ob, Direction direction = Direction::NONE){
     else{
         type =Type::BASELINE;
     }
-    //printf("in Primitive: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
+    //printf("in Task: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 

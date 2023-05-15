@@ -1,21 +1,21 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
+#include "opencv2/opencv.hpp"
 #include "Box2D/Box2D.h"
 #include "robot.h"
 #include <dirent.h>
 #include <vector>
-#include "opencv2/opencv.hpp"
 #include <thread>
 #include <filesystem>
 #include <cmath>
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-#include "primitive.h"
+#include "task.h"
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
-//#include <boost/graph/depth_first_search.hpp>
 #include <algorithm>
-#include<sys/stat.h>
+#include <sys/stat.h>
+
 
 
 
@@ -29,7 +29,7 @@ protected:
 	FILE * dumpPath;
 	//FILE * dumpDeltaV;
 	char fileNameBuffer[50];
-	Primitive currentDMP;
+	Task currentTask;
 public:
 	bool debugOn=0;
 	float affineTransError =0;
@@ -37,7 +37,7 @@ public:
 	char *folder;
 	char readMap[50];
 //	char msg[25];
-	Primitive desiredDMP;
+	Task desiredTask;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
@@ -68,7 +68,7 @@ Configurator(){
 	printf("hi\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	currentDMP = desiredDMP;
+	currentTask = desiredTask;
 	//dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 	if (debugOn){
 	char dirName[50];
@@ -97,7 +97,7 @@ Configurator(){
 
 }
 
-Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), currentDMP(_dmp), debugOn(debug), timerOff(noTimer){
+Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	printf("hey\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
@@ -127,14 +127,14 @@ Configurator(Primitive &_dmp, bool debug =0, bool noTimer=0): desiredDMP(_dmp), 
 	}
 
 
-	//printf("simduration = %i\n", currentDMP.getSimDuration());
+	//printf("simduration = %i\n", currentTask.getSimDuration());
 
 }
 
 void __init__(){
 }
 
-void __init__(Primitive & _currentDMP){
+void __init__(Task & _currentTask){
 }
 
 // class MedianFilter{
@@ -164,8 +164,8 @@ void __init__(Primitive & _currentDMP){
 
 // };
 
-void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentDMP' into a robot000n.txt file.
-								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentDMP
+void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
+								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
 	sprintf(fileNameBuffer, "%s", str);
 	//printf("reading trajectories from: %s\n", fileNameBuffer);
 }
@@ -232,34 +232,34 @@ b2Vec2 getAbsPos(){
 // }
 
 
-Primitive * getDMP(int advance=0){ //returns Primitive being executed
-	return &currentDMP;
+Task * getTask(int advance=0){ //returns Task being executed
+	return &currentTask;
 }
 
 
-void applyController(bool, Primitive &);
+void applyController(bool, Task &);
 
 
 b2Vec2 estimateDisplacementFromWheels();
 
 int getMaxStepDuration(){
-	return currentDMP.hz * currentDMP.getSimDuration();
+	return currentTask.hz * currentTask.getSimDuration();
 }
 
-// Primitive returnBest(Primitive & s1, Primitive & s2){ //returns pointer, remember to dereference
+// Task returnBest(Task & s1, Task & s2){ //returns pointer, remember to dereference
 // 	switch(s1.getType() == s2.getType()){
-// 	//if one of the Primitive is the desired Primitive, return the desired Primitive
+// 	//if one of the Task is the desired Task, return the desired Task
 // 		case 0: 
-// 			if (s1.getType() == desiredDMP.getType()){
+// 			if (s1.getType() == desiredTask.getType()){
 // 				return s1;
 // 			}
-// 			else if (s2.getType() == desiredDMP.getType()){
+// 			else if (s2.getType() == desiredTask.getType()){
 // 				return s2;
 // 			}
 // 		break;
 // 		case 1:
-// 			switch (s1.getType()== desiredDMP.getType()){
-// 				//if both Primitives are avoiding, choose the one with the least duration
+// 			switch (s1.getType()== desiredTask.getType()){
+// 				//if both Tasks are avoiding, choose the one with the least duration
 // 				case 0: 
 // 					if (s1.getStepDuration()< s2.getStepDuration()){
 // 						return s1;
@@ -270,7 +270,7 @@ int getMaxStepDuration(){
 // 					else {
 // 						return s1;
 // 					}
-// 				//if both Primitives are desired, choose the one with the most
+// 				//if both Tasks are desired, choose the one with the most
 // 				case 1:
 // 					if (s1.getStepDuration()> s2.getStepDuration()){
 // 						return s1;
@@ -291,24 +291,24 @@ int getMaxStepDuration(){
 
 // }
 
-//void reactiveAvoidance(b2World &, Primitive &, b2Vec2&, float&, Primitive::Direction); //performs reactive avoidance
+//void reactiveAvoidance(b2World &, Task &, b2Vec2&, float&, Task::Direction); //performs reactive avoidance
 
-void reactiveAvoidance(b2World &, Primitive::simResult &, Primitive&, b2Vec2 &, float &); //adds two Primitives if crashed but always next up is picked
+void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
 
 //vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
 
-vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionGraph&, Primitive  , b2World & , std::vector <vertexDescriptor> &);
+vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
-bool build_tree(vertexDescriptor v, CollisionGraph&g, Primitive s, b2World & w, std::vector <vertexDescriptor>&);
+bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
 
 
 
-Primitive::Direction getOppositeDirection(Primitive::Direction d){
+Task::Direction getOppositeDirection(Task::Direction d){
     switch (d){
-        case Primitive::Direction::LEFT: return Primitive::Direction::RIGHT;break;
-        case Primitive::Direction::RIGHT: return Primitive::Direction::LEFT;break;
+        case Task::Direction::LEFT: return Task::Direction::RIGHT;break;
+        case Task::Direction::RIGHT: return Task::Direction::LEFT;break;
         default:
-        return Primitive::Direction::NONE; //printf("default direction\n");
+        return Task::Direction::NONE; //printf("default direction\n");
 		break;
     }
 }
@@ -331,7 +331,7 @@ bool isFullLength(V v, const G & g, float length=0){
 }
 
 //FOR NEW CollisionGraph
-void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Primitive::Object obs = Primitive::Object()){
+void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Object obs = Task::Object()){
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
@@ -366,14 +366,14 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		best = e.m_source;
 	}
 	//std::sort(bestEdges.begin(), bestEdges.end());
-	if (currentDMP.change){
+	if (currentTask.change){
 	printf("plan to go: ");
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
 		switch (g[edge].direction){
-			case Primitive::NONE: printf("STRAIGHT, "); break;
-			case Primitive::LEFT: printf("LEFT, "); break;
-			case Primitive::RIGHT: printf("RIGHT, "); break;
+			case Task::NONE: printf("STRAIGHT, "); break;
+			case Task::LEFT: printf("LEFT, "); break;
+			case Task::RIGHT: printf("RIGHT, "); break;
 			default: break;
 
 		}
@@ -384,12 +384,12 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return e;
 }
 
-bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Transform start, Primitive * curr = NULL){
+bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
 	switch (d){
-		case Primitive::Direction::NONE:{
+		case Task::Direction::NONE:{
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		
@@ -448,7 +448,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
 					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentDMP.obstacle.getPosition())){
+						if (p.isInRadius(currentTask.obstacle.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -474,7 +474,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
 					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentDMP.obstacle.getPosition())){
+						if (p.isInRadius(currentTask.obstacle.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -486,7 +486,7 @@ bool constructWorldRepresentation(b2World & world, Primitive::Direction d, b2Tra
 			}
 			else if (curr!=NULL){
 			if (curr->obstacle.isValid()){
-				if (p.isInRadius(currentDMP.obstacle.getPosition()) & p !=*(&p-1)){
+				if (p.isInRadius(currentTask.obstacle.getPosition()) & p !=*(&p-1)){
 					obStillThere =1;
 					b2Body * body;
 					b2BodyDef bodyDef;

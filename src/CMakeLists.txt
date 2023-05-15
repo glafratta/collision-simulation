@@ -1,9 +1,11 @@
-set(SRC configurator.cpp primitive.cpp general.cpp)
+set(SRC configurator.cpp task.cpp general.cpp)
 
-set(HEAD configurator.h robot.h primitive.h general.h)
+set(HEAD configurator.h robot.h task.h general.h)
 
-add_library(gasolina ${SRC} ${HEAD})
+find_package(OpenCV REQUIRED)
 
-target_link_libraries(gasolina Box2D ${OpenCV_LIBS})
+add_library(HICS ${SRC} ${HEAD})
+
+target_link_libraries(HICS Box2D ${OpenCV_LIBS})
 
 set(CMAKE_BUILD_TYPE Debug)

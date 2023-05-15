@@ -84,8 +84,8 @@ public:
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	L= (c->getDMP()->getAction().getLWheelSpeed());
-	R = (c->getDMP()->getAction().getRWheelSpeed());
+	L= (c->getTask()->getAction().getLWheelSpeed());
+	R = (c->getTask()->getAction().getRWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c->getIteration());
@@ -99,8 +99,8 @@ int main(int argc, char** argv) {
 	//world setup with environment class
 	A1Lidar lidar;
 	AlphaBot motors;
-    Primitive desiredDMP;
-    Configurator configurator(desiredDMP);
+    Task desiredTask;
+    Configurator configurator(desiredTask);
     configurator.setReadMap("map");
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
