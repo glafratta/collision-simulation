@@ -169,7 +169,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 					currentDMP = Primitive(g[v0].obstacle, dir); //new currentDMP has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
-				 	currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::STOP);
+				 	currentDMP = Primitive(g[v0].obstacle, Primitive::Direction::NONE); //was stop
 				 	printf("using fallback\n");
 				}
 			}
