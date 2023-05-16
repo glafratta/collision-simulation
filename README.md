@@ -1,5 +1,5 @@
-# carmelo
-A library to implement spatial navigation based on homeostatic regulation of navigation mode and forward-chaining reasoning for optimal path planning for an indoor robot. Homeostatic navigation means that the robot has a preferred default mode, and new modes are created and executed upon its disruption, with the goal of returning to the steady state. The optimal next mode is chosen by selecting, in a graph of potentially unlimited future modes, the one which maximises the amount of time spent by the robot in the steady state. The mode graph is created based on continuously updating visual information about the robot's surroundings and simulation of the outcome of sequential mode-switching in game engine [Box2D](https://github.com/erincatto/box2d).
+# HICS - hierarchical input controller sequences
+This library allows obstacle avoidance in an indoor robot by creating Tasks, i.e. input controllers, in order to eliminate Disturbances. With this perspective, we view spatial navigation as an effort to maintain and restore homeostasis. This means that the robot has a preferred default Task, and new Tasks are created and executed upon its disruption, with the goal of returning to the steady state. This process is orchestrated by a Configurator and it is sufficient to perform reactive avoidance. However, Tasks may also be chained in a tree graph and simulated internally in order to find a Task which, if executed next, leads to fulfilment of a control goal.In this implementation the control goal is to maximise the amount of time spent by the robot in the steady state. The Task graph is created based on continuously updating visual information about the robot's surroundings and simulation of each Task in game engine [Box2D](https://github.com/erincatto/box2d).
 
 ## Hardware
 The indoor robot is equipped with 
@@ -33,11 +33,6 @@ make
 ```
 
 ## Run
-### Navigation demos (Raspberry Pi)
-* `sudo ./navigate` : this program demonstrates optimal next mode selection based on its own and its child branches' outcome. 
-### Test cases (Simulation
-* `./test/noRobot <your-map-folder> <bool timerOff> optional:<bool planningOn>` : this program allows to test the functionality of the "navigate" executable on any machine. Just provide it with a folder containg TSV files of (x, y) coordinates, whether you'd like the simulation to run in real-time and optionally if you'd like to see navigation with no mode planning
-* `./test/SPF` : this program illustrates in sequence how the mode tree is build using a Boost class
-* `./test/testEnvironmentRepresentation`: this program illustrates the selective object representation in Box2D, tailored to the execution of the mode being simulated
-* `./test/synthData`: allows to generate synthetic data for debug purposes from one single frame of coordinates
+### Navigation demo (Raspberry Pi)
+* `sudo ./navigate` : this program demonstrates optimal next mode selection based on its own and its child branches' outcome. By default, this only print out statements which allow to follow the robot's behaviour; you can turn on debug mode by instead typing `sudo ./navigate 1`. This prints out in `/tmp` a) LIDAR data with the prefix `map`, b) the bodies included in Box2D withthe prefix `bodies` and c) the trajectory descried by the robot during simulation with the prefix `robot`
 
