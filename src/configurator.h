@@ -21,22 +21,18 @@
 
 class Configurator{
 protected:
-	//std::vector <float> timeStamps;
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
 	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
-	//FILE * dumpDeltaV;
 	char fileNameBuffer[50];
 	Task currentTask;
 public:
 	bool debugOn=0;
 	float affineTransError =0;
-//	bool filterOn=1;
 	char *folder;
 	char readMap[50];
-//	char msg[25];
 	Task desiredTask;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
@@ -52,7 +48,6 @@ public:
 		bool valid =0;
 		b2Transform vector;
 		b2Transform affineResult;
-		//float angle;
 		getVelocityResult(){}
 		getVelocityResult(b2Transform disp):vector(disp){
 			valid=1;
@@ -60,16 +55,10 @@ public:
 
 	};
 
-//calculuate displacement and angle using partial affine transformation
-
-// 1:  new scan available: box2d world is rebuilt with Disturbances, current Action is checked#
-
 Configurator(){
-	printf("hi\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
 	currentTask = desiredTask;
-	//dumpDeltaV = fopen("/tmp/deltaV.txt", "w");
 	if (debugOn){
 	char dirName[50];
 	sprintf(dirName, "bodiesSpeedStats");
@@ -91,14 +80,12 @@ Configurator(){
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		FILE * f = fopen(statFile, "w");
-		//fprintf(f,"Bodies\tBranches\tTime\n");
 		fclose(f);
 }
 
 }
 
 Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
-	printf("hey\n");
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
 	if (debugOn){
@@ -125,10 +112,6 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 		FILE * f = fopen(statFile, "w");
 		fclose(f);
 	}
-
-
-	//printf("simduration = %i\n", currentTask.getSimDuration());
-
 }
 
 void __init__(){
@@ -137,43 +120,14 @@ void __init__(){
 void __init__(Task & _currentTask){
 }
 
-// class MedianFilter{
-//     int kSize;
-//     std::vector <float> bufferX;
-//     std::vector <float> bufferY;
-// public:
-//     MedianFilter(int _k=3): kSize(_k){
-//         bufferX = std::vector<float>(kSize);
-//         bufferY = std::vector<float>(kSize);
-//     }
-
-//     void filterFloat(float &c, std::vector<float> & buffer){ //value gets modified in the input vector
-//         buffer.push_back(c);
-//         buffer.erase(buffer.begin());
-//         std::vector <float> tmp = buffer;
-//         std::sort(tmp.begin(), tmp.end());
-//         int index = int(buffer.size()/2)+1;
-//         c = tmp[index];
-//         //printf("median value at index: %i, value = %f\n", index, tmp[index]);
-//     }
-
-//     void applyToPoint(cv::Point2f &p){
-//         filterFloat(p.x, bufferX);
-//         filterFloat(p.y, bufferY);
-//     }
-
-// };
 
 void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
 	sprintf(fileNameBuffer, "%s", str);
-	//printf("reading trajectories from: %s\n", fileNameBuffer);
 }
 
 void setReadMap(char * str){
 	sprintf(readMap,"%s", str);
-	printf("map name: %s\n", readMap);
-
 }
 
 char * getReadMap(){
@@ -196,7 +150,6 @@ void setFolder(char * _folder){ //the folder from where LIDAR data is read
 		else{
 			printf("%s doesn't exist", _folder);
 		}
-	printf("maps stored in %s\n", folder);
 }
 
 // void NewScan(std::vector <cv::Point2f> &); 
@@ -206,10 +159,7 @@ void NewScan(std::vector <Point> &);
 int getIteration(){
 	return iteration;
 }
-// Configurator::getVelocityResult GetRealVelocity(std::vector <cv::Point2f> &, std::vector <cv::Point2f> &);
-
 Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
-//Configurator::getVelocityResult GetVelocityFromReference(std::vector <Point> &, std::vector <Point> &);
 
 void controller();
 
@@ -227,11 +177,6 @@ b2Vec2 getAbsPos(){
 	return absPosition;
 }
 
-// Plan * plan(){
-// 	return &currentPlan;
-// }
-
-
 Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
 }
@@ -246,58 +191,10 @@ int getMaxStepDuration(){
 	return currentTask.hz * currentTask.getSimDuration();
 }
 
-// Task returnBest(Task & s1, Task & s2){ //returns pointer, remember to dereference
-// 	switch(s1.getType() == s2.getType()){
-// 	//if one of the Task is the desired Task, return the desired Task
-// 		case 0: 
-// 			if (s1.getType() == desiredTask.getType()){
-// 				return s1;
-// 			}
-// 			else if (s2.getType() == desiredTask.getType()){
-// 				return s2;
-// 			}
-// 		break;
-// 		case 1:
-// 			switch (s1.getType()== desiredTask.getType()){
-// 				//if both Tasks are avoiding, choose the one with the least duration
-// 				case 0: 
-// 					if (s1.getStepDuration()< s2.getStepDuration()){
-// 						return s1;
-// 					}
-// 					else if (s2.getStepDuration()< s1.getStepDuration()){
-// 						return s2;
-// 					}
-// 					else {
-// 						return s1;
-// 					}
-// 				//if both Tasks are desired, choose the one with the most
-// 				case 1:
-// 					if (s1.getStepDuration()> s2.getStepDuration()){
-// 						return s1;
-// 					}
-// 					else if (s2.getStepDuration()> s1.getStepDuration()){
-// 						return s2;
-// 					}
-// 					else {
-// 						return s1;
-// 					}
-// 				default:
-// 					break;
-// 			}
-
-// 			break;
-// 			default: break;
-// 	}
-
-// }
-
-//void reactiveAvoidance(b2World &, Task &, b2Vec2&, float&, Task::Direction); //performs reactive avoidance
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
 
-//vertexDescriptor eliminateDisturbance(b2World & world, vertexDescriptor v, Graph &g);
-
-vertexDescriptor eliminateDisturbance(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
+vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
 bool build_tree(vertexDescriptor v, Graph&g, b2World & w);
 bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
 
@@ -308,7 +205,7 @@ Task::Direction getOppositeDirection(Task::Direction d){
         case Task::Direction::LEFT: return Task::Direction::RIGHT;break;
         case Task::Direction::RIGHT: return Task::Direction::LEFT;break;
         default:
-        return Task::Direction::NONE; //printf("default direction\n");
+        return Task::Direction::NONE;
 		break;
     }
 }
@@ -330,7 +227,6 @@ bool isFullLength(V v, const G & g, float length=0){
 
 }
 
-//FOR NEW CollisionGraph
 void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Disturbance obs = Task::Disturbance()){
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
@@ -365,7 +261,6 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		bestEdges.push_back(e);
 		best = e.m_source;
 	}
-	//std::sort(bestEdges.begin(), bestEdges.end());
 	if (currentTask.change){
 	printf("plan to go: ");
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
@@ -394,7 +289,6 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		
 		Point positionVector, radiusVector, maxFromStart; 
-		//float minX, minY, maxX, maxY;
 		radiusVector.polarInit(BOX2DRANGE, start.q.GetAngle());
 		maxFromStart = Point(start.p) + radiusVector;
 		//FIND THE BOUNDS OF THE BOX
@@ -419,8 +313,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 			qTopP = top.y - mPerp*top.x;
 		}
 		else{
-			ceilingY = std::max(top.y, bottom.y); //top.y
-			floorY = std::min(top.y, bottom.y); //bottom.y
+			ceilingY = std::max(top.y, bottom.y); 
+			floorY = std::min(top.y, bottom.y); 
 			frontX = std::min(top.x, bottom.x);
 			backX = std::max(top.x, bottom.x);
 		}
@@ -506,7 +400,6 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 		break;
 
 	}
-	//bodies+=world.GetBodyCount();
 	return obStillThere;
 }
 

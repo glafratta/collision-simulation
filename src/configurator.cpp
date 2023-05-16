@@ -10,18 +10,6 @@ void Configurator::NewScan(std::vector <Point> & data){
 	current.clear();
 	current = data;
 
-	// //ROUND TO 2 decimal PLACES FOR BOX2D
-	// for (Point &d: data){
-	// 	float x = round(d.x*100)/100;
-	// 	float y= round(d.y*100)/100;
-	// 	Point p(x,y)
-	// 	if (p!=*(&p-1) && p !=*(&p-2)){
-	// 		currentBox2D.push_back(p);
-	// 	}
-
-	// }
-
-
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
@@ -29,23 +17,13 @@ void Configurator::NewScan(std::vector <Point> & data){
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
-	// if (debugOn){
-	// 	//printf("time elapsed: %f\n", timeElapsed);
-	// 	if (iteration>1){
-	// 		FILE * f = fopen(statFile, "a+");
-	// 		fprintf(f,"%.05f\n", timeElapsed);
-	// 		fclose(f);
-	// 	}
-	// }
-
-	//DISCARD BAD SCANS
 	if ( timeElapsed< .19){		
 		if (debugOn){
 			timeElapsed = .2;
 		}
 	}
 	else if (timeElapsed >.21){
-		printf("took too long! %f\n", timeElapsed);
+		//printf("took too long! %f\n", timeElapsed);
 		if (debugOn){
 			timeElapsed = .2;
 		}
@@ -62,38 +40,19 @@ void Configurator::NewScan(std::vector <Point> & data){
 	Configurator::getVelocityResult affRes= GetRealVelocity(current, previous);
 	b2Transform deltaP =affRes.vector;
 
-	// if (affineTransResult.valid){
-	// 	estimatedVelocity = affineTransResult.vector;
-	// }
-	// else{
-	// 	estimatedVelocity = currentTask.getAction().getLinearVelocity();
-	// 	//printf("invalid affine trans result\n");
-	//}
-
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = 0;
 	bool isSameTask = 1;
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
-	// absPosition.x += estimatedVelocity.x*timeElapsed;
-	// absPosition.y += estimatedVelocity.y*timeElapsed;
-
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	if (currentTask.obstacle.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
-		//printf("old untracked obstacle position: %f\t%f\n", plan[0].obstacle.getPosition().x, plan[0].obstacle.getPosition().y);
 		currentTask.trackDisturbance(currentTask.obstacle, timeElapsed, deltaP.p, {0.0f, 0.0f}); //robot default position is 0,0
 		if (currentTask.obstacle.getAngle(deltaP.p) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
 			currentTask.obstacle.invalidate();
 			currentTask = desiredTask;
 		}
-		// else{
-		// 	// Task::Disturbance temp = currentTask.obstacle;			//otherwise update current state with new obstacle position
-		// 	// Task::Direction dir = currentTask.getAction().getDirection();
-		// 	// //currentTask = Task(temp, dir);
-		// 	// currentTask.obstacle.
-		// }
-
 	}
 
 	//MAKE BOX2D BODIES 
@@ -101,35 +60,9 @@ void Configurator::NewScan(std::vector <Point> & data){
 	bool isObstacleStillThere=0;
 	isObstacleStillThere=constructWorldRepresentation(world, currentTask.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask);
 
-	// for (Point &p:current){
-	// 	if (p != *(&p-1) && p != *(&p-2)&& p.x >=0 && p.r < BOX2DRANGE){
-	// 		b2Body * body;
-	// 		b2BodyDef bodyDef;
-	// 		b2FixtureDef fixtureDef;
-	// 		bodyDef.type = b2_dynamicBody;
-	// 		b2PolygonShape fixture; //giving the point the shape of a box
-	// 		fixtureDef.shape = &fixture;
-	// 		fixture.SetAsBox(.001f, .001f); 
-
-	// 	//CHECK IF BODIES ARE OBSERVED IN THE GENERAL AREA WHERE THE OBSTACLE SHOULD BE 
-	// 		if (currentTask.obstacle.isValid()){
-	// 			if (p.isInRadius(currentTask.obstacle.getPosition())){
-	// 				isObstacleStillThere =1;
-	// 			}
-	// 		}
-	// 		if (p.x !=0 && p.y!=0){
-	// 			bodyDef.position.Set(p.x, p.y); 
-	// 			body = world.CreateBody(&bodyDef);
-	// 			body->CreateFixture(&fixtureDef);
-	// 			bodies++;
-	// 		}
-
-	//  	}
-	//  }
 	if (!isObstacleStillThere){ 
 		currentTask = desiredTask;
 	}
-	//int bodyCount = world.GetBodyCount();
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
 	b2Vec2 start(0.0f, 0.0f);
@@ -190,11 +123,11 @@ void Configurator::NewScan(std::vector <Point> & data){
 	bodies =0;
 	currentBox2D.clear();
 
-	//CHOOSE BEXT NEXT currentTask BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
+	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
-	printf("new currentTask wheel speeds: L= %f, R=%f\n", currentTask.getAction().LeftWheelSpeed, currentTask.getAction().RightWheelSpeed);
+	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().LeftWheelSpeed, currentTask.getAction().RightWheelSpeed);
 
-	//IF THE currentTask DIDN'T CHANGE, CORRECT PATH 
+	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameTask, currentTask);
 
 
@@ -223,7 +156,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			previousTmp.push_back(cv::Point2f(p.x, p.y));
 		}
 
-		if(diff>0){ //(current.size()>previous.size()){
+		if(diff>0){ 
 			if (previousTmp.empty()){
 				previousTmp = currentTmp;
 				}
@@ -238,7 +171,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			}
 		}
 	
-		else if (diff<0){//(current.size()<previous.size()){
+		else if (diff<0){
 			if (currentTmp.empty()){
 				printf("no data\n");
 				for (cv::Point2f p:previousTmp){
@@ -252,7 +185,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 				}
 		}
 		}
-//	printf("current Tmp = %i previoustmp %i\n", currentTmp.size(), previousTmp.size());
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
@@ -287,94 +219,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 
 
 
-// Configurator::getVelocityResult Configurator::GetVelocityFromReference(std::vector <Point> &_current, std::vector <Point> &_previous){	 //does not modify current vector, creates copy	
-// 		getVelocityResult result;
-
-//         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
-// 		std::vector <cv::Point2f> currentTmp, previousTmp;
-// 		//MAKE OPENCV VECTORS
-// 		for (Point p: _current){
-// 			if(p.y<=0.1 && p.y >=-0.1 && p.x >=0){
-// 				currentTmp.push_back(cv::Point2f(p.x, p.y));
-// 			}
-// 		}
-// 		for (Point p: _previous){
-// //			previousTmp.push_back(cv::Point2f(p.x, p.y));
-// 			if(p.y<=0.1 && p.y >=-0.1 && p.x >=0){
-// 				previousTmp.push_back(cv::Point2f(p.x, p.y));
-// 			}
-// 		}
-// 		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
-
-
-// 		if(diff>0){ //(current.size()>previous.size()){
-// 			if (previousTmp.empty()){
-// 				previousTmp = currentTmp;
-// 				}
-// 			else{
-// 				for (int i=0; i<abs(diff); i++){
-// 					previousTmp.push_back(previousTmp[0]); //before it was [-1]
-// 				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
-// 					printf("can't get previous data\n");
-// 				}
-
-// 			}
-// 			}
-// 		}
-	
-// 		else if (diff<0){//(current.size()<previous.size()){
-// 			if (currentTmp.empty()){
-// 				printf("no data\n");
-// 				for (cv::Point2f p:previousTmp){
-// 					return result;
-// 				} 
-// 				}
-// 			else{
-// 				for (int i=0; i<abs(diff); i++){
-// 			currentTmp.push_back(currentTmp[0]);
-// 				if (currentTmp[-1].x == 0 && currentTmp[-1].y ==0){
-// 				}
-
-// 				}
-// 		}
-// 		}
-
-// 	//use partial affine transformation to estimate displacement
-// 	cv::Mat transformMatrix = cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
-// 	float theta;
-// 		if (!transformMatrix.empty()){
-// 			result.affineResult;
-// 			result.affineResult.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
-// 			result.affineResult.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-// 			float tmpAngle = atan(result.affineResult.y/result.affineResult.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
-// 			if (result.affineResult.y ==0 && result.affineResult.x ==0){
-// 				tmpAngle =0;
-// 			}
-// 			if (result.affineResult.Length()>currentTask.getMaxSpeed()){
-// 				affineTransError += result.affineResult.Length()-currentTask.getMaxSpeed();
-// 				result.vector.x = currentTask.getAction().getLinearSpeed() *cos(tmpAngle);
-// 				result.vector.y = currentTask.getAction().getLinearSpeed() *sin(tmpAngle);
-// 			}
-// 			//return getVelocityResult(tmp);
-// 		}
-// 		else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
-// 			b2Vec2 estimatedVel;
-// 			theta = currentTask.getAction().getOmega()* timeElapsed;
-// 			estimatedVel ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-// 			result = getVelocityResult(estimatedVel);
-// 			//return result;
-// 		}
-// 		else{
-// 			printf("could not find velocity\n");
-// 			//return result;
-// 		}
-// 		return result;
-// 	}
-
-
-
-
-
 void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
 	r =s.willCollide(world, iteration, debugOn, start, angle, s.getSimDuration());
 	if (r.resultCode == Task::simResult::crashed){
@@ -388,7 +232,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 }
 
 
-vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -466,10 +310,6 @@ vertexDescriptor Configurator::eliminateDisturbance(vertexDescriptor v, Collisio
 					g[v].options.push_back(getOppositeDirection(dir));
 				}
 				}
-			// else if (s.getAction().getDirection()==Task::Direction::BACK){//NEWLY ADDED
-				
-//			}
-
 			}
 		else { //will only enter if successful
 			if (s.getType()==Task::Type::AVOID){
@@ -525,10 +365,9 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		}
 		fclose(f);
 	}
-	vertexDescriptor v1 = eliminateDisturbance(v, g,s,w, _leaves); 
+	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
 		//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
-		//printf("reset world\n");
 		b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 
@@ -547,7 +386,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		}
 		//END DEBUG
 		v= v1;
-		v1 = eliminateDisturbance(v,g,s, newWorld, _leaves);
+		v1 = nextNode(v,g,s, newWorld, _leaves);
 	}
 	return !g[0].obstacle.safeForNow;
 

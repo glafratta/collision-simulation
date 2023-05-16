@@ -2,7 +2,7 @@
 #include "Box2D/Box2D.h"
 #include <vector>
 #include <stdio.h>
-#include <math.h> //recommended cmath?
+#include <math.h> 
 #define BOX2DRANGE 0.5
 const float REACTION_TIME =2.0;
 
@@ -13,7 +13,7 @@ enum DisturbanceType {obstacle=0, target=1, other=2};
 
 class Task{
 public:
-    float hz =50.0f; //og was 60
+    float hz =50.0f; 
     float accumulatedError=0;
     char planFile[250]; //for debug
     float lidarRange =1.5;
@@ -49,10 +49,6 @@ public:
     Disturbance(DisturbanceType _t, b2Vec2 position):type(_t){
         bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(position.x, position.y);
-		// b2CircleShape fixture; //giving the point the shape of a box
-        // fixture.m_radius = .05;
-		// fixtureDef.shape = &fixture;
-		//fixtureDef.shape->m_radius = .05;
         valid =1;
     }
 
@@ -133,16 +129,13 @@ enum Direction{LEFT, RIGHT, NONE, BACK, STOP};
 
 struct Action{
 private:
-    //trajecotry is a function of the position of the disturbance
     float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
     b2Vec2 velocity;
     float omega=0; //initial angular velocity is 0  
-    //b2Vec2 velocity ={0.5, 0};
     bool valid=0;
     float distanceBetweenWheels = 0.15f;
     float maxOmega = M_PI; //calculated empirically with maxspeed of .125
     float minAngle = M_PI_2; //turn until the angle between the distance vector and the velocity 
-    //float angleAtStart;
     Direction direction;
 public:
     float RightWheelSpeed=0.5;
@@ -202,7 +195,6 @@ public:
 
 
     omega = (maxSpeed*(RightWheelSpeed-LeftWheelSpeed)/distanceBetweenWheels); //instant velocity, determines angle increment in willcollide
-        //printf("omega = %f pi\n", omega/M_PI);
         if (abs(omega)>M_PI){ //max turning angle in one second
             float multiplier=1;
             if (omega<0){
@@ -212,7 +204,6 @@ public:
         }
 
     linearSpeed = maxSpeed*(LeftWheelSpeed+RightWheelSpeed)/2;
-    //linearSpeed = distanceBetweenWheels*omega;
     if (abs(linearSpeed)>maxSpeed){
         float multiplier=1;
     if (linearSpeed<0){
@@ -220,22 +211,15 @@ public:
     }
     linearSpeed=maxSpeed*multiplier;
     }
-    //printf("linear speed = %f\n", linearSpeed);
-
-
     valid=1;
     }
-
-
     b2Vec2 getLinearVelocity(float maxV = 0.125){
         b2Vec2 vel;
         vel.x = linearSpeed *cos(omega);
         vel.y = linearSpeed *sin(omega);
         return vel;
-
     }
 
-    
     float getRWheelSpeed(){
         return RightWheelSpeed;
     }
@@ -264,9 +248,6 @@ public:
     Task::Direction getDirection(){
         return direction;
     }
-
-
-
 };
 
 
@@ -286,7 +267,6 @@ struct simResult{
     }
 
     simResult(resultType code, Disturbance obst): resultCode(code), collision(obst){
-        //collision.setIteration(it);
         valid =1;
     }
 };
@@ -336,10 +316,8 @@ Task(){
 }
 
 Task(Disturbance ob, Direction direction = Direction::NONE){
-   // printf("custom constructor\n");
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
-    //obstacle = ob;
     if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
         type =Type::AVOID;
@@ -347,7 +325,6 @@ Task(Disturbance ob, Direction direction = Direction::NONE){
     else{
         type =Type::BASELINE;
     }
-    //printf("in Task: L=%f\t R=%f, direction = %i\n", getAction().getLWheelSpeed(), getAction().getRWheelSpeed(), static_cast<int>(direction));
 
 }
 
@@ -402,10 +379,6 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
-
-//     return stepDuration;
-// }
-
 b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
     b2Vec2 vel;
     float realL = maxV*L;
@@ -428,7 +401,6 @@ b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
 
 float getAngularVelocity(float R, float L, float maxV = 0.125){
     float W = (maxV*(R-L)/action.getDistanceWheels()); //instant velocity, determines angle increment in willcollide
-    //printf("omega = %f pi\n", W/M_PI);
     if (abs(W)>M_PI){
         float multiplier=1;
         if (W<0){

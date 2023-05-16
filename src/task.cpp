@@ -96,15 +96,15 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
     }
     else {
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
-        accumulatedError += timeStepError; //og was new variable angleerror
+        accumulatedError += timeStepError; 
 		if (timeStepError<tolerance){
 			action.LeftWheelSpeed = 0.5;
 			action.RightWheelSpeed = 0.5;
 		}
 		else{
 			float normAccErr = timeStepError/M_PI_2;
-				action.LeftWheelSpeed -= normAccErr*pGain;  //og angle was -angle
-				action.RightWheelSpeed += normAccErr *pGain; //og was + angle
+				action.LeftWheelSpeed -= normAccErr*pGain;  
+				action.RightWheelSpeed += normAccErr *pGain; 
 				if (action.LeftWheelSpeed>1.0){
 				action.LeftWheelSpeed=1.0;
 				}

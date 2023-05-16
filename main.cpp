@@ -11,10 +11,6 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
-
-
-//the environment is sampled by the LIDAR every .2 seconds
-
 class LidarInterface : public A1Lidar::DataInterface{
 Configurator * c;
 
@@ -33,9 +29,7 @@ public:
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		printf("%s\n", name);
-		//if (c->debugOn){
-			f=fopen(name, "w");
-		//}
+		f=fopen(name, "w");
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <1.0){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -48,7 +42,7 @@ public:
 				if (p1!= p0){
 					current.push_back(p1);
 				}
-				if (p1B2D!= p0B2D){
+				if (p1B2D!= p0B2D){ //SEPARATE VECTOR FOR BOX2D
 					c->currentBox2D.push_back(p1B2D);
 					if (c->debugOn){
 						fprintf(f, "%.2f\t%.2f\n", p1B2D.x, p1B2D.y);
@@ -58,9 +52,7 @@ public:
 				p0B2D=p1B2D;
             }
 		}
-		//if (f !=NULL){
 			fclose(f);
-		//}
 		c->NewScan(current);
 		
 
@@ -101,25 +93,21 @@ int main(int argc, char** argv) {
 	AlphaBot motors;
     Task desiredTask;
     Configurator configurator(desiredTask);
-    configurator.setReadMap("map");
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
 	}
-	printf("debugon = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
+	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	LidarInterface dataInterface(&configurator);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
 	lidar.start();
 	motors.start();
-
 	do {
 	} while (!getchar());
-
-
 	motors.stop();
 	lidar.stop();
 
