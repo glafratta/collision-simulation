@@ -42,10 +42,10 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
 						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
-						result = simResult(simResult::resultType::safeForNow, Object(ObjectType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::safeForNow, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
 				}
 				else{
-						result = simResult(simResult::resultType::crashed, Object(ObjectType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::crashed, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 
@@ -75,12 +75,12 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 }
 
 
-void Task::trackObject(Object & object, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the object is tracked with the robot in the default position (0.0)
+void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
-	b2Vec2 newPos(object.getPosition().x+shift.x,object.getPosition().y + shift.y);
-	object.setPosition(newPos);
-	float angle = object.getAngle(robVelocity);
-	object.setAngle(angle); //with respect to robot's velocity
+	b2Vec2 newPos(d.getPosition().x+shift.x,d.getPosition().y + shift.y);
+	d.setPosition(newPos);
+	float angle = d.getAngle(robVelocity);
+	d.setAngle(angle); //with respect to robot's velocity
 }
 
 Task::controlResult Task::controller(){

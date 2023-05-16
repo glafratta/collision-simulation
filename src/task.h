@@ -8,7 +8,7 @@ const float REACTION_TIME =2.0;
 
 
 
-enum ObjectType {obstacle=0, target=1, other=2};  
+enum DisturbanceType {obstacle=0, target=1, other=2};  
 
 
 class Task{
@@ -33,10 +33,10 @@ protected:
 public:
 
 
-struct Object{ //maybe later can susbtitute this for a broader object so you can also set a target without having to make another class for it. Bernd has an enum object identifier
+struct Disturbance{ //maybe later can susbtitute this for a broader Disturbance so you can also set a target without having to make another class for it. Bernd has an enum Disturbance identifier
 private:
     bool valid= 0;
-    ObjectType type;
+    DisturbanceType type;
     int iteration;
     float angleToRobot=0;
 public:
@@ -44,9 +44,9 @@ public:
     b2BodyDef bodyDef;
     b2Body * body;
     bool safeForNow=1;
-    Object(){};
-    Object(ObjectType _t): type(_t){}
-    Object(ObjectType _t, b2Vec2 position):type(_t){
+    Disturbance(){};
+    Disturbance(DisturbanceType _t): type(_t){}
+    Disturbance(DisturbanceType _t, b2Vec2 position):type(_t){
         bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(position.x, position.y);
 		// b2CircleShape fixture; //giving the point the shape of a box
@@ -61,8 +61,8 @@ public:
     }
 
 
-    float getAngle(b2Vec2 posVector){ //gets the angle of an object wrt to another object (robot)
-        //reference is position vector 2. If the angle >0 means that object 1 is to the left of object 2
+    float getAngle(b2Vec2 posVector){ //gets the angle of an Disturbance wrt to another Disturbance (robot)
+        //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle1=0;
         float angle2 =0;
         if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
@@ -75,8 +75,8 @@ public:
         return angle;
     }
 
-    float getAngle(float angle2){ //gets the angle of an object wrt to the heading direction of another object
-        //reference is position vector 2. If the angle >0 means that object 1 is to the left of object 2
+    float getAngle(float angle2){ //gets the angle of an Disturbance wrt to the heading direction of another Disturbance
+        //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle1=0;
         if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
             angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin 
@@ -119,7 +119,7 @@ public:
         return valid;
     }
 
-    ObjectType getType(){
+    DisturbanceType getType(){
         return type;
     }
 
@@ -155,11 +155,11 @@ public:
         direction = Direction::NONE;
     }
 
-    void __init__(Object &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
+    void __init__(Disturbance &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
     direction = d;
     float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
-        if (ob.getType()==ObjectType::obstacle){
+        if (ob.getType()==DisturbanceType::obstacle){
             if (abs(ob.getAngle(pos))<end){
                 //NEW LOOP FOR ABOVE
                 if (direction == Task::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random
@@ -273,7 +273,7 @@ public:
 struct simResult{
     enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
     resultType resultCode;
-    Object collision;
+    Disturbance collision;
     bool valid = 0;
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
@@ -285,7 +285,7 @@ struct simResult{
         valid =1;
     }
 
-    simResult(resultType code, Object obst): resultCode(code), collision(obst){
+    simResult(resultType code, Disturbance obst): resultCode(code), collision(obst){
         //collision.setIteration(it);
         valid =1;
     }
@@ -316,7 +316,7 @@ private:
 Action action;
 public:
 std::vector <Task::Direction> options;
-Object obstacle;
+Disturbance obstacle;
 
 Task::Action getAction(){
     return action;
@@ -335,12 +335,12 @@ Task(){
 
 }
 
-Task(Object ob, Direction direction = Direction::NONE){
+Task(Disturbance ob, Direction direction = Direction::NONE){
    // printf("custom constructor\n");
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
     //obstacle = ob;
-    if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
+    if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
         type =Type::AVOID;
     }
@@ -358,10 +358,10 @@ void __init__(){
 
 }
 
-void __init__(Object ob, Direction direction = Direction::NONE){
+void __init__(Disturbance ob, Direction direction = Direction::NONE){
     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
     RecordedVelocity = action.getLinearVelocity();
-    if (ob.getType()== ObjectType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
+    if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
         obstacle = ob;
         type =Type::AVOID;
     }
@@ -372,7 +372,7 @@ void __init__(Object ob, Direction direction = Direction::NONE){
 }
 
 
-void setObstacle(Object ob){
+void setObstacle(Disturbance ob){
     obstacle = ob;
 }
 
@@ -451,7 +451,7 @@ float getLinearSpeed(float R, float L, float maxV = 0.125){
     return v;
 }
 
-void trackObject(Object &, float, b2Vec2, b2Vec2);
+void trackDisturbance(Disturbance &, float, b2Vec2, b2Vec2);
 
 simResult willCollide(b2World &, int, bool, b2Vec2, float, float);
 

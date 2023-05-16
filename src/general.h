@@ -19,7 +19,7 @@ struct Edge{
 };
 
 struct Node{
-	Task::Object obstacle;
+	Task::Disturbance obstacle;
 	std::vector <Task::Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;

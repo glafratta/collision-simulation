@@ -82,13 +82,13 @@ void Configurator::NewScan(std::vector <Point> & data){
 	if (currentTask.obstacle.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 		//printf("old untracked obstacle position: %f\t%f\n", plan[0].obstacle.getPosition().x, plan[0].obstacle.getPosition().y);
-		currentTask.trackObject(currentTask.obstacle, timeElapsed, deltaP.p, {0.0f, 0.0f}); //robot default position is 0,0
+		currentTask.trackDisturbance(currentTask.obstacle, timeElapsed, deltaP.p, {0.0f, 0.0f}); //robot default position is 0,0
 		if (currentTask.obstacle.getAngle(deltaP.p) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
 			currentTask.obstacle.invalidate();
 			currentTask = desiredTask;
 		}
 		// else{
-		// 	// Task::Object temp = currentTask.obstacle;			//otherwise update current state with new obstacle position
+		// 	// Task::Disturbance temp = currentTask.obstacle;			//otherwise update current state with new obstacle position
 		// 	// Task::Direction dir = currentTask.getAction().getDirection();
 		// 	// //currentTask = Task(temp, dir);
 		// 	// currentTask.obstacle.
@@ -142,7 +142,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	Task::simResult result;
 	currentTask.setRecordedVelocity(deltaP.p);
 
-	//creating decision tree object
+	//creating decision tree Disturbance
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
@@ -379,7 +379,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 	r =s.willCollide(world, iteration, debugOn, start, angle, s.getSimDuration());
 	if (r.resultCode == Task::simResult::crashed){
 		printf("crashed\n");
-		//IF THERE IS NO PLAN OR THE OBJECT WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
+		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
 		Point p(r.collision.getPosition());
 		if ((!s.obstacle.isValid()|| !(p.isInRadius(s.obstacle.getPosition())))){ 
 			s = Task(r.collision, Task::Direction::NONE);

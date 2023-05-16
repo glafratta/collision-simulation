@@ -62,7 +62,7 @@ public:
 
 //calculuate displacement and angle using partial affine transformation
 
-// 1:  new scan available: box2d world is rebuilt with objects, current Action is checked#
+// 1:  new scan available: box2d world is rebuilt with Disturbances, current Action is checked#
 
 Configurator(){
 	printf("hi\n");
@@ -331,7 +331,7 @@ bool isFullLength(V v, const G & g, float length=0){
 }
 
 //FOR NEW CollisionGraph
-void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Object obs = Task::Object()){
+void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Disturbance obs = Task::Disturbance()){
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
