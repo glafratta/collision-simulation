@@ -7,6 +7,9 @@
 #define MAX_TURN M_PI
 #define ROBOT_HALFLENGTH 0.11
 #define ROBOT_HALFWIDTH 0.09
+#define BETWEEN_WHEELS .15
+#define MAX_SPEED 0.125
+
 const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn
 										//to be at a safe distance from an obstacle in the worst

@@ -3,9 +3,12 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> 
+#include "robot.h"
 #define BOX2DRANGE 0.5
-const float REACTION_TIME =2.0;
-
+#define LIDAR_RANGE 1.5
+#define REACTION_TIME 2.0;
+#define HZ 50.0
+const float SIM_DURATION = int(BOX2DRANGE*2 /maxSpeed)
 
 
 enum DisturbanceType {obstacle=0, target=1, other=2};  
@@ -13,10 +16,10 @@ enum DisturbanceType {obstacle=0, target=1, other=2};
 
 class Task{
 public:
-    float hz =50.0f; 
+    //float hz =50.0f; 
     float accumulatedError=0;
     char planFile[250]; //for debug
-    float lidarRange =1.5;
+ //   float lidarRange =1.5;
     enum Type {BASELINE =0, AVOID =1, PURSUE =2, PANIC =3};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
@@ -24,9 +27,9 @@ public:
     float endAvoid = M_PI_2;
 protected:
     Type type;
-    float maxSpeed = 0.125f; //this needs to be defined better
+    //float maxSpeed = 0.125f; //this needs to be defined better
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
-    int simDuration =int(BOX2DRANGE*2 /maxSpeed); //in seconds
+    //int simDuration =int(BOX2DRANGE*2 /maxSpeed); //in seconds
 
 
 
@@ -148,9 +151,9 @@ public:
         direction = Direction::NONE;
     }
 
-    void __init__(Disturbance &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=60.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
+    void __init__(Disturbance &ob, Direction d, float simDuration=3, float maxSpeed=0.125, float hz=50.0f, b2Vec2 pos = {0,0}, float end = M_PI_2){
     direction = d;
-    float maxDistance = maxSpeed*simDuration;
+    //float maxDistance = maxSpeed*simDuration;
     if (ob.isValid()==true){
         if (ob.getType()==DisturbanceType::obstacle){
             if (abs(ob.getAngle(pos))<end){
@@ -328,25 +331,25 @@ Task(Disturbance ob, Direction direction = Direction::NONE){
 
 }
 
-void __init__(){
-    action.__init__(); //this is a valid trajectory, default going straight at moderate speed
-    type = Type::BASELINE;
-    RecordedVelocity = action.getLinearVelocity();
+// void __init__(){
+//     action.__init__(); //this is a valid trajectory, default going straight at moderate speed
+//     type = Type::BASELINE;
+//     RecordedVelocity = action.getLinearVelocity();
 
-}
+// }
 
-void __init__(Disturbance ob, Direction direction = Direction::NONE){
-    action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
-    RecordedVelocity = action.getLinearVelocity();
-    if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
-        obstacle = ob;
-        type =Type::AVOID;
-    }
-    else{
-        type =Type::BASELINE;
-    }
+// void __init__(Disturbance ob, Direction direction = Direction::NONE){
+//     action.__init__(ob, direction, simDuration, maxSpeed, hz, {0.0f, 0.0f}); 
+//     RecordedVelocity = action.getLinearVelocity();
+//     if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
+//         obstacle = ob;
+//         type =Type::AVOID;
+//     }
+//     else{
+//         type =Type::BASELINE;
+//     }
 
-}
+// }
 
 
 void setObstacle(Disturbance ob){
@@ -357,13 +360,13 @@ float getMaxSpeed(){
     return maxSpeed;
 }
 
-void setHz(float _hz){
-    hz = _hz;
-}
+// void setHz(float _hz){
+//     hz = _hz;
+// }
 
-void setSimDuration(int d){ //in seconds
-    simDuration = d;
-}
+// void setSimDuration(int d){ //in seconds
+//     simDuration = d;
+// }
 
 int getSimDuration(){ //in seconds
     return simDuration;
@@ -379,49 +382,49 @@ b2Vec2 getRecordedVelocity(){
     return RecordedVelocity;
 }
 
-b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
-    b2Vec2 vel;
-    float realL = maxV*L;
-    float realR = maxV*R;
-        //find angle theta in the pose:
-    float W = (realL-realR)/action.getDistanceWheels(); //rad/s, final angle at end of 1s
-    //find absolute speed
-    float V =(realL+realR)/2; //velocity
-    if (realR-realL == 0){
-        vel.x = realL;
-        vel.y = 0;
-        }
-    else {
-        vel.x = (action.getDistanceWheels()/2)* sin(action.getDistanceWheels()/(realR-realL));
-        vel.y = -(action.getDistanceWheels()/2)* cos(action.getDistanceWheels()/(realR-realL));
+// b2Vec2 getLinearVelocity(float R, float L, float maxV = 0.125){
+//     b2Vec2 vel;
+//     float realL = maxV*L;
+//     float realR = maxV*R;
+//         //find angle theta in the pose:
+//     float W = (realL-realR)/action.getDistanceWheels(); //rad/s, final angle at end of 1s
+//     //find absolute speed
+//     float V =(realL+realR)/2; //velocity
+//     if (realR-realL == 0){
+//         vel.x = realL;
+//         vel.y = 0;
+//         }
+//     else {
+//         vel.x = (action.getDistanceWheels()/2)* sin(action.getDistanceWheels()/(realR-realL));
+//         vel.y = -(action.getDistanceWheels()/2)* cos(action.getDistanceWheels()/(realR-realL));
 
-    }
-    return vel;
-}
+//     }
+//     return vel;
+// }
 
-float getAngularVelocity(float R, float L, float maxV = 0.125){
-    float W = (maxV*(R-L)/action.getDistanceWheels()); //instant velocity, determines angle increment in willcollide
-    if (abs(W)>M_PI){
-        float multiplier=1;
-        if (W<0){
-            multiplier=-1;
-        }
-        W= M_PI*multiplier;
-    }
-    return W;
-}
+// float getAngularVelocity(float R, float L, float maxV = 0.125){
+//     float W = (maxV*(R-L)/action.getDistanceWheels()); //instant velocity, determines angle increment in willcollide
+//     if (abs(W)>M_PI){
+//         float multiplier=1;
+//         if (W<0){
+//             multiplier=-1;
+//         }
+//         W= M_PI*multiplier;
+//     }
+//     return W;
+// }
 
-float getLinearSpeed(float R, float L, float maxV = 0.125){
-    float v = maxV*(L+R)/2;
-    if (abs(v)>maxV){
-        float multiplier=1;
-    if (v<0){
-        multiplier=-1;
-    }
-    v=maxV*multiplier;
-    }
-    return v;
-}
+// float getLinearSpeed(float R, float L, float maxV = 0.125){
+//     float v = maxV*(L+R)/2;
+//     if (abs(v)>maxV){
+//         float multiplier=1;
+//     if (v<0){
+//         multiplier=-1;
+//     }
+//     v=maxV*multiplier;
+//     }
+//     return v;
+// }
 
 void trackDisturbance(Disturbance &, float, b2Vec2, b2Vec2);
 

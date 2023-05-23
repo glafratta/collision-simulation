@@ -114,11 +114,11 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 	}
 }
 
-void __init__(){
-}
+// void __init__(){
+// }
 
-void __init__(Task & _currentTask){
-}
+// void __init__(Task & _currentTask){
+// }
 
 
 void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.

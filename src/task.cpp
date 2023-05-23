@@ -1,5 +1,4 @@
 #include "task.h"
-#include "robot.h"
 
 
 
@@ -17,7 +16,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start, theta);
 		int step=0;
-		for (step; step < (hz*remaining); step++) {//3 second
+		for (step; step < (HZ*remaining); step++) {//3 second
 			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
 			instVelocity.y = RecordedVelocity.Length()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
@@ -26,8 +25,8 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			}
-			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
-			theta += action.getOmega()/hz; //= omega *t
+			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
+			theta += action.getOmega()/HZ; //= omega *t
 			if (obstacle.isValid()){
 				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
 
@@ -37,10 +36,10 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				if (type == Task::Type::BASELINE && step/hz >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (type == Task::Type::BASELINE && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 						b2Vec2 posReadjusted;
-						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
-						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
+						posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+						posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
 						result = simResult(simResult::resultType::safeForNow, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
 				}
