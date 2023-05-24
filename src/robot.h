@@ -1,6 +1,6 @@
 #ifndef _ROBOT
 #define _ROBOT
-
+//box2d robot body and kinematic model
 #include "Box2D/Box2D.h"
 #include <math.h>
 #define SAFE_ANGLE M_PI_2
@@ -9,6 +9,7 @@
 #define ROBOT_HALFWIDTH 0.09
 #define BETWEEN_WHEELS .15
 #define MAX_SPEED 0.125
+#define MAX_OMEGA M_PI
 
 const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn

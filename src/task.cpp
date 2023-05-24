@@ -27,8 +27,8 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
-			if (obstacle.isValid()){
-				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
+			if (disturbance.isValid() || disturbance.getType() == DisturbanceType::obstacle){
+				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
 
 				if (absAngleToObstacle>=endAvoid){
 					break;
@@ -51,7 +51,8 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					}
 				break;
 			}
-		}	
+		}
+		result.collision.setAngle(robot.body->GetTransform());	
 		b2Vec2 distance; //= robot.body->GetPosition();
 		distance.x = robot.body->GetPosition().x - start.x;
 		distance.y = robot.body->GetPosition().y - start.y;
@@ -74,22 +75,24 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 }
 
 
-void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
+//void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2VEc2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
+void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
 	b2Vec2 newPos(d.getPosition().x+shift.x,d.getPosition().y + shift.y);
 	d.setPosition(newPos);
-	float angle = d.getAngle(robVelocity);
+	// float angle = d.getAngle(robVelocity);
+	float angle = d.getAngle(pose);
 	d.setAngle(angle); //with respect to robot's velocity
 }
 
 Task::controlResult Task::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-    if (obstacle.isValid()){
-        float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
+    if (disturbance.isValid() & disturbance.getType() == DisturbanceType::obstacle){
+        float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= endAvoid){
-			obstacle.invalidate();
+			disturbance.invalidate();
             return DONE;
         }
     }

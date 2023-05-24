@@ -8,7 +8,7 @@
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/depth_first_search.hpp>
+//#include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
 #include "task.h"
 
@@ -19,14 +19,14 @@ struct Edge{
 };
 
 struct Node{
-	Task::Disturbance obstacle;
+	Task::Disturbance disturbance;
 	std::vector <Task::Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 	int nodesInSameSpot =0;
-	int totObstacles=0;
+	int totDs=0;
 	Task::simResult::resultType outcome;
 	
 };
@@ -37,7 +37,7 @@ bool operator!=(Transform const &, Transform const &);
 
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Node, Edge> Tree;
+//typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Node, Edge> Tree;
 
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;

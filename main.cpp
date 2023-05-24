@@ -31,7 +31,7 @@ public:
 		printf("%s\n", name);
 		f=fopen(name, "w");
 		for (A1LidarData &data:data){
-			if (data.valid&& data.r <1.0){
+			if (data.valid&& data.r <LIDAR_RANGE){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
 				float x = round(data.x*1000)/1000;
 				float y = round(data.y*1000)/1000;

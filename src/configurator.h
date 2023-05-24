@@ -187,9 +187,9 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-int getMaxStepDuration(){
-	return currentTask.hz * currentTask.getSimDuration();
-}
+// int getMaxStepDuration(){
+// 	return HZ * currentTask.getSimDuration();
+// }
 
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
@@ -232,7 +232,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
-		g[v1].totObstacles=g[src].totObstacles;
+		g[v1].totDs=g[src].totDs;
 	}
 }
 
@@ -340,8 +340,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentTask.obstacle.getPosition())){
+					if (curr->disturbance.isValid()){
+						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -366,8 +366,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentTask.obstacle.getPosition())){
+					if (curr->disturbance.isValid()){
+						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -378,8 +378,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				body->CreateFixture(&fixtureDef);
 			}
 			else if (curr!=NULL){
-			if (curr->obstacle.isValid()){
-				if (p.isInRadius(currentTask.obstacle.getPosition()) & p !=*(&p-1)){
+			if (curr->disturbance.isValid()){
+				if (p.isInRadius(currentTask.disturbance.getPosition()) & p !=*(&p-1)){
 					obStillThere =1;
 					b2Body * body;
 					b2BodyDef bodyDef;
