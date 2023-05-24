@@ -114,43 +114,37 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 	}
 }
 
-// void __init__(){
+
+// void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
+// 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
+// 	sprintf(fileNameBuffer, "%s", str);
 // }
 
-// void __init__(Task & _currentTask){
+// void setReadMap(char * str){
+// 	sprintf(readMap,"%s", str);
 // }
 
+// char * getReadMap(){
+// 	return readMap;
+// }
 
-void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
-								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
-	sprintf(fileNameBuffer, "%s", str);
-}
-
-void setReadMap(char * str){
-	sprintf(readMap,"%s", str);
-}
-
-char * getReadMap(){
-	return readMap;
-}
-
-char * getFolder(){
-	return folder;
-}
-void setFolder(char * _folder){ //the folder from where LIDAR data is read
-	std::filesystem::path folderPath(_folder);
-		if (exists(folderPath)){
-			if (is_directory(folderPath)){
-				folder = _folder;
-			}
-			else{
-				printf("not a directory");
-			}
-		}
-		else{
-			printf("%s doesn't exist", _folder);
-		}
-}
+// char * getFolder(){
+// 	return folder;
+// }
+// void setFolder(char * _folder){ //the folder from where LIDAR data is read
+// 	std::filesystem::path folderPath(_folder);
+// 		if (exists(folderPath)){
+// 			if (is_directory(folderPath)){
+// 				folder = _folder;
+// 			}
+// 			else{
+// 				printf("not a directory");
+// 			}
+// 		}
+// 		else{
+// 			printf("%s doesn't exist", _folder);
+// 		}
+// }
 
 // void NewScan(std::vector <cv::Point2f> &); 
 
@@ -159,6 +153,7 @@ void NewScan(std::vector <Point> &);
 int getIteration(){
 	return iteration;
 }
+
 Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
 
 void controller();

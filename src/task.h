@@ -161,22 +161,22 @@ public:
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
 
     omega = (MAX_SPEED*(RightWheelSpeed-LeftWheelSpeed)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-        if (abs(omega)>MAX_OMEGA){ //max turning angle in one second
-            float multiplier=1;
-            if (omega<0){
-                multiplier=-1;
-            }
-            omega=MAX_OMEGA*multiplier;
-        }
+        // if (abs(omega)>MAX_OMEGA){ //max turning angle in one second
+        //     float multiplier=1;
+        //     if (omega<0){
+        //         multiplier=-1;
+        //     }
+        //     omega=MAX_OMEGA*multiplier;
+        // }
 
     linearSpeed = MAX_SPEED*(LeftWheelSpeed+RightWheelSpeed)/2;
-    if (abs(linearSpeed)>MAX_SPEED){
-        float multiplier=1;
-    if (linearSpeed<0){
-        multiplier=-1;
-    }
-    linearSpeed=MAX_SPEED*multiplier;
-    }
+    // if (abs(linearSpeed)>MAX_SPEED){
+    //     float multiplier=1;
+    // if (linearSpeed<0){
+    //     multiplier=-1;
+    // }
+    // linearSpeed=MAX_SPEED*multiplier;
+    // }
     valid=1;
     }
 
