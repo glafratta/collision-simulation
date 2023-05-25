@@ -255,7 +255,7 @@ class Listener : public b2ContactListener {
 private:
 Action action;
 public:
-std::vector <Task::Direction> options;
+//std::vector <Task::Direction> options;
 Disturbance disturbance;
 
 Task::Action getAction(){
@@ -293,7 +293,7 @@ Direction H(Disturbance ob, Direction d = Direction::NONE){
     if (ob.isValid()==true){
         if (ob.getType()==DisturbanceType::obstacle){
             //NEW LOOP FOR ABOVE
-            if (d == Task::Direction::NONE){ //if there are no constraints on the direction other than where the obstacle is, pick at random, start position assumed to be 0
+            if (d == Task::Direction::NONE){ //REACTIVE BEHAVIOUR
                 if (ob.getAngle()<0)//angle formed with robot at last safe pose
                     d = Task::Direction::LEFT; //go left
                 }
@@ -335,8 +335,18 @@ void setGain(float f){
 }
 
 
-private:
+struct M{
+    float L, R, omega, linearSpeed;
+    M(){}
+    M(float l, float r):
+        L(l), 
+        R(r)
+    {
+        omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+        linearSpeed = MAX_SPEED*(L+R)/2;   
+    }
 
+};
 
 
 };
