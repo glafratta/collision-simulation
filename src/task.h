@@ -1,9 +1,13 @@
-#pragma once
+#ifndef TASK_H
+#define TASK_H
 #include "Box2D/Box2D.h"
 #include <vector>
 #include <stdio.h>
 #include <math.h> 
 #include "robot.h"
+//#include "affordance.h"
+#include <stdexcept>
+#include "settings.cpp"
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.0
 #define REACTION_TIME 2.0
@@ -11,21 +15,19 @@
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
 
-enum DisturbanceType {obstacle=0, target=1, other=2};  
-
 class Task{
 public:
 enum Direction{LEFT, RIGHT, NONE, BACK, STOP};
     float accumulatedError=0;
     char planFile[250]; //for debug
-    enum Type {BASELINE =0, AVOID =1, PURSUE =2};
+    //enum Type {BASELINE =0, AVOID =1, PURSUE =2};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
     float endAvoid = M_PI_2;
     Direction direction= Direction::NONE;
 protected:
-    Type type = Type::BASELINE;
+    //Type type = Type::BASELINE;
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
 
@@ -33,7 +35,7 @@ public:
 struct Disturbance{ //maybe later can susbtitute this for a broader Disturbance so you can also set a target without having to make another class for it. Bernd has an enum Disturbance identifier
 private:
     bool valid= 0;
-    DisturbanceType type;
+    AffordanceIndex affordanceIndex = 0;
     float angleToRobot=0;
 public:
 	b2FixtureDef fixtureDef;
@@ -41,8 +43,21 @@ public:
     b2Body * body;
     bool safeForNow=1;
     Disturbance(){};
-    Disturbance(DisturbanceType _t): type(_t){}
-    Disturbance(DisturbanceType _t, b2Vec2 position):type(_t){
+    Disturbance(AffordanceIndex i){
+        if (i>affordances.size()-1){
+            throw std::invalid_argument("Not a valid affordance index\n");
+        }
+        else{
+            affordanceIndex = i;
+        }
+    }
+    Disturbance(AffordanceIndex i, b2Vec2 position){
+        if (i>affordances.size()-1){
+            throw std::invalid_argument("Not a valid affordance index\n");
+        }
+        else{
+            affordanceIndex = i;
+        }
         bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(position.x, position.y);
         valid =1;
@@ -117,8 +132,8 @@ public:
         return valid;
     }
 
-    DisturbanceType getType(){
-        return type;
+    AffordanceIndex getAffIndex(){
+        return affordanceIndex;
     }
 
     void invalidate(){
@@ -262,8 +277,8 @@ Task::Action getAction(){
     return action;
 }
 
-Task::Type getType(){
-    return type;
+AffordanceIndex getAffIndex(){
+    return disturbance.getAffIndex();
 }
 
 
@@ -277,12 +292,6 @@ Task(){
 Task(Disturbance ob, Direction d = Direction::NONE){
     RecordedVelocity = action.getLinearVelocity();
     disturbance = ob;
-    if (ob.getType()== DisturbanceType::obstacle && ob.isValid()==1){ //og obstacle.getTYpe()
-        type =Type::AVOID;
-    }
-    else{
-        type =Type::BASELINE;
-    }
     direction = H(disturbance, d);  
     //BELOW IS DEFINED THE H (AGENT TRANSFER FUNCTION) OF THE TASK, which we define implicitly to the creation of the task
     action = Action(direction); //creates motor output
@@ -291,7 +300,7 @@ Task(Disturbance ob, Direction d = Direction::NONE){
 
 Direction H(Disturbance ob, Direction d = Direction::NONE){
     if (ob.isValid()==true){
-        if (ob.getType()==DisturbanceType::obstacle){
+        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){
             //NEW LOOP FOR ABOVE
             if (d == Task::Direction::NONE){ //REACTIVE BEHAVIOUR
                 if (ob.getAngle()<0)//angle formed with robot at last safe pose
@@ -335,18 +344,6 @@ void setGain(float f){
 }
 
 
-struct M{
-    float L, R, omega, linearSpeed;
-    M(){}
-    M(float l, float r):
-        L(l), 
-        R(r)
-    {
-        omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-        linearSpeed = MAX_SPEED*(L+R)/2;   
-    }
-
 };
 
-
-};
+#endif

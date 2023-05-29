@@ -292,7 +292,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
-			if (s.getType()==Task::Type::BASELINE){
+			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
 				Task::Direction dir = Task::Direction::NONE;
 				if (boost::in_degree(srcVertex, g)>0){ //was >
 					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
@@ -312,7 +312,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 				}
 			}
 		else { //will only enter if successful
-			if (s.getType()==Task::Type::AVOID){
+			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
 				g[v].options.push_back(Task::Direction::NONE);
 			}
 	}	
@@ -324,7 +324,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 
 	//IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
-	bool straightFollowStraight=0;
 	if (!isLeaf){
 		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
 		return v1; //added now	

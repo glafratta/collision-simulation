@@ -1,5 +1,5 @@
-#ifndef _ROBOT
-#define _ROBOT
+#ifndef ROBOT_H
+#define ROBOT_H
 //box2d robot body and kinematic model
 #include "Box2D/Box2D.h"
 #include <math.h>

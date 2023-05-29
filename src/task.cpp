@@ -27,7 +27,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
-			if (disturbance.isValid() || disturbance.getType() == DisturbanceType::obstacle){
+			if (disturbance.isValid() || disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
 				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
 
 				if (absAngleToObstacle>=endAvoid){
@@ -36,15 +36,15 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				if (type == Task::Type::BASELINE && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (getAffIndex()==int(InnateAffordances::NONE) && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 						b2Vec2 posReadjusted;
 						posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
 						posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
-						result = simResult(simResult::resultType::safeForNow, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
 				}
 				else{
-						result = simResult(simResult::resultType::crashed, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 
@@ -88,7 +88,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVeloci
 Task::controlResult Task::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-    if (disturbance.isValid() & disturbance.getType() == DisturbanceType::obstacle){
+    if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
         float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= endAvoid){

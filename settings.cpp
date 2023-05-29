@@ -1,4 +1,4 @@
-#include "affordances.h"
+#include "affordance.h"
 //ID = position in primitives of M
 Task::M Straight(0.5, 0.5); //left, right
 Task::M Left(-.5, 0.5);

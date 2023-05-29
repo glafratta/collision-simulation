@@ -88,7 +88,6 @@ void step( AlphaBot &motors){
 
 
 int main(int argc, char** argv) {
-	//world setup with environment class
 	A1Lidar lidar;
 	AlphaBot motors;
     Task desiredTask;
