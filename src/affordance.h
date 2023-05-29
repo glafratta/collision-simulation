@@ -11,32 +11,33 @@
 typedef unsigned int AffordanceIndex; //was thinking of this being a character but doesn't have to be maybe enum is fine
 //typedef unsigned int MIndex;
 enum InnateAffordances {NONE, AVOID, PURSUE, ATTACK, EXPLORE}; //for ease of identification
+enum Direction{LEFT, RIGHT, DEFAULT, BACK, STOP};
 
-class M{
-public:
-    float L=0, R=0, omega=0, linearSpeed=0;
-    M(){}
-    M(float l, float r){
-        L=l;
-        R=r;
-        omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-        linearSpeed = MAX_SPEED*(L+R)/2;   
-    }
+// class M{
+// public:
+//     float L=0, R=0, omega=0, linearSpeed=0;
+//     M(){}
+//     M(float l, float r){
+//         L=l;
+//         R=r;
+//         omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+//         linearSpeed = MAX_SPEED*(L+R)/2;   
+//     }
 
-};
+// };
 
 class Affordance{
 public:
     AffordanceIndex ID=-1;
-    std::vector <M> options; //vector of primitives, low level affordance
+    std::vector <Direction> options; //vector of primitives, low level affordance
     Affordance(){}
 
-    Affordance(std::vector <M> vec, AffordanceIndex i =-1): 
+    Affordance(std::vector <Direction> vec, AffordanceIndex i =-1): 
     options(vec), 
     ID(i)
     {}
 
-    void initialiseMs(std::vector <M> vec){
+    void initialiseMs(std::vector <Direction> vec){
        options = vec;
     }
 

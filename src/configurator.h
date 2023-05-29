@@ -16,9 +16,6 @@
 #include <algorithm>
 #include <sys/stat.h>
 
-
-
-
 class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
@@ -42,7 +39,6 @@ public:
 	char statFile[100];
 	bool timerOff=0;
 	int bodies=0;
-
 
 	struct getVelocityResult{
 		bool valid =0;
@@ -194,12 +190,12 @@ bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::
 
 
 
-Task::Direction getOppositeDirection(Task::Direction d){
+Direction getOppositeDirection(Direction d){
     switch (d){
-        case Task::Direction::LEFT: return Task::Direction::RIGHT;break;
-        case Task::Direction::RIGHT: return Task::Direction::LEFT;break;
+        case LEFT: return Direction::RIGHT;break;
+        case Direction::RIGHT: return LEFT;break;
         default:
-        return Task::Direction::NONE;
+        return DEFAULT;
 		break;
     }
 }
@@ -260,9 +256,9 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
 		switch (g[edge].direction){
-			case Task::NONE: printf("STRAIGHT, "); break;
-			case Task::LEFT: printf("LEFT, "); break;
-			case Task::RIGHT: printf("RIGHT, "); break;
+			case DEFAULT: printf("STRAIGHT, "); break;
+			case LEFT: printf("LEFT, "); break;
+			case RIGHT: printf("RIGHT, "); break;
 			default: break;
 
 		}
@@ -273,12 +269,12 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return e;
 }
 
-bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transform start, Task * curr = NULL){
+bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
 	switch (d){
-		case Task::Direction::NONE:{
+		case DEFAULT:{
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		

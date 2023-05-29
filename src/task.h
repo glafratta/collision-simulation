@@ -8,16 +8,17 @@
 //#include "affordance.h"
 #include <stdexcept>
 #include "settings.cpp"
+//#include "configurator.h"
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.0
 #define REACTION_TIME 2.0
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
+class Configurator;
 
 class Task{
 public:
-enum Direction{LEFT, RIGHT, NONE, BACK, STOP};
     float accumulatedError=0;
     char planFile[250]; //for debug
     //enum Type {BASELINE =0, AVOID =1, PURSUE =2};
@@ -25,7 +26,7 @@ enum Direction{LEFT, RIGHT, NONE, BACK, STOP};
     bool change =0;
     float pGain=0.063;
     float endAvoid = M_PI_2;
-    Direction direction= Direction::NONE;
+    Direction direction= Direction::DEFAULT;
 protected:
     //Type type = Type::BASELINE;
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
@@ -149,65 +150,54 @@ private:
     float omega=0; //initial angular velocity is 0  
     bool valid=0;
 public:
-    float RightWheelSpeed=0.5;
-    float LeftWheelSpeed=0.5;
+    float R=0.5;
+    float L=0.5;
 
 
     Action(){}
 
     Action(Direction direction){
         switch (direction){
-        case Task::Direction::LEFT:
-        LeftWheelSpeed = -LeftWheelSpeed;
+        case Direction::DEFAULT:
         break;
-        case Task::Direction::RIGHT:
-        RightWheelSpeed = - RightWheelSpeed;
+        case Direction::LEFT:
+        L = -L;
         break;
-        case Task::Direction::BACK:
-        LeftWheelSpeed = - LeftWheelSpeed;
-        RightWheelSpeed = -RightWheelSpeed;
+        case Direction::RIGHT:
+        R = - R;
         break;
-        case Task::Direction::STOP:
-        LeftWheelSpeed=0;
-        RightWheelSpeed=0;
+        case Direction::BACK:
+        L = -L;
+        R = -R;
+        break;
+        case Direction::STOP:
+        L=0;
+        R=0;
         default:
+        throw std::invalid_argument("not a valid direction for M");
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
 
-    omega = (MAX_SPEED*(RightWheelSpeed-LeftWheelSpeed)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-        // if (abs(omega)>MAX_OMEGA){ //max turning angle in one second
-        //     float multiplier=1;
-        //     if (omega<0){
-        //         multiplier=-1;
-        //     }
-        //     omega=MAX_OMEGA*multiplier;
-        // }
+    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
 
-    linearSpeed = MAX_SPEED*(LeftWheelSpeed+RightWheelSpeed)/2;
-    // if (abs(linearSpeed)>MAX_SPEED){
-    //     float multiplier=1;
-    // if (linearSpeed<0){
-    //     multiplier=-1;
-    // }
-    // linearSpeed=MAX_SPEED*multiplier;
-    // }
+    linearSpeed = MAX_SPEED*(L+R)/2;
+
+    velocity.x = linearSpeed *cos(omega);
+    velocity.y = linearSpeed *sin(omega);
     valid=1;
     }
 
     b2Vec2 getLinearVelocity(){
-        b2Vec2 vel;
-        vel.x = linearSpeed *cos(omega);
-        vel.y = linearSpeed *sin(omega);
-        return vel;
+        return velocity;
     }
 
     float getRWheelSpeed(){
-        return RightWheelSpeed;
+        return R;
     }
 
     float getLWheelSpeed(){
-    return LeftWheelSpeed;
+    return L;
     }
 
 
@@ -270,7 +260,7 @@ class Listener : public b2ContactListener {
 private:
 Action action;
 public:
-//std::vector <Task::Direction> options;
+//std::vector <Direction> options;
 Disturbance disturbance;
 
 Task::Action getAction(){
@@ -289,7 +279,7 @@ Task(){
 }
 
 
-Task(Disturbance ob, Direction d = Direction::NONE){
+Task(Disturbance ob, Direction d = Direction::DEFAULT){
     RecordedVelocity = action.getLinearVelocity();
     disturbance = ob;
     direction = H(disturbance, d);  
@@ -298,20 +288,19 @@ Task(Disturbance ob, Direction d = Direction::NONE){
     }
 
 
-Direction H(Disturbance ob, Direction d = Direction::NONE){
+Direction H(Disturbance ob, Direction d = Direction::DEFAULT){
     if (ob.isValid()==true){
-        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){
-            //NEW LOOP FOR ABOVE
-            if (d == Task::Direction::NONE){ //REACTIVE BEHAVIOUR
+        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
+            if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
                 if (ob.getAngle()<0)//angle formed with robot at last safe pose
-                    d = Task::Direction::LEFT; //go left
+                    d = Direction::LEFT; //go left
                 }
                 else if (ob.getAngle()>0){ //angle formed with robot at last safe pose
-                    d = Task::Direction::RIGHT; //
+                    d = Direction::RIGHT; //
                 }   
                 else{
                     int c = rand() % 2;
-                    d = static_cast<Task::Direction>(c);
+                    d = static_cast<Direction>(c);
 
                 }
             }

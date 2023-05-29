@@ -100,24 +100,24 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; 
 		if (timeStepError<tolerance){
-			action.LeftWheelSpeed = 0.5;
-			action.RightWheelSpeed = 0.5;
+			action.L = 0.5;
+			action.R = 0.5;
 		}
 		else{
 			float normAccErr = timeStepError/M_PI_2;
-				action.LeftWheelSpeed -= normAccErr*pGain;  
-				action.RightWheelSpeed += normAccErr *pGain; 
-				if (action.LeftWheelSpeed>1.0){
-				action.LeftWheelSpeed=1.0;
+				action.L -= normAccErr*pGain;  
+				action.R += normAccErr *pGain; 
+				if (action.L>1.0){
+				action.L=1.0;
 				}
-				if (action.RightWheelSpeed>1.0){
-					action.RightWheelSpeed=1;
+				if (action.R>1.0){
+					action.R=1;
 				}
-				if (action.LeftWheelSpeed<(-1.0)){
-					action.LeftWheelSpeed=-1;
+				if (action.L<(-1.0)){
+					action.L=-1;
 				}
-				if (action.RightWheelSpeed<(-1.0)){
-					action.RightWheelSpeed=-1;
+				if (action.R<(-1.0)){
+					action.R=-1;
 				}
 
 

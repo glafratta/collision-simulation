@@ -13,14 +13,14 @@
 #include "task.h"
 
 struct Edge{
-	Task::Direction direction;
+	Direction direction;
 	//int stepDuration =0;
 	float distanceCovered=0;
 };
 
 struct Node{
 	Task::Disturbance disturbance;
-	std::vector <Task::Direction> options;
+	std::vector <Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
