@@ -2,10 +2,10 @@
 #include "configurator.h"
 #include <chrono>
 
-void Configurator::NewScan(std::vector <Point> & data){ 
+void Configurator::NewScan(CoordinateContainer & data){ 
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
-	std::vector <Point> previous;
+	CoordinateContainer previous;
 	previous = current;
 	current.clear();
 	current = data;
@@ -142,7 +142,7 @@ void Configurator::applyController(bool isSameTask, Task & task){
 	}
 }
 
-Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point> &_current, std::vector <Point> &_previous){	 //does not modify current vector, creates copy	
+Configurator::getVelocityResult Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		getVelocityResult result;
 
 		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
@@ -389,4 +389,36 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	}
 	return !g[0].disturbance.safeForNow;
 
+}
+
+void Configurator::start(){ 
+	running =1;
+	// if (di == NULL){
+	// 	throw std::exception("no data interface found");
+	// 	return;
+	// }
+	if (t!=NULL){ //already running
+		return;
+	}
+	t= new std::thread(Configurator::getData, this);
+
+}
+
+void Configurator::stop(){
+	running =0;
+	if (t!=NULL){
+		t->join();
+		delete t;
+		t=NULL;
+	}
+}
+
+void Configurator::registerDataInterface(DataInterface * _di){
+	//di = _di;
+}
+
+void getData(Configurator * c){
+	while (c->running){
+		
+	}
 }

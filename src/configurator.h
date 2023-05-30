@@ -16,16 +16,22 @@
 #include <algorithm>
 #include <sys/stat.h>
 
+class DataInterface;
+
+typedef std::set<Point> CoordinateContainer;
+
 class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
 	char fileNameBuffer[50];
 	Task currentTask;
+	DataInterface *di;
 public:
+	bool running =0;
+	std::thread * t=NULL;
 	bool debugOn=0;
 	float affineTransError =0;
 	char *folder;
@@ -34,7 +40,7 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	std::vector <Point> current, currentBox2D;
+	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
@@ -111,46 +117,13 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 }
 
 
-// void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
-// 								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
-// 	sprintf(fileNameBuffer, "%s", str);
-// }
-
-// void setReadMap(char * str){
-// 	sprintf(readMap,"%s", str);
-// }
-
-// char * getReadMap(){
-// 	return readMap;
-// }
-
-// char * getFolder(){
-// 	return folder;
-// }
-// void setFolder(char * _folder){ //the folder from where LIDAR data is read
-// 	std::filesystem::path folderPath(_folder);
-// 		if (exists(folderPath)){
-// 			if (is_directory(folderPath)){
-// 				folder = _folder;
-// 			}
-// 			else{
-// 				printf("not a directory");
-// 			}
-// 		}
-// 		else{
-// 			printf("%s doesn't exist", _folder);
-// 		}
-// }
-
-// void NewScan(std::vector <cv::Point2f> &); 
-
-void NewScan(std::vector <Point> &); 
+void NewScan(CoordinateContainer &); 
 
 int getIteration(){
 	return iteration;
 }
 
-Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
+Configurator::getVelocityResult GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
 void controller();
 
@@ -178,14 +151,11 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-// int getMaxStepDuration(){
-// 	return HZ * currentTask.getSimDuration();
-// }
-
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
 
 vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
+
 bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
 
 
@@ -310,7 +280,8 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		}
 		//CREATE POINTS
 
-		for (Point &p:currentBox2D){
+		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+			auto p = *_p;
 			bool include;
 			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
 				ceilingY = mHead*p.x +qTopH;
@@ -347,7 +318,8 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		break;
 		}
 		default:
-		for (Point &p:currentBox2D){	
+		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+			auto p = *_p;
 			if (p != *(&p-1)&& p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
@@ -393,7 +365,13 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	return obStillThere;
 }
 
+void start(); //data interface class collecting position of bodies
 
+void stop();
+
+static void getData(Configurator *);
+
+void registerDataInterface(DataInterface *);
 
 
 };
