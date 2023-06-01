@@ -27,7 +27,7 @@ The indoor robot is equipped with
 
 ## Build
 ```
-cd carmelo
+cd HICS
 cmake .
 make
 ```
