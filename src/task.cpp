@@ -60,11 +60,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		result.endPose = robot.body->GetTransform();
 		int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
-			if (b->GetUserData()!=NULL){
-				roboCount++;
-			}
 			_world.DestroyBody(b);
-
 		}
 		if (debugOn){
 			fclose(robotPath);
@@ -124,4 +120,26 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 		}
     }
     return CONTINUE;
+}
+
+Direction Task::H(Disturbance ob, Direction d){
+	if (ob.isValid()){
+        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
+            if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
+                if (ob.getAngle()<0){//angle formed with robot at last safe pose
+                    d= Direction::LEFT; //go left
+                }
+                else if (ob.getAngle()>0){ //angle formed with robot at last safe pose
+                    d= Direction::RIGHT; //
+                }   
+                else{
+                    int c = rand() % 2;
+                    d = static_cast<Direction>(c);
+
+                }
+            }
+        }
+    //printf("angle to ob = %f\n", ob.getAngle());
+    return d;
+}
 }

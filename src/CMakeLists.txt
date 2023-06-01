@@ -2,7 +2,7 @@ include(GNUInstallDirs)
 
 set(SRC configurator.cpp task.cpp general.cpp)
 
-set(HEAD configurator.h robot.h task.h general.h affordance.h)
+set(HEAD configurator.h robot.h task.h general.h affordance.h settings.h)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -13,7 +13,7 @@ add_library(HICS ${SRC} ${HEAD})
 set_target_properties(HICS PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
 PUBLIC_HEADER "${HEAD}")
 
-target_link_libraries(HICS Box2D ${OpenCV_LIBS})
+target_link_libraries(HICS Box2D ${OpenCV_LIBS} pthread)
 
 install(TARGETS HICS 
 	EXPORT HICS-targets 

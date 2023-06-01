@@ -102,7 +102,7 @@ void Configurator::NewScan(CoordinateContainer & data){
 					currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
-				 	currentTask = Task(g[v0].disturbance, DEFAULT); //was stop
+				 	currentTask = Task(g[v0].disturbance, Direction::DEFAULT); //was stop
 				 	printf("using fallback\n");
 				}
 			}
@@ -125,7 +125,7 @@ void Configurator::NewScan(CoordinateContainer & data){
 
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
-	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().R, currentTask.getAction().R);
+	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameTask, currentTask);
@@ -226,7 +226,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
 		Point p(r.collision.getPosition());
 		if ((!s.disturbance.isValid()|| !(p.isInRadius(s.disturbance.getPosition())))){ 
-			s = Task(r.collision, DEFAULT);
+			s = Task(r.collision, Direction::DEFAULT);
 		}			
 	}
 }
@@ -248,7 +248,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
-		if(g[inEdge].direction == DEFAULT){
+		if(g[inEdge].direction == Direction::DEFAULT){
 			remaining= (BOX2DRANGE-g[srcVertex].distanceSoFar)*2/MAX_SPEED;
 		} 
 		if (remaining<0){
@@ -292,19 +292,17 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
-			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
-				Direction dir = DEFAULT;
+			if (s.getAffIndex()==int(InnateAffordances::NONE)){
+				Direction dir = Direction::DEFAULT;
 				if (boost::in_degree(srcVertex, g)>0){ //was >
 					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
 				}
-				if (result.resultCode == Task::simResult::crashed && dir != DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
+				if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
 						g[v].options.push_back(dir);
 						//g[v].options.push_back(Direction::BACK); //NEWLY ADDED
 
 					}
 				else if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
-					Task::Action reflex;
-					//reflex.__init__(result.collision, DEFAULT);
 					dir= s.H(result.collision, DEFAULT);
 					g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
 					g[v].options.push_back(getOppositeDirection(dir));
@@ -313,7 +311,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 			}
 		else { //will only enter if successful
 			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
-				g[v].options.push_back(DEFAULT);
+				g[v].options.push_back(Direction::DEFAULT);
 			}
 	}	
 			//}
@@ -371,9 +369,9 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 
 		vertexDescriptor v1Src = v1InEdge.m_source;
-		Direction d = g[v1InEdge].direction;
-		s = Task(g[v1Src].disturbance, d);
-		constructWorldRepresentation(newWorld, d, g[v1Src].endPose); //was g[v].endPose
+		Direction dir = g[v1InEdge].direction;
+		s = Task(g[v1Src].disturbance, dir);
+		constructWorldRepresentation(newWorld, dir, g[v1Src].endPose); //was g[v].endPose
 		int bodyCount = newWorld.GetBodyCount();
 		//DEBUG
 		if (debugOn){
@@ -390,6 +388,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	return !g[0].disturbance.safeForNow;
 
 }
+
 
 void Configurator::start(){ 
 	running =1;
@@ -417,8 +416,9 @@ void Configurator::registerDataInterface(DataInterface * _di){
 	//di = _di;
 }
 
-void getData(Configurator * c){
+void Configurator::getData(Configurator * c){
 	while (c->running){
 		
 	}
 }
+

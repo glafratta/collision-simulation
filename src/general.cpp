@@ -16,3 +16,20 @@ bool operator!=(Transform const &t1, Transform const& t2){
 // 	result.y = this->y-p.y;
 // 	return result;
 // }
+
+bool operator<(P const & p1, P const &p2){
+	// bool ret=0;
+	// if (p1.r< p2.r){
+	// 	ret= true;
+	// }
+	// else if (p1.r == p2.r & p1.phi<p2.phi){
+	// 	ret = true;
+	// }
+	// return ret;
+	return std::tie(p1.r, p1.phi)< std::tie(p2.r, p2.phi);
+}
+
+bool operator>(P const &p1, P const & p2){
+	return p2<p1;
+
+}

@@ -43,6 +43,7 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 
 
 
+
 struct Point{
 	float x=0;
 	float y=0;
@@ -118,6 +119,7 @@ struct Point{
 		y = radius *sin(angle);
 	}
 
+
 };
 struct comparator{
     bool operator() ( Point a, Point b ){ //
@@ -125,8 +127,15 @@ struct comparator{
 	}
 }; 
 
-template <class P>
-P operator+=(P const &, P const &);
+
+//P operator+=(P const &, P const &);
+typedef Point P;
+//bool operator<(P const &, P const &);
+bool operator<(P const &, P const &);
+
+bool operator>(P const &, P const &);
+
+typedef std::set<Point> CoordinateContainer;
 
 
 

@@ -15,11 +15,7 @@
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>
-
 class DataInterface;
-
-typedef std::set<Point> CoordinateContainer;
-
 class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
@@ -162,10 +158,10 @@ bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::
 
 Direction getOppositeDirection(Direction d){
     switch (d){
-        case LEFT: return Direction::RIGHT;break;
-        case Direction::RIGHT: return LEFT;break;
+        case Direction::LEFT: return Direction::RIGHT;break;
+        case Direction::RIGHT: return Direction::LEFT;break;
         default:
-        return DEFAULT;
+        return Direction::DEFAULT;
 		break;
     }
 }
@@ -226,9 +222,9 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
 		switch (g[edge].direction){
-			case DEFAULT: printf("STRAIGHT, "); break;
-			case LEFT: printf("LEFT, "); break;
-			case RIGHT: printf("RIGHT, "); break;
+			case Direction::DEFAULT: printf("STRAIGHT, "); break;
+			case Direction::LEFT: printf("LEFT, "); break;
+			case Direction::RIGHT: printf("RIGHT, "); break;
 			default: break;
 
 		}
@@ -244,7 +240,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
 	switch (d){
-		case DEFAULT:{
+		case Direction::DEFAULT:{
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		
@@ -369,9 +365,10 @@ void start(); //data interface class collecting position of bodies
 
 void stop();
 
-static void getData(Configurator *);
 
 void registerDataInterface(DataInterface *);
+
+static void getData(Configurator *);
 
 
 };

@@ -7,11 +7,11 @@
 #include "robot.h"
 //#include "affordance.h"
 #include <stdexcept>
-#include "settings.cpp"
+#include "settings.h"
 //#include "configurator.h"
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.0
-#define REACTION_TIME 2.0
+#define REACTION_TIME 2.3
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
@@ -145,30 +145,30 @@ public:
 
 struct Action{
 private:
-    float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
-    b2Vec2 velocity;
+    float linearSpeed=0.625; //used to calculate instantaneous velocity using omega
     float omega=0; //initial angular velocity is 0  
     bool valid=0;
 public:
     float R=0.5;
     float L=0.5;
 
-
     Action(){}
 
-    Action(Direction direction){
+    void init(Direction direction){
         switch (direction){
         case Direction::DEFAULT:
         break;
         case Direction::LEFT:
-        L = -L;
+        L = -0.5;
+        R=0.5;
         break;
         case Direction::RIGHT:
-        R = - R;
+        L=0.5;
+        R = - 0.5;
         break;
         case Direction::BACK:
-        L = -L;
-        R = -R;
+        L = -0.5;
+        R = -0.5;
         break;
         case Direction::STOP:
         L=0;
@@ -183,12 +183,13 @@ public:
 
     linearSpeed = MAX_SPEED*(L+R)/2;
 
-    velocity.x = linearSpeed *cos(omega);
-    velocity.y = linearSpeed *sin(omega);
     valid=1;
     }
 
     b2Vec2 getLinearVelocity(){
+        b2Vec2 velocity;
+        velocity.x = linearSpeed *cos(omega);
+        velocity.y = linearSpeed *sin(omega);
         return velocity;
     }
 
@@ -271,43 +272,21 @@ AffordanceIndex getAffIndex(){
     return disturbance.getAffIndex();
 }
 
+Direction H(Disturbance, Direction);
 
 
 Task(){
     RecordedVelocity = action.getLinearVelocity();
-
+    action.init(direction);
 }
 
 
-Task(Disturbance ob, Direction d = Direction::DEFAULT){
+Task(Disturbance ob, Direction d){
     RecordedVelocity = action.getLinearVelocity();
     disturbance = ob;
     direction = H(disturbance, d);  
-    //BELOW IS DEFINED THE H (AGENT TRANSFER FUNCTION) OF THE TASK, which we define implicitly to the creation of the task
-    action = Action(direction); //creates motor output
-    }
-
-
-Direction H(Disturbance ob, Direction d = Direction::DEFAULT){
-    if (ob.isValid()==true){
-        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
-            if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
-                if (ob.getAngle()<0)//angle formed with robot at last safe pose
-                    d = Direction::LEFT; //go left
-                }
-                else if (ob.getAngle()>0){ //angle formed with robot at last safe pose
-                    d = Direction::RIGHT; //
-                }   
-                else{
-                    int c = rand() % 2;
-                    d = static_cast<Direction>(c);
-
-                }
-            }
-        }
-    return d;
+    action.init(direction);
 }
-
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
