@@ -140,6 +140,6 @@ Direction Task::H(Disturbance ob, Direction d){
             }
         }
     //printf("angle to ob = %f\n", ob.getAngle());
-    return d;
 }
+    return d;
 }

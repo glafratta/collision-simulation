@@ -259,7 +259,7 @@ class Listener : public b2ContactListener {
         
 	};
 private:
-Action action;
+Action action = Action();
 public:
 //std::vector <Direction> options;
 Disturbance disturbance;
@@ -277,15 +277,14 @@ Direction H(Disturbance, Direction);
 
 Task(){
     RecordedVelocity = action.getLinearVelocity();
-    action.init(direction);
 }
 
 
 Task(Disturbance ob, Direction d){
-    RecordedVelocity = action.getLinearVelocity();
     disturbance = ob;
     direction = H(disturbance, d);  
     action.init(direction);
+    RecordedVelocity = action.getLinearVelocity();
 }
 
 void setRecordedVelocity(b2Vec2 vel){
