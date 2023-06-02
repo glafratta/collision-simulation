@@ -1,5 +1,4 @@
 #include "task.h"
-#include "robot.h"
 
 
 
@@ -17,7 +16,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start, theta);
 		int step=0;
-		for (step; step < (hz*remaining); step++) {//3 second
+		for (step; step < (HZ*remaining); step++) {//3 second
 			instVelocity.x = RecordedVelocity.Length()*cos(theta); //integrate?
 			instVelocity.y = RecordedVelocity.Length()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
@@ -26,10 +25,10 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
 			}
-			_world.Step(1.0f/hz, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
-			theta += action.getOmega()/hz; //= omega *t
-			if (obstacle.isValid()){
-				float absAngleToObstacle = abs(obstacle.getAngle(robot.body));
+			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
+			theta += action.getOmega()/HZ; //= omega *t
+			if (disturbance.isValid() || disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
+				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
 
 				if (absAngleToObstacle>=endAvoid){
 					break;
@@ -37,22 +36,23 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				if (type == Task::Type::BASELINE && step/hz >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (getAffIndex()==int(InnateAffordances::NONE) && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 						b2Vec2 posReadjusted;
-						posReadjusted.x = start.x+ instVelocity.x*(step/hz-REACTION_TIME);						
-						posReadjusted.y = start.y+ instVelocity.y*(step/hz-REACTION_TIME);						
+						posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+						posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
 						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
-						result = simResult(simResult::resultType::safeForNow, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
 				}
 				else{
-						result = simResult(simResult::resultType::crashed, Disturbance(DisturbanceType::obstacle, listener.collisions[index]));
+						result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
 						result.collision.safeForNow =0;
 
 					}
 				break;
 			}
-		}	
+		}
+		result.collision.setAngle(robot.body->GetTransform());	
 		b2Vec2 distance; //= robot.body->GetPosition();
 		distance.x = robot.body->GetPosition().x - start.x;
 		distance.y = robot.body->GetPosition().y - start.y;
@@ -60,11 +60,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		result.endPose = robot.body->GetTransform();
 		int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
-			if (b->GetUserData()!=NULL){
-				roboCount++;
-			}
 			_world.DestroyBody(b);
-
 		}
 		if (debugOn){
 			fclose(robotPath);
@@ -75,22 +71,24 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 }
 
 
-void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
+//void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2VEc2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
+void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 	b2Vec2 shift = {-robVelocity.x*timeElapsed, -robVelocity.y*timeElapsed}; //calculates shift in the time step
 	b2Vec2 newPos(d.getPosition().x+shift.x,d.getPosition().y + shift.y);
 	d.setPosition(newPos);
-	float angle = d.getAngle(robVelocity);
+	// float angle = d.getAngle(robVelocity);
+	float angle = d.getAngle(pose);
 	d.setAngle(angle); //with respect to robot's velocity
 }
 
 Task::controlResult Task::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-    if (obstacle.isValid()){
-        float obstacleAngle = atan(obstacle.getPosition().y/obstacle.getPosition().x);
+    if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
+        float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
         float angleDifference = obstacleAngle - recordedAngle;
         if (abs(angleDifference) >= endAvoid){
-			obstacle.invalidate();
+			disturbance.invalidate();
             return DONE;
         }
     }
@@ -98,28 +96,50 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
         accumulatedError += timeStepError; 
 		if (timeStepError<tolerance){
-			action.LeftWheelSpeed = 0.5;
-			action.RightWheelSpeed = 0.5;
+			action.L = 0.5;
+			action.R = 0.5;
 		}
 		else{
 			float normAccErr = timeStepError/M_PI_2;
-				action.LeftWheelSpeed -= normAccErr*pGain;  
-				action.RightWheelSpeed += normAccErr *pGain; 
-				if (action.LeftWheelSpeed>1.0){
-				action.LeftWheelSpeed=1.0;
+				action.L -= normAccErr*pGain;  
+				action.R += normAccErr *pGain; 
+				if (action.L>1.0){
+				action.L=1.0;
 				}
-				if (action.RightWheelSpeed>1.0){
-					action.RightWheelSpeed=1;
+				if (action.R>1.0){
+					action.R=1;
 				}
-				if (action.LeftWheelSpeed<(-1.0)){
-					action.LeftWheelSpeed=-1;
+				if (action.L<(-1.0)){
+					action.L=-1;
 				}
-				if (action.RightWheelSpeed<(-1.0)){
-					action.RightWheelSpeed=-1;
+				if (action.R<(-1.0)){
+					action.R=-1;
 				}
 
 
 		}
     }
     return CONTINUE;
+}
+
+Direction Task::H(Disturbance ob, Direction d){
+	if (ob.isValid()){
+        if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
+            if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
+                if (ob.getAngle()<0){//angle formed with robot at last safe pose
+                    d= Direction::LEFT; //go left
+                }
+                else if (ob.getAngle()>0){ //angle formed with robot at last safe pose
+                    d= Direction::RIGHT; //
+                }   
+                else{
+                    int c = rand() % 2;
+                    d = static_cast<Direction>(c);
+
+                }
+            }
+        }
+    //printf("angle to ob = %f\n", ob.getAngle());
+}
+    return d;
 }

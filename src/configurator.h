@@ -15,20 +15,19 @@
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>
-
-
-
-
+class DataInterface;
 class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	b2Vec2 desiredVelocity;
 	b2Vec2 absPosition = {0.0f, 0.0f};
 	FILE * dumpPath;
 	char fileNameBuffer[50];
 	Task currentTask;
+	DataInterface *di;
 public:
+	bool running =0;
+	std::thread * t=NULL;
 	bool debugOn=0;
 	float affineTransError =0;
 	char *folder;
@@ -37,12 +36,11 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	std::vector <Point> current, currentBox2D;
+	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
 	int bodies=0;
-
 
 	struct getVelocityResult{
 		bool valid =0;
@@ -114,52 +112,14 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 	}
 }
 
-void __init__(){
-}
 
-void __init__(Task & _currentTask){
-}
-
-
-void setNameBuffer(char * str){ //set name of file from which to read trajectories. by default trajectories are dumped by 'currentTask' into a robot000n.txt file.
-								//changing this does not change where trajectories are dumped, but if you want the robot to follow a different trajectory than the one created by the currentTask
-	sprintf(fileNameBuffer, "%s", str);
-}
-
-void setReadMap(char * str){
-	sprintf(readMap,"%s", str);
-}
-
-char * getReadMap(){
-	return readMap;
-}
-
-char * getFolder(){
-	return folder;
-}
-void setFolder(char * _folder){ //the folder from where LIDAR data is read
-	std::filesystem::path folderPath(_folder);
-		if (exists(folderPath)){
-			if (is_directory(folderPath)){
-				folder = _folder;
-			}
-			else{
-				printf("not a directory");
-			}
-		}
-		else{
-			printf("%s doesn't exist", _folder);
-		}
-}
-
-// void NewScan(std::vector <cv::Point2f> &); 
-
-void NewScan(std::vector <Point> &); 
+void NewScan(CoordinateContainer &); 
 
 int getIteration(){
 	return iteration;
 }
-Configurator::getVelocityResult GetRealVelocity(std::vector <Point> &, std::vector <Point> &);
+
+Configurator::getVelocityResult GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
 void controller();
 
@@ -187,24 +147,21 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-int getMaxStepDuration(){
-	return currentTask.hz * currentTask.getSimDuration();
-}
-
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
 
 vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
+
 bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
 
 
 
-Task::Direction getOppositeDirection(Task::Direction d){
+Direction getOppositeDirection(Direction d){
     switch (d){
-        case Task::Direction::LEFT: return Task::Direction::RIGHT;break;
-        case Task::Direction::RIGHT: return Task::Direction::LEFT;break;
+        case Direction::LEFT: return Direction::RIGHT;break;
+        case Direction::RIGHT: return Direction::LEFT;break;
         default:
-        return Task::Direction::NONE;
+        return Direction::DEFAULT;
 		break;
     }
 }
@@ -232,7 +189,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
-		g[v1].totObstacles=g[src].totObstacles;
+		g[v1].totDs=g[src].totDs;
 	}
 }
 
@@ -265,9 +222,9 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
 		switch (g[edge].direction){
-			case Task::NONE: printf("STRAIGHT, "); break;
-			case Task::LEFT: printf("LEFT, "); break;
-			case Task::RIGHT: printf("RIGHT, "); break;
+			case Direction::DEFAULT: printf("STRAIGHT, "); break;
+			case Direction::LEFT: printf("LEFT, "); break;
+			case Direction::RIGHT: printf("RIGHT, "); break;
 			default: break;
 
 		}
@@ -278,12 +235,12 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return e;
 }
 
-bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transform start, Task * curr = NULL){
+bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
 	switch (d){
-		case Task::Direction::NONE:{
+		case Direction::DEFAULT:{
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		
@@ -319,7 +276,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 		}
 		//CREATE POINTS
 
-		for (Point &p:currentBox2D){
+		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+			auto p = *_p;
 			bool include;
 			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
 				ceilingY = mHead*p.x +qTopH;
@@ -340,8 +298,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentTask.obstacle.getPosition())){
+					if (curr->disturbance.isValid()){
+						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -356,7 +314,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 		break;
 		}
 		default:
-		for (Point &p:currentBox2D){	
+		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+			auto p = *_p;
 			if (p != *(&p-1)&& p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
@@ -366,8 +325,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->obstacle.isValid()){
-						if (p.isInRadius(currentTask.obstacle.getPosition())){
+					if (curr->disturbance.isValid()){
+						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
 					}
@@ -378,8 +337,8 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 				body->CreateFixture(&fixtureDef);
 			}
 			else if (curr!=NULL){
-			if (curr->obstacle.isValid()){
-				if (p.isInRadius(currentTask.obstacle.getPosition()) & p !=*(&p-1)){
+			if (curr->disturbance.isValid()){
+				if (p.isInRadius(currentTask.disturbance.getPosition()) & p !=*(&p-1)){
 					obStillThere =1;
 					b2Body * body;
 					b2BodyDef bodyDef;
@@ -402,7 +361,14 @@ bool constructWorldRepresentation(b2World & world, Task::Direction d, b2Transfor
 	return obStillThere;
 }
 
+void start(); //data interface class collecting position of bodies
 
+void stop();
+
+
+void registerDataInterface(DataInterface *);
+
+static void getData(Configurator *);
 
 
 };

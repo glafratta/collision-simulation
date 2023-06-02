@@ -2,10 +2,10 @@
 #include "configurator.h"
 #include <chrono>
 
-void Configurator::NewScan(std::vector <Point> & data){ 
+void Configurator::NewScan(CoordinateContainer & data){ 
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
-	std::vector <Point> previous;
+	CoordinateContainer previous;
 	previous = current;
 	current.clear();
 	current = data;
@@ -46,11 +46,11 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	if (currentTask.obstacle.isValid()){
+	if (currentTask.disturbance.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
-		currentTask.trackDisturbance(currentTask.obstacle, timeElapsed, deltaP.p, {0.0f, 0.0f}); //robot default position is 0,0
-		if (currentTask.obstacle.getAngle(deltaP.p) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
-			currentTask.obstacle.invalidate();
+		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaP.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
+		if (currentTask.disturbance.getAngle(deltaP) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
+			currentTask.disturbance.invalidate();
 			currentTask = desiredTask;
 		}
 	}
@@ -58,7 +58,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	//MAKE BOX2D BODIES 
 
 	bool isObstacleStillThere=0;
-	isObstacleStillThere=constructWorldRepresentation(world, currentTask.getAction().getDirection(), b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask);
+	isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask);
 
 	if (!isObstacleStillThere){ 
 		currentTask = desiredTask;
@@ -71,7 +71,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
-	isSameTask = wasAvoiding == currentTask.obstacle.isValid();
+	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	Task::simResult result;
 	currentTask.setRecordedVelocity(deltaP.p);
 
@@ -80,7 +80,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
 	edgeDescriptor e;
-	Task::Direction dir;
+	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 
@@ -99,10 +99,10 @@ void Configurator::NewScan(std::vector <Point> & data){
 				if (g.m_vertices.size()>1){
 					dir =g[e].direction;
 					printf("bestdirection = %i\n", dir);
-					currentTask = Task(g[v0].obstacle, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
+					currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
-				 	currentTask = Task(g[v0].obstacle, Task::Direction::NONE); //was stop
+				 	currentTask = Task(g[v0].disturbance, Direction::DEFAULT); //was stop
 				 	printf("using fallback\n");
 				}
 			}
@@ -125,7 +125,7 @@ void Configurator::NewScan(std::vector <Point> & data){
 
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
-	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().LeftWheelSpeed, currentTask.getAction().RightWheelSpeed);
+	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameTask, currentTask);
@@ -142,7 +142,7 @@ void Configurator::applyController(bool isSameTask, Task & task){
 	}
 }
 
-Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point> &_current, std::vector <Point> &_previous){	 //does not modify current vector, creates copy	
+Configurator::getVelocityResult Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		getVelocityResult result;
 
 		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
@@ -198,7 +198,7 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 			if (result.affineResult.p.y ==0 && result.affineResult.p.x ==0){
 				posAngle =0;
 			}
-			if (result.affineResult.p.Length()>currentTask.getMaxSpeed()){
+			if (result.affineResult.p.Length()>MAX_SPEED){
 				result.vector.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
 				result.vector.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
 			}
@@ -220,13 +220,13 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(std::vector <Point
 
 
 void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
-	r =s.willCollide(world, iteration, debugOn, start, angle, s.getSimDuration());
+	r =s.willCollide(world, iteration, debugOn, start, angle, SIM_DURATION);
 	if (r.resultCode == Task::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
 		Point p(r.collision.getPosition());
-		if ((!s.obstacle.isValid()|| !(p.isInRadius(s.obstacle.getPosition())))){ 
-			s = Task(r.collision, Task::Direction::NONE);
+		if ((!s.disturbance.isValid()|| !(p.isInRadius(s.disturbance.getPosition())))){ 
+			s = Task(r.collision, Direction::DEFAULT);
 		}			
 	}
 }
@@ -242,14 +242,14 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 
 		//FIND IF THE PRESENT STATE WILL COLLIDE
 	Task::simResult result; 
-	float remaining=s.getSimDuration();
+	float remaining=SIM_DURATION;
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
-		if(g[inEdge].direction == Task::NONE){
-			remaining= (BOX2DRANGE-g[srcVertex].distanceSoFar)*2/s.getMaxSpeed();
+		if(g[inEdge].direction == Direction::DEFAULT){
+			remaining= (BOX2DRANGE-g[srcVertex].distanceSoFar)*2/MAX_SPEED;
 		} 
 		if (remaining<0){
 			remaining=0;
@@ -269,16 +269,16 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	else{
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
-	g[v].obstacle = result.collision;
+	g[v].disturbance = result.collision;
 	if (result.collision.isValid()){
-		g[v].totObstacles++;
+		g[v].totDs++;
 	}
 	g[v].endPose = result.endPose;
 	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
-	bool fullMemory = g[v].totObstacles >=4;
+	bool fullMemory = g[v].totDs >=4;
 	bool moreCostlyThanLeaf =0; 
 
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
@@ -292,28 +292,26 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
-			if (s.getType()==Task::Type::BASELINE){
-				Task::Direction dir = Task::Direction::NONE;
+			if (s.getAffIndex()==int(InnateAffordances::NONE)){
+				Direction dir = Direction::DEFAULT;
 				if (boost::in_degree(srcVertex, g)>0){ //was >
 					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
 				}
-				if (result.resultCode == Task::simResult::crashed && dir != Task::NONE && g[v].nodesInSameSpot<maxNodesOnSpot){
+				if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
 						g[v].options.push_back(dir);
-						//g[v].options.push_back(Task::Direction::BACK); //NEWLY ADDED
+						//g[v].options.push_back(Direction::BACK); //NEWLY ADDED
 
 					}
 				else if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
-					Task::Action reflex;
-					reflex.__init__(result.collision, Task::Direction::NONE);
-					dir= reflex.getDirection();
+					dir= s.H(result.collision, DEFAULT);
 					g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
 					g[v].options.push_back(getOppositeDirection(dir));
 				}
 				}
 			}
 		else { //will only enter if successful
-			if (s.getType()==Task::Type::AVOID){
-				g[v].options.push_back(Task::Direction::NONE);
+			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
+				g[v].options.push_back(Direction::DEFAULT);
 			}
 	}	
 			//}
@@ -324,7 +322,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 
 	//IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
-	bool straightFollowStraight=0;
 	if (!isLeaf){
 		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
 		return v1; //added now	
@@ -372,9 +369,9 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 
 		vertexDescriptor v1Src = v1InEdge.m_source;
-		Task::Direction d = g[v1InEdge].direction;
-		s = Task(g[v1Src].obstacle, d);
-		constructWorldRepresentation(newWorld, d, g[v1Src].endPose); //was g[v].endPose
+		Direction dir = g[v1InEdge].direction;
+		s = Task(g[v1Src].disturbance, dir);
+		constructWorldRepresentation(newWorld, dir, g[v1Src].endPose); //was g[v].endPose
 		int bodyCount = newWorld.GetBodyCount();
 		//DEBUG
 		if (debugOn){
@@ -388,6 +385,40 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		v= v1;
 		v1 = nextNode(v,g,s, newWorld, _leaves);
 	}
-	return !g[0].obstacle.safeForNow;
+	return !g[0].disturbance.safeForNow;
 
 }
+
+
+void Configurator::start(){ 
+	running =1;
+	// if (di == NULL){
+	// 	throw std::exception("no data interface found");
+	// 	return;
+	// }
+	if (t!=NULL){ //already running
+		return;
+	}
+	t= new std::thread(Configurator::getData, this);
+
+}
+
+void Configurator::stop(){
+	running =0;
+	if (t!=NULL){
+		t->join();
+		delete t;
+		t=NULL;
+	}
+}
+
+void Configurator::registerDataInterface(DataInterface * _di){
+	//di = _di;
+}
+
+void Configurator::getData(Configurator * c){
+	while (c->running){
+		
+	}
+}
+

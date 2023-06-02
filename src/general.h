@@ -8,25 +8,25 @@
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/depth_first_search.hpp>
+//#include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
 #include "task.h"
 
 struct Edge{
-	Task::Direction direction;
+	Direction direction;
 	//int stepDuration =0;
 	float distanceCovered=0;
 };
 
 struct Node{
-	Task::Disturbance obstacle;
-	std::vector <Task::Direction> options;
+	Task::Disturbance disturbance;
+	std::vector <Direction> options;
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
 	b2Transform endPose;
 	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 	int nodesInSameSpot =0;
-	int totObstacles=0;
+	int totDs=0;
 	Task::simResult::resultType outcome;
 	
 };
@@ -35,14 +35,12 @@ typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 
 
-
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, Node, Edge> Tree;
-
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
+
 
 
 
@@ -121,6 +119,7 @@ struct Point{
 		y = radius *sin(angle);
 	}
 
+
 };
 struct comparator{
     bool operator() ( Point a, Point b ){ //
@@ -128,8 +127,15 @@ struct comparator{
 	}
 }; 
 
-template <class P>
-P operator+=(P const &, P const &);
+
+//P operator+=(P const &, P const &);
+typedef Point P;
+//bool operator<(P const &, P const &);
+bool operator<(P const &, P const &);
+
+bool operator>(P const &, P const &);
+
+typedef std::set<Point> CoordinateContainer;
 
 
 
