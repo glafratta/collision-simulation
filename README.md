@@ -29,7 +29,7 @@ The indoor robot is equipped with
 ```
 cd HICS
 cmake .
-make
+sudo make install
 ```
 
 ## Run
