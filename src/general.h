@@ -34,6 +34,9 @@ struct Node{
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 
+//typedef b2Vec2 V;
+//V operator-(V const &, V const &);
+
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 

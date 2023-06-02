@@ -5,27 +5,24 @@
 #include <stdio.h>
 #include <math.h> 
 #include "robot.h"
-//#include "affordance.h"
+#include "measurement.h"
 #include <stdexcept>
 #include "settings.h"
-//#include "configurator.h"
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.0
 #define REACTION_TIME 2.3
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
-class Configurator;
-
 class Task{
 public:
     float accumulatedError=0;
     char planFile[250]; //for debug
-    //enum Type {BASELINE =0, AVOID =1, PURSUE =2};
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
     float endAvoid = M_PI_2;
+    EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= Direction::DEFAULT;
 protected:
     //Type type = Type::BASELINE;
@@ -33,15 +30,14 @@ protected:
 public:
 
 
-struct Disturbance{ //maybe later can susbtitute this for a broader Disturbance so you can also set a target without having to make another class for it. Bernd has an enum Disturbance identifier
+struct Disturbance{ //this generates error
 private:
     bool valid= 0;
-    AffordanceIndex affordanceIndex = 0;
+    AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     float angleToRobot=0;
 public:
 	b2FixtureDef fixtureDef;
-    b2BodyDef bodyDef;
-    b2Body * body;
+    b2Vec2 position;
     bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
@@ -52,15 +48,15 @@ public:
             affordanceIndex = i;
         }
     }
-    Disturbance(AffordanceIndex i, b2Vec2 position){
+    Disturbance(AffordanceIndex i, b2Vec2 p){
         if (i>affordances.size()-1){
             throw std::invalid_argument("Not a valid affordance index\n");
         }
         else{
             affordanceIndex = i;
         }
-        bodyDef.type = b2_dynamicBody;
-		bodyDef.position.Set(position.x, position.y);
+        //bodyDef.type = b2_dynamicBody;
+		position.Set(p.x, p.y);
         valid =1;
     }
 
@@ -72,8 +68,8 @@ public:
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;
         b2Vec2 thisToB;
-        thisToB.x = bodyDef.position.x-t.p.x;
-        thisToB.y = bodyDef.position.y - t.p.y;
+        thisToB.x = position.x-t.p.x;
+        thisToB.y = position.y - t.p.y;
         float cosA = (thisToB.x * cos(t.q.GetAngle())+ thisToB.y*sin(t.q.GetAngle()))/thisToB.Length();
         angleToRobot = acos(cosA);
     }
@@ -83,8 +79,8 @@ public:
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;
         b2Vec2 thisToB;
-        thisToB.x = bodyDef.position.x-t.p.x;
-        thisToB.y = bodyDef.position.y - t.p.y;
+        thisToB.x = position.x-t.p.x;
+        thisToB.y = position.y - t.p.y;
         float cosA = (thisToB.x * cos(t.q.GetAngle())+ thisToB.y*sin(t.q.GetAngle()))/thisToB.Length();
         angle = acos(cosA);
         return angle;
@@ -93,8 +89,8 @@ public:
     float getAngle(float angle2){ //gets the angle of an Disturbance wrt to the heading direction of another Disturbance
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle1=0;
-        if (bodyDef.position.y !=0 && bodyDef.position.x !=0){ //inclusive or?
-            angle1 = atan(bodyDef.position.y/bodyDef.position.x); //own angle to the origin 
+        if (position.y !=0 && position.x !=0){ //inclusive or?
+            angle1 = atan(position.y/position.x); //own angle to the origin 
         }
 	    float angle = angle1-angle2;
         return angle;
@@ -103,8 +99,8 @@ public:
     float getAngle(b2Body* b){
         float angle;
         b2Vec2 thisToB;
-        thisToB.x = bodyDef.position.x-b->GetPosition().x;
-        thisToB.y = bodyDef.position.y - b->GetPosition().y;
+        thisToB.x = position.x-b->GetPosition().x;
+        thisToB.y = position.y - b->GetPosition().y;
         float cosA = (thisToB.x * cos(b->GetAngle())+ thisToB.y*sin(b->GetAngle()))/thisToB.Length();
         angle = acos(cosA);
         return angle;
@@ -115,17 +111,17 @@ public:
     }
 
     void setPosition(b2Vec2 pos){
-        bodyDef.position.Set(pos.x, pos.y);
+        position.Set(pos.x, pos.y);
         valid =1;
     }
     
     void setPosition(float x, float y){
-        bodyDef.position.Set(x, y);
+        position.Set(x, y);
         valid=1;
     }
     
     b2Vec2 getPosition(){
-        return bodyDef.position;
+        return position;
     }
 
 
@@ -274,6 +270,9 @@ AffordanceIndex getAffIndex(){
 
 Direction H(Disturbance, Direction);
 
+void setEndCriteria();
+
+bool checkEnded(b2Transform);
 
 Task(){
     RecordedVelocity = action.getLinearVelocity();
@@ -285,6 +284,7 @@ Task(Disturbance ob, Direction d){
     direction = H(disturbance, d);  
     action.init(direction);
     RecordedVelocity = action.getLinearVelocity();
+    setEndCriteria();
 }
 
 void setRecordedVelocity(b2Vec2 vel){

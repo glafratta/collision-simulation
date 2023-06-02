@@ -29,7 +29,6 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			theta += action.getOmega()/HZ; //= omega *t
 			if (disturbance.isValid() || disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
 				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
-
 				if (absAngleToObstacle>=endAvoid){
 					break;
 				}
@@ -37,16 +36,16 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				if (getAffIndex()==int(InnateAffordances::NONE) && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
-						b2Vec2 posReadjusted;
-						posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-						posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
-						robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
-						result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
+					b2Vec2 posReadjusted;
+					posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+					posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
+					robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
+					result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
 				}
 				else{
-						result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
-						robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
-						result.collision.safeForNow =0;
+					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
+					robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+					result.collision.safeForNow =0;
 
 					}
 				break;
@@ -101,20 +100,20 @@ float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 		}
 		else{
 			float normAccErr = timeStepError/M_PI_2;
-				action.L -= normAccErr*pGain;  
-				action.R += normAccErr *pGain; 
-				if (action.L>1.0){
-				action.L=1.0;
-				}
-				if (action.R>1.0){
-					action.R=1;
-				}
-				if (action.L<(-1.0)){
-					action.L=-1;
-				}
-				if (action.R<(-1.0)){
-					action.R=-1;
-				}
+			action.L -= normAccErr*pGain;  
+			action.R += normAccErr *pGain; 
+			if (action.L>1.0){
+			action.L=1.0;
+			}
+			if (action.R>1.0){
+				action.R=1;
+			}
+			if (action.L<(-1.0)){
+				action.L=-1;
+			}
+			if (action.R<(-1.0)){
+				action.R=-1;
+			}
 
 
 		}
@@ -142,4 +141,49 @@ Direction Task::H(Disturbance ob, Direction d){
     //printf("angle to ob = %f\n", ob.getAngle());
 }
     return d;
+}
+
+void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
+	switch (direction){
+		case DEFAULT: break;
+		case LEFT: 
+		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+			endCriteria.angle = Angle(M_PI_2);
+		}
+		break;
+		case RIGHT: 
+		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+			endCriteria.angle = Angle(M_PI_2);
+		}
+		break;
+		case BACK: 
+		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+			endCriteria.distance = Distance(.05);
+		}
+		break;
+		case STOP:
+		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+			endCriteria.angle = Angle(M_PI_2);
+			endCriteria.distance = Distance(.05);
+		}
+		break;
+		default:break;
+	}
+}
+
+bool Task::checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+	bool r = false;
+	if (disturbance.isValid()){
+		if (getAffIndex()== int(InnateAffordances::AVOID)){
+			Angle a(abs(disturbance.getAngle(robotTransform.q.GetAngle())));
+			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
+			Distance d(v.Length());
+			r= a>= endCriteria.angle || d>=endCriteria.distance;
+		}
+	}
+	else{
+		r= true;
+	}
+	return r;
+
 }
