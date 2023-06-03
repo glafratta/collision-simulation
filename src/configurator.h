@@ -276,8 +276,9 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		}
 		//CREATE POINTS
 
-		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
-			auto p = *_p;
+		// for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+		// 	auto p = *_p;
+		for (auto p:currentBox2D){
 			bool include;
 			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
 				ceilingY = mHead*p.x +qTopH;
@@ -314,8 +315,9 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		break;
 		}
 		default:
-		for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
-			auto p = *_p;
+		// for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
+		// 	auto p = *_p;
+		for (auto p:currentBox2D){
 			if (p != *(&p-1)&& p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;

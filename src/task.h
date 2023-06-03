@@ -272,7 +272,7 @@ Direction H(Disturbance, Direction);
 
 void setEndCriteria();
 
-bool checkEnded(b2Transform);
+bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
 Task(){
     RecordedVelocity = action.getLinearVelocity();

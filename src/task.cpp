@@ -27,6 +27,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
+			bool ended = checkEnded(robot.body->GetTransform()); //this will substitute the if loop below
 			if (disturbance.isValid() || disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
 				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
 				if (absAngleToObstacle>=endAvoid){
@@ -83,42 +84,41 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVeloci
 Task::controlResult Task::controller(){
 float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-    if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
-        float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
-        float angleDifference = obstacleAngle - recordedAngle;
-        if (abs(angleDifference) >= endAvoid){
-			disturbance.invalidate();
-            return DONE;
-        }
-    }
-    else {
-		float timeStepError =action.getOmega()*0.2 - recordedAngle; 
-        accumulatedError += timeStepError; 
-		if (timeStepError<tolerance){
-			action.L = 0.5;
-			action.R = 0.5;
+bool ended = checkEnded();
+if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
+	float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
+	float angleDifference = obstacleAngle - recordedAngle;
+	if (abs(angleDifference) >= endAvoid){
+		disturbance.invalidate();
+		return DONE;
+	}
+}
+else {
+	float timeStepError =action.getOmega()*0.2 - recordedAngle; 
+	accumulatedError += timeStepError; 
+	if (timeStepError<tolerance){
+		action.L = 0.5;
+		action.R = 0.5;
+	}
+	else{
+		float normAccErr = timeStepError/M_PI_2;
+		action.L -= normAccErr*pGain;  
+		action.R += normAccErr *pGain; 
+		if (action.L>1.0){
+		action.L=1.0;
 		}
-		else{
-			float normAccErr = timeStepError/M_PI_2;
-			action.L -= normAccErr*pGain;  
-			action.R += normAccErr *pGain; 
-			if (action.L>1.0){
-			action.L=1.0;
-			}
-			if (action.R>1.0){
-				action.R=1;
-			}
-			if (action.L<(-1.0)){
-				action.L=-1;
-			}
-			if (action.R<(-1.0)){
-				action.R=-1;
-			}
-
-
+		if (action.R>1.0){
+			action.R=1;
 		}
-    }
-    return CONTINUE;
+		if (action.L<(-1.0)){
+			action.L=-1;
+		}
+		if (action.R<(-1.0)){
+			action.R=-1;
+		}
+	}
+}
+	return CONTINUE;
 }
 
 Direction Task::H(Disturbance ob, Direction d){
@@ -171,7 +171,7 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 	}
 }
 
-bool Task::checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+bool Task::checkEnded(b2Transform robotTransform){
 	bool r = false;
 	if (disturbance.isValid()){
 		if (getAffIndex()== int(InnateAffordances::AVOID)){

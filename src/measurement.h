@@ -44,8 +44,8 @@ struct EndCriteria{
 };
 
 typedef Measurement M;
-bool operator<(M const &, M const &);
+bool operator<(M &, M &);
 
-bool operator>=(M const &, M const &);
+bool operator>=(M &, M &);
 
 #endif
