@@ -27,10 +27,10 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
-			bool ended = checkEnded(robot.body->GetTransform()); //this will substitute the if loop below
 			if (disturbance.isValid() || disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
 				float absAngleToObstacle = abs(disturbance.getAngle(robot.body));
 				if (absAngleToObstacle>=endAvoid){
+					bool ended = checkEnded(robot.body->GetTransform()); //this will substitute the if loop below
 					break;
 				}
 			}
@@ -180,9 +180,9 @@ bool Task::checkEnded(b2Transform robotTransform){
 			Distance d(v.Length());
 			r= a>= endCriteria.angle || d>=endCriteria.distance;
 		}
-	}
-	else{
-		r= true;
+		else if (getAffIndex()== int(InnateAffordances::NONE)){
+			r = true;
+		}
 	}
 	return r;
 

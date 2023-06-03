@@ -1,6 +1,8 @@
 #ifndef MEASUREMENT_H
 #define MEASUREMENT_H
 #include <stdio.h>
+#include <stdlib.h>
+#include <cmath>
 
 class Measurement{
 protected:
@@ -26,7 +28,7 @@ class Angle: public Measurement{
     public:
     Angle(){}
     Angle(float f)
-    {   value =f;
+    {   value =round(f*100)/100;
         valid =1;}
 };
 
@@ -34,7 +36,7 @@ class Distance: public Measurement{
     public:
     Distance(){}
     Distance(float f)
-    {value =f;
+    {value =round(f*100)/100;
     valid =1;}
 };
 
