@@ -49,8 +49,9 @@ void Configurator::NewScan(CoordinateContainer & data){
 	if (currentTask.disturbance.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaP.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
-		bool ended = currentTask.checkEnded();
-		if (currentTask.disturbance.getAngle(deltaP) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
+		//bool ended = currentTask.checkEnded();
+		//if (currentTask.disturbance.getAngle(deltaP) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
+		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
 			currentTask = desiredTask;
 		}
