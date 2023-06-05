@@ -179,10 +179,10 @@ bool Task::checkEnded(b2Transform robotTransform){
 	bool r = false;
 	if (disturbance.isValid()){
 		if (getAffIndex()== int(InnateAffordances::AVOID)){
-			Angle a(abs(disturbance.getAngle(robotTransform.q.GetAngle())));
+			Angle a(abs(disturbance.getAngle(robotTransform)));
 			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
 			Distance d(v.Length());
-			r= a>= endCriteria.angle || d>=endCriteria.distance;
+			r= a>= endCriteria.angle && d>=endCriteria.distance;
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r = true;

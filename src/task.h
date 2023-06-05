@@ -86,24 +86,25 @@ public:
         return angle;
     }
 
-    float getAngle(float angle2){ //gets the angle of an Disturbance wrt to the heading direction of another Disturbance
-        //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
-        float angle1=0;
-        if (position.y !=0 && position.x !=0){ //inclusive or?
-            angle1 = atan(position.y/position.x); //own angle to the origin 
-        }
-	    float angle = angle1-angle2;
-        return angle;
-    }
+    // float getAngle(float angle2){ //gets the angle of an Disturbance wrt to the heading direction of another Disturbance
+    //     //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
+    //     float angle1=0;
+    //     if (position.y !=0 && position.x !=0){ //inclusive or?
+    //         angle1 = atan(position.y/position.x); //own angle to the origin 
+    //     }
+	//     float angle = angle1-angle2;
+    //     return angle;
+    // }
 
     float getAngle(b2Body* b){
-        float angle;
-        b2Vec2 thisToB;
-        thisToB.x = position.x-b->GetPosition().x;
-        thisToB.y = position.y - b->GetPosition().y;
-        float cosA = (thisToB.x * cos(b->GetAngle())+ thisToB.y*sin(b->GetAngle()))/thisToB.Length();
-        angle = acos(cosA);
-        return angle;
+        // float angle;
+        // b2Vec2 thisToB;
+        // thisToB.x = position.x-b->GetPosition().x;
+        // thisToB.y = position.y - b->GetPosition().y;./no
+        // float cosA = (thisToB.x * cos(b->GetAngle())+ thisToB.y*sin(b->GetAngle()))/thisToB.Length();
+        // angle = acos(cosA);
+        // return angle;
+        return getAngle(b->GetTransform());
     }
 
     float getAngle(){
