@@ -90,12 +90,12 @@ float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded();
 if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
-	float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
-	float angleDifference = obstacleAngle - recordedAngle;
-	if (abs(angleDifference) >= endAvoid){
-		disturbance.invalidate();
-		return DONE;
-	}
+	// float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
+	// float angleDifference = obstacleAngle - recordedAngle;
+	// if (abs(angleDifference) >= endAvoid){
+	// 	disturbance.invalidate();
+	// 	return DONE;
+	// }
 }
 else {
 	float timeStepError =action.getOmega()*0.2 - recordedAngle; 
