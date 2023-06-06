@@ -21,7 +21,7 @@ public:
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
 		//std::vector <Point> current;
-		Point p1, p0, p1B2D, p0B2D;
+		Point p, p2f;
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
@@ -34,15 +34,15 @@ public:
 				float y = round(data.y*1000)/1000;
 				float x2 = round(data.x*100)/100;
 				float y2 = round(data.y*100)/100;
-				p1= (Point(x, y));
-				p1B2D=Point(x2, y2);
+				p= (Point(x, y));
+				p2f=Point(x2, y2);
 				//if (p1!= p0){
-					ci->data.insert(p1);
+					ci->data.insert(p);
 				//}
 				//if (p1B2D!= p0B2D){ //SEPARATE VECTOR FOR BOX2D
-					ci->data2fp.insert(p1B2D);
+					ci->data2fp.insert(p2f);
 					if (ci->debugOn){
-						fprintf(f, "%.2f\t%.2f\n", p1B2D.x, p1B2D.y);
+						fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
 					}
 				//}
 				// p0= p1;
