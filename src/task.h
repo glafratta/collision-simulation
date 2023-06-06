@@ -142,14 +142,47 @@ public:
 
 struct Action{
 private:
-    float linearSpeed=0.625; //used to calculate instantaneous velocity using omega
-    float omega=0; //initial angular velocity is 0  
+    float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
+    float omega=0; //initial angular velocity is 0
     bool valid=0;
 public:
-    float R=0.5;
-    float L=0.5;
+    float R=.5;
+    float L=.5;
 
-    Action(){}
+    Action(Direction direction = DEFAULT){
+        switch (direction){
+        case Direction::DEFAULT:
+        L=0.5;
+        R=.5;
+        break;
+        case Direction::LEFT:
+        L = -0.5;
+        R=0.5;
+        break;
+        case Direction::RIGHT:
+        L=0.5;
+        R = - 0.5;
+        break;
+        case Direction::BACK:
+        L = -0.5;
+        R = -0.5;
+        break;
+        case Direction::STOP:
+        L=0;
+        R=0;
+        break;
+        default:
+        throw std::invalid_argument("not a valid direction for M");
+        break;
+    }
+    //kinematic model internal to action so it can be versatile for use in real P and simulated P
+    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+
+    linearSpeed = MAX_SPEED*(L+R)/2;
+
+    valid=1;
+        
+    }
 
     void init(Direction direction){
         switch (direction){
@@ -276,14 +309,14 @@ void setEndCriteria();
 bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
 Task(){
+    action = Action(direction);
     RecordedVelocity = action.getLinearVelocity();
 }
-
 
 Task(Disturbance ob, Direction d){
     disturbance = ob;
     direction = H(disturbance, d);  
-    action.init(direction);
+    action = Action(direction);
     RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
 }
