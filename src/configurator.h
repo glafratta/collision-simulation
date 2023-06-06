@@ -15,7 +15,12 @@
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>
-class DataInterface;
+class ConfiguratorInterface{
+public:
+	CoordinateContainer data;
+	CoordinateContainer data2fp;
+};
+
 class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
@@ -24,8 +29,8 @@ protected:
 	FILE * dumpPath;
 	char fileNameBuffer[50];
 	Task currentTask;
-	DataInterface *di;
 public:
+	ConfiguratorInterface * ci;
 	bool running =0;
 	std::thread * t=NULL;
 	bool debugOn=0;
@@ -113,7 +118,7 @@ Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), cu
 }
 
 
-void NewScan(CoordinateContainer &); 
+void Spawner(CoordinateContainer &, CoordinateContainer &); 
 
 int getIteration(){
 	return iteration;
@@ -147,14 +152,11 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-
 void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
 
 vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
 
 bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
-
-
 
 Direction getOppositeDirection(Direction d){
     switch (d){
@@ -367,10 +369,9 @@ void start(); //data interface class collecting position of bodies
 
 void stop();
 
+void registerInterface(ConfiguratorInterface *);
 
-void registerDataInterface(DataInterface *);
-
-static void getData(Configurator *);
+static void run(Configurator *);
 
 
 };

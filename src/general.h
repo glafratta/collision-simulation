@@ -138,6 +138,8 @@ bool operator<(P const &, P const &);
 
 bool operator>(P const &, P const &);
 
+bool operator==(P const &, P const &);
+
 typedef std::set<Point> CoordinateContainer;
 
 

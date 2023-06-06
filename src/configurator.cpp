@@ -2,13 +2,15 @@
 #include "configurator.h"
 #include <chrono>
 
-void Configurator::NewScan(CoordinateContainer & data){ 
+void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
 	previous = current;
 	current.clear();
 	current = data;
+	currentBox2D.clear();
+	currentBox2D = data2fp;
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -394,14 +396,14 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 
 void Configurator::start(){ 
 	running =1;
-	// if (di == NULL){
-	// 	throw std::exception("no data interface found");
-	// 	return;
-	// }
+	if (ci == NULL){
+		throw std::invalid_argument("no data interface found");
+		return;
+	}
 	if (t!=NULL){ //already running
 		return;
 	}
-	t= new std::thread(Configurator::getData, this);
+	t= new std::thread(Configurator::run, this);
 
 }
 
@@ -414,13 +416,15 @@ void Configurator::stop(){
 	}
 }
 
-void Configurator::registerDataInterface(DataInterface * _di){
-	//di = _di;
+void Configurator::registerInterface(ConfiguratorInterface * _ci){
+	ci = _ci;
 }
 
-void Configurator::getData(Configurator * c){
+void Configurator::run(Configurator * c){
 	while (c->running){
-		
+		if (c->ci->data != c->current && !(c->ci->data.empty())){
+			c->Spawner(c->ci->data, c->ci->data2fp);
+		}
 	}
 }
 
