@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 class ConfiguratorInterface{
 public:
+	bool debugOn=0;
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 };

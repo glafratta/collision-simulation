@@ -12,18 +12,15 @@
 #define _USE_MATH_DEFINES
 
 class LidarInterface : public A1Lidar::DataInterface{
-Configurator * c;
-
-char folder[250];
+ConfiguratorInterface * ci;
 public: 
     int mapCount =0;
 
-    LidarInterface(Configurator * _c): c(_c){
-		}
+    LidarInterface(ConfiguratorInterface * _ci): ci(_ci){}
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    mapCount++;
-		std::vector <Point> current;
+		//std::vector <Point> current;
 		Point p1, p0, p1B2D, p0B2D;
 		FILE *f;
 		char name[256];
@@ -39,27 +36,23 @@ public:
 				float y2 = round(data.y*100)/100;
 				p1= (Point(x, y));
 				p1B2D=Point(x2, y2);
-				if (p1!= p0){
-					current.push_back(p1);
-				}
-				if (p1B2D!= p0B2D){ //SEPARATE VECTOR FOR BOX2D
-					c->currentBox2D.push_back(p1B2D);
-					if (c->debugOn){
+				//if (p1!= p0){
+					ci->data.insert(p1);
+				//}
+				//if (p1B2D!= p0B2D){ //SEPARATE VECTOR FOR BOX2D
+					ci->data2fp.insert(p1B2D);
+					if (ci->debugOn){
 						fprintf(f, "%.2f\t%.2f\n", p1B2D.x, p1B2D.y);
 					}
-				}
-				p0= p1;
-				p0B2D=p1B2D;
+				//}
+				// p0= p1;
+				// p0B2D=p1B2D;
             }
 		}
 			fclose(f);
-		c->NewScan(current);
+		//c->NewScan(current);
 		
 
-	}
-
-	char * getFolder(){
-		return folder;
 	}
 
 
@@ -91,22 +84,27 @@ int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
     Task desiredTask;
+	ConfiguratorInterface configuratorInterface;
     Configurator configurator(desiredTask);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
-	LidarInterface dataInterface(&configurator);
+	LidarInterface dataInterface(&configuratorInterface);
+	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
 	lidar.start();
 	motors.start();
+	configurator.start();
 	do {
 	} while (!getchar());
+	configurator.stop();
 	motors.stop();
 	lidar.stop();
 
