@@ -302,9 +302,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
 				}
 				if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
-						g[v].options.push_back(dir);
-						//g[v].options.push_back(Direction::BACK); //NEWLY ADDED
-
+					g[v].options.push_back(dir);
 					}
 				else if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
 					dir= s.H(result.collision, DEFAULT);
@@ -428,3 +426,4 @@ void Configurator::run(Configurator * c){
 	}
 }
 
+void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor &v){}

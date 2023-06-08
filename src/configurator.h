@@ -163,6 +163,7 @@ Direction getOppositeDirection(Direction d){
     switch (d){
         case Direction::LEFT: return Direction::RIGHT;break;
         case Direction::RIGHT: return Direction::LEFT;break;
+		//case Direction::DEFAULT: return Direction::BACK; break;
         default:
         return Direction::DEFAULT;
 		break;
@@ -365,6 +366,8 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	}
 	return obStillThere;
 }
+
+void addOptionsToNode(CollisionGraph &, vertexDescriptor &);
 
 void start(); //data interface class collecting position of bodies
 
