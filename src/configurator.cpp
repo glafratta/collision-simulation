@@ -442,7 +442,7 @@ void Configurator::run(Configurator * c){
 				c->Spawner(c->ci->data, c->ci->data2fp);
 				c->ci->data.clear();
 				c->ci->data2fp.clear();
-				c->ready=0;
+				c->ci->ready=0;
 			}
 		}
 	}
