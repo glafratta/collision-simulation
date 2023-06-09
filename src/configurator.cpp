@@ -393,11 +393,11 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 
 
 void Configurator::start(){ 
-	running =1;
 	if (ci == NULL){
 		throw std::invalid_argument("no data interface found");
 		return;
 	}
+	running =1;
 	if (t!=NULL){ //already running
 		return;
 	}
@@ -420,9 +420,11 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 
 void Configurator::run(Configurator * c){
 	while (c->running){
-		if (c->ci->data != c->current && !(c->ci->data.empty())){
-			printf("c->ci->data size = %i\n", c->ci->data.size());
-			c->Spawner(c->ci->data, c->ci->data2fp);
+		if (c->ci->data.size()!=0){
+			//printf("c->ci->data size = %i\n", c->ci->data.size());
+			if (c->ci->data != c->current){
+				c->Spawner(c->ci->data, c->ci->data2fp);
+			}
 		}
 	}
 }

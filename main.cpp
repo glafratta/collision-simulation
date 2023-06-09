@@ -13,6 +13,8 @@
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
+CoordinateContainer data;
+CoordinateContainer data2fp;
 public: 
     int mapCount =0;
 
@@ -36,23 +38,18 @@ public:
 				float y2 = round(data.y*100)/100;
 				p= (Point(x, y));
 				p2f=Point(x2, y2);
-				//if (p1!= p0){
-					ci->data.insert(p);
-				//}
-				//if (p1B2D!= p0B2D){ //SEPARATE VECTOR FOR BOX2D
-					ci->data2fp.insert(p2f);
-					if (ci->debugOn){
-						fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
-					}
-				//}
-				// p0= p1;
-				// p0B2D=p1B2D;
+				data.insert(p);
+				data2fp.insert(p2f);
+				if (ci->debugOn){
+					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
+				}
             }
 		}
-			fclose(f);
-		//c->NewScan(current);
-		
-
+		fclose(f);
+		ci->data = data;
+		ci->data2fp = data2fp;
+		data.clear();
+		data2fp.clear();
 	}
 
 
