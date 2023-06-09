@@ -421,6 +421,7 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 void Configurator::run(Configurator * c){
 	while (c->running){
 		if (c->ci->data != c->current && !(c->ci->data.empty())){
+			printf("c->ci->data size = %i\n", c->ci->data.size());
 			c->Spawner(c->ci->data, c->ci->data2fp);
 		}
 	}
