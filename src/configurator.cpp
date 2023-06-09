@@ -431,6 +431,9 @@ void Configurator::run(Configurator * c){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
 		}
+		if (c == NULL){
+			printf("null pointer to configurator\n");
+		}
 		if (!(c->ci->data.empty()) && !(c->ci->data2fp.empty())){
 
 			if (c->ci->data != c->current){
