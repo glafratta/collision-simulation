@@ -48,9 +48,10 @@ public:
             }
 		}
 		fclose(f);
+		printf("added data to lidar containers\n");
 		ci->data = coordinates;
 		ci->data2fp = coordinates2fp;
-		printf("acquired data\n");
+		printf("added data to interface containers\n");
 
 	}
 
