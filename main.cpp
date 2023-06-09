@@ -48,7 +48,7 @@ public:
             }
 		}
 		fclose(f);
-		printf("added data to lidar containers\n");
+		printf("added data to lidar containers, coord = %i, coord2fp = %i\n", coordinates.size(), coordinates2fp.size());
 		if (ci == NULL){
 			printf("null pointer to ci\n");
 			return;
