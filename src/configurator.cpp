@@ -9,8 +9,14 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	CoordinateContainer previous;
 	previous = current;
 	current.clear();
-	current = data;
+	for (Point d:data){
+		current.insert(p);
+	}
+	//current = data;
 	currentBox2D.clear();
+	for (Point d:data2fp){
+		currentBox2D.insert(p);
+	}
 	currentBox2D = data2fp;
 	printf("updated coordinate vectors\n");
 
