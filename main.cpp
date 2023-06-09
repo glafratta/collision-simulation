@@ -50,6 +50,7 @@ public:
 		fclose(f);
 		ci->data = coordinates;
 		ci->data2fp = coordinates2fp;
+		printf("acquired data\n");
 
 	}
 
