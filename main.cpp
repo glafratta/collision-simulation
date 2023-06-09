@@ -49,6 +49,10 @@ public:
 		}
 		fclose(f);
 		printf("added data to lidar containers\n");
+		if (ci == NULL){
+			printf("null pointer to ci\n");
+			return;
+		}
 		ci->data = coordinates;
 		ci->data2fp = coordinates2fp;
 		printf("added data to interface containers\n");
