@@ -11,6 +11,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	current = data;
 	currentBox2D.clear();
 	currentBox2D = data2fp;
+	printf("updated coordinate vectors\n");
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -32,15 +33,19 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		
 	}
 
+	printf("calculated time elapsed\n");
+
 	//CREATE BOX2D ENVIRONMENT
 	b2World world = b2World({0.0f,0.0f});
 	char name[256];
 	//int bodies=0;
-	
+	printf("made world\n");
+
 	//CALCULATE VELOCITY 
 	
 	Configurator::getVelocityResult affRes= GetRealVelocity(current, previous);
 	b2Transform deltaP =affRes.vector;
+	printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = 0;
@@ -58,6 +63,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			currentTask = desiredTask;
 		}
 	}
+	printf("tracked disturbance");
 
 	//MAKE BOX2D BODIES 
 
