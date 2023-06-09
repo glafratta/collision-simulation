@@ -29,6 +29,8 @@ public:
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		printf("%s\n", name);
 		f=fopen(name, "w");
+		coordinates.clear();
+		coordinates2fp.clear();
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <LIDAR_RANGE){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -48,8 +50,7 @@ public:
 		fclose(f);
 		ci->data = coordinates;
 		ci->data2fp = coordinates2fp;
-		coordinates.clear();
-		coordinates2fp.clear();
+
 	}
 
 
