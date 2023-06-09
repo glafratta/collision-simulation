@@ -53,10 +53,10 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
-		for (Point & d:coordinates){
+		for (Point d:coordinates){
 			ci->data.insert(d);
 		}
-		for (Point & d:coordinates2fp){
+		for (Point d:coordinates2fp){
 			ci->data2fp.insert(d);
 		}
 		ci->ready=1;
