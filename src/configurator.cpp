@@ -78,7 +78,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	b2Vec2 start(0.0f, 0.0f);
 	float theta=0;
 
-
+	printf("made bodies\n");
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
@@ -93,6 +93,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
+	printf("set velocity and created empty graph\n");
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	switch (planning){
@@ -426,8 +427,11 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 
 void Configurator::run(Configurator * c){
 	while (c->running){
+		if (c->ci == NULL){
+			printf("null pointer to interface\n");
+		}
 		if (!(c->ci->data.empty()) && !(c->ci->data2fp.empty())){
-			//printf("c->ci->data size = %i\n", c->ci->data.size());
+			printf("c->ci->data size = %i\n", c->ci->data.size());
 			if (c->ci->data != c->current){
 				c->Spawner(c->ci->data, c->ci->data2fp);
 			}
