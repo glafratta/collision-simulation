@@ -59,7 +59,7 @@ public:
 		for (Point d:coordinates2fp){
 			ci->data2fp.insert(d);
 		}
-		ci->ready=1;
+		ci->ready =1;
 		//ci->data = coordinates;
 		//ci->data2fp = coordinates2fp;
 		printf("added data to interface containers\n");
