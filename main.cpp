@@ -1,5 +1,5 @@
 //#include "Box2D/Box2D.h"
-#include "src/configurator.h"
+#include "configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
 #include "CppTimer.h"
