@@ -3,6 +3,7 @@
 #include <chrono>
 
 void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
+	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
