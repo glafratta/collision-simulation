@@ -53,8 +53,15 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
-		ci->data = coordinates;
-		ci->data2fp = coordinates2fp;
+		for (Point & d:coordinates){
+			ci->data.insert(d);
+		}
+		for (Point & d:coordinates2fp){
+			ci->data2fp.insert(d);
+		}
+		ci->ready=1;
+		//ci->data = coordinates;
+		//ci->data2fp = coordinates2fp;
 		printf("added data to interface containers\n");
 
 	}

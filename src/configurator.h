@@ -18,6 +18,7 @@
 class ConfiguratorInterface{
 public:
 	bool debugOn=0;
+	bool ready =0;
 	CoordinateContainer data = {};
 	CoordinateContainer data2fp = {};
 };
