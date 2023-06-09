@@ -140,7 +140,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
-	applyController(isSameTask, currentTask);
+	//applyController(isSameTask, currentTask);
 
 
 }
