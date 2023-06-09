@@ -431,12 +431,13 @@ void Configurator::run(Configurator * c){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
 		}
-		//if (!(c->ci->data.empty()) && !(c->ci->data2fp.empty())){
+		if (!(c->ci->data.empty()) && !(c->ci->data2fp.empty())){
+
 			if (c->ci->data != c->current){
 				printf("c->ci->data size = %i\n", c->ci->data.size());
 				c->Spawner(c->ci->data, c->ci->data2fp);
 			}
-		//}
+		}
 	}
 }
 
