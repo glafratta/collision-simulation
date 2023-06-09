@@ -68,6 +68,9 @@ public:
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
+	if (c ==NULL){
+		printf("null pointer to configurator in stepcallback\n");
+	}
 	L= (c->getTask()->getAction().getLWheelSpeed());
 	R = (c->getTask()->getAction().getRWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
