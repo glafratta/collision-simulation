@@ -13,8 +13,8 @@
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
-CoordinateContainer datav = {};
-CoordinateContainer datav2fp = {};
+CoordinateContainer coordinates = {};
+CoordinateContainer coordinates2fp = {};
 public: 
     int mapCount =0;
 
@@ -38,18 +38,18 @@ public:
 				float y2 = round(data.y*100)/100;
 				p= (Point(x, y));
 				p2f=Point(x2, y2);
-				datav.insert(p);
-				datav2fp.insert(p2f);
+				coordinates.insert(p);
+				coordinates2fp.insert(p2f);
 				if (ci->debugOn){
 					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
 				}
             }
 		}
 		fclose(f);
-		ci->data = datav;
-		ci->data2fp = datav2fp;
-		datav.clear();
-		data2fpv.clear();
+		ci->data = coordinates;
+		ci->data2fp = coordinates2fp;
+		coordinates.clear();
+		coordinates2fp.clear();
 	}
 
 
