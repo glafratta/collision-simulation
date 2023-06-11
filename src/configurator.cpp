@@ -310,30 +310,39 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-		if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
+		Direction dir = Direction::DEFAULT;
+		if (boost::in_degree(srcVertex, g)>0){ //was >
+			dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+		}
+	//	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getAffIndex()==int(InnateAffordances::NONE)){
-				Direction dir = Direction::DEFAULT;
-				if (boost::in_degree(srcVertex, g)>0){ //was >
-					dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
-				}
-				if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
-					g[v].options.push_back(dir);
+				// Direction dir = Direction::DEFAULT;
+				// if (boost::in_degree(srcVertex, g)>0){ //was >
+				// 	dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
+				// }
+				// if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
+				// 	g[v].options.push_back(dir);
+				// 	}
+				// else 
+//				if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
+				if (result.resultCode != Task::simResult::successful|| boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
+				//	dir= s.H(result.collision, DEFAULT);
+				//	g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
+				//	g[v].options.push_back(getOppositeDirection(dir));
+				//	g[v].options.push_back(Direction::BACK);
+					for (Direction d :Avoid.options){
+						g[v].options.push_back(d);
 					}
-				else if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0){
-					dir= s.H(result.collision, DEFAULT);
-					g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
-					g[v].options.push_back(getOppositeDirection(dir));
-					g[v].options.push_back(Direction::BACK);
 				}
 				}
-			}
-		else { //will only enter if successful
-			if (s.getAffIndex()==int(InnateAffordances::AVOID)){
+		//	}
+//		else { //will only enter if successful
+		else if (s.getAffIndex()==int(InnateAffordances::AVOID)){
 				g[v].options.push_back(Direction::DEFAULT);
 			}
 	}	
 			//}
-	}
+//	}
 
 
 	isLeaf = (g[v].options.size() ==0);

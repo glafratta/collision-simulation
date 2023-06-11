@@ -10,13 +10,19 @@ enum Direction{LEFT, RIGHT, DEFAULT, BACK, STOP};
 class Affordance{
 public:
     AffordanceIndex ID=-1;
-    std::vector <Direction> options; //vector of primitives, low level affordance
+    std::set <Direction> options; //vector of primitives, low level affordance
     Affordance(){}
 
-    Affordance(std::vector <Direction> vec, AffordanceIndex i =-1): options(vec),ID(i){}
+    Affordance(std::set <Direction> vec, AffordanceIndex i =-1):ID(i){
+        for (Direction d:vec){
+            options.insert(d);
+        }
+    }
 
-    void initialiseMs(std::vector <Direction> vec){
-       options = vec;
+    void initialiseMs(std::set<Direction> vec){
+        for (Direction d:vec){
+            options.insert(d);
+        }
     }
 
     void setID(AffordanceIndex i){

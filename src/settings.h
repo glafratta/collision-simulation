@@ -7,7 +7,7 @@ const std::vector <Affordance> affordances{None, Avoid};
 
 class Knowledge{
     public:
-    std::vector <Direction> primitives = primitives;
+    std:: <Direction> primitives = primitives;
     std::vector <Direction> affordances = affordances;
 };
 
