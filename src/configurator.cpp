@@ -323,6 +323,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 					dir= s.H(result.collision, DEFAULT);
 					g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
 					g[v].options.push_back(getOppositeDirection(dir));
+					g[v].options.push_back(Direction::BACK);
 				}
 				}
 			}
