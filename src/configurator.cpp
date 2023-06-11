@@ -401,7 +401,6 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
     while (v1!= v){
 		b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
-
 		vertexDescriptor v1Src = v1InEdge.m_source;
 		Direction dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir);
