@@ -310,11 +310,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-		Direction dir = Direction::DEFAULT;
-		if (boost::in_degree(srcVertex, g)>0){ //was >
-			dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
-		}
-	//	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
+	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getAffIndex()==int(InnateAffordances::NONE)){
 				// Direction dir = Direction::DEFAULT;
 				// if (boost::in_degree(srcVertex, g)>0){ //was >
@@ -325,7 +321,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 				// 	}
 				// else 
 //				if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
-				if (result.resultCode != Task::simResult::successful|| boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
+				if (boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
 				//	dir= s.H(result.collision, DEFAULT);
 				//	g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
 				//	g[v].options.push_back(getOppositeDirection(dir));
@@ -335,13 +331,24 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 					}
 				}
 				}
-		//	}
-//		else { //will only enter if successful
-		else if (s.getAffIndex()==int(InnateAffordances::AVOID)){
-				g[v].options.push_back(Direction::DEFAULT);
 			}
-	}	
-			//}
+		else { //will only enter if successful
+		if (s.getAffIndex()==int(InnateAffordances::AVOID)){
+			if (s.direction == LEFT || s.direction == RIGHT){
+				for (Direction d: None.options){
+					g[v].options.push_back(d);
+				}
+			}
+			else if (s.direction == BACK){
+				for (Direction d: Avoid.options){
+					if (d !=BACK){
+						g[v].options.push_back(d);
+					}
+				}
+			}
+		}
+		}	
+	}
 //	}
 
 
