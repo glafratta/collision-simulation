@@ -232,6 +232,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 			case Direction::DEFAULT: printf("STRAIGHT, "); break;
 			case Direction::LEFT: printf("LEFT, "); break;
 			case Direction::RIGHT: printf("RIGHT, "); break;
+			case Direction::BACK: printf("BACK, "); break;
 			default: break;
 
 		}
