@@ -17,8 +17,8 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		robot.body->SetTransform(start, theta);
 		int step=0;
 		for (step; step < (HZ*remaining); step++) {//3 second
-			instVelocity.x = SignedVelocity(RecordedVelocity)*cos(theta); //integrate?
-			instVelocity.y = SignedVelocity(RecordedVelocity)*sin(theta);
+			instVelocity.x = SignedVectorLength(RecordedVelocity)*cos(theta); //integrate?
+			instVelocity.y = SignedVectorLength(RecordedVelocity)*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);

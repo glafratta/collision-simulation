@@ -21,3 +21,11 @@ bool operator>=(M & m1, M& m2){
     }
     return r;
 }
+
+float SignedVectorLength(b2Vec2 v){
+	float signedLength = v.Length();
+	if (v.x <0){
+		signedLength*=-1;
+	}
+	return signedLength;
+}

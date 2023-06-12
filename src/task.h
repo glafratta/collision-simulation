@@ -7,7 +7,6 @@
 #include "measurement.h"
 #include <stdexcept>
 #include "settings.h"
-#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.0
 #define REACTION_TIME 2.3

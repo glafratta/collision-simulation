@@ -124,10 +124,7 @@ struct comparator{
 	}
 }; 
 
-
-//P operator+=(P const &, P const &);
 typedef Point P;
-//bool operator<(P const &, P const &);
 bool operator<(P const &, P const &);
 
 bool operator>(P const &, P const &);
@@ -137,17 +134,5 @@ bool operator==(P const &, P const &);
 typedef std::set<Point> CoordinateContainer;
 
 typedef b2Transform DeltaPose;
-
-float SignedVelocity(b2Vec2 v){
-	float signedLength = v.Length();
-	if (v.x <0){
-		signedLength*=1;
-	}
-	return signedLength;
-}
-
-
-
-
 
 #endif

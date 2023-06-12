@@ -2,7 +2,7 @@
 #define CONFIGURATOR_H
 #include "opencv2/opencv.hpp"
 #include "Box2D/Box2D.h"
-#include "robot.h"
+//#include "robot.h"
 #include <dirent.h>
 #include <vector>
 #include <thread>
@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-#include "task.h"
+//#include "task.h"
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>

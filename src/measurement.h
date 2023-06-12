@@ -49,4 +49,6 @@ bool operator<(M &, M &);
 
 bool operator>=(M &, M &);
 
+float SignedVectorLength(b2Vec2);
+
 #endif
