@@ -53,8 +53,8 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
 		b2Vec2 distance; //= robot.body->GetPosition();
-		distance.x = robot.body->GetPosition().x - start.x;
-		distance.y = robot.body->GetPosition().y - start.y;
+		distance.x = robot.body->GetPosition().x - start.p.x;
+		distance.y = robot.body->GetPosition().y - start.p.y;
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
 		int roboCount=0;
@@ -159,15 +159,14 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			b2Vec2 v = disturbance.getPosition() - start.p;
 			Distance d(v.Length());
-			endCriteria.distance = Distance(d+0.05);
+			endCriteria.distance = Distance(v.Length()+0.05);
 		}
 		break;
 		case STOP:
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
 			b2Vec2 v = disturbance.getPosition() - start.p;
-			Distance d(v.Length());
-			endCriteria.distance = Distance(d+0.05);
+			endCriteria.distance = Distance(v.Length()+0.05);
 		}
 		break;
 		default:break;

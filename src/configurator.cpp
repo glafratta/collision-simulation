@@ -232,8 +232,8 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 
 
 
-void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &s, b2Vec2 & start, float & angle){ //returns true if disturbance needs to be eliminated	
-	r =s.willCollide(world, iteration, debugOn, start, angle, SIM_DURATION);
+void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &s){ //returns true if disturbance needs to be eliminated	
+	r =s.willCollide(world, iteration, debugOn, SIM_DURATION);
 	if (r.resultCode == Task::simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN

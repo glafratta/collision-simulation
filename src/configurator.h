@@ -145,7 +145,7 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-void reactiveAvoidance(b2World &, Task::simResult &, Task&, b2Vec2 &, float &); //adds two Tasks if crashed but always next up is picked
+void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
 vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
 

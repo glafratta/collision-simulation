@@ -314,7 +314,7 @@ Task(){
     RecordedVelocity = action.getLinearVelocity();
 }
 
-Task(Disturbance ob, Direction d, b2Transform _start){
+Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
     disturbance = ob;
     direction = H(disturbance, d);  
     action = Action(direction);
@@ -336,7 +336,7 @@ b2Vec2 getRecordedVelocity(){
 
 void trackDisturbance(Disturbance &, float, b2Vec2, b2Transform);
 
-simResult willCollide(b2World &, int, bool, b2Vec2, float, float);
+simResult willCollide(b2World &, int, bool, float);
 
 enum controlResult{DONE =0, CONTINUE =1};
 
