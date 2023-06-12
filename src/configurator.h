@@ -45,7 +45,8 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	CoordinateContainer current, currentBox2D;
+	CoordinateContainer current = {};
+	CoordinateContainer currentBox2D={};
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
