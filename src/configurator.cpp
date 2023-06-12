@@ -331,13 +331,11 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 					}
 				}
 				}
-			}
+		}
 		else { //will only enter if successful
 		if (s.getAffIndex()==int(InnateAffordances::AVOID)){
 			if (s.direction == LEFT || s.direction == RIGHT){
-				for (Direction d: None.options){
-					g[v].options.push_back(d);
-				}
+				g[v].options.push_back(DEFAULT);
 			}
 			else if (s.direction == BACK){
 				for (Direction d: Avoid.options){

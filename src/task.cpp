@@ -28,7 +28,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
 			if (checkEnded(robot.body->GetTransform())){
-				if (direction=BACK){
+				if (direction==BACK){
 					result = simResult(simResult::resultType::successful, disturbance);
 				}
 				break;
