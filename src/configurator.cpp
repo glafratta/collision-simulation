@@ -3,7 +3,7 @@
 #include <chrono>
 
 void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
-	printf("started spawner\n");
+	//printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
@@ -18,7 +18,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		currentBox2D.insert(d);
 	}
 	currentBox2D = data2fp;
-	printf("updated coordinate vectors\n");
+	//printf("updated coordinate vectors\n");
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -28,31 +28,31 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	previousTimeScan=now; //update the time of sampling
 
 	if ( timeElapsed< .19){		
-		if (debugOn){
+		if (timerOff){ //was debugon
 			timeElapsed = .2;
 		}
 	}
 	else if (timeElapsed >.21){
 		//printf("took too long! %f\n", timeElapsed);
-		if (debugOn){
+		if (timerOff){
 			timeElapsed = .2;
 		}
 		
 	}
 
-	printf("calculated time elapsed\n");
+//	printf("calculated time elapsed\n");
 
 	//CREATE BOX2D ENVIRONMENT
 	b2World world = b2World({0.0f,0.0f});
 	char name[256];
 	//int bodies=0;
-	printf("made world\n");
+	//printf("made world\n");
 
 	//CALCULATE VELOCITY 
 	
 	Configurator::getVelocityResult affRes= GetRealVelocity(current, previous);
 	b2Transform deltaP =affRes.vector;
-	printf("calculated velocity\n");
+	//printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = 0;
@@ -70,7 +70,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			currentTask = desiredTask;
 		}
 	}
-	printf("tracked disturbance");
+//	printf("tracked disturbance");
 
 	//MAKE BOX2D BODIES 
 
@@ -85,7 +85,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	b2Vec2 start(0.0f, 0.0f);
 	float theta=0;
 
-	printf("made bodies\n");
+	//printf("made bodies\n");
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
@@ -100,7 +100,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
-	printf("set velocity and created empty graph\n");
+	//printf("set velocity and created empty graph\n");
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	switch (planning){
@@ -116,7 +116,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 				//FIND BEST OPTION FOR CHANGING
 				if (g.m_vertices.size()>1){
 					dir =g[e].direction;
-					printf("bestdirection = %i\n", dir);
+					//printf("bestdirection = %i\n", dir);
 					currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
@@ -143,11 +143,11 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
-	printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
+	//printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameTask, currentTask);
-	printf("applied controller\n");
+	//printf("applied controller\n");
 
 
 }

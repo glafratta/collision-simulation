@@ -14,6 +14,7 @@
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
+
 class Task{
 public:
     float accumulatedError=0;

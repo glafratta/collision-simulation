@@ -147,22 +147,22 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		case DEFAULT: break;
 		case LEFT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(M_PI_2);
+			endCriteria.angle = Angle(SAFE_ANGLE);
 		}
 		break;
 		case RIGHT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(M_PI_2);
+			endCriteria.angle = Angle(SAFE_ANGLE);
 		}
 		break;
 		case BACK: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.distance = Distance(.05);
+			endCriteria.distance = Distance(0.05);
 		}
 		break;
 		case STOP:
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(M_PI_2);
+			endCriteria.angle = Angle(SAFE_ANGLE);
 			endCriteria.distance = Distance(.05);
 		}
 		break;

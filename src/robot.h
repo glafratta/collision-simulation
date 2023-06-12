@@ -4,6 +4,7 @@
 #include "Box2D/Box2D.h"
 #include <math.h>
 #define SAFE_ANGLE M_PI_2
+#define SAFE_DISTANCE 0.125
 #define MAX_TURN M_PI
 #define ROBOT_HALFLENGTH 0.11
 #define ROBOT_HALFWIDTH 0.09

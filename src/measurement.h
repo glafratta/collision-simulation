@@ -36,7 +36,7 @@ class Distance: public Measurement{
     public:
     Distance(){}
     Distance(float f)
-    {value =round(f*100)/100;
+    {value = round(SAFE_DISTANCE +f*100)/100;
     valid =1;}
 };
 
