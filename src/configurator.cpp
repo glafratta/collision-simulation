@@ -106,7 +106,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	switch (planning){
 		case 0:
 			printf("reacting\n");
-			reactiveAvoidance(world, result, currentTask, start, theta);
+			reactiveAvoidance(world, result, currentTask);
 			break;
 		case 1:
 			currentTask.change = build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
@@ -267,12 +267,12 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		if (remaining<0){
 			remaining=0;
 		}
-		result =s.willCollide(w, iteration, debugOn, g[srcVertex].endPose.p, g[srcVertex].endPose.q.GetAngle(), remaining); //start from where the last Task ended (if previous Task crashes)
+		result =s.willCollide(w, iteration, debugOn, remaining); //start from where the last Task ended (if previous Task crashes)
 		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
 		g[v].predecessors = g[srcVertex].predecessors +1;
 	}
 	else{
-		result =s.willCollide(w, iteration, debugOn, {0.0, 0.0}, 0, remaining); //default start from 0
+		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
 	}
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
@@ -395,7 +395,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 		vertexDescriptor v1Src = v1InEdge.m_source;
 		Direction dir = g[v1InEdge].direction;
-		s = Task(g[v1Src].disturbance, dir);
+		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(newWorld, dir, g[v1Src].endPose); //was g[v].endPose
 		int bodyCount = newWorld.GetBodyCount();
 		//DEBUG

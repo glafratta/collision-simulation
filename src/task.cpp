@@ -2,7 +2,7 @@
 
 
 
-Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, b2Vec2 start = b2Vec2(), float _theta=0.0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
+Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;
@@ -12,9 +12,9 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			sprintf(planFile, "/tmp/robot%04i.txt", iteration);
 			robotPath = fopen(planFile, "a");
 		}
-		float theta = _theta;
+		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
-		robot.body->SetTransform(start, theta);
+		robot.body->SetTransform(start.p, theta);
 		int step=0;
 		for (step; step < (HZ*remaining); step++) {//3 second
 			instVelocity.x = SignedVectorLength(RecordedVelocity)*cos(theta); //integrate?
@@ -37,14 +37,14 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 				int index = int(listener.collisions.size()/2);
 				if (getAffIndex()==int(InnateAffordances::NONE) && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
-					posReadjusted.x = start.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-					posReadjusted.y = start.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
-					robot.body->SetTransform(posReadjusted, _theta); //if the simulation crashes reset position for 
+					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
+					robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
 				}
 				else{
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
-					robot.body->SetTransform(start, _theta); //if the simulation crashes reset position for 
+					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result.collision.safeForNow =0;
 
 					}
@@ -157,13 +157,17 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		break;
 		case BACK: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.distance = Distance(0.05);
+			b2Vec2 v = disturbance.getPosition() - start.p;
+			Distance d(v.Length());
+			endCriteria.distance = Distance(d+0.05);
 		}
 		break;
 		case STOP:
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
-			endCriteria.distance = Distance(.05);
+			b2Vec2 v = disturbance.getPosition() - start.p;
+			Distance d(v.Length());
+			endCriteria.distance = Distance(d+0.05);
 		}
 		break;
 		default:break;

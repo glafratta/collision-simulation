@@ -18,6 +18,7 @@ class Task{
 public:
     float accumulatedError=0;
     char planFile[250]; //for debug
+    b2Transform start;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
@@ -313,11 +314,12 @@ Task(){
     RecordedVelocity = action.getLinearVelocity();
 }
 
-Task(Disturbance ob, Direction d){
+Task(Disturbance ob, Direction d, b2Transform _start){
     disturbance = ob;
     direction = H(disturbance, d);  
     action = Action(direction);
     RecordedVelocity = action.getLinearVelocity();
+    start = _start;
     setEndCriteria();
 }
 
