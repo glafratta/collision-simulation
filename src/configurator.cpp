@@ -7,7 +7,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
-	previous = current;
+	for (Point d:current){
+		previous.insert(d);
+	}
+	//previous = current;
 	current.clear();
 	for (Point d:data){
 		current.insert(d);
