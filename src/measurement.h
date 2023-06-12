@@ -1,8 +1,6 @@
 #ifndef MEASUREMENT_H
 #define MEASUREMENT_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
+#include "robot.h"
 
 class Measurement{
 protected:

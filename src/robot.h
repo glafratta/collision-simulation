@@ -2,6 +2,8 @@
 #define ROBOT_H
 //box2d robot body and kinematic model
 #include "Box2D/Box2D.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #define SAFE_ANGLE M_PI_2
 #define SAFE_DISTANCE 0.125

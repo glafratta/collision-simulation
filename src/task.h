@@ -4,7 +4,6 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> 
-#include "robot.h"
 #include "measurement.h"
 #include <stdexcept>
 #include "settings.h"
