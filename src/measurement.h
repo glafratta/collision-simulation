@@ -38,6 +38,7 @@ class Distance: public Measurement{
     valid =1;}
 };
 
+
 struct EndCriteria{
     Angle angle;
     Distance distance;

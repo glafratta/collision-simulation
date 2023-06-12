@@ -50,8 +50,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 	//CALCULATE VELOCITY 
 	
-	Configurator::getVelocityResult affRes= GetRealVelocity(current, previous);
-	b2Transform deltaP =affRes.vector;
+	DeltaPose deltaPose= GetRealVelocity(current, previous);
+	//b2Transform deltaPose =affRes.vector;
 	//printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
@@ -62,9 +62,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	if (currentTask.disturbance.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
-		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaP.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
+		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
 		//bool ended = currentTask.checkEnded();
-		//if (currentTask.disturbance.getAngle(deltaP) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
+		//if (currentTask.disturbance.getAngle(deltaPose) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
 		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
 			currentTask = desiredTask;
@@ -90,7 +90,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	Task::simResult result;
-	currentTask.setRecordedVelocity(deltaP.p);
+	currentTask.setRecordedVelocity(deltaPose.p);
 
 	//creating decision tree Disturbance
 	CollisionGraph g;
@@ -161,8 +161,8 @@ void Configurator::applyController(bool isSameTask, Task & task){
 	}
 }
 
-Configurator::getVelocityResult Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
-		getVelocityResult result;
+DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
+		DeltaPose result;
 
 		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
@@ -189,7 +189,6 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(CoordinateContaine
 			}
 			}
 		}
-	
 		else if (diff<0){
 			if (currentTmp.empty()){
 				printf("no data\n");
@@ -199,41 +198,36 @@ Configurator::getVelocityResult Configurator::GetRealVelocity(CoordinateContaine
 				}
 			else{
 				for (int i=0; i<abs(diff); i++){
-			currentTmp.push_back(currentTmp[0]);
-
+					currentTmp.push_back(currentTmp[0]);
 				}
 		}
 		}
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
-		if (!transformMatrix.empty()){
-			result.valid =1;
-			result.affineResult.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
-			result.affineResult.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-			result.affineResult.q.Set(acos(transformMatrix.at<double>(0,0))/timeElapsed);
-			result.vector = result.affineResult;
-			float posAngle = atan(result.affineResult.p.y/result.affineResult.p.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
-			if (result.affineResult.p.y ==0 && result.affineResult.p.x ==0){
-				posAngle =0;
-			}
-			if (result.affineResult.p.Length()>MAX_SPEED){
-				result.vector.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
-				result.vector.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
-			}
-			
+	if (!transformMatrix.empty()){
+		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
+		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+		result.q.Set(acos(transformMatrix.at<double>(0,0))/timeElapsed);
+		float posAngle = atan(result.p.y/result.p.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
+		if (result.p.y ==0 && result.p.x ==0){
+			posAngle =0;
 		}
-		else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
-			b2Transform deltaP;
-			theta = currentTask.getAction().getOmega()* timeElapsed;
-			deltaP.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-			deltaP.q.Set(currentTask.getAction().getOmega());
-			result = getVelocityResult(deltaP);
+		if (result.p.Length()>MAX_SPEED){
+			result.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
+			result.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
 		}
-		else{
-			printf("could not find velocity\n");
-		}
-		return result;
+		
+	}
+	else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
+		theta = currentTask.getAction().getOmega()* timeElapsed;
+		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
+		result.q.Set(currentTask.getAction().getOmega());
+	}
+	else{
+		printf("could not find velocity\n");
+	}
+	return result;
 	}
 
 

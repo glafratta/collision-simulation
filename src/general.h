@@ -34,18 +34,11 @@ struct Node{
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 
-//typedef b2Vec2 V;
-//V operator-(V const &, V const &);
-
-
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
-
-
-
 
 struct Point{
 	float x=0;
@@ -124,6 +117,7 @@ struct Point{
 
 
 };
+
 struct comparator{
     bool operator() ( Point a, Point b ){ //
         return a.y <=b.y;
@@ -141,6 +135,18 @@ bool operator>(P const &, P const &);
 bool operator==(P const &, P const &);
 
 typedef std::set<Point> CoordinateContainer;
+
+typedef b2Transform DeltaPose;
+
+float SignedVelocity(b2Vec2 v){
+	float signedLength = v.Length();
+	if (v.x <0){
+		signedLength*=1;
+	}
+	return signedLength;
+}
+
+
 
 
 
