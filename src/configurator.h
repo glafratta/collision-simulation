@@ -51,17 +51,6 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 
-	struct getVelocityResult{
-		bool valid =0;
-		b2Transform vector;
-		b2Transform affineResult;
-		getVelocityResult(){}
-		getVelocityResult(b2Transform disp):vector(disp){
-			valid=1;
-		}
-
-	};
-
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
