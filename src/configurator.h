@@ -117,7 +117,7 @@ int getIteration(){
 	return iteration;
 }
 
-Configurator::getVelocityResult GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
+DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
 void controller();
 
