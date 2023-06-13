@@ -310,16 +310,17 @@ void setEndCriteria();
 bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
 Task(){
+    start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     action = Action(direction);
     RecordedVelocity = action.getLinearVelocity();
 }
 
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+    start = _start;
     disturbance = ob;
     direction = H(disturbance, d);  
     action = Action(direction);
     RecordedVelocity = action.getLinearVelocity();
-    start = _start;
     setEndCriteria();
 }
 
