@@ -318,7 +318,8 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 				// 	}
 				// else 
 //				if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
-				if (boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
+				///if (boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
+				if (g[v].nodesInSameSpot<maxNodesOnSpot){
 				//	dir= s.H(result.collision, DEFAULT);
 				//	g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
 				//	g[v].options.push_back(getOppositeDirection(dir));

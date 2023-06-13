@@ -19,7 +19,7 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     b2Transform start;
-    b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+    //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
     float endAvoid = M_PI_2;
