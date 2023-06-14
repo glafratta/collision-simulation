@@ -285,6 +285,10 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
 	}
 
+	if (direction == BACK){
+		printf("addign BACK node\n");
+	}
+
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
