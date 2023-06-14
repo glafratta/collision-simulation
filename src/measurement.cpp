@@ -25,7 +25,8 @@ bool operator>=(M & m1, M& m2){
 float SignedVectorLength(b2Vec2 v){
 	float signedLength = v.Length();
 	if (v.x <0){
-		signedLength*=-1;
+        printf("this task goes backwards\n");
+		signedLength = -signedLength;
 	}
 	return signedLength;
 }
