@@ -132,8 +132,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
 				}
 				else{ //FALLBACK, ensure it's still operating even if tree building fails
-				 	currentTask = Task(g[v0].disturbance, Direction::DEFAULT); //was stop
-				 	printf("using fallback\n");
+				 	currentTask = Task(g[v0].disturbance, Direction::STOP); //was stop
+				 	printf("I am stuck!\n");
 				}
 			}
 			break;
