@@ -2,6 +2,15 @@
 #include "configurator.h"
 #include <chrono>
 
+void ConfiguratorInterface::setReady(bool b){
+	ready = b;
+}
+
+
+bool ConfiguratorInterface::isReady(){
+	return ready;
+}
+
 void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
 	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
