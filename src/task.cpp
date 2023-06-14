@@ -49,6 +49,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					//DEBUG PRINT STATEMTNS
 					if (direction=BACK){
 						printf("failed because it will bump into body at %f, %f\ninst velocity = %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y, instVelocity.x, instVelocity.y);
+						printf("step = %i, robot positon = %f %f\n", step, robot.body->GetPosition().x, robot.body->GetPosition().y);
 					}
 
 					}
