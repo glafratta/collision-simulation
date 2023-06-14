@@ -48,7 +48,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					result.collision.safeForNow =0;
 					//DEBUG PRINT STATEMTNS
 					if (direction=BACK){
-						printf("failed because it will bump into body at %f, %f\n", collision.getPosition().x, collision.getPosition().y);
+						printf("failed because it will bump into body at %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y);
 					}
 
 					}
