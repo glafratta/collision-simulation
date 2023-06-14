@@ -75,8 +75,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	if (currentTask.disturbance.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
-		//bool ended = currentTask.checkEnded();
-		//if (currentTask.disturbance.getAngle(deltaPose) >= currentTask.endAvoid){ 		//if obstacle (pos) and robot (vel) are perpendicular
+		b2Vec2 v = currentTask.disturbance.getPosition() - currentTask.start.p;
+		printf("distance from disturbance = %f, direction of current Task = %i\n", v.Length(), int(currentTask.direction));
 		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
 			currentTask = desiredTask;
@@ -425,7 +425,6 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 
 }
 
-
 void Configurator::start(){ 
 	if (ci == NULL){
 		throw std::invalid_argument("no data interface found");
@@ -456,9 +455,13 @@ void Configurator::run(Configurator * c){
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
+			running=0;
+			return;
 		}
 		if (c == NULL){
 			printf("null pointer to configurator\n");
+			running=0;
+			return;
 		}
 		if (c->ci->isReady()){
 			if (c->ci->data != c->current){
