@@ -3,7 +3,7 @@
 #include <chrono>
 
 void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
-	//printf("started spawner\n");
+	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
@@ -21,7 +21,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		currentBox2D.insert(d);
 	}
 	currentBox2D = data2fp;
-	//printf("updated coordinate vectors\n");
+	printf("updated coordinate vectors\n");
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -142,15 +142,13 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		fclose(f);
 	}
 	bodies =0;
-	currentBox2D.clear();
-
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
 	//printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	applyController(isSameTask, currentTask);
-	//printf("applied controller\n");
+	printf("applied controller\n");
 
 
 }
