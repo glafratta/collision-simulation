@@ -455,12 +455,12 @@ void Configurator::run(Configurator * c){
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
-			running=0;
+			c->running=0;
 			return;
 		}
 		if (c == NULL){
 			printf("null pointer to configurator\n");
-			running=0;
+			c->running=0;
 			return;
 		}
 		if (c->ci->isReady()){
