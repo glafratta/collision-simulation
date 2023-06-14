@@ -21,7 +21,8 @@ public:
     LidarInterface(ConfiguratorInterface * _ci): ci(_ci){}
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
-	    ci->setReady(0);
+	    //ci->setReady(0);
+		ci->ready=0;
 		mapCount++;
 		//std::vector <Point> current;
 		Point p, p2f;
@@ -60,9 +61,8 @@ public:
 		for (Point d:coordinates2fp){
 			ci->data2fp.insert(d);
 		}
-		ci->setReady(1);
-		//ci->data = coordinates;
-		//ci->data2fp = coordinates2fp;
+		//ci->setReady(1);
+		ci->ready=1;
 		printf("added data to interface containers\n");
 
 	}
