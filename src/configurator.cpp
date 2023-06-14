@@ -285,7 +285,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
 	}
 
-	if (direction == BACK){
+	if (s.direction == BACK){
 		printf("addign BACK node\n");
 	}
 
