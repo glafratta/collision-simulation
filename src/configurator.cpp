@@ -451,7 +451,7 @@ void Configurator::run(Configurator * c){
 		if (c == NULL){
 			printf("null pointer to configurator\n");
 		}
-		if (!(c->ci->data2fp.empty())){
+		if (ci->isReady()){
 			if (c->ci->data != c->current){
 				printf("c->ci->data size = %i\n", c->ci->data.size());
 				c->Spawner(c->ci->data, c->ci->data2fp);

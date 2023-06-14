@@ -22,7 +22,13 @@ public:
 	CoordinateContainer data2fp;
 	bool ready=0;
 
+	void setReady(bool b){
+		ready = b;
+	}
 
+	bool isReady(){
+		return ready;
+	}
 };
 
 class Configurator{
