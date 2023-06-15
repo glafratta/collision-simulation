@@ -134,6 +134,8 @@ public:
     float R=.5;
     float L=.5;
 
+    //Action()=0;
+
     Action(Direction direction = DEFAULT){
         switch (direction){
         case Direction::DEFAULT:
@@ -167,7 +169,7 @@ public:
     if (direction == BACK){
         printf("direction is BACK, linear speed = %f\n", linearSpeed);
     }
-    if (L=-.5 && R==L){
+    if (L==-.5 && R==L){
         printf("direction = %i\n", int(direction));
     }
 
@@ -175,37 +177,6 @@ public:
         
     }
 
-    //void init(Direction direction){
-    //     switch (direction){
-    //     case Direction::DEFAULT:
-    //     break;
-    //     case Direction::LEFT:
-    //     L = -0.5;
-    //     R=0.5;
-    //     break;
-    //     case Direction::RIGHT:
-    //     L=0.5;
-    //     R = - 0.5;
-    //     break;
-    //     case Direction::BACK:
-    //     L = -0.5;
-    //     R = -0.5;
-    //     break;
-    //     case Direction::STOP:
-    //     L=0;
-    //     R=0;
-    //     default:
-    //     throw std::invalid_argument("not a valid direction for M");
-    //     break;
-    // }
-    //kinematic model internal to action so it can be versatile for use in real P and simulated P
-
-    // omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-
-    // linearSpeed = MAX_SPEED*(L+R)/2;
-
-    // valid=1;
-    // }
 
     b2Vec2 getLinearVelocity(){
         b2Vec2 velocity;
