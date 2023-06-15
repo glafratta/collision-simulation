@@ -63,6 +63,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CALCULATE VELOCITY 
 	
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
+	// currentTask.action.omega = deltaPose.q.GetAngle();
+	// currentTask.action.linearSpeed = SignedVectorLength(deltaPose.p.Length());
 	//b2Transform deltaPose =affRes.vector;
 	//printf("calculated velocity\n");
 
@@ -102,7 +104,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	Task::simResult result;
-	currentTask.setRecordedVelocity(deltaPose.p);
+	//currentTask.setRecordedVelocity(deltaPose.p);
 
 	//creating decision tree Disturbance
 	CollisionGraph g;
@@ -236,7 +238,9 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 	}
 	else{
 		printf("could not find velocity\n");
-	}
+	}	
+	currentTask.action.omega = result.q.GetAngle();
+	currentTask.action.linearSpeed = SignedVectorLength(result.p.Length())'
 	return result;
 	}
 

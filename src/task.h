@@ -87,24 +87,7 @@ public:
         return angle;
     }
 
-    // float getAngle(float angle2){ //gets the angle of an Disturbance wrt to the heading direction of another Disturbance
-    //     //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
-    //     float angle1=0;
-    //     if (position.y !=0 && position.x !=0){ //inclusive or?
-    //         angle1 = atan(position.y/position.x); //own angle to the origin 
-    //     }
-	//     float angle = angle1-angle2;
-    //     return angle;
-    // }
-
     float getAngle(b2Body* b){
-        // float angle;
-        // b2Vec2 thisToB;
-        // thisToB.x = position.x-b->GetPosition().x;
-        // thisToB.y = position.y - b->GetPosition().y;./no
-        // float cosA = (thisToB.x * cos(b->GetAngle())+ thisToB.y*sin(b->GetAngle()))/thisToB.Length();
-        // angle = acos(cosA);
-        // return angle;
         return getAngle(b->GetTransform());
     }
 
@@ -185,37 +168,37 @@ public:
         
     }
 
-    void init(Direction direction){
-        switch (direction){
-        case Direction::DEFAULT:
-        break;
-        case Direction::LEFT:
-        L = -0.5;
-        R=0.5;
-        break;
-        case Direction::RIGHT:
-        L=0.5;
-        R = - 0.5;
-        break;
-        case Direction::BACK:
-        L = -0.5;
-        R = -0.5;
-        break;
-        case Direction::STOP:
-        L=0;
-        R=0;
-        default:
-        throw std::invalid_argument("not a valid direction for M");
-        break;
-    }
+    //void init(Direction direction){
+    //     switch (direction){
+    //     case Direction::DEFAULT:
+    //     break;
+    //     case Direction::LEFT:
+    //     L = -0.5;
+    //     R=0.5;
+    //     break;
+    //     case Direction::RIGHT:
+    //     L=0.5;
+    //     R = - 0.5;
+    //     break;
+    //     case Direction::BACK:
+    //     L = -0.5;
+    //     R = -0.5;
+    //     break;
+    //     case Direction::STOP:
+    //     L=0;
+    //     R=0;
+    //     default:
+    //     throw std::invalid_argument("not a valid direction for M");
+    //     break;
+    // }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
 
-    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+    // omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
 
-    linearSpeed = MAX_SPEED*(L+R)/2;
+    // linearSpeed = MAX_SPEED*(L+R)/2;
 
-    valid=1;
-    }
+    // valid=1;
+    // }
 
     b2Vec2 getLinearVelocity(){
         b2Vec2 velocity;
@@ -245,6 +228,7 @@ public:
     return omega;
     }
 
+    friend class Configurator;
 };
 
 
