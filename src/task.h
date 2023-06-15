@@ -16,6 +16,7 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
 class Task{
 public:
+    friend class Configurator;
     float accumulatedError=0;
     char planFile[250]; //for debug
     b2Transform start;

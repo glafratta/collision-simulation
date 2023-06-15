@@ -240,7 +240,7 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		printf("could not find velocity\n");
 	}	
 	currentTask.action.omega = result.q.GetAngle();
-	currentTask.action.linearSpeed = SignedVectorLength(result.p.Length())'
+	currentTask.action.linearSpeed = SignedVectorLength(result.p);
 	return result;
 	}
 
