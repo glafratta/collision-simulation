@@ -134,9 +134,9 @@ public:
     float R=.5;
     float L=.5;
 
-    //Action()=0;
+    Action()=0;
 
-    Action(Direction direction = DEFAULT){
+    void init(Direction direction = DEFAULT){
         switch (direction){
         case Direction::DEFAULT:
         L=0.5;
@@ -273,7 +273,7 @@ bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot
 
 Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-    action = Action(direction);
+    action.init();
     RecordedVelocity = action.getLinearVelocity();
 }
 
@@ -281,7 +281,8 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     start = _start;
     disturbance = ob;
     direction = H(disturbance, d);  
-    action = Action(direction);
+    //action = Action(direction);
+    action.init(direction);
     RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
 }
