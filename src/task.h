@@ -134,7 +134,7 @@ public:
     float R=.5;
     float L=.5;
 
-    Action()=0;
+    Action(){}
 
     void init(Direction direction = DEFAULT){
         switch (direction){
