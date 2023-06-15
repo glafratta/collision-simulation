@@ -164,6 +164,9 @@ public:
     omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
 
     linearSpeed = MAX_SPEED*(L+R)/2;
+    if (direction == BACK){
+        printf("direction is BACK, linear speed = %f\n", linearSpeed);
+    }
 
     valid=1;
         
