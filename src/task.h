@@ -167,6 +167,9 @@ public:
     if (direction == BACK){
         printf("direction is BACK, linear speed = %f\n", linearSpeed);
     }
+    if (L=-.5 && R==L){
+        printf("direction = %i\n", int(direction));
+    }
 
     valid=1;
         
