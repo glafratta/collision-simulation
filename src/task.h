@@ -153,7 +153,6 @@ public:
         case Direction::BACK:
         L = -0.5;
         R = -0.5;
-        printf("made wheel speeds back\n");
         break;
         case Direction::STOP:
         L=0;
@@ -201,7 +200,14 @@ public:
     return omega;
     }
 
-    friend class Configurator;
+    void setOmega(float o){
+        omega =o;
+    }
+
+    void setLinearSpeed(float s){
+        linearSpeed =s;
+    }
+    //friend class Configurator;
 };
 
 
@@ -266,11 +272,13 @@ void setEndCriteria();
 
 bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
+//Task(){}
+
 Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
-    RecordedVelocity = action.getLinearVelocity();
+    //RecordedVelocity = action.getLinearVelocity();
 }
 
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
@@ -279,7 +287,24 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     direction = H(disturbance, d);  
     //action = Action(direction);
     action.init(direction);
-    RecordedVelocity = action.getLinearVelocity();
+    //RecordedVelocity = action.getLinearVelocity();
+    setEndCriteria();
+}
+
+void init(){
+    start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+    direction = DEFAULT;
+    action.init(direction);
+   // RecordedVelocity = action.getLinearVelocity();
+}
+
+void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+    start = _start;
+    disturbance = ob;
+    direction = H(disturbance, d);  
+    //action = Action(direction);
+    action.init(direction);
+   // RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
 }
 

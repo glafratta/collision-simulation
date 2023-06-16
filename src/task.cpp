@@ -19,8 +19,6 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		for (step; step < (HZ*remaining); step++) {//3 second
 			instVelocity.x = action.getLinearSpeed()*cos(theta);
 			instVelocity.y = action.getLinearSpeed()*sin(theta);
-			// instVelocity.x = SignedVectorLength(RecordedVelocity)*cos(theta); //integrate?
-			// instVelocity.y = SignedVectorLength(RecordedVelocity)*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
@@ -47,11 +45,11 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 				else{
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
-					if (direction=BACK){
-						printf("signed vector length = %f, action direction code = %i, linear speed = %f\n", SignedVectorLength(instVelocity), int(direction), action.getLinearSpeed());
-						printf("failed because it will bump into body at %f, %f\ninst velocity = %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y, instVelocity.x, instVelocity.y);
-						printf("step = %i, robot positon = %f %f\n", step, robot.body->GetPosition().x, robot.body->GetPosition().y);
-					}
+					// if (direction==BACK){
+					// 	printf("signed vector length = %f, action direction code = %i, linear speed = %f\n", SignedVectorLength(instVelocity), int(direction), action.getLinearSpeed());
+					// 	printf("failed because it will bump into body at %f, %f\ninst velocity = %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y, instVelocity.x, instVelocity.y);
+					// 	printf("step = %i, robot positon = %f %f\n", step, robot.body->GetPosition().x, robot.body->GetPosition().y);
+					// }
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result.collision.safeForNow =0;

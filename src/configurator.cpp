@@ -62,8 +62,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CALCULATE VELOCITY 
 	
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
-	// currentTask.action.omega = deltaPose.q.GetAngle();
-	// currentTask.action.linearSpeed = SignedVectorLength(deltaPose.p.Length());
+	currentTask.action.setOmega(deltaPose.q.GetAngle());
+	currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
 	//b2Transform deltaPose =affRes.vector;
 	//printf("calculated velocity\n");
 
@@ -77,7 +77,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
 		b2Vec2 v = currentTask.disturbance.getPosition() - currentTask.start.p;
-		printf("distance from disturbance = %f, direction of current Task = %i\n", v.Length(), int(currentTask.direction));
+		//printf("distance from disturbance = %f, direction of current Task = %i\n", v.Length(), int(currentTask.direction));
 		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
 			currentTask = desiredTask;
@@ -238,8 +238,6 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 	else{
 		printf("could not find velocity\n");
 	}	
-	currentTask.action.omega = result.q.GetAngle();
-	currentTask.action.linearSpeed = SignedVectorLength(result.p);
 	return result;
 	}
 
@@ -288,9 +286,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
 	}
 
-	if (s.direction == BACK){
-		printf("addign BACK node\n");
-	}
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
