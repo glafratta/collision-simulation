@@ -47,8 +47,8 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	CoordinateContainer current = {};
-	CoordinateContainer currentBox2D={};
+	CoordinateContainer current;
+	CoordinateContainer currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
@@ -80,8 +80,7 @@ Configurator(){
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		FILE * f = fopen(statFile, "w");
 		fclose(f);
-}
-
+	}
 }
 
 Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){

@@ -16,17 +16,16 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
-	for (Point d:current){
+	for (auto d: current){
 		previous.insert(d);
 	}
-	//previous = current;
 	current.clear();
-	for (Point d:data){
+	for (auto d:data){
 		current.insert(d);
 	}
 	//current = data;
 	currentBox2D.clear();
-	for (Point d:data2fp){
+	for (auto d:data2fp){
 		currentBox2D.insert(d);
 	}
 	currentBox2D = data2fp;

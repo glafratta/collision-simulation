@@ -23,9 +23,9 @@ public:
     //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
-    float endAvoid = M_PI_2;
+    //float endAvoid = M_PI_2;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
-    Direction direction= Direction::DEFAULT;
+    Direction direction;
 protected:
     //Type type = Type::BASELINE;
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
@@ -136,7 +136,7 @@ public:
 
     Action(){}
 
-    void init(Direction direction = DEFAULT){
+    void init(Direction direction){
         switch (direction){
         case Direction::DEFAULT:
         L=0.5;
@@ -153,6 +153,7 @@ public:
         case Direction::BACK:
         L = -0.5;
         R = -0.5;
+        printf("made wheel speeds back\n");
         break;
         case Direction::STOP:
         L=0;
@@ -166,12 +167,6 @@ public:
     omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
 
     linearSpeed = MAX_SPEED*(L+R)/2;
-    if (direction == BACK){
-        printf("direction is BACK, linear speed = %f\n", linearSpeed);
-    }
-    if (L==-.5 && R==L){
-        printf("direction = %i\n", int(direction));
-    }
 
     valid=1;
         
@@ -252,7 +247,7 @@ class Listener : public b2ContactListener {
         
 	};
 private:
-Action action = Action();
+Action action;
 public:
 //std::vector <Direction> options;
 Disturbance disturbance;
@@ -273,7 +268,8 @@ bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot
 
 Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-    action.init();
+    direction = DEFAULT;
+    action.init(direction);
     RecordedVelocity = action.getLinearVelocity();
 }
 
