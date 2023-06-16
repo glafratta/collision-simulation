@@ -62,8 +62,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CALCULATE VELOCITY 
 	
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
-	currentTask.action.setOmega(deltaPose.q.GetAngle());
-	currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
+	if (currentTask.direction !=LEFT && currentTask.direction != RIGHT){
+		currentTask.action.setOmega(deltaPose.q.GetAngle());
+		currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
+	}
 	//b2Transform deltaPose =affRes.vector;
 	//printf("calculated velocity\n");
 

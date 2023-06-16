@@ -372,6 +372,10 @@ void registerInterface(ConfiguratorInterface *);
 
 static void run(Configurator *);
 
+void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
+
+void snapNodes();
+
 
 };
 
