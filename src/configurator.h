@@ -238,8 +238,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
-	switch (d){
-		case Direction::DEFAULT:{
+	if (d ==DEFAULT || d==BACK){
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;		
@@ -311,9 +310,9 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 
 			}
 		}
-		break;
+
 		}
-		default:
+		else{
 		// for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
 		// 	auto p = *_p;
 		for (auto p:currentBox2D){
@@ -338,25 +337,25 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				body->CreateFixture(&fixtureDef);
 			}
 			else if (curr!=NULL){
-			if (curr->disturbance.isValid()){
-				if (p.isInRadius(currentTask.disturbance.getPosition()) & p !=*(&p-1)){
-					obStillThere =1;
-					b2Body * body;
-					b2BodyDef bodyDef;
-					b2FixtureDef fixtureDef;
-					bodyDef.type = b2_dynamicBody;
-					b2PolygonShape fixture; //giving the point the shape of a box
-					fixtureDef.shape = &fixture;
-					fixture.SetAsBox(.001f, .001f); 
-					bodyDef.position.Set(p.x, p.y); 
-					body = world.CreateBody(&bodyDef);
-					bodies++;
-					body->CreateFixture(&fixtureDef);
+				if (curr->disturbance.isValid()){
+					if (p.isInRadius(currentTask.disturbance.getPosition()) & p !=*(&p-1)){
+						obStillThere =1;
+						b2Body * body;
+						b2BodyDef bodyDef;
+						b2FixtureDef fixtureDef;
+						bodyDef.type = b2_dynamicBody;
+						b2PolygonShape fixture; //giving the point the shape of a box
+						fixtureDef.shape = &fixture;
+						fixture.SetAsBox(.001f, .001f); 
+						bodyDef.position.Set(p.x, p.y); 
+						body = world.CreateBody(&bodyDef);
+						bodies++;
+						body->CreateFixture(&fixtureDef);
+					}
 				}
-			}
 		}
 		}
-		break;
+		
 
 	}
 	return obStillThere;
