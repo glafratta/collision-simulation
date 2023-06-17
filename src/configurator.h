@@ -238,12 +238,19 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
-	if (d ==DEFAULT || d==BACK){
+	if (d!=LEFT && d!=RIGHT){
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
-		float ceilingY, floorY, frontX, backX;		
+		float ceilingY, floorY, frontX, backX;
+		float boxLength =BOX2DRANGE;		
 		Point positionVector, radiusVector, maxFromStart; 
-		radiusVector.polarInit(BOX2DRANGE, start.q.GetAngle());
+		if(d==BACK && curr !=NULL){
+			float x = start - curr.endCriteria().distance.get()* cos(start.q.GetAngle());
+			float y = start - curr.endCriteria().distance.get()* sin(start.q.GetAngle());
+			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
+			boxLength = BOX2DRANGE+ curr.endCriteria().distance.get();
+		}
+		radiusVector.polarInit(boxLength, start.q.GetAngle());
 		maxFromStart = Point(start.p) + radiusVector;
 		//FIND THE BOUNDS OF THE BOX
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
