@@ -12,6 +12,7 @@
 #define REACTION_TIME 2.3
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
+#define END_BACK 0.05
 
 
 class Task{
