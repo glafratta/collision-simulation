@@ -62,7 +62,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CALCULATE VELOCITY 
 	
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
-	if (currentTask.direction !=LEFT && currentTask.direction != RIGHT){
+	if (currentTask.direction ==DEFAULT){
 		currentTask.action.setOmega(deltaPose.q.GetAngle());
 		currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
 	}
@@ -162,6 +162,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	applyController(isSameTask, currentTask);
 	printf("applied controller\n");
 
+	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
 
 }
 
