@@ -165,14 +165,14 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			b2Vec2 v = disturbance.getPosition() - start.p;
 			Distance d(v.Length());
-			endCriteria.distance = Distance(v.Length()+0.05);
+			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
 		}
 		break;
 		case STOP:
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
 			b2Vec2 v = disturbance.getPosition() - start.p;
-			endCriteria.distance = Distance(v.Length()+0.05);
+			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
 		}
 		break;
 		default:break;

@@ -244,11 +244,11 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		float ceilingY, floorY, frontX, backX;
 		float boxLength =BOX2DRANGE;		
 		Point positionVector, radiusVector, maxFromStart; 
-		if(d==BACK && curr !=NULL){
-			float x = start - curr.endCriteria().distance.get()* cos(start.q.GetAngle());
-			float y = start - curr.endCriteria().distance.get()* sin(start.q.GetAngle());
+		if(d==BACK){
+			float x = start.p.x - BACK_DISTANCE* cos(start.q.GetAngle());
+			float y = start.p.y - BACK_DISTANCE* sin(start.q.GetAngle());
 			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
-			boxLength = BOX2DRANGE+ curr.endCriteria().distance.get();
+			boxLength = BOX2DRANGE+ BACK_DISTANCE;
 		}
 		radiusVector.polarInit(boxLength, start.q.GetAngle());
 		maxFromStart = Point(start.p) + radiusVector;
@@ -314,7 +314,6 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				bodies++;
 				body = world.CreateBody(&bodyDef);
 				body->CreateFixture(&fixtureDef);
-
 			}
 		}
 
