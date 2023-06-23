@@ -230,7 +230,6 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	}
 	}
 	printf("\n");
-	
 	return e;
 }
 
@@ -238,7 +237,8 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
-	if (d!=LEFT && d!=RIGHT){
+	printf("constructing\n");
+	if (d!=LEFT && d!=RIGHT){ //IF THE ROBOT IS NOT TURNING
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;
@@ -248,10 +248,13 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			float x = start.p.x - BACK_DISTANCE* cos(start.q.GetAngle());
 			float y = start.p.y - BACK_DISTANCE* sin(start.q.GetAngle());
 			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
-			boxLength = BOX2DRANGE+ BACK_DISTANCE;
+			boxLength += BACK_DISTANCE;
+			printf("modified boxlength = %f\n", boxLength);
 		}
 		radiusVector.polarInit(boxLength, start.q.GetAngle());
+		printf("radius vector = x=%f, y=%f\n", radiusVector.x, radiusVector.y);
 		maxFromStart = Point(start.p) + radiusVector;
+		printf("max from start length = %f\n", maxFromStart.r);
 		//FIND THE BOUNDS OF THE BOX
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
 		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
@@ -280,9 +283,6 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			backX = std::max(top.x, bottom.x);
 		}
 		//CREATE POINTS
-
-		// for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
-		// 	auto p = *_p;
 		for (auto p:currentBox2D){
 			bool include;
 			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
@@ -290,10 +290,11 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				floorY = mHead*p.x+qBottomH;
 				float frontY= mPerp*p.x+qBottomP;
 				float backY = mPerp*p.x+qTopP;
-				include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
+				//include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
+				include = p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY;
 			}
 			else{
-				include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
+				include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
 			}
 			if (include){
 				b2Body * body;
@@ -316,13 +317,10 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				body->CreateFixture(&fixtureDef);
 			}
 		}
-
 		}
-		else{
-		// for (auto _p = currentBox2D.begin(); _p!= currentBox2D.end(); ++_p){	
-		// 	auto p = *_p;
+		else{ //IF DIRECTION IS LEFT OR RIGHT 
 		for (auto p:currentBox2D){
-			if (p != *(&p-1)&& p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			if (p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;
@@ -344,7 +342,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			}
 			else if (curr!=NULL){
 				if (curr->disturbance.isValid()){
-					if (p.isInRadius(currentTask.disturbance.getPosition()) & p !=*(&p-1)){
+					if (p.isInRadius(currentTask.disturbance.getPosition())){
 						obStillThere =1;
 						b2Body * body;
 						b2BodyDef bodyDef;
