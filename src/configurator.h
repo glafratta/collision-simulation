@@ -237,7 +237,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	const float halfWindowWidth = .1;
-	printf("constructing\n");
+	//printf("constructing\n");
 	if (d!=LEFT && d!=RIGHT){ //IF THE ROBOT IS NOT TURNING
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
@@ -249,12 +249,12 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			float y = start.p.y - BACK_DISTANCE* sin(start.q.GetAngle());
 			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
 			boxLength += BACK_DISTANCE;
-			printf("modified boxlength = %f, start x = %f, y= %f\n", boxLength, start.p.x, start.p.y);
+			//printf("modified boxlength = %f, start x = %f, y= %f\n", boxLength, start.p.x, start.p.y);
 		}
 		radiusVector.polarInit(boxLength, start.q.GetAngle());
-		printf("radius vector = x=%f, y=%f\n", radiusVector.x, radiusVector.y);
+		//printf("radius vector = x=%f, y=%f\n", radiusVector.x, radiusVector.y);
 		maxFromStart = Point(start.p) + radiusVector;
-		printf("max from start length = %f\n", maxFromStart.r);
+		//printf("max from start length = %f\n", maxFromStart.r);
 		//FIND THE BOUNDS OF THE BOX
 		b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
 		b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
