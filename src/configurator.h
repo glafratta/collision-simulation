@@ -267,7 +267,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
 		bottom = bounds[0];
 		top = bounds[3];
-		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
+		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
 			//FIND PARAMETERS OF THE LINES CONNECTING THE a
 			mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
 			mPerp = -1/mHead;
