@@ -79,10 +79,15 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	if (currentTask.disturbance.isValid()){
 		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
-		b2Vec2 v = currentTask.disturbance.getPosition() - currentTask.start.p;
-		//printf("distance from disturbance = %f, direction of current Task = %i\n", v.Length(), int(currentTask.direction));
+		//b2Vec2 v = currentTask.disturbance.getPosition() - currentTask.start.p;
+		if (debugOn && currentTask.direction == BACK){
+			printf("distance from disturbance = %f, desired distance = %f\n", currentTask.disturbance.getPosition().Length(), currentTask.endCriteria.distance.get());
+		}
 		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
+			if (debugOn && currentTask.direction ==BACK){
+				printf("invalidating disturbance")
+			}
 			currentTask = desiredTask;
 		}
 	}

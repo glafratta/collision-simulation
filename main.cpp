@@ -77,8 +77,8 @@ public:
 };
 
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
-    int iteration=0;
-    int confIteration=0;
+    //int iteration=0;
+    //int confIteration=0;
     Configurator * c;
     float L=0;
 	float R=0;
@@ -98,7 +98,7 @@ void step( AlphaBot &motors){
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c->getIteration());
-    iteration++;
+    //iteration++;
 }
 };
 
