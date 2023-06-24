@@ -16,6 +16,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//PREPARE VECTORS TO RECEIVE DATA
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
+	printf("current size = %i, previous size = %i, currentbox2d size = %i\n", current.size(), previous.size(), currentBox2D.size());
 	for (auto d: current){
 		previous.insert(d);
 	}
@@ -473,7 +474,7 @@ void Configurator::run(Configurator * c){
 			return;
 		}
 		if (c->ci->isReady()){
-			printf(".")
+			printf(".");
 			if (c->ci->data != c->current){
 				printf("\nc->ci->data size = %i\n", c->ci->data.size());
 				c->Spawner(c->ci->data, c->ci->data2fp);
