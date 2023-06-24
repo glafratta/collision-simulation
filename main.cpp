@@ -68,6 +68,7 @@ public:
 		// }
 		//ci->setReady(1);
 		ci->ready=1;
+		//ci->iteration++;
 		printf("added data to interface containers\n");
 
 	}
@@ -79,7 +80,8 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
     int iteration=0;
     int confIteration=0;
     Configurator * c;
-    float L,R;
+    float L=0;
+	float R=0;
 
 public:
 
@@ -88,6 +90,9 @@ Callback(Configurator *conf): c(conf){
 void step( AlphaBot &motors){
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
+	}
+	if (c->iteration ==0){
+		return;
 	}
 	L= (c->getTask()->getAction().getLWheelSpeed());
 	R = (c->getTask()->getAction().getRWheelSpeed());
