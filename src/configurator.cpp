@@ -474,7 +474,7 @@ void Configurator::run(Configurator * c){
 			return;
 		}
 		if (c->ci->isReady()){
-			printf(".");
+			//printf(".");
 			if (c->ci->data != c->current){
 				printf("\nc->ci->data size = %i\n", c->ci->data.size());
 				c->Spawner(c->ci->data, c->ci->data2fp);
