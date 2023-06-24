@@ -406,7 +406,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	}
 	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
 	if (debugOn){
-		printf("planfile = %s\n", s.planFile);
+		printf("planfile = robot%04i.txt\n", iteration);
 	}
 		//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
