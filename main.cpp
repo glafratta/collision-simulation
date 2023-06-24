@@ -91,11 +91,10 @@ void step( AlphaBot &motors){
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
-	if (c->iteration ==0){
-		return;
+	if (c->iteration >0){
+		L= (c->getTask()->getAction().getLWheelSpeed());
+		R = (c->getTask()->getAction().getRWheelSpeed());	
 	}
-	L= (c->getTask()->getAction().getLWheelSpeed());
-	R = (c->getTask()->getAction().getRWheelSpeed());
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c->getIteration());
