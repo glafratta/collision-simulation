@@ -91,7 +91,7 @@ void step( AlphaBot &motors){
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
-	if (c->iteration >0){
+	if (c->getIteration() >0){
 		L= (c->getTask()->getAction().getLWheelSpeed());
 		R = (c->getTask()->getAction().getRWheelSpeed());	
 	}
