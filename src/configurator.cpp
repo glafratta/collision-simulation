@@ -146,14 +146,14 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 	}
 	printf("tree size = %i\n", g.m_vertices.size());
-	if (debugOn){
-		auto endTime =std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
-		float duration=float(d.count())/1000; //express in seconds
-		FILE * f = fopen(statFile, "a+");
-		fprintf(f,"%i\t%i\t%f\n", bodies, g.m_vertices.size(), duration);
-		fclose(f);
-	}
+	// if (debugOn){
+	// 	auto endTime =std::chrono::high_resolution_clock::now();
+	// 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
+	// 	float duration=float(d.count())/1000; //express in seconds
+	// 	FILE * f = fopen(statFile, "a+");
+	// 	fprintf(f,"%i\t%i\t%f\n", bodies, g.m_vertices.size(), duration);
+	// 	fclose(f);
+	// }
 	bodies =0;
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
