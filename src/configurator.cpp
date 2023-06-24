@@ -86,7 +86,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		if(currentTask.checkEnded()){
 			currentTask.disturbance.invalidate();
 			if (debugOn && currentTask.direction ==BACK){
-				printf("invalidating disturbance")
+				printf("invalidating disturbance");
 			}
 			currentTask = desiredTask;
 		}
