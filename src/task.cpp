@@ -88,7 +88,8 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVeloci
 }
 
 Task::controlResult Task::controller(){
-float recordedAngle = atan(RecordedVelocity.y/RecordedVelocity.x);
+if ()
+//float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded();
 if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
@@ -100,7 +101,7 @@ if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::
 	// }
 }
 else {
-	float timeStepError =action.getOmega()*0.2 - recordedAngle; 
+	float timeStepError =action.getOmega()/0.2; 
 	accumulatedError += timeStepError; 
 	if (timeStepError<tolerance){
 		action.L = 0.5;
