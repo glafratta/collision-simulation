@@ -216,7 +216,7 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		bestEdges.push_back(e);
 		best = e.m_source;
 	}
-	if (currentTask.change){
+	if (!g[0].disturbance.safeForNow){
 	printf("plan to go: ");
 	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
 		edgeDescriptor edge = *eIt;
