@@ -7,7 +7,7 @@ temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
     # Convert the CPU temperature to degrees Celsius and store as a string.
 #    temp=$(awk "BEGIN {printf \"%.2f\n\", $line/1000}")
 #fi
-if [$temp <80000]
+if [$temp -lt 80000]
 then
 	echo "temperature ok, building"
 	cmake .
