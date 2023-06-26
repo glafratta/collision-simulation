@@ -67,43 +67,36 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		currentTask.action.setOmega(deltaPose.q.GetAngle());
 		currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
 	}
-	//b2Transform deltaPose =affRes.vector;
 	//printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
-	bool wasAvoiding = 0;
+	bool wasAvoiding = currentTask.disturbance.isValid();
 	bool isSameTask = 1;
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	if (currentTask.disturbance.isValid()){
-		wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
-		currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
-		//b2Vec2 v = currentTask.disturbance.getPosition() - currentTask.start.p;
-		if (debugOn && currentTask.direction == BACK){
-			printf("distance from disturbance = %f, desired distance = %f\n", currentTask.disturbance.getPosition().Length(), currentTask.endCriteria.distance.get());
-		}
-		if(currentTask.checkEnded()){
-			currentTask.disturbance.invalidate();
-			if (debugOn && currentTask.direction ==BACK){
-				printf("invalidating disturbance");
-			}
-			else if (currentTask.direction ==STOP){
-				printf("stop ended\n");
-			}
-			currentTask = desiredTask;
-		}
+	//if (currentTask.disturbance.isValid()){
+	//	wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
+	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
+	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
+	if(currentTask.checkEnded()|| !isObstacleStillThere){
+		currentTask.disturbance.invalidate();
+		// if (debugOn && currentTask.direction ==BACK){
+		// 	printf("invalidating disturbance");
+		// }
+		// else if (currentTask.direction ==STOP){
+		// 	printf("stop ended\n");
+		// }
+		currentTask = desiredTask;
 	}
+	//}
 //	printf("tracked disturbance");
 
 	//MAKE BOX2D BODIES 
 
-	bool isObstacleStillThere=0;
-	isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask);
-
-	if (!isObstacleStillThere){ 
-		currentTask = desiredTask;
-	}
+	// if (!isObstacleStillThere){ 
+	// 	currentTask = desiredTask;
+	// }
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
 	b2Vec2 start(0.0f, 0.0f);
@@ -123,7 +116,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	edgeDescriptor e;
 	Direction dir;
 
-	auto startTime =std::chrono::high_resolution_clock::now();
+	//auto startTime =std::chrono::high_resolution_clock::now();
 	//printf("set velocity and created empty graph\n");
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
@@ -133,9 +126,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			reactiveAvoidance(world, result, currentTask);
 			break;
 		case 1:
-			currentTask.change = build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			e = findBestBranch(g, leaves);
-			if (currentTask.change){
+			if (!g[0].disturbance.safeForNow){
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				if (g.m_vertices.size()>1){
@@ -330,21 +323,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getAffIndex()==int(InnateAffordances::NONE)){
-				// Direction dir = Direction::DEFAULT;
-				// if (boost::in_degree(srcVertex, g)>0){ //was >
-				// 	dir = g[boost::in_edges(srcVertex, g).first.dereference()].direction;
-				// }
-				// if (result.resultCode == Task::simResult::crashed && dir != Direction::DEFAULT && g[v].nodesInSameSpot<maxNodesOnSpot){
-				// 	g[v].options.push_back(dir);
-				// 	}
-				// else 
-//				if (result.resultCode == Task::simResult::safeForNow || boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
-				///if (boost::in_degree(srcVertex, g)==0 && g[v].nodesInSameSpot<maxNodesOnSpot){
 				if (g[v].nodesInSameSpot<maxNodesOnSpot){
-				//	dir= s.H(result.collision, DEFAULT);
-				//	g[v].options.push_back(dir);// the first branch is the actions generating from a reflex to the collision
-				//	g[v].options.push_back(getOppositeDirection(dir));
-				//	g[v].options.push_back(Direction::BACK);
 					for (Direction d :Avoid.options){
 						g[v].options.push_back(d);
 					}
@@ -393,7 +372,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
                         break;
                     }
                 }
-
 		}
 		return v1;
 	}
@@ -402,6 +380,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	char n[250];
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
+	//PRINT DEBUG
 	if (debugOn){
 			FILE *f = fopen(n, "w"); //erase contents from previous run
 			fclose(f);
@@ -413,10 +392,12 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		}
 		fclose(f);
 	}
-	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
 	if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
+	//END DEBUG FILE
+	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
+
 		//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
 		b2World newWorld({0.0f, 0.0f});
@@ -437,9 +418,8 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		//END DEBUG
 		v= v1;
 		v1 = nextNode(v,g,s, newWorld, _leaves);
-
 	}
-	return !g[0].disturbance.safeForNow;
+	//return !g[0].disturbance.safeForNow;
 
 }
 
