@@ -45,7 +45,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 				else{
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
-					if (direction==BACK & start = b2Transform(b2Vec2(0,0), b2Rot(0))){
+					if (direction==BACK & start == b2Transform(b2Vec2(0,0), b2Rot(0))){
 						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE\n");
 					// 	printf("signed vector length = %f, action direction code = %i, linear speed = %f\n", SignedVectorLength(instVelocity), int(direction), action.getLinearSpeed());
 					// 	printf("failed because it will bump into body at %f, %f\ninst velocity = %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y, instVelocity.x, instVelocity.y);
