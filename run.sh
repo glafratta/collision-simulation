@@ -1,6 +1,6 @@
 #!/bin/bash
-temp = $(vcgencmd measure_temp | egrep -o '[0-9]*\.[0-9]*')
-if [$temp<80]
+temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
+if [ $temp -lt 51000 ]
 then
 	echo "ok to run, running"
 	echo "planning on? answer 0 or 1"
