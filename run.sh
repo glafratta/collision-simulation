@@ -1,6 +1,6 @@
 #!/bin/bash
 temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
-if [ $temp -lt 51000 ]
+if [ $temp -lt 70000 ]
 then
 	echo "ok to run, running"
 	echo "planning on? answer 0 or 1"
