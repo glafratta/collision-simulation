@@ -99,8 +99,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	// }
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
-	b2Vec2 start(0.0f, 0.0f);
-	float theta=0;
+	//b2Vec2 start(0.0f, 0.0f);
+	//float theta=0;
 
 	//printf("made bodies\n");
 
