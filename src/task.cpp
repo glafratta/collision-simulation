@@ -23,7 +23,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
 			if (debugOn){
-				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions
+				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
@@ -45,11 +45,12 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 				else{
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
-					// if (direction==BACK){
+					if (direction==BACK && start = b2Transform(b2Vec2(0,0), b2Rot(0))){
+						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE\n");
 					// 	printf("signed vector length = %f, action direction code = %i, linear speed = %f\n", SignedVectorLength(instVelocity), int(direction), action.getLinearSpeed());
 					// 	printf("failed because it will bump into body at %f, %f\ninst velocity = %f, %f\n", result.collision.getPosition().x, result.collision.getPosition().y, instVelocity.x, instVelocity.y);
 					// 	printf("step = %i, robot positon = %f %f\n", step, robot.body->GetPosition().x, robot.body->GetPosition().y);
-					// }
+					}
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result.collision.safeForNow =0;

@@ -249,7 +249,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			float x = start.p.x - (BACK_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
 			float y = start.p.y - (BACK_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
 			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
-			boxLength += BACK_DISTANCE;
+			boxLength += BACK_DISTANCE+ROBOT_HALFLENGTH;
 			//printf("modified boxlength = %f, start x = %f, y= %f\n", boxLength, start.p.x, start.p.y);
 		}
 		radiusVector.polarInit(boxLength, start.q.GetAngle());
