@@ -9,7 +9,7 @@ temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
 #fi
 if [ $temp -lt 80000 ]
 then
-	echo "temperature ok, building"
+	echo "temperature of $temp ok, building"
 	cmake .
 	make
 	sudo make install
