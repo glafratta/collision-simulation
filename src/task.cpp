@@ -88,7 +88,6 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVeloci
 }
 
 Task::controlResult Task::controller(){
-if ()
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded();
