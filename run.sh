@@ -7,7 +7,7 @@ then
 	read planning
 	echo "debug on? answer 0 or 1"
 	read debug
-	sudo ./navigate $planning $debug
+	sudo ./navigate $debug $planning
 else
 	echo "too hot! temperature = $temp"
 fi
