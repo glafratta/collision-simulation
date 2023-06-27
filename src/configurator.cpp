@@ -128,7 +128,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		case 1:
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			e = findBestBranch(g, leaves);
-			if (!g[0].disturbance.safeForNow){
+			if (g[0].outcome == crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
 				if (g.m_vertices.size()>1){
