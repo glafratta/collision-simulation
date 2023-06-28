@@ -12,10 +12,10 @@ then
 	then
 	sudo ./navigate $debug $planning
 	else
-	today = date +'%d%m%Y_%H%M'
-	filename = "/tmp/transcript$date"+ ".txt"
+	today =$(date +'%d%m%Y_%H%M')
+	filename = $("/tmp/transcript$date"+".txt")
 	echo "writing to $filename"
-	sudo ./navigate $debug $planning > /tmp/$filename
+	sudo ./navigate $debug $planning > $filename
 	fi
 else
 	echo "too hot! wait"
