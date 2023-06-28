@@ -14,7 +14,7 @@ then
 	else
 	echo "what file to write to?"
 	read filename
-	sudo ./navidate $debug $planning > /tmp/$filename
+	sudo ./navigate $debug $planning > /tmp/$filename
 	fi
 else
 	echo "too hot! wait"
