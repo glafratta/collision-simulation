@@ -8,7 +8,7 @@ then
 	read planning
 	echo "debug on? answer 0 or 1"
 	read debug
-	if [ $debug -eq 0 ]
+	if [ $debug == "0" ]
 	then
 	sudo ./navigate $debug $planning
 	else
