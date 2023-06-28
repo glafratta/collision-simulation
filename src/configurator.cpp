@@ -79,11 +79,12 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//	wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	if(currentTask.checkEnded()|| !isObstacleStillThere){
+	bool ended = currentTask.checkEnded();
+	if(ended|| !isObstacleStillThere){
 		currentTask.disturbance.invalidate();
-		// if (debugOn && currentTask.direction ==BACK){
-		// 	printf("invalidating disturbance");
-		// }
+		if (currentTask.direction ==BACK){
+		 	printf("invalidating disturbance. ended = %i, still there = %i\n", ended, isObstacleStillThere);
+		}
 		// else if (currentTask.direction ==STOP){
 		// 	printf("stop ended\n");
 		// }
@@ -131,7 +132,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
+				if(currentTask.direction ==BACK){
 				printf("will crash with object: %f, %f\n", g[v0].disturbance.position.x, g[v0].disturbance.position.y);
+				}
 				if (g.m_vertices.size()>1){
 					dir =g[e].direction;
 					//printf("bestdirection = %i\n", dir);
@@ -380,6 +383,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 
 bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 	char n[250];
+	int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
 	//PRINT DEBUG
 	if (debugOn){
@@ -398,7 +402,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	}
 	//END DEBUG FILE
 	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
-
+	bodyCount += w.GetBodyCount();
 		//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
 		b2World newWorld({0.0f, 0.0f});
@@ -407,7 +411,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		Direction dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(newWorld, dir, g[v1Src].endPose); //was g[v].endPose
-		int bodyCount = newWorld.GetBodyCount();
+		bodyCount =newWorld.GetBodyCount();
 		//DEBUG
 		if (debugOn){
 			FILE *f = fopen(n, "a+");
