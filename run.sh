@@ -8,7 +8,13 @@ then
 	read planning
 	echo "debug on? answer 0 or 1"
 	read debug
+	if [debug ==0]
+	then
 	sudo ./navigate $debug $planning
+	else
+	echo "what file to write to?"
+	read filename
+	sudo ./navidate $debug $planning > /tmp/$filename
 else
 	echo "too hot! wait"
 fi
