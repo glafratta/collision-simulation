@@ -12,7 +12,7 @@ then
 	then
 	sudo ./navigate $debug $planning
 	else
-	today =date +"%d%m%Y_%H%M"
+	today=$(date +%d%m%y_%H%M)
 	echo "writing to $today"
 	sudo ./navigate $debug $planning > /tmp/transcript$today.txt
 	fi
