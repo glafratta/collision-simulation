@@ -12,8 +12,9 @@ then
 	then
 	sudo ./navigate $debug $planning
 	else
-	echo "what file to write to?"
-	read filename
+	today = date +'%d%m%Y_%H%M'
+	filename = "/tmp/transcript$date"+ ".txt"
+	echo "writing to $filename"
 	sudo ./navigate $debug $planning > /tmp/$filename
 	fi
 else

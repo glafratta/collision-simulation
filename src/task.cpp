@@ -46,7 +46,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
-						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f\n", listener.collisions[index].x, listener.collisions[index].y);
+						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
 					}
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
