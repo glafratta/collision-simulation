@@ -18,7 +18,7 @@
 class ConfiguratorInterface{
 public:
 	bool debugOn=0;
-	//int iteration =0;
+	int iteration =0;
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 	bool ready=0;
