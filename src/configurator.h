@@ -54,6 +54,7 @@ public:
 	char statFile[100];
 	bool timerOff=0;
 	int bodies=0;
+	int treeSize = 0;
 
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();

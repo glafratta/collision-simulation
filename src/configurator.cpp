@@ -403,6 +403,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	//END DEBUG FILE
 	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
 	bodyCount += w.GetBodyCount();
+	treeSize= g.m_vertices.size();
 		//destroying world causes segfault even if it's no longer required so skipping for now
     while (v1!= v){
 		b2World newWorld({0.0f, 0.0f});
@@ -423,6 +424,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		//END DEBUG
 		v= v1;
 		v1 = nextNode(v,g,s, newWorld, _leaves);
+		treeSize= g.m_vertices.size();
 	}
 	//return !g[0].disturbance.safeForNow;
 
