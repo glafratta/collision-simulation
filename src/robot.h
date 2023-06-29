@@ -27,7 +27,8 @@ const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLEN
 class Robot {
 private: 
 	b2FixtureDef fixtureDef;
-	b2PolygonShape box;
+	//b2PolygonShape box;
+	//b2Vec2 centroid;
 public:
 	b2Vec2 velocity = {0,0};
 	b2Body* body;
@@ -39,7 +40,9 @@ public:
 		body = world->CreateBody(&bodyDef);
 		body->SetUserData(this);  
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
-		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE); 
+		b2PolygonShape box;
+		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE);
+		//centroid = box.m_centroid; 
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;
 		body->CreateFixture(&fixtureDef);
