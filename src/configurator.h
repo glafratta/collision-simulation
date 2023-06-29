@@ -321,7 +321,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		}
 		else{ //IF DIRECTION IS LEFT OR RIGHT 
 		for (auto p:currentBox2D){
-			if (p.isInRadius(start.p, halfWindowWidth)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X + 0.01)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				b2Body * body;
 				b2BodyDef bodyDef;
 				b2FixtureDef fixtureDef;
@@ -341,24 +341,24 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				bodies++;
 				body->CreateFixture(&fixtureDef);
 			}
-			else if (curr!=NULL){
-				if (curr->disturbance.isValid()){
-					if (p.isInRadius(currentTask.disturbance.getPosition())){
-						obStillThere =1;
-						b2Body * body;
-						b2BodyDef bodyDef;
-						b2FixtureDef fixtureDef;
-						bodyDef.type = b2_dynamicBody;
-						b2PolygonShape fixture; //giving the point the shape of a box
-						fixtureDef.shape = &fixture;
-						fixture.SetAsBox(.001f, .001f); 
-						bodyDef.position.Set(p.x, p.y); 
-						body = world.CreateBody(&bodyDef);
-						bodies++;
-						body->CreateFixture(&fixtureDef);
-					}
-				}
-		}
+		// 	else if (curr!=NULL){
+		// 		if (curr->disturbance.isValid()){
+		// 			if (p.isInRadius(currentTask.disturbance.getPosition())){
+		// 				obStillThere =1;
+		// 				b2Body * body;
+		// 				b2BodyDef bodyDef;
+		// 				b2FixtureDef fixtureDef;
+		// 				bodyDef.type = b2_dynamicBody;
+		// 				b2PolygonShape fixture; //giving the point the shape of a box
+		// 				fixtureDef.shape = &fixture;
+		// 				fixture.SetAsBox(.001f, .001f); 
+		// 				bodyDef.position.Set(p.x, p.y); 
+		// 				body = world.CreateBody(&bodyDef);
+		// 				bodies++;
+		// 				body->CreateFixture(&fixtureDef);
+		// 			}
+		// 		}
+		// }
 		}
 		
 
