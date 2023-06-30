@@ -94,7 +94,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 //	printf("tracked disturbance");
 
 	//MAKE BOX2D BODIES 
-
+8
 	// if (!isObstacleStillThere){ 
 	// 	currentTask = desiredTask;
 	// }
@@ -332,7 +332,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 						g[v].options.push_back(d);
 					}
 				}
-				}
+			}
 		}
 		else { //will only enter if successful
 		if (s.getAffIndex()==int(InnateAffordances::AVOID)){

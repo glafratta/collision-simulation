@@ -54,7 +54,7 @@ public:
 	char statFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	int treeSize = 0;
+	int treeSize = 0; //for debug
 
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
@@ -210,30 +210,32 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 		printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
 	}
 	//FIND FIRST NODE BEFORE ORIGIN
-	std::vector <edgeDescriptor> bestEdges;
-	edgeDescriptor e;
-	while (best != *(boost::vertices(g).first)){
-		e = boost::in_edges(best, g).first.dereference();
-		bestEdges.push_back(e);
-		best = e.m_source;
-	}
-	if (!g[0].disturbance.safeForNow){
-	printf("plan to go: ");
-	for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
-		edgeDescriptor edge = *eIt;
-		switch (g[edge].direction){
-			case Direction::DEFAULT: printf("STRAIGHT, "); break;
-			case Direction::LEFT: printf("LEFT, "); break;
-			case Direction::RIGHT: printf("RIGHT, "); break;
-			case Direction::BACK: printf("BACK, "); break;
-			default: break;
+	// std::vector <edgeDescriptor> bestEdges;
+	// edgeDescriptor e;
+	// while (best != *(boost::vertices(g).first)){
+	// 	e = boost::in_edges(best, g).first.dereference();
+	// 	bestEdges.push_back(e);
+	// 	best = e.m_source;
+	// }
+	// if (!g[0].disturbance.safeForNow){
+	// printf("plan to go: ");
+	// for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
+	// 	edgeDescriptor edge = *eIt;
+	// 	switch (g[edge].direction){
+	// 		case Direction::DEFAULT: printf("STRAIGHT, "); break;
+	// 		case Direction::LEFT: printf("LEFT, "); break;
+	// 		case Direction::RIGHT: printf("RIGHT, "); break;
+	// 		case Direction::BACK: printf("BACK, "); break;
+	// 		default: break;
 
-		}
-	}
-	}
-	printf("\n");
-	return e;
+	// 	}
+	// }
+	// }
+	// printf("\n");
+	// return e;
 }
+
+std::vector <edgeDescriptor> getPlan(CollisionGraph &g, vertexDescriptor best);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
