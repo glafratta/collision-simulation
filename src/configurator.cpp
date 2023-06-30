@@ -430,6 +430,37 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 
 }
 
+vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
+	//FIND BEST LEAF
+	vertexDescriptor best = _leaves[0];
+	for (vertexDescriptor leaf: _leaves){
+		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
+			best = leaf;
+		}
+		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
+			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
+				best = leaf;
+			}
+		}
+	}
+	return best;
+}
+
+Plan getPlan(CollisionGraph &g, vertexDescriptor best){
+	//std::vector <edgeDescriptor> bestEdges;
+	Plan p;
+	edgeDescriptor e;
+	while (best != *(boost::vertices(g).first)){
+		e = boost::in_edges(best, g).first.dereference();
+		//bestEdges.push_back(e);
+		best = e.m_source;
+		TaskSummary ts(g[best].disturbance, g[e].direction);
+		p.push_back(ts);
+	}
+	return p;
+}
+
+
 void Configurator::start(){ 
 	if (ci == NULL){
 		throw std::invalid_argument("no data interface found");

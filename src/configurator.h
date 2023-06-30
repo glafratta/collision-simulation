@@ -193,7 +193,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	}
 }
 
-edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
+vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
@@ -206,9 +206,10 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 			}
 		}
 	}
-	if (debugOn){
-		printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
-	}
+	// if (debugOn){
+	// 	printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
+	// }
+	return best;
 	//FIND FIRST NODE BEFORE ORIGIN
 	// std::vector <edgeDescriptor> bestEdges;
 	// edgeDescriptor e;
@@ -235,7 +236,9 @@ edgeDescriptor findBestBranch(CollisionGraph &g, std::vector <vertexDescriptor> 
 	// return e;
 }
 
-std::vector <edgeDescriptor> getPlan(CollisionGraph &g, vertexDescriptor best);
+Plan getPlan(CollisionGraph &g, vertexDescriptor best);
+
+void printPlan();
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
