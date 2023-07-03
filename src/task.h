@@ -41,7 +41,7 @@ private:
 public:
 	b2FixtureDef fixtureDef;
     b2Vec2 position;
-    bool safeForNow=1;
+   // bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
         if (i>affordances.size()-1){
@@ -219,6 +219,7 @@ struct simResult{
     bool valid = 0;
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+  //  int step=0;
 
 
     simResult(){}

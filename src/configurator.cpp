@@ -81,14 +81,13 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
 	bool ended = currentTask.checkEnded();
 	if(ended|| !isObstacleStillThere){
-		currentTask.disturbance.invalidate();
-		if (currentTask.direction ==BACK){
-		 	printf("invalidating disturbance. ended = %i, still there = %i\n", ended, isObstacleStillThere);
+		if (!plan.empty()){
+			plan.erase(plan.begin());
+			currentTask = Task(plan[0].first, plan[0].second);
 		}
-		// else if (currentTask.direction ==STOP){
-		// 	printf("stop ended\n");
-		// }
-		currentTask = desiredTask;
+		else{
+			currentTask = desiredTask;
+		}
 	}
 	//}
 //	printf("tracked disturbance");
@@ -114,7 +113,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
-	edgeDescriptor e;
+	//edgeDescriptor e;
 	Direction dir;
 
 	//auto startTime =std::chrono::high_resolution_clock::now();
@@ -128,22 +127,26 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			break;
 		case 1:
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-			e = findBestBranch(g, leaves);
+			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+			plan = getPlan(g, bestLeaf);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
-				if(currentTask.direction ==BACK){
-				printf("will crash with object: %f, %f\n", g[v0].disturbance.position.x, g[v0].disturbance.position.y);
-				}
-				if (g.m_vertices.size()>1){
-					dir =g[e].direction;
-					//printf("bestdirection = %i\n", dir);
-					currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
-				}
+				// if(currentTask.direction ==BACK){
+				// printf("will crash with object: %f, %f\n", g[v0].disturbance.position.x, g[v0].disturbance.position.y);
+				// }
+				// if (g.m_vertices.size()>1){
+				// 	dir =g[e].direction;
+				// 	//printf("bestdirection = %i\n", dir);
+				// 	currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
+				// }
 				// else{ //FALLBACK, ensure it's still operating even if tree building fails
 				//  	currentTask = Task(g[v0].disturbance, Direction::STOP); //was stop
 				//  	printf("I am stuck!\n");
 				// }
+				if (!plan.empty()){
+					currentTask = Task(plan[0].first, plan[0].second);
+				}
 			}
 			break;
 		default: 
@@ -303,28 +306,28 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	else{
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
-	g[v].disturbance = result.collision;
 	if (result.collision.isValid()){
 		g[v].totDs++;
 	}
+	g[v].disturbance = result.collision;
 	g[v].endPose = result.endPose;
 	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	g[v].outcome = result.resultCode;
+	//g[v].step = result.step;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 	bool fullMemory = g[v].totDs >=4;
-	bool moreCostlyThanLeaf =0; 
+	bool growBranch =1; 
 
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].distanceSoFar <= g[l].distanceSoFar && (g[v].outcome == g[l].outcome && g[v].predecessors>g[l].predecessors)){
-			moreCostlyThanLeaf =1;
+		if (g[v].distanceSoFar <= g[l].distanceSoFar && (g[v].outcome == g[l].outcome && g[v].totDs>g[l].totDs)){
+			growBranch =0;
 		}
 
 	}
-	
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!fl&& !moreCostlyThanLeaf && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+	if(!fl&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getAffIndex()==int(InnateAffordances::NONE)){
 				if (g[v].nodesInSameSpot<maxNodesOnSpot){
@@ -427,7 +430,21 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		treeSize= g.m_vertices.size();
 	}
 	//return !g[0].disturbance.safeForNow;
+}
 
+void cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+	if (leaf <root){
+		throw std::invalid_argument("wrong order of vertices for iteration\n");
+	}
+	vertexDescriptor lastValidNode = leaf;
+	while (leaf !=root){
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference; //get edge
+		if (g[leaf].endPose == g[root].endPose){ //if the leaf does not progress the robot			
+			boost::remove_vertex(leaf, g);
+			boost::remove_edge()
+		}
+	}
+	
 }
 
 vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
@@ -438,7 +455,7 @@ vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> 
 			best = leaf;
 		}
 		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
-			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
+			if (g[leaf].totDs< g[best].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
 				best = leaf;
 			}
 		}
@@ -448,14 +465,16 @@ vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> 
 
 Plan getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
-	Plan p;
+	int size = g[best].predecessors;
+	Plan p(size);
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
 		e = boost::in_edges(best, g).first.dereference();
 		//bestEdges.push_back(e);
 		best = e.m_source;
 		TaskSummary ts(g[best].disturbance, g[e].direction);
-		p.push_back(ts);
+		p[size-1]=ts; //fill the plan from the end backwards
+		size--;
 	}
 	return p;
 }

@@ -50,10 +50,13 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					}
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
-					result.collision.safeForNow =0;
+					//result.collision.safeForNow =0;
 					}
 				break;
 			}
+			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
+			// 	result.step =step;
+			// }
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
 		b2Vec2 distance; //= robot.body->GetPosition();

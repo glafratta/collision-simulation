@@ -19,15 +19,15 @@ struct Edge{
 };
 
 struct Node{
-	Task::Disturbance disturbance;
+	Task::Disturbance disturbance; //error signal
+	b2Transform endPose; 
+	float distanceSoFar =0; 
+	Task::simResult::resultType outcome;
+	//int step=0; //error signal
 	std::vector <Direction> options;
-	b2Transform endPose;
-	float distanceSoFar =0; //just negative of the total distance
 	int predecessors =0;
 	int nodesInSameSpot =0;
-	int totDs=0;
-	Task::simResult::resultType outcome;
-	
+	int totDs=0; //error signal
 };
 
 typedef b2Transform Transform;

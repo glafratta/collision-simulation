@@ -55,6 +55,7 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 	int treeSize = 0; //for debug
+	Plan plan;
 
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
@@ -193,50 +194,53 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	}
 }
 
-vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
-	//FIND BEST LEAF
-	vertexDescriptor best = _leaves[0];
-	for (vertexDescriptor leaf: _leaves){
-		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
-			best = leaf;
-		}
-		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
-			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
-				best = leaf;
-			}
-		}
-	}
-	// if (debugOn){
-	// 	printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
-	// }
-	return best;
-	//FIND FIRST NODE BEFORE ORIGIN
-	// std::vector <edgeDescriptor> bestEdges;
-	// edgeDescriptor e;
-	// while (best != *(boost::vertices(g).first)){
-	// 	e = boost::in_edges(best, g).first.dereference();
-	// 	bestEdges.push_back(e);
-	// 	best = e.m_source;
-	// }
-	// if (!g[0].disturbance.safeForNow){
-	// printf("plan to go: ");
-	// for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
-	// 	edgeDescriptor edge = *eIt;
-	// 	switch (g[edge].direction){
-	// 		case Direction::DEFAULT: printf("STRAIGHT, "); break;
-	// 		case Direction::LEFT: printf("LEFT, "); break;
-	// 		case Direction::RIGHT: printf("RIGHT, "); break;
-	// 		case Direction::BACK: printf("BACK, "); break;
-	// 		default: break;
+void cleanCollisionGraph(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
-	// 	}
-	// }
-	// }
-	// printf("\n");
-	// return e;
-}
+vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
+// {
+// 	//FIND BEST LEAF
+// 	vertexDescriptor best = _leaves[0];
+// 	for (vertexDescriptor leaf: _leaves){
+// 		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
+// 			best = leaf;
+// 		}
+// 		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
+// 			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
+// 				best = leaf;
+// 			}
+// 		}
+// 	}
+// 	// if (debugOn){
+// 	// 	printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
+// 	// }
+// 	return best;
+// 	//FIND FIRST NODE BEFORE ORIGIN
+// 	// std::vector <edgeDescriptor> bestEdges;
+// 	// edgeDescriptor e;
+// 	// while (best != *(boost::vertices(g).first)){
+// 	// 	e = boost::in_edges(best, g).first.dereference();
+// 	// 	bestEdges.push_back(e);
+// 	// 	best = e.m_source;
+// 	// }
+// 	// if (!g[0].disturbance.safeForNow){
+// 	// printf("plan to go: ");
+// 	// for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
+// 	// 	edgeDescriptor edge = *eIt;
+// 	// 	switch (g[edge].direction){
+// 	// 		case Direction::DEFAULT: printf("STRAIGHT, "); break;
+// 	// 		case Direction::LEFT: printf("LEFT, "); break;
+// 	// 		case Direction::RIGHT: printf("RIGHT, "); break;
+// 	// 		case Direction::BACK: printf("BACK, "); break;
+// 	// 		default: break;
 
-Plan getPlan(CollisionGraph &g, vertexDescriptor best);
+// 	// 	}
+// 	// }
+// 	// }
+// 	// printf("\n");
+// 	// return e;
+// }
+
+Plan getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan();
 
@@ -372,7 +376,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	return obStillThere;
 }
 
-void addOptionsToNode(CollisionGraph &, vertexDescriptor &); //adds options for the robot to travel only straight, left and right
+void addOptionsToNode(CollisionGraph &); //adds options for the robot to travel only straight, left and right
 
 void start(); //data interface class collecting position of bodies
 
@@ -383,8 +387,6 @@ void registerInterface(ConfiguratorInterface *);
 static void run(Configurator *);
 
 void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
-
-void snapNodes();
 
 
 };
