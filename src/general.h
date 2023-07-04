@@ -39,7 +39,7 @@ typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
-typedef std::pair <Disturbance, Direction> TaskSummary;
+typedef std::pair <Task::Disturbance, Direction> TaskSummary;
 typedef std::vector <TaskSummary> Plan;
 
 struct Point{

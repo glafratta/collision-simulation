@@ -93,7 +93,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 //	printf("tracked disturbance");
 
 	//MAKE BOX2D BODIES 
-8
+
 	// if (!isObstacleStillThere){ 
 	// 	currentTask = desiredTask;
 	// }
@@ -120,14 +120,14 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//printf("set velocity and created empty graph\n");
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
-	switch (planning){
-		case 0:
+		if (!planning){
 			printf("reacting\n");
 			reactiveAvoidance(world, result, currentTask);
-			break;
-		case 1:
+		}	
+		else{
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+			cleanCollisionGraph(g, bestLeaf);
 			plan = getPlan(g, bestLeaf);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
@@ -148,11 +148,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					currentTask = Task(plan[0].first, plan[0].second);
 				}
 			}
-			break;
-		default: 
-		break;
-
-	}
+		}
 	printf("tree size = %i\n", g.m_vertices.size());
 	// if (debugOn){
 	// 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -438,11 +434,21 @@ void cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescript
 	}
 	vertexDescriptor lastValidNode = leaf;
 	while (leaf !=root){
-		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference; //get edge
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
+		vertexDescriptor src = boost::source(e,g);
+		edgeDescriptor workingEdge;
 		if (g[leaf].endPose == g[root].endPose){ //if the leaf does not progress the robot			
-			boost::remove_vertex(leaf, g);
-			boost::remove_edge()
+			if (lastValidNode != leaf){//create edge with the last working node
+				workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
+				workingEdge.m_source = src; //connect the last working node to the source
+			}			
+			boost::remove_edge(src, leaf, g); //remove edge
+			boost::remove_vertex(leaf, g); //remove vertex
 		}
+		else{
+			lastValidNode = leaf; // the leaf is a valid working node
+		}
+		leaf = src; //go back
 	}
 	
 }
@@ -465,16 +471,17 @@ vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> 
 
 Plan getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
-	int size = g[best].predecessors;
-	Plan p(size);
+	//int size = g[best].predecessors;
+	Plan p;
 	edgeDescriptor e;
 	while (best != *(boost::vertices(g).first)){
 		e = boost::in_edges(best, g).first.dereference();
 		//bestEdges.push_back(e);
 		best = e.m_source;
 		TaskSummary ts(g[best].disturbance, g[e].direction);
-		p[size-1]=ts; //fill the plan from the end backwards
-		size--;
+		p.insert(p.begin(), ts);
+		//p[size-1]=ts; //fill the plan from the end backwards
+		//size--;
 	}
 	return p;
 }
@@ -532,4 +539,4 @@ void Configurator::run(Configurator * c){
 	}
 }
 
-void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor &v){}
+void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor v){}
