@@ -442,6 +442,9 @@ void Configurator::cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, 
 			if (lastValidNode != leaf){//create edge with the last working node
 				workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
 				workingEdge.m_source = src; //connect the last working node to the source
+			}
+			else{
+				lastValidNode = src;
 			}			
 			boost::remove_edge(src, leaf, g); //remove edge
 			boost::remove_vertex(leaf, g); //remove vertex
