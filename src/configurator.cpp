@@ -127,6 +127,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		else{
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+			Plan debugPlan = getPlan(g, bestLeaf);
 			cleanCollisionGraph(g, bestLeaf);
 			plan = getPlan(g, bestLeaf);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
@@ -428,7 +429,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	//return !g[0].disturbance.safeForNow;
 }
 
-void cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+void Configurator::cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
 	}
@@ -437,7 +438,7 @@ void cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescript
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
 		edgeDescriptor workingEdge;
-		if (g[leaf].endPose == g[root].endPose){ //if the leaf does not progress the robot			
+		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
 			if (lastValidNode != leaf){//create edge with the last working node
 				workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
 				workingEdge.m_source = src; //connect the last working node to the source
@@ -453,7 +454,7 @@ void cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescript
 	
 }
 
-vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
+vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
@@ -469,7 +470,7 @@ vertexDescriptor findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> 
 	return best;
 }
 
-Plan getPlan(CollisionGraph &g, vertexDescriptor best){
+Plan Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
 	//int size = g[best].predecessors;
 	Plan p;
