@@ -127,10 +127,15 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		}	
 		else{
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
-			Plan debugPlan = getPlan(g, bestLeaf);
+			printf("best leaf = %i\n", bestLeaf);
+			//Plan debugPlan = getPlan(g, bestLeaf);
+			//printf("done debug//plan");
 			removeIdleNodes(g, bestLeaf);
+			printf("removed idle nodes");
 			plan = getPlan(g, bestLeaf);
+			printf("done plan\n");
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
@@ -520,6 +525,7 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 }
 
 void Configurator::run(Configurator * c){
+	int lastInterface
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
@@ -538,9 +544,7 @@ void Configurator::run(Configurator * c){
 				//printf("ci ready = %i, c->ci->data == c->current = %i\n", c->ci->isReady(), c->ci->data == c->current );
 				c->Spawner(c->ci->data, c->ci->data2fp);
 			}
-			else{
-				printf("data2fp smae as box2d\n");
-			}
+
 		}
 	}
 }
