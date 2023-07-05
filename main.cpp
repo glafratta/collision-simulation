@@ -68,7 +68,7 @@ public:
 		// }
 		ci->setReady(1);
 		//ci->ready=1;
-		/ci->iteration++;
+		ci->iteration++;
 		printf("added data to interface containers\n");
 
 	}
