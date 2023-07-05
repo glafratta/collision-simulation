@@ -17,18 +17,19 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
 	printf("current size = %i, previous size = %i, currentbox2d size = %i\n", current.size(), previous.size(), currentBox2D.size());
-	for (auto d: current){
-		previous.insert(d);
-	}
+	// for (auto d: current){
+	// 	previous.insert(d);
+	// }
+	previous =current;
 	current.clear();
-	for (auto d:data){
-		current.insert(d);
-	}
-	//current = data;
+	// for (auto d:data){
+	// 	current.insert(d);
+	// }
+	current = data;
 	currentBox2D.clear();
-	for (auto d:data2fp){
-		currentBox2D.insert(d);
-	}
+	// for (auto d:data2fp){
+	// 	currentBox2D.insert(d);
+	// }
 	currentBox2D = data2fp;
 	printf("updated coordinate vectors\n");
 
@@ -533,7 +534,7 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			//printf(".");
 			if (c->ci->data2fp != c->currentBox2D){
-				//printf("\nc->ci->data size = %i, current size = %i\n", c->ci->data.size(), c->current.size());
+				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				//printf("ci ready = %i, c->ci->data == c->current = %i\n", c->ci->isReady(), c->ci->data == c->current );
 				c->Spawner(c->ci->data, c->ci->data2fp);
 				// c->ci->data.clear();

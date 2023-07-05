@@ -22,13 +22,13 @@ public:
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
 	    //ci->setReady(0);
-		ci->ready=0;
-		ci->data.clear();
-		ci->data2fp.clear();
 		if (ci == NULL){
 			printf("null pointer to ci\n");
 			return;
 		}
+		ci->ready=0;
+		ci->data.clear();
+		ci->data2fp.clear();
 		mapCount++;
 		//std::vector <Point> current;
 		Point p, p2f;
@@ -66,9 +66,9 @@ public:
 		// for (Point d:coordinates2fp){
 		// 	ci->data2fp.insert(d);
 		// }
-		//ci->setReady(1);
-		ci->ready=1;
-		ci->iteration++;
+		ci->setReady(1);
+		//ci->ready=1;
+		/ci->iteration++;
 		printf("added data to interface containers\n");
 
 	}
