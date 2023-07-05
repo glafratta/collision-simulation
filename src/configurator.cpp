@@ -544,9 +544,9 @@ void Configurator::run(Configurator * c){
 
 				c->Spawner(c->ci->data, c->ci->data2fp);
 			}
-			else if (c->ci->data.empty()){
-				c->currentTask = c->desiredTask;
-			}
+			// else if (c->ci->data.empty()){
+			// 	c->currentTask = c->desiredTask;
+			// }
 
 		}
 	}
