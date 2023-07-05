@@ -537,9 +537,9 @@ void Configurator::run(Configurator * c){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				//printf("ci ready = %i, c->ci->data == c->current = %i\n", c->ci->isReady(), c->ci->data == c->current );
 				c->Spawner(c->ci->data, c->ci->data2fp);
-				// c->ci->data.clear();
-				// c->ci->data2fp.clear();
-				//c->ci->ready=0;
+			}
+			else{
+				printf("data2fp smae as box2d\n");
 			}
 		}
 	}
