@@ -62,7 +62,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//printf("made world\n");
 
 	//CALCULATE VELOCITY 
-	
+	printf("current = %i\t previous = %i\n", current.size(), previous.size());
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
 	if (currentTask.direction ==DEFAULT){
 		currentTask.action.setOmega(deltaPose.q.GetAngle());
