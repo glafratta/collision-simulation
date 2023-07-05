@@ -525,7 +525,6 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 }
 
 void Configurator::run(Configurator * c){
-	int lastInterface
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
