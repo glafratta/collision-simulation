@@ -437,11 +437,13 @@ void Configurator::cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, 
 	while (leaf !=root){
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
-		edgeDescriptor workingEdge;
 		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
 			if (lastValidNode != leaf){//create edge with the last working node
-				workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
-				workingEdge.m_source = src; //connect the last working node to the source
+				//edgeDescriptor workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
+				//g[workingEdge].
+				//workingEdge.m_source = src; 
+				boost::remove_edge(leaf, lastValidNode, g); //remove edge
+				boost::add_edge(src, lastValidNode, g);//connect the last working node to the source
 			}
 			else{
 				lastValidNode = src;
