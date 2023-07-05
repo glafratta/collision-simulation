@@ -194,7 +194,7 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	}
 }
 
-void cleanCollisionGraph(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 // {
@@ -242,7 +242,7 @@ vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 
 Plan getPlan(CollisionGraph &, vertexDescriptor);
 
-void printPlan();
+void printPlan(Plan);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot

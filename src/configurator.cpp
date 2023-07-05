@@ -128,7 +128,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			Plan debugPlan = getPlan(g, bestLeaf);
-			cleanCollisionGraph(g, bestLeaf);
+			removeIdleNodes(g, bestLeaf);
 			plan = getPlan(g, bestLeaf);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
@@ -429,7 +429,7 @@ bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 	//return !g[0].disturbance.safeForNow;
 }
 
-void Configurator::cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
 	}
@@ -439,9 +439,6 @@ void Configurator::cleanCollisionGraph(CollisionGraph&g, vertexDescriptor leaf, 
 		vertexDescriptor src = boost::source(e,g);
 		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
 			if (lastValidNode != leaf){//create edge with the last working node
-				//edgeDescriptor workingEdge = boost::in_edges(lastValidNode, g).first.dereference();
-				//g[workingEdge].
-				//workingEdge.m_source = src; 
 				boost::remove_edge(leaf, lastValidNode, g); //remove edge
 				boost::add_edge(src, lastValidNode, g);//connect the last working node to the source
 			}
@@ -491,6 +488,8 @@ Plan Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	}
 	return p;
 }
+
+void Configurator::printPlan(Plan p){}
 
 
 void Configurator::start(){ 
