@@ -130,14 +130,13 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			//printf("best leaf = %i\n", bestLeaf);
-			Sequence debugPlan = getUnprocessedSequence(g, bestLeaf);
-			printf("debug plan = ");
-			printPlan(debugPlan);
+			//Sequence debugPlan = getUnprocessedSequence(g, bestLeaf);
+			//printf("debug plan = ");
+			//printPlan(debugPlan);
 			//removeIdleNodes(g, bestLeaf);
 			//plan = getPlan(g, bestLeaf);
-			printf("cleaned plan");
+			//printf("cleaned plan");
 			plan = getCleanSequence(g, bestLeaf);
-			printf("done plan\n");
 			printPlan(plan);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
@@ -155,6 +154,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 				//  	printf("I am stuck!\n");
 				// }
 				if (!plan.empty()){
+					Sequence next= {plan[0]};
+					printf("change to:");
+					printPlan(next);
 					currentTask = Task(plan[0].first, plan[0].second);
 				}
 			}
