@@ -12,7 +12,7 @@
 #define REACTION_TIME 1.0
 #define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
-#define BACK_DISTANCE 0.1 //DEFAULT backtracking distance
+#define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
 
 
 class Task{
