@@ -198,6 +198,8 @@ void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0)
 
 Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
+Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+
 
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 // {

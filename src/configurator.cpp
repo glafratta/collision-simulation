@@ -130,13 +130,15 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			//printf("best leaf = %i\n", bestLeaf);
-			//Plan debugPlan = getPlan(g, bestLeaf);
-			//printf("done debug//plan");
+			Plan debugPlan = getUnprocessedSequence(g, bestLeaf);
+			printf("debug plan = ");
+			printPlan(debugPlan);
 			//removeIdleNodes(g, bestLeaf);
-			//printf("removed idle nodes\n");
 			//plan = getPlan(g, bestLeaf);
+			printf("cleaned plan");
 			plan = getCleanSequence(g, bestLeaf);
 			printf("done plan\n");
+			printPlan(plan);
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
@@ -463,32 +465,6 @@ void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vert
 	
 }
 
-void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
-	if (leaf <root){
-		throw std::invalid_argument("wrong order of vertices for iteration\n");
-	}
-	vertexDescriptor lastValidNode = leaf;
-	while (leaf !=0){
-		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
-		vertexDescriptor src = boost::source(e,g);
-		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
-			if (lastValidNode != leaf){//create edge with the last working node
-				boost::remove_edge(leaf, lastValidNode, g); //remove edge
-				boost::add_edge(src, lastValidNode, g);//connect the last working node to the source
-			}
-			else{
-				lastValidNode = src;
-			}			
-			boost::remove_edge(src, leaf, g); //remove edge
-			boost::remove_vertex(leaf, g); //remove vertex
-		}
-		else{
-			lastValidNode = leaf; // the leaf is a valid working node
-		}
-		leaf = src; //go back
-	}
-	
-}
 
 Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	Sequence p;
@@ -506,6 +482,27 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 			TaskSummary ts(g[src].disturbance, g[e].direction);
 			p.insert(p.begin(), ts);	
 		}
+		leaf = src; //go back
+		}
+	}
+	return p;
+	
+}
+
+Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+	Sequence p;
+	if (leaf <root){
+		throw std::invalid_argument("wrong order of vertices for iteration\n");
+	}
+	while (leaf !=root){
+		if (boost::in_degree(leaf, g)<1){
+			break;
+		}
+		else{ 
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
+		vertexDescriptor src = boost::source(e,g);
+		TaskSummary ts(g[src].disturbance, g[e].direction);
+		p.insert(p.begin(), ts);	
 		leaf = src; //go back
 		}
 	}
@@ -533,7 +530,7 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
 	//int size = g[best].predecessors;
-	Plan p;
+	Sequence p;
 	edgeDescriptor e;
 	while (boost::in_degree(best, g)){
 		e = boost::in_edges(best, g).first.dereference();
@@ -547,7 +544,20 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	return p;
 }
 
-void Configurator::printPlan(Sequence p){}
+void Configurator::printPlan(Sequence p){
+	for (TaskSummary ts: p){
+		switch (ts.second){
+			case DEFAULT: printf("DEFAULT");break;
+			case LEFT: printf("LEFT"); break;
+			case RIGHT: printf("RIGHT"); break;
+			case BACK: printf("RIGHT"); break;
+			case STOP: printf("STOP");break;
+			default:break;
+		}
+		printf(", ");
+	}
+	printf("\n");
+}
 
 
 void Configurator::start(){ 
