@@ -129,12 +129,13 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
-			printf("best leaf = %i\n", bestLeaf);
+			//printf("best leaf = %i\n", bestLeaf);
 			//Plan debugPlan = getPlan(g, bestLeaf);
 			//printf("done debug//plan");
-			removeIdleNodes(g, bestLeaf);
-			printf("removed idle nodes");
-			plan = getPlan(g, bestLeaf);
+			//removeIdleNodes(g, bestLeaf);
+			//printf("removed idle nodes\n");
+			//plan = getPlan(g, bestLeaf);
+			plan = getCleanSequence(g, bestLeaf);
 			printf("done plan\n");
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
@@ -440,7 +441,7 @@ void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vert
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
 	}
 	vertexDescriptor lastValidNode = leaf;
-	while (leaf !=root){
+	while (leaf!=root){
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
 		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
@@ -462,6 +463,57 @@ void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vert
 	
 }
 
+void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+	if (leaf <root){
+		throw std::invalid_argument("wrong order of vertices for iteration\n");
+	}
+	vertexDescriptor lastValidNode = leaf;
+	while (leaf !=0){
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
+		vertexDescriptor src = boost::source(e,g);
+		if (g[leaf].endPose == g[src].endPose){ //if the leaf does not progress the robot			
+			if (lastValidNode != leaf){//create edge with the last working node
+				boost::remove_edge(leaf, lastValidNode, g); //remove edge
+				boost::add_edge(src, lastValidNode, g);//connect the last working node to the source
+			}
+			else{
+				lastValidNode = src;
+			}			
+			boost::remove_edge(src, leaf, g); //remove edge
+			boost::remove_vertex(leaf, g); //remove vertex
+		}
+		else{
+			lastValidNode = leaf; // the leaf is a valid working node
+		}
+		leaf = src; //go back
+	}
+	
+}
+
+Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+	Sequence p;
+	if (leaf <root){
+		throw std::invalid_argument("wrong order of vertices for iteration\n");
+	}
+	while (leaf !=root){
+		if (boost::in_degree(leaf, g)<1){
+			break;
+		}
+		else{ 
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
+		vertexDescriptor src = boost::source(e,g);
+		if (g[leaf].endPose != g[src].endPose){ //if the node was successful
+			TaskSummary ts(g[src].disturbance, g[e].direction);
+			p.insert(p.begin(), ts);	
+		}
+		leaf = src; //go back
+		}
+	}
+	return p;
+	
+}
+
+
 vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
@@ -478,12 +530,12 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 	return best;
 }
 
-Plan Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
+Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
 	//int size = g[best].predecessors;
 	Plan p;
 	edgeDescriptor e;
-	while (best != *(boost::vertices(g).first)){
+	while (boost::in_degree(best, g)){
 		e = boost::in_edges(best, g).first.dereference();
 		//bestEdges.push_back(e);
 		best = e.m_source;
@@ -495,7 +547,7 @@ Plan Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	return p;
 }
 
-void Configurator::printPlan(Plan p){}
+void Configurator::printPlan(Sequence p){}
 
 
 void Configurator::start(){ 

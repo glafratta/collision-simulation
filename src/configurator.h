@@ -55,7 +55,7 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 	int treeSize = 0; //for debug
-	Plan plan;
+	Sequence plan;
 
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
@@ -196,6 +196,9 @@ void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 
 void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
+Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+
+
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 // {
 // 	//FIND BEST LEAF
@@ -240,9 +243,9 @@ vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 // 	// return e;
 // }
 
-Plan getPlan(CollisionGraph &, vertexDescriptor);
+Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
-void printPlan(Plan);
+void printPlan(Sequence);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
