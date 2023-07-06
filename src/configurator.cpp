@@ -130,7 +130,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			//printf("best leaf = %i\n", bestLeaf);
-			Plan debugPlan = getUnprocessedSequence(g, bestLeaf);
+			Sequence debugPlan = getUnprocessedSequence(g, bestLeaf);
 			printf("debug plan = ");
 			printPlan(debugPlan);
 			//removeIdleNodes(g, bestLeaf);
