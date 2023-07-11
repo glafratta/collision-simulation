@@ -201,7 +201,6 @@ Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor ro
 
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>);
 // {
 // 	//FIND BEST LEAF

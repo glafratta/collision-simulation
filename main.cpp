@@ -106,9 +106,6 @@ void step( AlphaBot &motors){
 
 
 int main(int argc, char** argv) {
-
-	
-
 	A1Lidar lidar;
 	AlphaBot motors;
     Task controlGoal;
