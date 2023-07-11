@@ -529,12 +529,13 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 		if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
 			best = leaf;
 		}
-		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
+		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
 			if (g[leaf].totDs< g[best].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
 				best = leaf;
 			}
 		}
 	}
+
 	return best;
 }
 
