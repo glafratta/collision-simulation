@@ -104,7 +104,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//MAKE BOX2D BODIES 
 
 	// if (!isObstacleStillThere){ 
-	// 	currentTask = desiredTask;
+	// 	currentTask = controlGoal;
 	// }
 
 	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
@@ -195,7 +195,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 void Configurator::applyController(bool isSameTask, Task & task){
 	if (isSameTask){
 		if (task.controller()==Task::controlResult::DONE){
-			task = desiredTask;
+			task = controlGoal;
 		}
 	}
 }
@@ -617,7 +617,7 @@ void Configurator::run(Configurator * c){
 				c->Spawner(c->ci->data, c->ci->data2fp);
 			}
 			// else if (c->ci->data.empty()){
-			// 	c->currentTask = c->desiredTask;
+			// 	c->currentTask = c->controlGoal;
 			// }
 
 		}

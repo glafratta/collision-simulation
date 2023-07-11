@@ -111,9 +111,9 @@ int main(int argc, char** argv) {
 
 	A1Lidar lidar;
 	AlphaBot motors;
-    Task desiredTask;
+    Task controlGoal;
 	ConfiguratorInterface configuratorInterface;
-    Configurator configurator(desiredTask);
+    Configurator configurator(controlGoal);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);

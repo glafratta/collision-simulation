@@ -15,6 +15,7 @@
 #include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>
+
 class ConfiguratorInterface{
 public:
 	bool debugOn=0;
@@ -44,7 +45,7 @@ public:
 	float affineTransError =0;
 	char *folder;
 	char readMap[50];
-	Task desiredTask;
+	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
@@ -60,7 +61,7 @@ public:
 Configurator(){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime = 0.0f;
-	currentTask = desiredTask;
+	currentTask = controlGoal;
 	if (debugOn){
 	char dirName[50];
 	sprintf(dirName, "bodiesSpeedStats");
@@ -86,7 +87,7 @@ Configurator(){
 	}
 }
 
-Configurator(Task &_task, bool debug =0, bool noTimer=0): desiredTask(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
+Configurator(Task &_task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
 	if (debugOn){
