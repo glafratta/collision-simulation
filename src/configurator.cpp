@@ -525,7 +525,6 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
 	for (vertexDescriptor leaf: _leaves){
-		//if (g[leaf].distanceSoFar>g[best].distanceSoFar){ //old
 		if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
 			best = leaf;
 		}

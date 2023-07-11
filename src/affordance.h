@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 typedef unsigned int AffordanceIndex; //was thinking of this being a character but doesn't have to be maybe enum is fine
-enum InnateAffordances {NONE, AVOID, PURSUE, ATTACK, EXPLORE}; //for ease of identification
+enum InnateAffordances {NONE, AVOID, PURSUE}; //for ease of identification, previously also ATTACK and EXPLORE
 enum Direction{LEFT, RIGHT, DEFAULT, BACK, STOP};
 
 class Affordance{

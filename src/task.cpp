@@ -46,7 +46,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
-						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
+//						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
 					}
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
@@ -91,14 +91,7 @@ Task::controlResult Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded();
-if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){
-	// float obstacleAngle = atan(disturbance.getPosition().y/disturbance.getPosition().x);
-	// float angleDifference = obstacleAngle - recordedAngle;
-	// if (abs(angleDifference) >= endAvoid){
-	// 	disturbance.invalidate();
-	// 	return DONE;
-	// }
-}
+if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){}
 else {
 	float timeStepError =action.getOmega()/0.2; 
 	accumulatedError += timeStepError; 
@@ -151,15 +144,25 @@ Direction Task::H(Disturbance ob, Direction d){
 
 void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
 	switch (direction){
-		case DEFAULT: break;
+		case DEFAULT: 
+		if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+			endCriteria.distance = Distance(ROBOT_HALFLENGTH); //end if D is 5 cm away
+		}
+		break;
 		case LEFT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
+		}
+		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+			endCriteria.angle = Angle(0);
 		}
 		break;
 		case RIGHT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
+		}
+		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+			endCriteria.angle = Angle(0);
 		}
 		break;
 		case BACK: 
@@ -191,6 +194,13 @@ bool Task::checkEnded(b2Transform robotTransform){
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r = true;
+		}
+		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
+			Angle a(abs(disturbance.getAngle(robotTransform)));
+			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
+			Distance d(v.Length());
+			r = d<=endCriteria.distance && endCriteria.angle-ANGLE_ERROR_TOLERANCE <=a && endCriteria.angle +ANGLE_ERROR_TOLERANCE>=a;
+
 		}
 	}
 	return r;

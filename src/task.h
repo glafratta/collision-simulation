@@ -31,8 +31,6 @@ protected:
     //Type type = Type::BASELINE;
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
-
-
 struct Disturbance{ //this generates error
 private:
     bool valid= 0;
