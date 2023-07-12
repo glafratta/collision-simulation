@@ -27,7 +27,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
-			if (checkEnded(robot.body->GetTransform())){
+			if (checkEnded(robot.body->GetTransform()).ended){
 				if (direction==BACK){
 					result = simResult(simResult::resultType::successful, disturbance);
 				}
@@ -90,7 +90,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Vec2 robVeloci
 Task::controlResult Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-bool ended = checkEnded();
+bool ended = checkEnded().ended;
 if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){}
 else {
 	float timeStepError =action.getOmega()/0.2; 
@@ -216,10 +216,10 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			a = Angle(abs(disturbance.getAngle(robotTransform)));
 			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
 			d= Distance(v.Length());
-			r.ended = d=endCriteria.distance && (endCriteria.angle-ANGLE_ERROR_TOLERANCE) <=a && (endCriteria.angle +ANGLE_ERROR_TOLERANCE)>=a;
+			r.ended = d=endCriteria.distance && (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a && (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a;
 		}
 	}
-	r.continuousError = endCriteria.getStandardError(a,d);
+	r.errorFloat = endCriteria.getStandardError(a,d);
 	return r;
 
 }
