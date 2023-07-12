@@ -30,6 +30,7 @@ struct Node{
 	int totDs=0; //error signal
 };
 
+
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);

@@ -20,6 +20,15 @@ public:
     void set(float f){
         value =f;
     }
+
+    bool operator<(const Measurement &);
+
+    bool operator>=(const Measurement &);
+
+    float getError(Measurement);
+
+    float getStandardError(Measurement);
+
 };
 
 class Angle: public Measurement{
@@ -41,13 +50,23 @@ class Distance: public Measurement{
 
 struct EndCriteria{
     Angle angle;
-    Distance distance;
+    Distance distance;    
+    float getError(EndCriteria); //expresses magnitude of error, not normalised
+    float getStandardError(EndCriteria);
+
 };
 
-typedef Measurement M;
-bool operator<(M &, M &);
 
-bool operator>=(M &, M &);
+struct EndedResult{
+	bool ended=0;
+	float errorFloat=0; //dot product of end criteria
+};
+
+//typedef Measurement Mst;
+// bool operator<(Meas &, Meas &);
+
+// bool operator>=(Meas &, Meas &);
+
 
 float SignedVectorLength(b2Vec2);
 

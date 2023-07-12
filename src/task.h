@@ -7,10 +7,6 @@
 #include "measurement.h"
 #include <stdexcept>
 #include "settings.h"
-#define BOX2DRANGE 1.0
-#define LIDAR_RANGE 1.0
-#define REACTION_TIME 1.0
-#define HZ 50.0
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 #define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
 
@@ -270,7 +266,7 @@ Direction H(Disturbance, Direction);
 
 void setEndCriteria();
 
-bool checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
+EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
 //Task(){}
 
@@ -319,7 +315,7 @@ b2Vec2 getRecordedVelocity(){
 }
 
 
-void trackDisturbance(Disturbance &, float, b2Vec2, b2Transform);
+void trackDisturbance(Disturbance &, float, b2Vec2, b2Transform= b2Transform(b2Vec2(0,0), b2Rot(0)));
 
 simResult willCollide(b2World &, int, bool, float);
 

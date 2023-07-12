@@ -78,15 +78,17 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//if (currentTask.disturbance.isValid()){
 	//	wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
-	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))); //robot default position is 0,0
+	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p); //robot default position is 0,0
+	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose.p);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	bool ended = currentTask.checkEnded();
+	bool tempEnded = currentTask.checkEnded();
+	bool controlEnded = controlGoal.checkEnded();
 	if (!plan.empty()){
 		Sequence s = {TaskSummary(plan[1].first, plan[1].second)};
 		printf("next is ");
 		printPlan(s);
 	}
-	if(ended|| !isObstacleStillThere){
+	if(tempEnded|| !isObstacleStillThere){
 		if (!plan.empty()){
 			plan.erase(plan.begin());
 			currentTask = Task(plan[0].first, plan[0].second);

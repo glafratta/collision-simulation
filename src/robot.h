@@ -17,6 +17,12 @@
 #define MAX_SPEED 0.125
 #define MAX_OMEGA M_PI
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180;
+#define BOX2DRANGE 1.0
+#define LIDAR_RANGE 1.0
+#define REACTION_TIME 1.0
+#define HZ 50.0
+#define MAX_ANGLE_ERROR M_PI
+#define MAX_DISTANCE_ERROR BOX2DRANGE
 
 const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn
