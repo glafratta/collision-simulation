@@ -81,9 +81,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose.p);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	bool tempEnded = currentTask.checkEnded();
-	bool controlEnded = controlGoal.checkEnded();
-	if (controlEnded){
+	EndedResult tempEnded = currentTask.checkEnded();
+	EndedResult controlEnded = controlGoal.checkEnded();
+	if (controlEnded.ended){
 		currentTask= Task(Task::Disturbance(), STOP);
 		return;
 	}
@@ -92,7 +92,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		printf("next is ");
 		printPlan(s);
 	}
-	if(tempEnded|| !isObstacleStillThere){
+	if(tempEnded.ended|| !isObstacleStillThere){
 		if (!plan.empty()){
 			plan.erase(plan.begin());
 			currentTask = Task(plan[0].first, plan[0].second);

@@ -1,6 +1,6 @@
 #ifndef TASK_H
 #define TASK_H
-#include "Box2D/Box2D.h"
+//#include "box2d/box2d.h"
 #include <vector>
 #include <stdio.h>
 #include <math.h> 
@@ -235,13 +235,13 @@ class Listener : public b2ContactListener {
     std::vector <b2Vec2> collisions;
     
 		void BeginContact(b2Contact * contact) {
-			void* bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
-			if (bodyData) {
+			b2BodyUserData bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
+			if (bodyData.pointer) {
                 b2Body * other = contact->GetFixtureB()->GetBody();
                 collisions.push_back(other->GetPosition());
 			}
 			bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
-			if (bodyData) {
+			if (bodyData.pointer) {
                 b2Body * other = contact->GetFixtureA()->GetBody();
                 collisions.push_back(other->GetPosition());
                 }       

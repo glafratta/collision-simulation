@@ -1,7 +1,7 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 //box2d robot body and kinematic model
-#include "Box2D/Box2D.h"
+#include "box2d/box2d.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -45,7 +45,9 @@ public:
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world->CreateBody(&bodyDef);
-		body->SetUserData(this);  
+		//body->SetUserData(this);  
+		//uintptr_t ptr = static_cast<uintptr_t>(this);
+		body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
 		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE);
