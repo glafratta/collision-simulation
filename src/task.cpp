@@ -216,7 +216,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			a = Angle(abs(disturbance.getAngle(robotTransform)));
 			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
 			d= Distance(v.Length());
-			r.ended = d=endCriteria.distance && (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a && (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a;
+			r.ended = d.get()<=endCriteria.distance.get() && (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() && (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
 		}
 	}
 	r.errorFloat = endCriteria.getStandardError(a,d);

@@ -21,9 +21,9 @@ public:
         value =f;
     }
 
-    bool operator<(const Measurement &);
+    bool operator<(Measurement &);
 
-    bool operator>=(const Measurement &);
+    bool operator>=(Measurement &);
 
     float getError(Measurement);
 

@@ -1,9 +1,9 @@
 #include "measurement.h"
 
-bool Measurement::operator<(const Measurement& m2){
+bool Measurement::operator<(Measurement & m2){
     bool r = false;
-    if (this->isValid() && m2.isValid()){
-        r= this->get()<m2.get();
+    if (isValid() && m2.isValid()){
+        r= get()<m2.get();
     }
     else{
         r=true;
@@ -11,10 +11,10 @@ bool Measurement::operator<(const Measurement& m2){
     return r;
 }
 
-bool Measurement::operator>=(const Measurement& m2){
+bool Measurement::operator>=(Measurement &m2){
     bool r = false;
-    if (this->isValid() && m2.isValid()){
-        r= this->get()>=m2.get();
+    if (isValid() && m2.isValid()){
+        r= get()>=m2.get();
     }
     else{
         r=true;
@@ -34,11 +34,11 @@ float Measurement::getStandardError(Measurement m2){
     float result =0;
     float normValue = this->get();
     if (m2.isValid()&& this->isValid()){
-        float num = m2.get()-this->get();
+        float num = m2.get()-get();
         if (num ==0){
             return result;
         }
-        float den = (m2.get()+this->get())/2; //normalise to the arithmetic mean, max value =2
+        float den = (m2.get()+get())/2; //normalise to the arithmetic mean, max value =2
         if (den==0){
             return 2;
         }
@@ -49,24 +49,19 @@ float Measurement::getStandardError(Measurement m2){
 
 float EndCriteria::getError(EndCriteria ec){
     float result =0;
-    result = this->angle.getError(ec.angle) + this->distance.getError(ec.distance);
+    result = angle.getError(ec.angle) + distance.getError(ec.distance);
     return result;
 }
 
 float EndCriteria::getStandardError(EndCriteria ec){ //standard error
     float result =0;
-    float normAngle= this->angle;
-    if (this->angle==0){
-        normAngle=M_PI *2;
-    }
-    result = this->angle.getStandardError(ec.angle)+ this->distance.getStandardError(ec.distance); //max =4;
+    result = angle.getStandardError(ec.angle)+ distance.getStandardError(ec.distance); //max =4;
     return result;
 }
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    float normAngle= this->angle;
-    result = this->angle.getStandardError(a)+ this->distance.getStandardError(d); //max =4;
+    result = angle.getStandardError(a)+ this->distance.getStandardError(d); //max =4;
     return result;
 }
 
@@ -79,6 +74,6 @@ float SignedVectorLength(b2Vec2 v){
 	return signedLength;
 }
 
-bool hasEnd(){
+bool EndCriteria::hasEnd(){
     return angle.isValid() || distance.isValid();
 }

@@ -93,12 +93,10 @@ public:
 
     void setPosition(b2Vec2 pos){
         position.Set(pos.x, pos.y);
-        valid =1;
     }
     
     void setPosition(float x, float y){
         position.Set(x, y);
-        valid=1;
     }
     
     b2Vec2 getPosition(){
