@@ -200,26 +200,26 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 
 EndedResult Task::checkEnded(b2Transform robotTransform){
 	EndedResult r;
-	EndCriteria tempEC;
+	Angle a;
+	Distance d;
 	if (disturbance.isValid()){
 		if (getAffIndex()== int(InnateAffordances::AVOID)){
-			tempEC.angle(abs(disturbance.getAngle(robotTransform)));
+			a= Angle(abs(disturbance.getAngle(robotTransform)));
 			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			tempEC.distance(v.Length());
-			r.ended= tempEC.angle>= endCriteria.angle && tempEC.distance>=endCriteria.distance;
+			d= Distance(v.Length());
+			r.ended= a>= endCriteria.angle && d>=endCriteria.distance;
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r.ended = true;
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
-			EndCriteria tempEC;
-			tempEC.angle(abs(disturbance.getAngle(robotTransform)));
+			a = Angle(abs(disturbance.getAngle(robotTransform)));
 			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			tempEC.distance(v.Length());
-			r.ended = tempEC.distance<=endCriteria.distance && (endCriteria.angle-ANGLE_ERROR_TOLERANCE) <=tempEC.angle && (endCriteria.angle +ANGLE_ERROR_TOLERANCE)>=tempEC.angle;
+			d= Distance(v.Length());
+			r.ended = d=endCriteria.distance && (endCriteria.angle-ANGLE_ERROR_TOLERANCE) <=a && (endCriteria.angle +ANGLE_ERROR_TOLERANCE)>=a;
 		}
 	}
-	r.continuousError = endCriteria.getStandardError(tempEC);
+	r.continuousError = endCriteria.getStandardError(a,d);
 	return r;
 
 }

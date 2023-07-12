@@ -28,6 +28,15 @@ struct Node{
 	int predecessors =0;
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
+
+	Angle getAngle(){
+		return Angle(disturbance.getAngle(endPose));
+	}
+
+	Distance getDistance(){
+		b2Vec2 v = endPose.p - disturbance.getPosition();
+		return Distance(v.Length());
+	}
 };
 
 

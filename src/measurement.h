@@ -27,7 +27,7 @@ public:
 
     float getError(Measurement);
 
-    float getStandardError(Measurement);
+    float getStandardError(Measurement); //relative standard error
 
 };
 
@@ -53,6 +53,8 @@ struct EndCriteria{
     Distance distance;    
     float getError(EndCriteria); //expresses magnitude of error, not normalised
     float getStandardError(EndCriteria);
+    float getStandardError(Angle, Distance);
+    bool hasEnd();
 
 };
 

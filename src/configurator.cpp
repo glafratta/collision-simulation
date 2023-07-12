@@ -83,6 +83,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
 	bool tempEnded = currentTask.checkEnded();
 	bool controlEnded = controlGoal.checkEnded();
+	if (controlEnded){
+		currentTask= Task(Task::Disturbance(), STOP);
+		return;
+	}
 	if (!plan.empty()){
 		Sequence s = {TaskSummary(plan[1].first, plan[1].second)};
 		printf("next is ");
@@ -523,11 +527,30 @@ Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor
 }
 
 
-vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves){
+vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves, EndCriteria * refEnd){
 	//FIND BEST LEAF
 	vertexDescriptor best = _leaves[0];
+	float bestError=0;
+	Angle aBest;
+	Distance dBest;
+	if (refEnd !=NULL){
+		aBest = g[best].getAngle();
+		dBest = g[best].getDistance();
+		bestError = refEnd->getStandardError(aBest, dBest);
+	}
 	for (vertexDescriptor leaf: _leaves){
-		if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
+		if (refEnd !=NULL && refEnd->hasEnd()){
+			Angle a = g[leaf].getAngle();
+			Distance d = g[leaf].getDistance();
+			float leafError =refEnd->getStandardError(a,d);
+			if (leafError<bestError){
+				best=leaf;
+				aBest = a;
+				dBest =d;
+				bestError= leafError;
+			}
+		}
+		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
 			best = leaf;
 		}
 		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
