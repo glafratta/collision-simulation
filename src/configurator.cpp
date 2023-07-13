@@ -142,7 +142,6 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		}	
 		else{
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-			printf("built tree\n");
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			//printf("best leaf = %i\n", bestLeaf);
 			//Sequence debugPlan = getUnprocessedSequence(g, bestLeaf);
@@ -153,6 +152,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			//printf("cleaned plan");
 			plan = getCleanSequence(g, bestLeaf);
 			printPlan(plan);
+			printf("built tree\n");
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
 				//FIND BEST OPTION FOR CHANGING
