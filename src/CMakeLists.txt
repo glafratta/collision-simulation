@@ -8,14 +8,14 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(OpenCV REQUIRED)
 
-find_package(box2d)
+find_package(box2d REQUIRED)
 
 add_library(HICS ${SRC} ${HEAD})
 
 set_target_properties(HICS PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
 PUBLIC_HEADER "${HEAD}")
 
-target_link_libraries(HICS box2d ${OpenCV_LIBS} pthread)
+target_link_libraries(HICS ${box2d_LIBS} ${OpenCV_LIBS} pthread)
 
 install(TARGETS HICS 
 	EXPORT HICS-targets 
