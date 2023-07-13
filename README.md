@@ -13,17 +13,19 @@ The indoor robot is equipped with
 * G++ compiler
 * CMake
 * PiGPIO library
-* Box2D
 * OpenCV
 * Boost
+* XOrg
+* LibGLU1
 
-`sudo apt install g++ cmake libpigpio-dev libbox2d-dev libopencv-dev libboost-all-dev`
+`sudo apt install g++ cmake libpigpio-dev libopencv-dev libboost-all-dev xorg-dev libglu1-mesa-dev`
 
 ### GitHub repositories
 
 * [LIDAR API](https://github.com/berndporr/rplidar_rpi)
 * [Motors API](https://github.com/berndporr/alphabot)
 * [Cpp Timer](https://github.com/berndporr/cppTimer)
+* [Box2D v2.4.1](https://github.com/erincatto/box2d) : build from source in '/home/pi'
 
 ## Build
 ```
