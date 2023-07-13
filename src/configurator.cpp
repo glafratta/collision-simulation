@@ -190,7 +190,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
-	applyController(isSameTask, currentTask);
+	if (isSameTask){
+		currentTask.controller();
+	}
+	//applyController(isSameTask, currentTask);
 	printf("applied controller\n");
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
@@ -198,13 +201,13 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 }
 
 
-void Configurator::applyController(bool isSameTask, Task & task){
-	if (isSameTask){
-		if (task.controller()==Task::controlResult::DONE){
-			task = controlGoal;
-		}
-	}
-}
+// void Configurator::applyController(bool isSameTask, Task & task){
+// 	if (isSameTask){
+// 		if (task.controller()==Task::controlResult::DONE){
+// 			task = controlGoal;
+// 		}
+// 	}
+// }
 
 DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		DeltaPose result;
