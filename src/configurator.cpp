@@ -17,19 +17,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
 	printf("current size = %i, previous size = %i, currentbox2d size = %i\n", current.size(), previous.size(), currentBox2D.size());
-	// for (auto d: current){
-	// 	previous.insert(d);
-	// }
 	previous =current;
 	current.clear();
-	// for (auto d:data){
-	// 	current.insert(d);
-	// }
 	current = data;
 	currentBox2D.clear();
-	// for (auto d:data2fp){
-	// 	currentBox2D.insert(d);
-	// }
 	currentBox2D = data2fp;
 	printf("updated coordinate vectors\n");
 
@@ -39,27 +30,16 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	timeElapsed=float(diff.count())/1000; //express in seconds
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
+	printf("calculated time elapsed = %f\n", timeElapsed);
 
-	if ( timeElapsed< .19){		
-		if (timerOff){ //was debugon
-			timeElapsed = .2;
-		}
-	}
-	else if (timeElapsed >.21){
-		//printf("took too long! %f\n", timeElapsed);
-		if (timerOff){
-			timeElapsed = .2;
-		}
-		
+	if (timerOff){
+		timeElapsed = .2;
 	}
 
-//	printf("calculated time elapsed\n");
 
 	//CREATE BOX2D ENVIRONMENT
 	b2World world = b2World({0.0f,0.0f});
 	char name[256];
-	//int bodies=0;
-	//printf("made world\n");
 
 	//CALCULATE VELOCITY 
 	printf("current = %i\t previous = %i\n", current.size(), previous.size());
@@ -76,8 +56,6 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	//if (currentTask.disturbance.isValid()){
-	//	wasAvoiding =1; //remembesfr that the robot was avoiding an obstacle
 	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose.p); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose.p);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
@@ -86,11 +64,6 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	if (controlEnded.ended){
 		currentTask= Task(Task::Disturbance(), STOP);
 		return;
-	}
-	if (!plan.empty()){
-		Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
-		printf("next is ");
-		printPlan(s);
 	}
 	if(tempEnded.ended|| !isObstacleStillThere){
 		if (!plan.empty()){
@@ -105,34 +78,18 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			printf("no plan\n");
 		}
 	}
-	//}
-//	printf("tracked disturbance");
-
-	//MAKE BOX2D BODIES 
-
-	// if (!isObstacleStillThere){ 
-	// 	currentTask = controlGoal;
-	// }
-
-	//CREATE ANOTHER PARALLEL PLAN TO COMPARE IT AGAINST THE ONE BEING EXECUTED: currently working on greedy algorithm so local minimum wins
-	//b2Vec2 start(0.0f, 0.0f);
-	//float theta=0;
-
-	//printf("made bodies\n");
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	Task::simResult result;
-	//currentTask.setRecordedVelocity(deltaPose.p);
 
 	//creating decision tree Disturbance
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
 	std::vector <vertexDescriptor> leaves;
-	//edgeDescriptor e;
 	Direction dir;
 
-	//auto startTime =std::chrono::high_resolution_clock::now();
+	auto startTime =std::chrono::high_resolution_clock::now();
 	//printf("set velocity and created empty graph\n");
 
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
@@ -143,31 +100,10 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		else{
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
-			//printf("best leaf = %i\n", bestLeaf);
-			//Sequence debugPlan = getUnprocessedSequence(g, bestLeaf);
-			//printf("debug plan = ");
-			//printPlan(debugPlan);
-			//removeIdleNodes(g, bestLeaf);
-			//plan = getPlan(g, bestLeaf);
-			//printf("cleaned plan");
 			plan = getCleanSequence(g, bestLeaf);
 			printPlan(plan);
 			printf("built tree\n");
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
-				//see search algorithms for bidirectional graphs (is this like incorrect bonkerballs are mathematicians going to roast me)
-				//FIND BEST OPTION FOR CHANGING
-				// if(currentTask.direction ==BACK){
-				// printf("will crash with object: %f, %f\n", g[v0].disturbance.position.x, g[v0].disturbance.position.y);
-				// }
-				// if (g.m_vertices.size()>1){
-				// 	dir =g[e].direction;
-				// 	//printf("bestdirection = %i\n", dir);
-				// 	currentTask = Task(g[v0].disturbance, dir); //new currentTask has the obstacle of the previous and the direction of the edge remaining 
-				// }
-				// else{ //FALLBACK, ensure it's still operating even if tree building fails
-				//  	currentTask = Task(g[v0].disturbance, Direction::STOP); //was stop
-				//  	printf("I am stuck!\n");
-				// }
 				if (!plan.empty()){
 					Sequence next= {plan[0]};
 					printf("change to:");
@@ -178,24 +114,21 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			}
 		}
 	printf("tree size = %i\n", g.m_vertices.size());
-	// if (debugOn){
-	// 	auto endTime =std::chrono::high_resolution_clock::now();
-	// 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
-	// 	float duration=float(d.count())/1000; //express in seconds
+	 if (debugOn){
+	 	auto endTime =std::chrono::high_resolution_clock::now();
+	 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
+	 	float duration=float(d.count())/1000; //express in seconds
 	// 	FILE * f = fopen(statFile, "a+");
 	// 	fprintf(f,"%i\t%i\t%f\n", bodies, g.m_vertices.size(), duration);
 	// 	fclose(f);
-	// }
+	}
 	bodies =0;
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
-
-	//printf("new Task wheel speeds: L= %f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	if (isSameTask){
 		currentTask.controller();
 	}
-	//applyController(isSameTask, currentTask);
 	printf("applied controller\n");
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
