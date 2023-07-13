@@ -7,9 +7,9 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)
 
-find_package(OpenCV REQUIRED)
+##find_package(OpenCV REQUIRED)
 
-find_package(Boost)
+##find_package(Boost)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 

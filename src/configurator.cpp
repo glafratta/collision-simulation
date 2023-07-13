@@ -648,4 +648,4 @@ void Configurator::run(Configurator * c){
 	}
 }
 
-void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor v){}
+//void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor v){}
