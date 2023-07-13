@@ -88,7 +88,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		return;
 	}
 	if (!plan.empty()){
-		Sequence s = {TaskSummary(plan[1].first, plan[1].second)};
+		Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
 		printf("next is ");
 		printPlan(s);
 	}
@@ -102,6 +102,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		}
 		else{
 			currentTask = Task();
+			printf("no plan\n");
 		}
 	}
 	//}
@@ -172,6 +173,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					printf("change to:");
 					printPlan(next);
 					currentTask = Task(plan[0].first, plan[0].second);
+					plan.erase(plan.begin());
 				}
 			}
 		}
