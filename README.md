@@ -25,7 +25,7 @@ The indoor robot is equipped with
 * [LIDAR API](https://github.com/berndporr/rplidar_rpi)
 * [Motors API](https://github.com/berndporr/alphabot)
 * [Cpp Timer](https://github.com/berndporr/cppTimer)
-* [Box2D v2.4.1](https://github.com/erincatto/box2d) : build from source in '/home/pi'
+* [Box2D v2.4.1](https://github.com/erincatto/box2d) : build from source in `/home/pi`
 
 ## Build
 ```
