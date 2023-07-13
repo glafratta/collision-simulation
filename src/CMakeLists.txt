@@ -16,7 +16,7 @@ set_target_properties(HICS PROPERTIES POSITION_INDEPENDENT_CODE TRUE
 PUBLIC_HEADER "${HEAD}")
 
 #if(box2d_FOUND)
-	target_link_libraries(HICS ${box2d_LIBS} ${OpenCV_LIBS} pthread)
+	target_link_libraries(HICS box2d ${OpenCV_LIBS} pthread)
 	message("box2d installed")
 #else()
 #	set(BOX2D_BIN_DIR ${"../box2d/build/bin"})
