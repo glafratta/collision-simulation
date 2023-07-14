@@ -153,9 +153,9 @@ b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
-vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <vertexDescriptor> &);
+vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <Leaf> &);
 
-bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&);
+bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
 
 Direction getOppositeDirection(Direction d){
     switch (d){
@@ -201,7 +201,7 @@ Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor ro
 
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, EndCriteria * refEnd = NULL);
+vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <Leaf>, EndCriteria * refEnd = NULL);
 // {
 // 	//FIND BEST LEAF
 // 	vertexDescriptor best = _leaves[0];

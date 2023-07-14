@@ -52,6 +52,13 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 typedef std::pair <Task::Disturbance, Direction> TaskSummary;
 typedef std::vector <TaskSummary> Sequence;
 
+struct Leaf{
+	vertexDescriptor vertex=0;
+	float error =0;
+
+	Leaf(vertexDescriptor v, float e):vertex(v), error(e){}
+};
+
 struct Point{
 	float x=0;
 	float y=0;

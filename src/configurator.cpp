@@ -67,11 +67,11 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	}
 	if(tempEnded.ended|| !isObstacleStillThere){
 		if (!plan.empty()){
-			plan.erase(plan.begin());
 			currentTask = Task(plan[0].first, plan[0].second);
 			Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
 			printf("switched to ");
 			printPlan(s);
+			plan.erase(plan.begin());
 		}
 		else{
 			currentTask = Task();
@@ -86,7 +86,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//creating decision tree Disturbance
 	CollisionGraph g;
 	vertexDescriptor v0 = boost::add_vertex(g);
-	std::vector <vertexDescriptor> leaves;
+	std::vector <Leaf> leaves;
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
@@ -229,7 +229,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 }
 
 
-vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <Leaf> &_leaves){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -279,10 +279,21 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 	bool fullMemory = g[v].totDs >=4;
 	bool growBranch =1; 
-
+	float unsignedError=0;
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].distanceSoFar <= g[l].distanceSoFar && (g[v].outcome == g[l].outcome && g[v].totDs>g[l].totDs)){
+		if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+			if (g[v].outcome == g[l.vertex].outcome){
+				Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
+				Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
+				unsignedError = controlGoal.endCriteria.getStandardError(a, d);
+				if (unsignedError>=l.error){
+					growBranch=0;
+				}
+				else if (g[v].totDs>=g[l.vertex].totDs){
+					growBranch=0;
+				}
+			}
 			growBranch =0;
 		}
 
@@ -326,7 +337,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
-		_leaves.push_back(v);
+		_leaves.push_back(Leaf(v, unsignedError));
                 while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
                     if(boost::in_degree(v, g)>0){
 	                    inEdge = boost::in_edges(v, g).first.dereference();
@@ -345,7 +356,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 
 
-bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	char n[250];
 	int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
@@ -466,40 +477,40 @@ Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor
 }
 
 
-vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves, EndCriteria * refEnd){
+vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <Leaf> _leaves, EndCriteria * refEnd){
 	//FIND BEST LEAF
-	vertexDescriptor best = _leaves[0];
-	float bestError=0;
+	Leaf best = _leaves[0];
+	//float bestError=0;
 	Angle aBest;
 	Distance dBest;
-	if (refEnd !=NULL){
-		aBest = g[best].getAngle();
-		dBest = g[best].getDistance();
-		bestError = refEnd->getStandardError(aBest, dBest);
-	}
-	for (vertexDescriptor leaf: _leaves){
+	// if (refEnd !=NULL){
+	// 	aBest = g[best].getAngle();
+	// 	dBest = g[best].getDistance();
+	// 	bestError = refEnd->getStandardError(aBest, dBest);
+	// }
+	for (Leaf leaf: _leaves){
 		if (refEnd !=NULL && refEnd->hasEnd()){
-			Angle a = g[leaf].getAngle();
-			Distance d = g[leaf].getDistance();
-			float leafError =refEnd->getStandardError(a,d);
-			if (leafError<bestError){
-				best=leaf;
-				aBest = a;
-				dBest =d;
-				bestError= leafError;
+			Angle a = g[leaf.vertex].getAngle();
+			Distance d = g[leaf.vertex].getDistance();
+			//float leafError =refEnd->getStandardError(a,d);
+			if (leaf.error<best.error){
+				best.vertex=leaf.vertex;
+				// aBest = a;
+				// dBest =d;
+				best.error= leaf.error;
 			}
 		}
-		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
+		else if (g[leaf.vertex].endPose.p.Length() > g[best.vertex].endPose.p.Length()){
 			best = leaf;
 		}
-		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
-			if (g[leaf].totDs< g[best].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
+		else if (g[leaf.vertex].endPose.p.Length() > g[best.vertex].endPose.p.Length()){
+			if (g[leaf.vertex].totDs< g[best.vertex].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
 				best = leaf;
 			}
 		}
 	}
 
-	return best;
+	return best.vertex;
 }
 
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
