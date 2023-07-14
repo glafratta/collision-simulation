@@ -42,7 +42,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	char name[256];
 
 	//CALCULATE VELOCITY 
-	printf("current = %i\t previous = %i\n", current.size(), previous.size());
+	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
 	if (currentTask.direction ==DEFAULT){
 		currentTask.action.setOmega(deltaPose.q.GetAngle());
@@ -101,6 +101,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			plan = getCleanSequence(g, bestLeaf);
+			printf("plan:");
 			printPlan(plan);
 			printf("built tree\n");
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
