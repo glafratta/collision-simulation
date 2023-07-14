@@ -32,3 +32,5 @@ install(TARGETS HICS
 message("library and archive destination " ${CMAKE_INSTALL_LIBDIR})
 
 set(CMAKE_BUILD_TYPE Debug)
+
+add_compile_options(-Wall -pedantic)

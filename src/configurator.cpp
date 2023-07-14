@@ -295,7 +295,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 					growBranch=0;
 				}
 			}
-			growBranch =0;
+			//growBranch =0;
 		}
 
 	}
