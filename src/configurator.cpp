@@ -297,7 +297,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 			}
 			//growBranch =0;
 		}
-
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!fl&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
@@ -537,7 +536,7 @@ void Configurator::printPlan(Sequence p){
 			case DEFAULT: printf("DEFAULT");break;
 			case LEFT: printf("LEFT"); break;
 			case RIGHT: printf("RIGHT"); break;
-			case BACK: printf("RIGHT"); break;
+			case BACK: printf("BACK"); break;
 			case STOP: printf("STOP");break;
 			default:break;
 		}
