@@ -22,7 +22,9 @@ else()
 	message("not building any executable")
 endif()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+add_compile_options(-Wall -pedantic)
 
 ##this is for debugging using gdb
 #set(CMAKE_BUILD_TYPE Debug)
