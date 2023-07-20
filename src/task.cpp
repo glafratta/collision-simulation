@@ -35,7 +35,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				if (getAffIndex()==int(InnateAffordances::NONE) && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
 					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
 					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
@@ -45,9 +45,9 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 				else{
 					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
 					//DEBUG PRINT STATEMTNS
-					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
-//						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
-					}
+// 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
+// //						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
+// 					}
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 					//result.collision.safeForNow =0;
