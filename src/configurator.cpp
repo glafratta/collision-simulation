@@ -277,29 +277,34 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	g[v].outcome = result.resultCode;
 	//g[v].step = result.step;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
-	bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
+	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 	bool fullMemory = g[v].totDs >=4;
 	bool growBranch =1; 
 	float unsignedError=0;
+	EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-			if (g[v].outcome == g[l.vertex].outcome){
-				Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
-				Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
-				unsignedError = controlGoal.endCriteria.getStandardError(a, d);
-				if (unsignedError>=l.error){
-					growBranch=0;
+		if (er.errorFloat>= l.error){
+			if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+				if (g[v].outcome == g[l.vertex].outcome){
+					// Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
+					// Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
+					// unsignedError = controlGoal.endCriteria.getStandardError(a, d);
+					// if (unsignedError>=l.error){
+					// 	growBranch=0;
+					// }
+					//else 
+					if (g[v].totDs>=g[l.vertex].totDs){
+						growBranch=0;
+					}
 				}
-				else if (g[v].totDs>=g[l.vertex].totDs){
-					growBranch=0;
-				}
-			}
 			//growBranch =0;
+			}
 		}
+		
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!fl&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+	if(!er.ended&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (s.getAffIndex()==int(InnateAffordances::NONE)){
 				if (g[v].nodesInSameSpot<maxNodesOnSpot){
