@@ -58,36 +58,9 @@ public:
 	int treeSize = 0; //for debug
 	Sequence plan;
 
-Configurator(){
-	previousTimeScan = std::chrono::high_resolution_clock::now();
-	totalTime = 0.0f;
-	currentTask = controlGoal;
-	if (debugOn){
-	char dirName[50];
-	sprintf(dirName, "bodiesSpeedStats");
-	if (!opendir(dirName)){
-		mkdir(dirName, 0777);
-		printf("made stats directory\n");
-	}
-	else{
-		printf("opened stats directory\n");
-	}
-	//TODAYS DATE AND TIME
-		time_t now =time(0);
-		tm *ltm = localtime(&now);
-		int y,m,d, h, min;
-		y=ltm->tm_year-100;
-		m = ltm->tm_mon +1;
-		d=ltm->tm_mday;
-		h= ltm->tm_hour;
-		min = ltm->tm_min;
-		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-		FILE * f = fopen(statFile, "w");
-		fclose(f);
-	}
-}
+Configurator()=default;
 
-Configurator(Task &_task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
+Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
 	if (debugOn){

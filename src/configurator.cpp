@@ -74,7 +74,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			plan.erase(plan.begin());
 		}
 		else{
-			currentTask = Task();
+			currentTask = Task(controlGoal.disturbance, DEFAULT); //fall back to control goal
 			printf("no plan\n");
 		}
 	}
