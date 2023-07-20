@@ -243,7 +243,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	float remaining=SIM_DURATION;
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
-		inEdge = boost::in_edges(v, g).first.dereference();/
+		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
