@@ -108,7 +108,8 @@ void step( AlphaBot &motors){
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
-    Task controlGoal;
+	Task::Disturbance target(2, b2Vec2(BOX2DRANGE, 0));
+    Task controlGoal(target, DEFAULT);
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	if (argc>1){
