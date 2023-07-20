@@ -278,13 +278,14 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	//g[v].step = result.step;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
+	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
 	bool fullMemory = g[v].totDs >=4;
 	bool growBranch =1; 
-	float unsignedError=0;
+	//float unsignedError=0;
 	EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (er.errorFloat>= l.error){
+		if (er.errorFloat<= l.error){
 			if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 				if (g[v].outcome == g[l.vertex].outcome){
 					// Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
@@ -300,6 +301,9 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 				}
 			//growBranch =0;
 			}
+		}
+		else{
+			growBranch =0; 
 		}
 		
 	}
