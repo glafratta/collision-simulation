@@ -247,7 +247,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
-			remaining= (BOX2DRANGE-g[srcVertex].distanceSoFar)*2/MAX_SPEED;
+			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())*2/MAX_SPEED;
 		} 
 		if (remaining<0){
 			remaining=0;
