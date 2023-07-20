@@ -346,7 +346,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
-		_leaves.push_back(Leaf(v, unsignedError));
+		_leaves.push_back(Leaf(v, er.errorFloat));
                 while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
                     if(boost::in_degree(v, g)>0){
 	                    inEdge = boost::in_edges(v, g).first.dereference();
