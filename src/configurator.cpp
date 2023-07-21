@@ -276,7 +276,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	EndedResult er;
 	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
 	bool fullMemory = g[v].totDs >=4;
-	bool growBranch = betterThanLeaves(g, v, _leaves, er); 
+	bool growBranch =betterThanLeaves(g, v, _leaves, er); 
 	// //float unsignedError=0;
 	// EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	// //ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
@@ -630,27 +630,18 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 		if (g[v].outcome == g[l.vertex].outcome){
 			if (er.errorFloat<= l.error){
 				if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-					//if (g[v].outcome == g[l.vertex].outcome){
-						// Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
-						// Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
-						// unsignedError = controlGoal.endCriteria.getStandardError(a, d);
-						// if (unsignedError>=l.error){
-						// 	growBranch=0;
-						// }
-						//else 
 						if (g[v].totDs>=g[l.vertex].totDs){
 							growBranch=0;
+							break;
 						}
-					//}
-				//growBranch =0;
 				}
 			}
 			else{
 				growBranch =0; 
+				break;
 				}
 		}
-		
-		
 	}
+	return growBranch;
 
 }
