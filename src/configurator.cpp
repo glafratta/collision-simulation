@@ -300,11 +300,11 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 						}
 					//}
 				//growBranch =0;
+				}
 			}
-		}
-		else{
-			growBranch =0; 
-			}
+			else{
+				growBranch =0; 
+				}
 		}
 		
 		
