@@ -342,7 +342,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 
 
-bool Configurator::buildTreeDepthFirst(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
+bool Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	char n[250];
 	int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
@@ -390,8 +390,8 @@ bool Configurator::buildTreeDepthFirst(vertexDescriptor v, CollisionGraph& g, Ta
 	//return !g[0].disturbance.safeForNow;
 }
 
-bool Configurator::buildTreeIDBFS(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
-	Task::simResult result = s.willCollide(w, iteration, debugOn, )
+bool Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
+	//Task::simResult result = s.willCollide(w, iteration, debugOn, )
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
