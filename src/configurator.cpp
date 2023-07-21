@@ -45,7 +45,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
 	if (currentTask.direction ==DEFAULT){
-		currentTask.action.setOmega(deltaPose.q.GetAngle());
+		//currentTask.action.setOmega(deltaPose.q.GetAngle()); //NO SETTING ANGLE
 		currentTask.action.setLinearSpeed(SignedVectorLength(deltaPose.p));
 	}
 	//printf("calculated velocity\n");

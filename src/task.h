@@ -127,7 +127,7 @@ public:
     float R=.5;
     float L=.5;
 
-    Action(){}
+    Action()=default;
 
     void init(Direction direction){
         switch (direction){
