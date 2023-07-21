@@ -98,7 +98,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			reactiveAvoidance(world, result, currentTask);
 		}	
 		else{
-			buildTreeDepthFirst(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+			backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			plan = getCleanSequence(g, bestLeaf);
 			printf("plan:");
