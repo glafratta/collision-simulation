@@ -12,7 +12,7 @@
 #include </usr/include/boost/container/map.hpp>
 #include "task.h"
 
-enum M_CODES {THREE_M, FOUR_M};
+enum M_CODES {THREE_M=3, FOUR_M=4};
 
 enum GRAPH_CONSTRUCTION {DEPTH_FIRST, BREADTH_FIRST_ITDE};
 

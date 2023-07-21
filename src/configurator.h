@@ -51,14 +51,15 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	CoordinateContainer current;
-	CoordinateContainer currentBox2D;
+	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
 	int bodies=0;
 	int treeSize = 0; //for debug
 	Sequence plan;
+	M_CODES numberOfM =THREE_M;
+	GRAPH_CONSTRUCTION graphConstruction = DEPTH_FIRST;
 
 Configurator()=default;
 
@@ -371,6 +372,8 @@ void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
 void applyTransitionMatrix3M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
 
 void applyTransitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
+
+bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
 };
 
