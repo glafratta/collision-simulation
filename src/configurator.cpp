@@ -275,7 +275,6 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	g[v].endPose = result.endPose;
 	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	g[v].outcome = result.resultCode;
-	//g[v].step = result.step;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
@@ -309,7 +308,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!er.ended&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-
+		applyTransitionMatrix3M(g, v, s.direction);
 	// if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 	// 		//if (s.getAffIndex()==int(InnateAffordances::NONE)){
 	// 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
@@ -611,11 +610,13 @@ void Configurator::run(Configurator * c){
 void Configurator::applyTransitionMatrix3M(CollisionGraph&g, vertexDescriptor v, Direction d){
 	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 		//if (s.getAffIndex()==int(InnateAffordances::NONE)){
+		if (d ==DEFAULT){
 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
 				//for (Direction d :Avoid.options){
 					g[v].options= {LEFT, RIGHT, BACK};
 				//}
 			}
+		}
 		//}
 	}
 	else { //will only enter if successful
