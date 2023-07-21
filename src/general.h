@@ -21,7 +21,7 @@ struct Edge{
 struct Node{
 	Task::Disturbance disturbance; //error signal
 	b2Transform endPose; 
-	float distanceSoFar =0; 
+	//float distanceSoFar =0; 
 	Task::simResult::resultType outcome;
 	//int step=0; //error signal
 	std::vector <Direction> options;
@@ -37,6 +37,8 @@ struct Node{
 		b2Vec2 v = endPose.p - disturbance.getPosition();
 		return Distance(v.Length());
 	}
+
+	void fill(Task::simResult);
 };
 
 

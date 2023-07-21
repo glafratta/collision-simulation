@@ -1,5 +1,15 @@
 #include "general.h"
 
+void Node::fill(Task::simResult result){
+	if (result.collision.isValid()){
+		totDs++;
+	}
+	disturbance = result.collision;
+	endPose = result.endPose;
+	//distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
+	outcome = result.resultCode;
+}
+
 bool operator!=(Transform const &t1, Transform const& t2){
 	//printf("%f != %f = %i\t %f != %f = %i\t %f != %f = %i\n",t1.p.x, t2.p.x, t1.p.x != t2.p.x,t1.p.y, t2.p.y, t1.p.y != t2.p.y, t1.q.GetAngle(), t2.q.GetAngle(), t1.q.GetAngle() != t2.q.GetAngle() );
 	return t1.p.x != t2.p.x || t1.p.y != t2.p.y || t1.q.GetAngle() != t2.q.GetAngle();

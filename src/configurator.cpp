@@ -252,14 +252,8 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		if (remaining<0){
 			remaining=0;
 		}
-		result =s.willCollide(w, iteration, debugOn, remaining); //start from where the last Task ended (if previous Task crashes)
-		//g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
-		//g[v].predecessors = g[srcVertex].predecessors +1;
 	}
-	else{
-		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
-	}
-
+	result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
 
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
@@ -268,13 +262,13 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	else{
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
-	if (result.collision.isValid()){
-		g[v].totDs++;
-	}
-	g[v].disturbance = result.collision;
-	g[v].endPose = result.endPose;
-	g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
-	g[v].outcome = result.resultCode;
+	// if (result.collision.isValid()){
+	// 	g[v].totDs++;
+	// }
+	// g[v].disturbance = result.collision;
+	// g[v].endPose = result.endPose;
+	// g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
+	// g[v].outcome = result.resultCode;
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
@@ -286,7 +280,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	for (auto l: _leaves){
 		if (g[v].outcome == g[l.vertex].outcome){
 			//if (er.errorFloat<= l.error){
-				if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+				if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 					//if (g[v].outcome == g[l.vertex].outcome){
 						// Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
 						// Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
@@ -392,6 +386,7 @@ bool Configurator::buildTreeDepthFirst(vertexDescriptor v, CollisionGraph& g, Ta
 }
 
 bool Configurator::buildTreeIDBFS(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
+	Task::simResult result = s.willCollide(w, iteration, debugOn, )
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
