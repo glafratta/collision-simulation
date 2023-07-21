@@ -98,7 +98,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			reactiveAvoidance(world, result, currentTask);
 		}	
 		else{
-			build_tree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+			buildTreeDepthFirst(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 			plan = getCleanSequence(g, bestLeaf);
 			printf("plan:");
@@ -343,7 +343,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 
 
-bool Configurator::build_tree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
+bool Configurator::buildTreeDepthFirstvertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	char n[250];
 	int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);

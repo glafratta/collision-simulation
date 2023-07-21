@@ -128,7 +128,9 @@ void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if
 
 vertexDescriptor nextNode(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <Leaf> &);
 
-bool build_tree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
+bool buildTreeDepthFirst(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
+
+bool buildTreeIDBFS(vertexDescriptor, CollisionGraph&, Task, b2World &, std::vector <Leaf>&);
 
 Direction getOppositeDirection(Direction d){
     switch (d){
