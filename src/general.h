@@ -15,7 +15,7 @@
 struct Edge{
 	Direction direction;
 	//int stepDuration =0;
-	float distanceCovered=0;
+	//float distanceCovered=0;
 };
 
 struct Node{
@@ -25,7 +25,7 @@ struct Node{
 	Task::simResult::resultType outcome;
 	//int step=0; //error signal
 	std::vector <Direction> options;
-	int predecessors =0;
+	//int predecessors =0;
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
 
