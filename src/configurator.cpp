@@ -315,13 +315,14 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 
 	//IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
 			//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
-	if (!isLeaf){
-		addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
-		return v1; //added now	
-	}
+	// if (!isLeaf){
+	// 	addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
+	// 	//return v1; //added now	
+	// }
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
-	else {
+	if (isLeaf) {
 		_leaves.push_back(Leaf(v, er.errorFloat));
+		backtrack(g, v);
                 // while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
                 //     if(boost::in_degree(v, g)>0){
 	            //         inEdge = boost::in_edges(v, g).first.dereference();
@@ -336,6 +337,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
                 //     }
                 // }
 		}
+		addVertex(v, v1, g);
 		return v1;
 	}
 
@@ -649,20 +651,18 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 
 }
 
-vertexDescriptor Configurator::backtrack(CollisionGraph&g, vertexDescriptor v){
-	vertexDescriptor v1 =v;
+void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
 		if(boost::in_degree(v, g)>0){
 			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
 			v = inEdge.m_source;
 			if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
 				//addVertex(v,v1,g);
-				return v1;
+				return;
 			}
 		}
 		else{
-			break;
+			return;
 		}
     }
-	return v1;
 }
