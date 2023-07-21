@@ -309,6 +309,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!er.ended&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+
 	// if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
 	// 		//if (s.getAffIndex()==int(InnateAffordances::NONE)){
 	// 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
@@ -620,7 +621,7 @@ void Configurator::applyTransitionMatrix3M(CollisionGraph&g, vertexDescriptor v,
 	else { //will only enter if successful
 	//if (s.getAffIndex()==int(InnateAffordances::AVOID)){
 		if (d== LEFT || d == RIGHT){
-			g[v].options = {DEFAULT, BACK};
+			g[v].options = {DEFAULT};
 		}
 		else if (d == BACK){
 			//for (Direction d: Avoid.options){
