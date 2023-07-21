@@ -12,6 +12,10 @@
 #include </usr/include/boost/container/map.hpp>
 #include "task.h"
 
+enum M_CODES {THREE_M, FOUR_M};
+
+enum GRAPH_CONSTRUCTION {DEPTH_FIRST, BREADTH_FIRST_ITDE};
+
 struct Edge{
 	Direction direction;
 	//int stepDuration =0;
@@ -153,7 +157,5 @@ bool operator>(P const &, P const &);
 bool operator==(P const &, P const &);
 
 typedef std::set<Point> CoordinateContainer;
-
-typedef b2Transform DeltaPose;
 
 #endif

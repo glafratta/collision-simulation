@@ -262,6 +262,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	else{
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
+	g[v].fill(result);
 	// if (result.collision.isValid()){
 	// 	g[v].totDs++;
 	// }

@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <sys/stat.h>
 
+typedef b2Transform DeltaPose;
+
 class ConfiguratorInterface{
 public:
 	bool debugOn=0;
