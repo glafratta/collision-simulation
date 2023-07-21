@@ -12,6 +12,7 @@
 #include <ncurses.h>
 #include <fstream>
 //#include "task.h"
+#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include <algorithm>
 #include <sys/stat.h>
 

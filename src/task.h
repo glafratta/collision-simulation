@@ -6,11 +6,11 @@
 #include <math.h> 
 #include "measurement.h"
 #include <stdexcept>
-#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include "settings.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 #define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
 
+struct Node;
 
 class Task{
 public:
@@ -266,6 +266,8 @@ Direction H(Disturbance, Direction);
 void setEndCriteria();
 
 EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
+
+EndedResult checkEnded(Node); //check task ended based on simulation results
 
 //Task(){}
 
