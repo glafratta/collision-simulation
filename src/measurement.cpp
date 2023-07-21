@@ -65,10 +65,12 @@ float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     return result;
 }
 
-float EndCriteria::getStandardError(Node){
-    float result =0;
-    return result;
-}
+// float EndCriteria::getStandardError(Node){
+//     float result =0;
+
+
+//     return result;
+// }
 
 float SignedVectorLength(b2Vec2 v){
 	float signedLength = v.Length();

@@ -10,7 +10,7 @@
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 #define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
 
-struct Node;
+//struct Node;
 
 class Task{
 public:

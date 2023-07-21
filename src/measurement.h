@@ -2,8 +2,6 @@
 #define MEASUREMENT_H
 #include "robot.h"
 
-struct Node;
-
 class Measurement{
 protected:
     bool valid =0;
@@ -56,7 +54,7 @@ struct EndCriteria{
     float getError(EndCriteria); //expresses magnitude of error, not normalised
     float getStandardError(EndCriteria);
     float getStandardError(Angle, Distance);
-    float getStandardError(Node);
+   // float getStandardError(Node);
     bool hasEnd();
 
 };
