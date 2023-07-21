@@ -322,19 +322,19 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
 	else {
 		_leaves.push_back(Leaf(v, er.errorFloat));
-                while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
-                    if(boost::in_degree(v, g)>0){
-	                    inEdge = boost::in_edges(v, g).first.dereference();
-						v = inEdge.m_source;
-						if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-							addVertex(v,v1,g);
-							return v1;
-						}
-                    }
-                    else{
-                        break;
-                    }
-                }
+                // while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
+                //     if(boost::in_degree(v, g)>0){
+	            //         inEdge = boost::in_edges(v, g).first.dereference();
+				// 		v = inEdge.m_source;
+				// 		if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+				// 			addVertex(v,v1,g);
+				// 			return v1;
+				// 		}
+                //     }
+                //     else{
+                //         break;
+                //     }
+                // }
 		}
 		return v1;
 	}
@@ -647,4 +647,22 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 	}
 	return better;
 
+}
+
+vertexDescriptor Configurator::backtrack(CollisionGraph&g, vertexDescriptor v){
+	vertexDescriptor v1 =v;
+	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
+		if(boost::in_degree(v, g)>0){
+			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
+			v = inEdge.m_source;
+			if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+				//addVertex(v,v1,g);
+				return v1;
+			}
+		}
+		else{
+			break;
+		}
+    }
+	return v1;
 }

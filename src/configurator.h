@@ -375,7 +375,7 @@ void applyTransitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DE
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
-vertexDescriptor backTrack(CollisionGraph&, vertexDescriptor)
+vertexDescriptor backtrack(CollisionGraph&, vertexDescriptor);
 
 };
 
