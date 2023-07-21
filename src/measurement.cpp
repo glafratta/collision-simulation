@@ -47,7 +47,7 @@ float Measurement::getStandardError(Measurement m2){
     return result;
 }
 
-float EndCriteria::getError(EndCriteria ec){
+float EndCriteria::getError(EndCriteria ec){ //not normalised
     float result =0;
     result = angle.getError(ec.angle) + distance.getError(ec.distance);
     return result;
@@ -62,6 +62,11 @@ float EndCriteria::getStandardError(EndCriteria ec){ //standard error
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
     result = angle.getStandardError(a)+ this->distance.getStandardError(d); //max =4;
+    return result;
+}
+
+float EndCriteria::getStandardError(Node){
+    float result =0;
     return result;
 }
 
