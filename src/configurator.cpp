@@ -309,29 +309,29 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	if(!er.ended&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-	if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
-			if (s.getAffIndex()==int(InnateAffordances::NONE)){
-				if (g[v].nodesInSameSpot<maxNodesOnSpot){
-					for (Direction d :Avoid.options){
-						g[v].options.push_back(d);
-					}
-				}
-			}
-		}
-		else { //will only enter if successful
-		if (s.getAffIndex()==int(InnateAffordances::AVOID)){
-			if (s.direction == LEFT || s.direction == RIGHT){
-				g[v].options.push_back(DEFAULT);
-			}
-			else if (s.direction == BACK){
-				for (Direction d: Avoid.options){
-					if (d !=BACK){
-						g[v].options.push_back(d);
-					}
-				}
-			}
-		}
-		}	
+	// if (result.resultCode != Task::simResult::successful){ //accounts for simulation also being safe for now
+	// 		//if (s.getAffIndex()==int(InnateAffordances::NONE)){
+	// 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
+	// 				for (Direction d :Avoid.options){
+	// 					g[v].options.push_back(d);
+	// 				}
+	// 			}
+	// 		//}
+	// 	}
+	// 	else { //will only enter if successful
+	// 	if (s.getAffIndex()==int(InnateAffordances::AVOID)){
+	// 		if (s.direction == LEFT || s.direction == RIGHT){
+	// 			g[v].options.push_back(DEFAULT);
+	// 		}
+	// 		else if (s.direction == BACK){
+	// 			for (Direction d: Avoid.options){
+	// 				if (d !=BACK){
+	// 					g[v].options.push_back(d);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	}	
 	}
 //	}
 
@@ -607,4 +607,29 @@ void Configurator::run(Configurator * c){
 	}
 }
 
-//void Configurator::addOptionsToNode(CollisionGraph & g, vertexDescriptor v){}
+void Configurator::applyTransitionMatrix3M(CollisionGraph&g, vertexDescriptor v, Direction d){
+	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+		//if (s.getAffIndex()==int(InnateAffordances::NONE)){
+			if (g[v].nodesInSameSpot<maxNodesOnSpot){
+				//for (Direction d :Avoid.options){
+					g[v].options= {LEFT, RIGHT, BACK};
+				//}
+			}
+		//}
+	}
+	else { //will only enter if successful
+	//if (s.getAffIndex()==int(InnateAffordances::AVOID)){
+		if (d== LEFT || d == RIGHT){
+			g[v].options = {DEFAULT, BACK};
+		}
+		else if (d == BACK){
+			//for (Direction d: Avoid.options){
+				//if (d !=BACK){
+				g[v].options= {LEFT, RIGHT};
+				//}
+			//}
+		}
+	//}
+	}	
+
+}

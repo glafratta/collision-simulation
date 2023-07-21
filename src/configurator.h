@@ -354,8 +354,6 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	return obStillThere;
 }
 
-void addOptionsToNode(CollisionGraph &, vertexDescriptor); //adds options for the robot to travel only straight, left and right
-
 void start(); //data interface class collecting position of bodies
 
 void stop();
@@ -366,6 +364,7 @@ static void run(Configurator *);
 
 void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
 
+void applyTransitionMatrix3M(CollisionGraph&, vertexDescriptor, Direction);
 
 };
 
