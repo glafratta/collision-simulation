@@ -284,7 +284,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
 	for (auto l: _leaves){
-		if (g[v].outcome == g[l].outcome){
+		if (g[v].outcome == g[l.vertex].outcome){
 			if (er.errorFloat<= l.error){
 				if (g[v].distanceSoFar <= g[l.vertex].distanceSoFar ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 					//if (g[v].outcome == g[l.vertex].outcome){
@@ -302,10 +302,11 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 				//growBranch =0;
 			}
 		}
-	}
 		else{
 			growBranch =0; 
+			}
 		}
+		
 		
 	}
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
