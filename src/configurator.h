@@ -59,7 +59,7 @@ public:
 	int treeSize = 0; //for debug
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
-	GRAPH_CONSTRUCTION graphConstruction = DEPTH_FIRST;
+	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
 
 Configurator()=default;
 
@@ -374,6 +374,8 @@ void applyTransitionMatrix3M(CollisionGraph&, vertexDescriptor, Direction); //DE
 void applyTransitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
+
+vertexDescriptor backTrack(CollisionGraph&, vertexDescriptor)
 
 };
 

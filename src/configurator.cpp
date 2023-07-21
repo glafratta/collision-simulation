@@ -238,7 +238,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	bool isLeaf=0;
 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
-		//FIND IF THE PRESENT STATE WILL COLLIDE
+		//EVALUATE NODE()
 	Task::simResult result; 
 	float remaining=SIM_DURATION;
 	//IDENTIFY SOURCE NODE, IF ANY
@@ -276,7 +276,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 	EndedResult er;
 	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
 	bool fullMemory = g[v].totDs >=4;
-	bool growBranch =betterThanLeaves(g, v, _leaves, er); 
+	bool better =betterThanLeaves(g, v, _leaves, er); 
 	// //float unsignedError=0;
 	// EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	// //ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
@@ -307,7 +307,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 		
 	// }
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!er.ended&& growBranch && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+	if(!er.ended&& better && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
 		applyTransitionMatrix3M(g, v, s.direction);	
 	}
 
@@ -623,25 +623,28 @@ void Configurator::applyTransitionMatrix4M(CollisionGraph&g, vertexDescriptor v,
 }
 
 bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <Leaf> _leaves, EndedResult& er){
-	bool growBranch =1; 
+	bool better =1; 
 	er = controlGoal.checkEnded(g[v].endPose);
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
-	for (auto l: _leaves){
-		if (g[v].outcome == g[l.vertex].outcome){
-			if (er.errorFloat<= l.error){
-				if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-						if (g[v].totDs>=g[l.vertex].totDs){
-							growBranch=0;
-							break;
-						}
+	if (graphConstruction = BACKTRACKING){
+		for (auto l: _leaves){
+			if (g[v].outcome == g[l.vertex].outcome){
+				if (er.errorFloat<= l.error){
+					if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+							if (g[v].totDs>=g[l.vertex].totDs){
+								better=0;
+								break;
+							}
+					}
 				}
+				else{
+					better =0; 
+						break;
+					}
 			}
-			else{
-				growBranch =0; 
-				break;
-				}
-		}
 	}
-	return growBranch;
+
+	}
+	return better;
 
 }
