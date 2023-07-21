@@ -253,8 +253,8 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
 			remaining=0;
 		}
 		result =s.willCollide(w, iteration, debugOn, remaining); //start from where the last Task ended (if previous Task crashes)
-		g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
-		g[v].predecessors = g[srcVertex].predecessors +1;
+		//g[inEdge].distanceCovered= result.distanceCovered; //assign data to edge
+		//g[v].predecessors = g[srcVertex].predecessors +1;
 	}
 	else{
 		result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
@@ -392,7 +392,6 @@ bool Configurator::buildTreeDepthFirst(vertexDescriptor v, CollisionGraph& g, Ta
 }
 
 bool Configurator::buildTreeIDBFS(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
-
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
@@ -590,7 +589,7 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::applyTransitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
+void Configurator::applyTransitionMatrix3M(CollisionGraph&g, vertexDescriptor v, Direction d){
 	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 		if (d ==DEFAULT){
 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
