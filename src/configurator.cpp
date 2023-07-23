@@ -230,7 +230,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 }
 
 
-vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <Leaf> &_leaves){
+vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <Leaf> &_leaves){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -337,7 +337,7 @@ vertexDescriptor Configurator::nextNode(vertexDescriptor v, CollisionGraph&g, Ta
                 //     }
                 // }
 		}
-		addVertex(v, v1, g);
+		addVertex(v, v1, g); //if it is not leaf, will have vertex, if it is leaf, will backtrack
 		return v1;
 	}
 
@@ -362,31 +362,34 @@ bool Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
 	//END DEBUG FILE
-	vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
-	bodyCount += w.GetBodyCount();
-	treeSize= g.m_vertices.size();
+	//vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
+	vertexDescriptor v1;
+	// bodyCount += w.GetBodyCount();
+	// treeSize= g.m_vertices.size();
 		//destroying world causes segfault even if it's no longer required so skipping for now
-    while (v1!= v){
-		b2World newWorld({0.0f, 0.0f});
+    do{
+		bodyCount =w.GetBodyCount();
+		//evaluate
+		v1=P(v, g,s, w, _leaves);
+		//b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 		vertexDescriptor v1Src = v1InEdge.m_source;
 		Direction dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
-		constructWorldRepresentation(newWorld, dir, g[v1Src].endPose); //was g[v].endPose
-		bodyCount =newWorld.GetBodyCount();
+		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
 		//DEBUG
-		if (debugOn){
-			FILE *f = fopen(n, "a+");
-			for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
-				fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-			}
-			fclose(f);
-		}
+		// if (debugOn){
+		// 	FILE *f = fopen(n, "a+");
+		// 	for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
+		// 		fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+		// 	}
+		// 	fclose(f);
+		// }
 		//END DEBUG
 		v= v1;
-		v1 = nextNode(v,g,s, newWorld, _leaves);
-		treeSize= g.m_vertices.size();
-	}
+		//v1 = nextNode(v,g,s, newWorld, _leaves);
+		//treeSize= g.m_vertices.size();
+	}while (v1!= v);
 	//return !g[0].disturbance.safeForNow;
 }
 
