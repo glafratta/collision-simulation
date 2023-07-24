@@ -230,7 +230,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 }
 
 
-vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w, std::vector <Leaf> &_leaves){
+vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -410,7 +410,7 @@ bool Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	//Task::simResult result = s.willCollide(w, iteration, debugOn, )
 	vertexDescriptor v1 =v;
 	do{
-		
+		P(v, g, s, w,)
 	}while(true);
 }
 

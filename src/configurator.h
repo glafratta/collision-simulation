@@ -129,7 +129,7 @@ b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
-vertexDescriptor P(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <Leaf> &);
+vertexDescriptor P(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
 
