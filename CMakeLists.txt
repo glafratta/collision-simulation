@@ -15,8 +15,10 @@ add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(navigate main.cpp)
+  add_executable(targetless targetless.cpp)
   target_link_libraries(navigate alphabot a1lidarrpi HICS pigpio)
-  message("detected architecture aarch64, building navigate.exe")
+  target_link_libraries(targetless alphabot a1lidarrpi HICS pigpio)
+  message("detected architecture aarch64, building executables")
 else()
 #	add_subdirectory(test)
 	message("not building any executable")

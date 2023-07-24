@@ -371,11 +371,11 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		//destroying world causes segfault even if it's no longer required so skipping for now
     do{		
 		v= v1;
-		bodyCount =w.GetBodyCount();
+		//bodyCount =w.GetBodyCount();
 		//evaluate
-		v1=P(v, g,s, w, _leaves);
+		P(v, g,s, w, _leaves);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (g[v].totDs <4 && er.ended && betterThanLeaves(g, v, _leaves, er)){
+		if (g[v].totDs <4 && !er.ended && betterThanLeaves(g, v, _leaves, er)){
 			applyTransitionMatrix(g, v, s.direction);
 		}
 		if (g[v].options.size()==0){
@@ -408,6 +408,10 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 
 bool Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	//Task::simResult result = s.willCollide(w, iteration, debugOn, )
+	vertexDescriptor v1 =v;
+	do{
+		
+	}while(true);
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
