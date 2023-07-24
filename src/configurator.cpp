@@ -99,7 +99,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 		}	
 		else{
 			switch (graphConstruction){
-				case BACKTRACKING:
+				case BACKTRACKING:{
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 					plan = getCleanSequence(g, bestLeaf);
@@ -107,7 +107,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					printPlan(plan);
 					printf("built tree\n");
 					break;
-				case BREADTH_FIRST_ITDE:
+				}
+					
+				case BREADTH_FIRST_ITDE:{
 					BFIDBuildTree(v0, g, currentTask, world);
 					vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
 					plan = getCleanSequence(g, bestLeaf);
@@ -115,6 +117,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					printPlan(plan);
 					printf("built tree\n");
 					break;
+				}
 				default:
 					break;
 			}
