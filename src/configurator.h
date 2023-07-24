@@ -131,7 +131,7 @@ void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if
 
 vertexDescriptor P(vertexDescriptor, CollisionGraph&, Task  , b2World & , std::vector <Leaf> &);
 
-bool backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
+void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
 
 bool BFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, std::vector <Leaf>&);
 

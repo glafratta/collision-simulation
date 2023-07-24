@@ -344,7 +344,7 @@ vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, 
 	}
 
 
-bool Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
+void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	char n[250];
 	int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
