@@ -25,13 +25,11 @@ struct Edge{
 struct Node{
 	Task::Disturbance disturbance; //error signal
 	b2Transform endPose; 
-	//float distanceSoFar =0; 
 	Task::simResult::resultType outcome;
-	//int step=0; //error signal
 	std::vector <Direction> options;
-	//int predecessors =0;
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
+	bool filled =0;
 
 	Angle getAngle(){
 		return Angle(disturbance.getAngle(endPose));
@@ -61,8 +59,13 @@ typedef std::vector <TaskSummary> Sequence;
 struct Leaf{
 	vertexDescriptor vertex=0;
 	float error =0;
+	bool valid=0;
 
-	Leaf(vertexDescriptor v, float e):vertex(v), error(e){}
+	Leaf()=default;
+
+	Leaf(vertexDescriptor v, float e):vertex(v), error(e){
+		valid=1;
+	}
 };
 
 struct Point{

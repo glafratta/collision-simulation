@@ -133,7 +133,7 @@ vertexDescriptor P(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
 
-bool BFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, std::vector <Leaf>&);
+void BFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &);
 
 Direction getOppositeDirection(Direction d){
     switch (d){

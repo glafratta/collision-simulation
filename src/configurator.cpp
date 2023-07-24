@@ -98,12 +98,26 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			reactiveAvoidance(world, result, currentTask);
 		}	
 		else{
-			backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-			vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
-			plan = getCleanSequence(g, bestLeaf);
-			printf("plan:");
-			printPlan(plan);
-			printf("built tree\n");
+			switch (graphConstruction){
+				case BACKTRACKING:
+					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+					plan = getCleanSequence(g, bestLeaf);
+					printf("plan:");
+					printPlan(plan);
+					printf("built tree\n");
+					break;
+				case BREADTH_FIRST_ITDE:
+					BFIDBuildTree(v0, g, currentTask, world);
+					vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
+					plan = getCleanSequence(g, bestLeaf);
+					printf("plan:");
+					printPlan(plan);
+					printf("built tree\n");
+					break;
+				default:
+					break;
+			}
 			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
 				if (!plan.empty()){
 					Sequence next= {plan[0]};
@@ -373,7 +387,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		v= v1;
 		//bodyCount =w.GetBodyCount();
 		//evaluate
-		P(v, g,s, w, _leaves);
+		P(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (g[v].totDs <4 && !er.ended && betterThanLeaves(g, v, _leaves, er)){
 			applyTransitionMatrix(g, v, s.direction);
@@ -406,12 +420,31 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//return !g[0].disturbance.safeForNow;
 }
 
-bool Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
-	//Task::simResult result = s.willCollide(w, iteration, debugOn, )
+void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w){
 	vertexDescriptor v1 =v;
+	Leaf bestNext;
 	do{
-		P(v, g, s, w,)
-	}while(true);
+		v=v1;
+		if (!(g[v].filled)){ //for the first vertex
+			P(v, g, s, w);			
+		}
+		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+		if (g[v].totDs <4 && !er.ended){
+			applyTransitionMatrix(g, v, s.direction);
+		}
+		for (Direction d: g[v].options){ //add and evaluate all vertices
+			addVertex(v, v1, g, g[v].disturbance); //add
+			s = Task(g[v].disturbance, d);
+			P(v1, g, s, w); //find simulation result
+			float error = controlGoal.checkEnded(g[v].endPose).errorFloat;
+			if (!bestNext.valid|| bestNext.error >=error){ //find error
+				if (bestNext.vertex!=0){
+					boost::remove_vertex(bestNext.vertex, g);
+				}
+				bestNext = Leaf(v1, error);
+			}
+		}
+	}while(v !=v1);
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
