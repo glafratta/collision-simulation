@@ -365,11 +365,12 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	}
 	//END DEBUG FILE
 	//vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
-	vertexDescriptor v1;
+	vertexDescriptor v1=v;
 	// bodyCount += w.GetBodyCount();
 	// treeSize= g.m_vertices.size();
 		//destroying world causes segfault even if it's no longer required so skipping for now
-    do{
+    do{		
+		v= v1;
 		bodyCount =w.GetBodyCount();
 		//evaluate
 		v1=P(v, g,s, w, _leaves);
@@ -399,7 +400,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		// 	fclose(f);
 		// }
 		//END DEBUG
-		v= v1;
 		//v1 = nextNode(v,g,s, newWorld, _leaves);
 		//treeSize= g.m_vertices.size();
 	}while (v1!= v);
