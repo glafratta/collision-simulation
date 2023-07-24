@@ -313,34 +313,34 @@ vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, 
 	// 	applyTransitionMatrix3M(g, v, s.direction);	
 	// }
 
-	isLeaf = (g[v].options.size() ==0);
+	// isLeaf = (g[v].options.size() ==0);
 
-	//IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
-			//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
-	// if (!isLeaf){
-	// 	addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
-	// 	//return v1; //added now	
-	// }
-	//IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
-	if (isLeaf) {
-		_leaves.push_back(Leaf(v, er.errorFloat));
-		backtrack(g, v);
-                // while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
-                //     if(boost::in_degree(v, g)>0){
-	            //         inEdge = boost::in_edges(v, g).first.dereference();
-				// 		v = inEdge.m_source;
-				// 		if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-				// 			addVertex(v,v1,g);
-				// 			return v1;
-				// 		}
-                //     }
-                //     else{
-                //         break;
-                //     }
-                // }
-		}
-		addVertex(v, v1, g); //if it is not leaf, will have vertex, if it is leaf, will backtrack
-		return v1;
+	// //IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
+	// 		//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
+	// // if (!isLeaf){
+	// // 	addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
+	// // 	//return v1; //added now	
+	// // }
+	// //IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
+	// if (isLeaf) {
+	// 	_leaves.push_back(Leaf(v, er.errorFloat));
+	// 	backtrack(g, v);
+    //             // while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
+    //             //     if(boost::in_degree(v, g)>0){
+	//             //         inEdge = boost::in_edges(v, g).first.dereference();
+	// 			// 		v = inEdge.m_source;
+	// 			// 		if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
+	// 			// 			addVertex(v,v1,g);
+	// 			// 			return v1;
+	// 			// 		}
+    //             //     }
+    //             //     else{
+    //             //         break;
+    //             //     }
+    //             // }
+	// 	}
+	// 	addVertex(v, v1, g); //if it is not leaf, will have vertex, if it is leaf, will backtrack
+	// 	return v1;
 	}
 
 
@@ -376,6 +376,13 @@ bool Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (g[v].totDs <4 && er.ended && betterThanLeaves(g, v, _leaves, er)){
 			applyTransitionMatrix(g, v, s.direction);
+		}
+		if (g[v].options.size()==0){
+			_leaves.push_back(Leaf(v, er.errorFloat));
+			backtrack(g, v);
+		}
+		if (!addVertex(v, v1, g)){
+			return;
 		}
 		//b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();

@@ -163,14 +163,17 @@ bool isFullLength(V v, const G & g, float length=0){
 
 }
 
-void addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Disturbance obs = Task::Disturbance()){
+bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Disturbance obs = Task::Disturbance()){
+	bool vertexAdded = false;
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
+		vertexAdded=true;
 	}
+	return vertexAdded;
 }
 
 void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
@@ -376,6 +379,7 @@ void applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFA
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
 void backtrack(CollisionGraph&, vertexDescriptor&);
+
 
 };
 
