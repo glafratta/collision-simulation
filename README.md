@@ -37,5 +37,5 @@ sudo make install
 
 ## Run
 ### Navigation demo (Raspberry Pi)
-* `sudo ./navigate` : this program demonstrates optimal next mode selection based on its own and its child branches' outcome. By default, this only print out statements which allow to follow the robot's behaviour; you can turn on debug mode by instead typing `sudo ./navigate 1`. This prints out in `/tmp` a) LIDAR data with the prefix `map`, b) the bodies included in Box2D withthe prefix `bodies` and c) the trajectory descried by the robot during simulation with the prefix `robot`
-
+* `sudo ./targetless` : this program demonstrates optimal next mode selection based on its own and its child branches' outcome. By default, this only print out statements which allow to follow the robot's behaviour; you can turn on debug mode by instead typing `sudo ./navigate 1`. This prints out in `/tmp` a) LIDAR data with the prefix `map`, b) the bodies included in Box2D withthe prefix `bodies` and c) the trajectory descried by the robot during simulation with the prefix `robot`
+* `sudo ./navigate`: under construction for target-oriented navigation
