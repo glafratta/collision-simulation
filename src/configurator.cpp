@@ -273,10 +273,12 @@ vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, 
 	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
 	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
 
-	EndedResult er;
-	bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
-	bool fullMemory = g[v].totDs >=4;
-	bool better =betterThanLeaves(g, v, _leaves, er); 
+	// EndedResult er;
+	// bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
+	// bool fullMemory = g[v].totDs >=4;
+	// bool better =betterThanLeaves(g, v, _leaves, er); 
+
+
 	// //float unsignedError=0;
 	// EndedResult er = controlGoal.checkEnded(g[v].endPose);
 	// //ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
@@ -307,9 +309,9 @@ vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, 
 		
 	// }
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
-	if(!er.ended&& better && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-		applyTransitionMatrix3M(g, v, s.direction);	
-	}
+	// if(!er.ended&& better && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
+	// 	applyTransitionMatrix3M(g, v, s.direction);	
+	// }
 
 	isLeaf = (g[v].options.size() ==0);
 
@@ -371,6 +373,10 @@ bool Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		bodyCount =w.GetBodyCount();
 		//evaluate
 		v1=P(v, g,s, w, _leaves);
+		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+		if (g[v].totDs <4 && er.ended && betterThanLeaves(g, v, _leaves, er)){
+			applyTransitionMatrix(g, v, s.direction);
+		}
 		//b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 		vertexDescriptor v1Src = v1InEdge.m_source;
@@ -592,40 +598,64 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::applyTransitionMatrix3M(CollisionGraph&g, vertexDescriptor v, Direction d){
-	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d){
+	switch (numberOfM){
+		case (THREE_M):
+		if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 		if (d ==DEFAULT){
 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
 					g[v].options= {LEFT, RIGHT};
 			}
-		}
-	}
-	else { //will only enter if successful
-		if (d== LEFT || d == RIGHT){
-			g[v].options = {DEFAULT};
-		}
-	}	
-
-}
-
-void Configurator::applyTransitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
-	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
-		if (d ==DEFAULT){
-			if (g[v].nodesInSameSpot<maxNodesOnSpot){
-					g[v].options= {LEFT, RIGHT, BACK};
 			}
 		}
+		else { //will only enter if successful
+			if (d== LEFT || d == RIGHT){
+				g[v].options = {DEFAULT};
+			}
+		}	
+		break;
+		case (FOUR_M):
+		if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (d ==DEFAULT){
+				if (g[v].nodesInSameSpot<maxNodesOnSpot){
+						g[v].options= {LEFT, RIGHT, BACK};
+				}
+			}
+		}
+		else { //will only enter if successful
+			if (d== LEFT || d == RIGHT){
+				g[v].options = {DEFAULT};
+			}
+			else if (d == BACK){
+					g[v].options= {LEFT, RIGHT};
+			}
+		}
+		break;
+		default:
+		break;
 	}
-	else { //will only enter if successful
-		if (d== LEFT || d == RIGHT){
-			g[v].options = {DEFAULT};
-		}
-		else if (d == BACK){
-				g[v].options= {LEFT, RIGHT};
-		}
-	}	
+	
 
 }
+
+// void Configurator::applyTransitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
+// 	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+// 		if (d ==DEFAULT){
+// 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
+// 					g[v].options= {LEFT, RIGHT, BACK};
+// 			}
+// 		}
+// 	}
+// 	else { //will only enter if successful
+// 		if (d== LEFT || d == RIGHT){
+// 			g[v].options = {DEFAULT};
+// 		}
+// 		else if (d == BACK){
+// 				g[v].options= {LEFT, RIGHT};
+// 		}
+// 	}	
+
+// }
 
 bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <Leaf> _leaves, EndedResult& er){
 	bool better =1; 

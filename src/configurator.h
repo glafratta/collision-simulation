@@ -369,9 +369,9 @@ static void run(Configurator *);
 
 void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
 
-void applyTransitionMatrix3M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
+void applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
 
-void applyTransitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
+//void applyTransitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
