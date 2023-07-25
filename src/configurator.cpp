@@ -103,6 +103,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 					plan = getCleanSequence(g, bestLeaf);
+					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
 					printPlan(plan);
 					printf("built tree\n");
@@ -113,6 +114,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					BFIDBuildTree(v0, g, currentTask, world);
 					vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
 					plan = getCleanSequence(g, bestLeaf);
+					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
 					printPlan(plan);
 					printf("built tree\n");
