@@ -440,7 +440,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		}
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			addVertex(v, v1, g, g[v].disturbance); //add
-			s = Task(g[v].disturbance, d);
+			s = Task(g[v].disturbance, d, g[v].endPose);
 			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			float error = controlGoal.checkEnded(g[v].endPose).errorFloat;
