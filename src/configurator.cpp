@@ -250,7 +250,7 @@ void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &
 }
 
 
-vertexDescriptor Configurator::P(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
+vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -393,7 +393,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		v= v1;
 		//bodyCount =w.GetBodyCount();
 		//evaluate
-		P(v, g,s, w);
+		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (g[v].totDs <4 && !er.ended && betterThanLeaves(g, v, _leaves, er)){
 			applyTransitionMatrix(g, v, s.direction);
@@ -432,7 +432,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	do{
 		v=v1;
 		if (!(g[v].filled)){ //for the first vertex
-			P(v, g, s, w);			
+			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (g[v].totDs <4 && !er.ended){
@@ -442,7 +442,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d);
 			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
-			P(v1, g, s, w); //find simulation result
+			evaluateNode(v1, g, s, w); //find simulation result
 			float error = controlGoal.checkEnded(g[v].endPose).errorFloat;
 			if (!bestNext.valid|| bestNext.error >=error){ //find error
 				// if (bestNext.vertex!=0){
