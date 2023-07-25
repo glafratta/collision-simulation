@@ -111,8 +111,9 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 				}
 					
 				case BREADTH_FIRST_ITDE:{
-					BFIDBuildTree(v0, g, currentTask, world);
-					vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
+					vertexDescriptor bestLeaf=v0;
+					BFIDBuildTree(v0, g, currentTask, world, bestLeaf);
+					//vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
 					plan = getCleanSequence(g, bestLeaf);
 					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
@@ -425,7 +426,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//return !g[0].disturbance.safeForNow;
 }
 
-void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w){
+void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best){
 	vertexDescriptor v1 =v;
 	Leaf bestNext;
 	do{
@@ -443,10 +444,11 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			P(v1, g, s, w); //find simulation result
 			float error = controlGoal.checkEnded(g[v].endPose).errorFloat;
 			if (!bestNext.valid|| bestNext.error >=error){ //find error
-				if (bestNext.vertex!=0){
-					boost::remove_vertex(bestNext.vertex, g);
-				}
+				// if (bestNext.vertex!=0){
+				// 	boost::remove_vertex(bestNext.vertex, g);
+				// }
 				bestNext = Leaf(v1, error);
+				best=v1;
 			}
 		}
 	}while(v !=v1);
