@@ -446,7 +446,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (!controlGoal.endCriteria.hasEnd()){
-			if (g[v].totDs <4){
+			if (g[v].totDs <=4){
 				applyTransitionMatrix(g, v, s.direction);
 			}
 		}
