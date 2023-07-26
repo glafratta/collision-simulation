@@ -447,7 +447,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			float error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
-			if (!bestNext.valid|| bestNext.error >=error){ //find error
+			if (!bestNext.valid|| bestNext.error >error){ //find error
 				// if (bestNext.vertex!=0){
 				// 	boost::remove_vertex(bestNext.vertex, g);
 				// }
@@ -455,7 +455,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 				best=v1;
 			}
 		}
-	}while(v1!=v); //this means that v has progressed
+	}while(bestNext.vertex!=v); //this means that v has progressed
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
