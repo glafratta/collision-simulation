@@ -430,7 +430,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	vertexDescriptor v1 =v;
 	Leaf bestNext;
 	do{
-		v=v1;
+		v=bestNext.vertex;
 		if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
 		}
