@@ -431,6 +431,9 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	Leaf bestNext;
 	do{
 		v=v1;
+		if (debugOn){
+		printf("planfile = robot%04i.txt\n", iteration);
+		}
 		if (!(g[v].filled)){ //for the first vertex
 			evaluateNode(v, g, s, w);			
 		}
@@ -443,7 +446,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			s = Task(g[v].disturbance, d, g[v].endPose);
 			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			float error = controlGoal.checkEnded(g[v].endPose).errorFloat;
+			float error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
 			if (!bestNext.valid|| bestNext.error >=error){ //find error
 				// if (bestNext.vertex!=0){
 				// 	boost::remove_vertex(bestNext.vertex, g);
