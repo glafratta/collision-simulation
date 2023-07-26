@@ -24,7 +24,7 @@ struct Edge{
 
 struct Node{
 	Task::Disturbance disturbance; //error signal
-	b2Transform endPose; 
+	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
 	Task::simResult::resultType outcome;
 	std::vector <Direction> options;
 	int nodesInSameSpot =0;
