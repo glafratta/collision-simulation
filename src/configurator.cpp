@@ -370,8 +370,8 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
 	//PRINT DEBUG
 	if (debugOn){
-			FILE *f = fopen(n, "w"); //erase contents from previous run
-			fclose(f);
+		FILE *f = fopen(n, "w"); //erase contents from previous run
+		fclose(f);
 	}
 	if (debugOn){
 		FILE *f = fopen(n, "a+");
@@ -455,7 +455,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 				best=v1;
 			}
 		}
-	}while(v !=v1);
+	}while(g[v].options>0);
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
