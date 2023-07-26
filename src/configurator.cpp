@@ -455,7 +455,7 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 				best=v1;
 			}
 		}
-	}while(g[v].options>0);
+	}while(v1!=v); //this means that v has progressed
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
