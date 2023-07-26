@@ -395,8 +395,15 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		//evaluate
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (g[v].totDs <4 && !er.ended && betterThanLeaves(g, v, _leaves, er)){
-			applyTransitionMatrix(g, v, s.direction);
+		if (!controlGoal.endCriteria.hasEnd()){
+			if (g[v].totDs <4 && betterThanLeaves(g, v, _leaves, er)){
+				applyTransitionMatrix(g, v, s.direction);
+			}
+		}
+		else{
+			if (!er.ended){
+				applyTransitionMatrix(g, v, s.direction);
+			}
 		}
 		if (g[v].options.size()==0){
 			_leaves.push_back(Leaf(v, er.errorFloat));
@@ -438,8 +445,15 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (g[v].totDs <4 && !er.ended){
-			applyTransitionMatrix(g, v, s.direction);
+		if (!controlGoal.endCriteria.hasEnd()){
+			if (g[v].totDs <4){
+				applyTransitionMatrix(g, v, s.direction);
+			}
+		}
+		else{
+			if (!er.ended){
+				applyTransitionMatrix(g, v, s.direction);
+			}
 		}
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			addVertex(v, v1, g, g[v].disturbance); //add

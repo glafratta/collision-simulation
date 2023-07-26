@@ -63,6 +63,8 @@ struct EndCriteria{
 struct EndedResult{
 	bool ended=0;
 	float errorFloat=0; //dot product of end criteria
+
+    EndedResult() = default;
 };
 
 //typedef Measurement Mst;
