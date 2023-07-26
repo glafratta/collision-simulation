@@ -429,11 +429,11 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best){
 	vertexDescriptor v1 =v;
 	Leaf bestNext;
-	do{
-		v=bestNext.vertex;
-		if (debugOn){
+	if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
-		}
+	}
+	do{		
+		v=bestNext.vertex;
 		if (!(g[v].filled)){ //for the first vertex
 			evaluateNode(v, g, s, w);			
 		}
