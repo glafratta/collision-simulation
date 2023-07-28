@@ -208,7 +208,7 @@ public:
         recordedSpeed =s;
     }
 
-    setRecOmega(float w){
+    void setRecOmega(float w){
         recordedOmega=w;
     }
 
