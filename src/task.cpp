@@ -17,16 +17,16 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		robot.body->SetTransform(start.p, theta);
 		int step=0;
 		for (step; step < (HZ*remaining); step++) {//3 second
-			instVelocity.x = action.getLinearSpeed()*cos(theta);
-			instVelocity.y = action.getLinearSpeed()*sin(theta);
+			instVelocity.x = action.getRecSpeed()*cos(theta);
+			instVelocity.y = action.getRecSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
-			robot.body->SetAngularVelocity(action.getOmega());
+			robot.body->SetAngularVelocity(action.getRecOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
-			theta += action.getOmega()/HZ; //= omega *t
+			theta += action.getRecOmega()/HZ; //= omega *t
 			if (checkEnded(robot.body->GetTransform()).ended){
 				if (direction==BACK){
 					result = simResult(simResult::resultType::successful, disturbance);

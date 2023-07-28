@@ -122,7 +122,9 @@ public:
 struct Action{
 private:
     float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
+    float recordedSpeed=linearSpeed;
     float omega=0; //initial angular velocity is 0
+    float recordedOmega = omega;
     bool valid=0;
 public:
     float R=.5;
@@ -200,6 +202,22 @@ public:
 
     void setLinearSpeed(float s){
         linearSpeed =s;
+    }
+
+    void setRecSpeed(float s){
+        recordedSpeed =s;
+    }
+
+    setRecOmega(float w){
+        recordedOmega=w;
+    }
+
+    float getRecSpeed(){
+        return recordedSpeed;
+    }
+
+    float getRecOmega(){
+        return recordedOmega;
     }
     //friend class Configurator;
 };
