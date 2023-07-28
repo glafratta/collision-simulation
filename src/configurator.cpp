@@ -168,6 +168,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		DeltaPose result;
+		result.p = b2Vec2(0,0);
+		result.q.Set(0);
 
 		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
@@ -182,7 +184,8 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 
 		if(diff>0){ 
 			if (previousTmp.empty()){
-				previousTmp = currentTmp;
+				//previousTmp = currentTmp;
+				return result;
 				}
 			else{
 				for (int i=0; i<abs(diff); i++){
@@ -197,16 +200,16 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		else if (diff<0){
 			if (currentTmp.empty()){
 				printf("no data\n");
-				for (cv::Point2f p:previousTmp){
+				//for (cv::Point2f p:previousTmp){
 					return result;
-				} 
+				//} 
 				}
 			else{
 				for (int i=0; i<abs(diff); i++){
 					currentTmp.push_back(currentTmp[0]);
 				}
-		}
-		}
+			}
+		}		
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
 	float theta;
@@ -274,7 +277,6 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 		}
 	}
 	result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
-
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
