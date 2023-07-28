@@ -215,7 +215,6 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		}		
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
-	float theta;
 	if (!transformMatrix.empty()){
 		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
