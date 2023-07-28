@@ -44,11 +44,11 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//CALCULATE VELOCITY 
 	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
 	DeltaPose deltaPose= GetRealVelocity(current, previous);
-	//if (currentTask.direction ==DEFAULT){
+	if (currentTask.direction ==DEFAULT){
 		//currentTask.action.setOmega(deltaPose.q.GetAngle()); //NO SETTING ANGLE
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
-	//}
+	}
 	//printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS

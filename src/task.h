@@ -160,8 +160,9 @@ public:
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
     omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
-
+    recordedOmega = omega;
     linearSpeed = MAX_SPEED*(L+R)/2;
+    recordedSpeed=linearSpeed;
 
     valid=1;
         
