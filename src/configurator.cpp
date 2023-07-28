@@ -169,8 +169,8 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		DeltaPose result;
-		result.p = b2Vec2(0,0);
-		result.q.Set(0);
+		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
+		result.q.Set(currentTask.getAction().getOmega());
 
 		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
@@ -213,7 +213,6 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		}		
 	//use partial affine transformation to estimate displacement
 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
-	float theta;
 	if (!transformMatrix.empty()){
 		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
 		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
@@ -228,14 +227,13 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		}
 		
 	}
-	else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
-		theta = currentTask.getAction().getOmega()* timeElapsed;
-		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-		result.q.Set(currentTask.getAction().getOmega());
-	}
-	else{
-		printf("could not find velocity\n");
-	}	
+	// else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
+	// 	result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
+	// 	result.q.Set(currentTask.getAction().getOmega());
+	// }
+	// else{
+	// 	printf("could not find velocity\n");
+	// }	
 	return result;
 	}
 
