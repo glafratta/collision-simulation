@@ -512,9 +512,9 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			vertexDescriptor v0=v;
 			do {
-			addVertex(v, v1, g, g[v].disturbance); //add
-			s = Task(g[v].disturbance, d, g[v].endPose);
-			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
+			addVertex(v0, v1, g, g[v].disturbance); //add
+			s = Task(g[v0].disturbance, d, g[v0].endPose);
+			constructWorldRepresentation(w, d, g[v0].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			v0=v1;
 			}while(g[v0].endPose.p == g[v1].endPose.p);
@@ -527,7 +527,6 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 				best = f.vertex;
 				bestNext.error = f.error;
 			}
-
 		}
 	}while(bestNext.vertex!=v); //this means that v has progressed
 }
