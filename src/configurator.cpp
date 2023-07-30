@@ -111,10 +111,20 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					break;
 				}
 					
-				case BREADTH_FIRST_ITDE:{
+				case DEPTH_FIRST_ITDE:{
 					vertexDescriptor bestLeaf=v0;
-					BFIDBuildTree(v0, g, currentTask, world, bestLeaf);
+					DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
 					//vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
+					plan = getCleanSequence(g, bestLeaf);
+					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
+					printf("plan:");
+					printPlan(plan);
+					printf("built tree\n");
+					break;
+				}
+				case DEPTH_FIRST_ITDE_2:{
+					vertexDescriptor bestLeaf=v0;
+					DFIDBuildTree(v0, g, currentTask, world, bestLeaf, leaves);
 					plan = getCleanSequence(g, bestLeaf);
 					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
@@ -437,7 +447,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//return !g[0].disturbance.safeForNow;
 }
 
-void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best){
+void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best){
 	vertexDescriptor v1 =v;
 	Leaf bestNext;
 	if (debugOn){
@@ -472,6 +482,52 @@ void Configurator::BFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 				bestNext = Leaf(v1, error);
 				best=v1;
 			}
+		}
+	}while(bestNext.vertex!=v); //this means that v has progressed
+}
+
+void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best, std::vector <Leaf> &frontier){
+	vertexDescriptor v1 =v;
+	Leaf bestNext;
+	float error;
+	if (debugOn){
+		printf("planfile = robot%04i.txt\n", iteration);
+	}
+	do{		
+		v=bestNext.vertex;
+		if (!(g[v].filled)){ //for the first vertex
+			evaluateNode(v, g, s, w);			
+		}
+		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+		if (!controlGoal.endCriteria.hasEnd()){
+			if (g[v].totDs <=4){
+				applyTransitionMatrix(g, v, s.direction);
+			}
+		}
+		else{
+			if (!er.ended){
+				applyTransitionMatrix(g, v, s.direction);
+			}
+		}
+		for (Direction d: g[v].options){ //add and evaluate all vertices
+			vertexDescriptor v0=v;
+			do {
+			addVertex(v, v1, g, g[v].disturbance); //add
+			s = Task(g[v].disturbance, d, g[v].endPose);
+			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
+			evaluateNode(v1, g, s, w); //find simulation result
+			v0=v1;
+			}while(g[v0].endPose.p == g[v1].endPose.p);
+			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
+			frontier.push_back(Leaf(v1,error));
+		}
+		for (Leaf f:frontier){
+			if (!bestNext.valid ||f.error<bestNext.error){
+				bestNext.vertex = f.vertex;
+				best = f.vertex;
+				bestNext.error = f.error;
+			}
+
 		}
 	}while(bestNext.vertex!=v); //this means that v has progressed
 }

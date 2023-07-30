@@ -131,9 +131,11 @@ void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if
 
 vertexDescriptor evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
-void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&);
+void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&); //builds the whole tree and finds the best solution
 
-void BFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
+void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
+
+void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &, std::vector <Leaf>&); //evaluates only after DEFAULT, internal one step lookahead
 
 Direction getOppositeDirection(Direction d){
     switch (d){
