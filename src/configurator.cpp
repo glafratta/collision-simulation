@@ -487,7 +487,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			do {
 			addVertex(v0, v1, g, g[v0].disturbance); //add
 			s = Task(g[v0].disturbance, d, g[v0].endPose);
-			constructWorldRepresentation(w, d, g[v0].endPose); //was g[v].endPose
+			constructWorldRepresentation(w, d, s.start); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d);
 			v0=v1;
@@ -691,37 +691,37 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d){
+void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
 	switch (numberOfM){
 		case (THREE_M):{
-			if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (g[vd].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 			if (d ==DEFAULT){
-				if (g[v].nodesInSameSpot<maxNodesOnSpot){
-						g[v].options= {LEFT, RIGHT};
+				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
+						g[vd].options= {LEFT, RIGHT};
 				}
 				}
 			}
 			else { //will only enter if successful
 				if (d== LEFT || d == RIGHT){
-					g[v].options = {DEFAULT};
+					g[vd].options = {DEFAULT};
 				}
 			}
 		}	
 		break;
 		case (FOUR_M):{
-			if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (g[vd].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 				if (d ==DEFAULT){
-					if (g[v].nodesInSameSpot<maxNodesOnSpot){
-							g[v].options= {LEFT, RIGHT, BACK};
+					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
+							g[vd].options= {LEFT, RIGHT, BACK};
 					}
 				}
 			}
 			else { //will only enter if successful
 				if (d== LEFT || d == RIGHT){
-					g[v].options = {DEFAULT};
+					g[vd].options = {DEFAULT};
 				}
 				else if (d == BACK){
-						g[v].options= {LEFT, RIGHT};
+						g[vd].options= {LEFT, RIGHT};
 				}
 			}
 		}
@@ -731,17 +731,17 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor v, Direct
 	}
 }
 
-void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor v, Direction d, std::vector <Leaf> leaves){
-	EndedResult er = controlGoal.checkEnded(g[v].endPose);
+void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd, Direction d, std::vector <Leaf> leaves){
+	EndedResult er = controlGoal.checkEnded(g[vd].endPose);
 	if (controlGoal.endCriteria.hasEnd()){
 		if (er.ended){
 			return;
 		}
 	}
-	else if(g[v].totDs>4 && !betterThanLeaves(g, v, leaves, er)){
+	else if(g[vd].totDs>4 && !betterThanLeaves(g, vd, leaves, er)){
 			return;
 		}
-	transitionMatrix(g, v, d);
+	transitionMatrix(g, vd, d);
 }
 
 
