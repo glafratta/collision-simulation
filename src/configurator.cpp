@@ -469,7 +469,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 }
 
 void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best, std::vector <Leaf> &frontier){
-	vertexDescriptor v1 =v;
+	vertexDescriptor v1;
 	Leaf bestNext;
 	float error;
 	if (debugOn){
@@ -484,6 +484,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		applyTransitionMatrix(g, v, s.direction);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			vertexDescriptor v0=v;
+			v1 =v0;
 			do {
 			addVertex(v0, v1, g, g[v0].disturbance); //add
 			s = Task(g[v0].disturbance, d, g[v0].endPose);
