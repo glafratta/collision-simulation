@@ -378,7 +378,7 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <Leaf> leaves = std::vector <Leaf>())
+void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <Leaf> leaves = std::vector <Leaf>());
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
