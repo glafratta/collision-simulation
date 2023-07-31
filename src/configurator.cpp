@@ -102,7 +102,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 			switch (graphConstruction){
 				case BACKTRACKING:{
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+					vertexDescriptor bestLeaf = findBestLeaf(g, leaves).vertex;
 					plan = getCleanSequence(g, bestLeaf);
 					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
@@ -409,16 +409,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		//evaluate
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (!controlGoal.endCriteria.hasEnd()){
-			if (g[v].totDs <4 && betterThanLeaves(g, v, _leaves, er)){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
-		else{
-			if (!er.ended){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
+		applyTransitionMatrix(g,v, s.direction, _leaves);
 		if (g[v].options.size()==0){
 			_leaves.push_back(Leaf(v, er.errorFloat));
 			backtrack(g, v);
@@ -459,16 +450,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (!controlGoal.endCriteria.hasEnd()){
-			if (g[v].totDs <=4){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
-		else{
-			if (!er.ended){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
+		applyTransitionMatrix(g, v, s.direction);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d, g[v].endPose);
@@ -499,16 +481,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (!controlGoal.endCriteria.hasEnd()){
-			if (g[v].totDs <=4){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
-		else{
-			if (!er.ended){
-				transitionMatrix(g, v, s.direction);
-			}
-		}
+		applyTransitionMatrix(g, v, s.direction);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			vertexDescriptor v0=v;
 			do {
@@ -516,11 +489,14 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			s = Task(g[v0].disturbance, d, g[v0].endPose);
 			constructWorldRepresentation(w, d, g[v0].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
+			applyTransitionMatrix(g, v, d);
 			v0=v1;
 			}while(g[v0].endPose.p == g[v1].endPose.p);
 			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
 			frontier.push_back(Leaf(v1,error));
 		}
+		bestNext = findBestLeaf(g, frontier);
+		best = bestNext.vertex;
 		for (Leaf f:frontier){
 			if (!bestNext.valid ||f.error<bestNext.error){
 				bestNext.vertex = f.vertex;
@@ -604,40 +580,29 @@ Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor
 }
 
 
-vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <Leaf> _leaves, EndCriteria * refEnd){
+Leaf Configurator::findBestLeaf(CollisionGraph &g, std::vector <Leaf> _leaves, EndCriteria * refEnd){
 	//FIND BEST LEAF
 	Leaf best = _leaves[0];
-	//float bestError=0;
-	Angle aBest;
-	Distance dBest;
-	// if (refEnd !=NULL){
-	// 	aBest = g[best].getAngle();
-	// 	dBest = g[best].getDistance();
-	// 	bestError = refEnd->getStandardError(aBest, dBest);
-	// }
+	if (refEnd==NULL){
+		refEnd = &controlGoal.endCriteria;
+	}
 	for (Leaf leaf: _leaves){
-		if (refEnd !=NULL && refEnd->hasEnd()){
-			Angle a = g[leaf.vertex].getAngle();
-			Distance d = g[leaf.vertex].getDistance();
-			//float leafError =refEnd->getStandardError(a,d);
+		if (refEnd->hasEnd()){
 			if (leaf.error<best.error){
 				best.vertex=leaf.vertex;
-				// aBest = a;
-				// dBest =d;
 				best.error= leaf.error;
 			}
 		}
 		else if (g[leaf.vertex].endPose.p.Length() > g[best.vertex].endPose.p.Length()){
 			best = leaf;
 		}
-		else if (g[leaf.vertex].endPose.p.Length() > g[best.vertex].endPose.p.Length()){
+		else if (g[leaf.vertex].endPose.p.Length() == g[best.vertex].endPose.p.Length()){
 			if (g[leaf.vertex].totDs< g[best.vertex].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
 				best = leaf;
 			}
 		}
 	}
-
-	return best.vertex;
+	return best;
 }
 
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
@@ -766,30 +731,26 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor v, Direct
 
 }
 
-// void Configurator::transitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
-// 	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
-// 		if (d ==DEFAULT){
-// 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
-// 					g[v].options= {LEFT, RIGHT, BACK};
-// 			}
-// 		}
-// 	}
-// 	else { //will only enter if successful
-// 		if (d== LEFT || d == RIGHT){
-// 			g[v].options = {DEFAULT};
-// 		}
-// 		else if (d == BACK){
-// 				g[v].options= {LEFT, RIGHT};
-// 		}
-// 	}	
+void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor v, Direction d, std::vector <Leaf> leaves){
+	EndedResult er = controlGoal.checkEnded(g[v].endPose);
+	if (controlGoal.endCriteria.hasEnd()){
+		if (er.ended){
+			return;
+		}
+	}
+	else if(g[v].totDs>4 && !betterThanLeaves(g, v, leaves, er)){
+			return;
+		}
+	transitionMatrix(g, v, d);
+}
 
-// }
+
 
 bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <Leaf> _leaves, EndedResult& er){
 	bool better =1; 
 	er = controlGoal.checkEnded(g[v].endPose);
 	//ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
-	if (graphConstruction = BACKTRACKING){
+	//if (graphConstruction = BACKTRACKING){
 		for (auto l: _leaves){
 			if (g[v].outcome == g[l.vertex].outcome){
 				if (er.errorFloat<= l.error){
@@ -807,9 +768,8 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 			}
 	}
 
-	}
+	//}
 	return better;
-
 }
 
 void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
