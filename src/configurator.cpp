@@ -487,7 +487,8 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			v1 =v0;
 			do {
 			addVertex(v0, v1, g, g[v0].disturbance); //add
-			s = Task(g[v0].disturbance, d, g[v0].endPose);
+			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 			constructWorldRepresentation(w, d, s.start); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d);
