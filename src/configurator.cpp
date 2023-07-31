@@ -344,7 +344,7 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 	// }
 	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
 	// if(!er.ended&& better && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-	// 	applyTransitionMatrix3M(g, v, s.direction);	
+	// 	transitionMatrix3M(g, v, s.direction);	
 	// }
 
 	// isLeaf = (g[v].options.size() ==0);
@@ -411,12 +411,12 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (!controlGoal.endCriteria.hasEnd()){
 			if (g[v].totDs <4 && betterThanLeaves(g, v, _leaves, er)){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		else{
 			if (!er.ended){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		if (g[v].options.size()==0){
@@ -461,12 +461,12 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (!controlGoal.endCriteria.hasEnd()){
 			if (g[v].totDs <=4){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		else{
 			if (!er.ended){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -501,12 +501,12 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (!controlGoal.endCriteria.hasEnd()){
 			if (g[v].totDs <=4){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		else{
 			if (!er.ended){
-				applyTransitionMatrix(g, v, s.direction);
+				transitionMatrix(g, v, s.direction);
 			}
 		}
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -726,7 +726,7 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d){
+void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d){
 	switch (numberOfM){
 		case (THREE_M):
 		if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
@@ -766,7 +766,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, D
 
 }
 
-// void Configurator::applyTransitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
+// void Configurator::transitionMatrix4M(CollisionGraph&g, vertexDescriptor v, Direction d){
 // 	if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
 // 		if (d ==DEFAULT){
 // 			if (g[v].nodesInSameSpot<maxNodesOnSpot){
