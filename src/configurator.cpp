@@ -485,7 +485,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			vertexDescriptor v0=v;
 			do {
-			addVertex(v0, v1, g, g[v].disturbance); //add
+			addVertex(v0, v1, g, g[v0].disturbance); //add
 			s = Task(g[v0].disturbance, d, g[v0].endPose);
 			constructWorldRepresentation(w, d, g[v0].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
@@ -693,42 +693,42 @@ void Configurator::run(Configurator * c){
 
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d){
 	switch (numberOfM){
-		case (THREE_M):
-		if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
-		if (d ==DEFAULT){
-			if (g[v].nodesInSameSpot<maxNodesOnSpot){
-					g[v].options= {LEFT, RIGHT};
+		case (THREE_M):{
+			if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (d ==DEFAULT){
+				if (g[v].nodesInSameSpot<maxNodesOnSpot){
+						g[v].options= {LEFT, RIGHT};
+				}
+				}
 			}
-			}
-		}
-		else { //will only enter if successful
-			if (d== LEFT || d == RIGHT){
-				g[v].options = {DEFAULT};
+			else { //will only enter if successful
+				if (d== LEFT || d == RIGHT){
+					g[v].options = {DEFAULT};
+				}
 			}
 		}	
 		break;
-		case (FOUR_M):
-		if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
-			if (d ==DEFAULT){
-				if (g[v].nodesInSameSpot<maxNodesOnSpot){
-						g[v].options= {LEFT, RIGHT, BACK};
+		case (FOUR_M):{
+			if (g[v].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+				if (d ==DEFAULT){
+					if (g[v].nodesInSameSpot<maxNodesOnSpot){
+							g[v].options= {LEFT, RIGHT, BACK};
+					}
 				}
 			}
-		}
-		else { //will only enter if successful
-			if (d== LEFT || d == RIGHT){
-				g[v].options = {DEFAULT};
-			}
-			else if (d == BACK){
-					g[v].options= {LEFT, RIGHT};
+			else { //will only enter if successful
+				if (d== LEFT || d == RIGHT){
+					g[v].options = {DEFAULT};
+				}
+				else if (d == BACK){
+						g[v].options= {LEFT, RIGHT};
+				}
 			}
 		}
 		break;
 		default:
 		break;
 	}
-	
-
 }
 
 void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor v, Direction d, std::vector <Leaf> leaves){
