@@ -507,7 +507,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 		// 		bestNext.error = f.error;
 		// 	}
 		// }
-	}while(bestNext.vertex!=v); //this means that v has progressed
+	}while(g[best].options.size()>0); //this means that v has progressed
 }
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
