@@ -497,13 +497,13 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		}
 		bestNext = findBestLeaf(g, frontier);
 		best = bestNext.vertex;
-		for (Leaf f:frontier){
-			if (!bestNext.valid ||f.error<bestNext.error){
-				bestNext.vertex = f.vertex;
-				best = f.vertex;
-				bestNext.error = f.error;
-			}
-		}
+		// for (Leaf f:frontier){
+		// 	if (!bestNext.valid ||f.error<bestNext.error){
+		// 		bestNext.vertex = f.vertex;
+		// 		best = f.vertex;
+		// 		bestNext.error = f.error;
+		// 	}
+		// }
 	}while(bestNext.vertex!=v); //this means that v has progressed
 }
 
