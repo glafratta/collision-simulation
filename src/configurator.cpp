@@ -500,7 +500,6 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 		}
 		bestNext = findBestLeaf(g, frontier);
 		best = bestNext.vertex;
-		frontier.clear();
 		// for (Leaf f:frontier){
 		// 	if (!bestNext.valid ||f.error<bestNext.error){
 		// 		bestNext.vertex = f.vertex;
