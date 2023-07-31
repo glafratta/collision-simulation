@@ -489,7 +489,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			s = Task(g[v0].disturbance, d, g[v0].endPose);
 			constructWorldRepresentation(w, d, g[v0].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v, d);
+			applyTransitionMatrix(g, v1, d);
 			v0=v1;
 			}while(g[v0].endPose.p == g[v1].endPose.p);
 			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
