@@ -124,7 +124,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 				}
 				case DEPTH_FIRST_ITDE_2:{
 					vertexDescriptor bestLeaf=v0;
-					DFIDBuildTree(v0, g, currentTask, world, bestLeaf, leaves);
+					DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
 					plan = getCleanSequence(g, bestLeaf);
 					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
@@ -468,14 +468,15 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	}while(bestNext.vertex!=v); //this means that v has progressed
 }
 
-void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best, std::vector <Leaf> &frontier){
+void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & best){
 	vertexDescriptor v1;
 	Leaf bestNext;
 	float error;
 	if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
-	do{		
+	do{	
+		std::vector <Leaf> frontier;	
 		v=bestNext.vertex;
 		if (!(g[v].filled)){ //for the first vertex
 			evaluateNode(v, g, s, w);			
@@ -499,6 +500,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		}
 		bestNext = findBestLeaf(g, frontier);
 		best = bestNext.vertex;
+		frontier.clear();
 		// for (Leaf f:frontier){
 		// 	if (!bestNext.valid ||f.error<bestNext.error){
 		// 		bestNext.vertex = f.vertex;

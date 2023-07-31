@@ -135,7 +135,7 @@ void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World
 
 void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &, std::vector <Leaf>&); //evaluates only after DEFAULT, internal one step lookahead
+void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
 Direction getOppositeDirection(Direction d){
     switch (d){
