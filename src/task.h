@@ -377,6 +377,8 @@ void setGain(float f){
 std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
                                                                                     //finding a line passing through those points
 
+float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
+
 
 };
 

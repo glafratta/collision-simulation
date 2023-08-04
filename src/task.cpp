@@ -14,6 +14,7 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 		}
 		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
+		b2Vec2 pointInObject;
 		robot.body->SetTransform(start.p, theta);
 		int step=0;
 		for (step; step < (HZ*remaining); step++) {//3 second
@@ -35,15 +36,21 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
+				Disturbance collision = Disturbance(1, listener.collisions[index]);
+				std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(_world,listener.collisions[index]);
+				if (neighbour.first){
+					float orientation =findOrientation(listener.collisions[index], neighbour.second);
+					collision.setOrientation(orientation);
+				}
 				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
 					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
 					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
 					robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
-					result = simResult(simResult::resultType::safeForNow, Disturbance(1, listener.collisions[index]));
+					result = simResult(simResult::resultType::safeForNow, collision);
 				}
 				else{
-					result = simResult(simResult::resultType::crashed, Disturbance(1, listener.collisions[index]));
+					result = simResult(simResult::resultType::crashed, collision);
 					//DEBUG PRINT STATEMTNS
 // 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
 // //						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
@@ -165,7 +172,12 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		break;
 		case LEFT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(SAFE_ANGLE);
+			if (!disturbance.isPartOfObject()){
+				endCriteria.angle = Angle(SAFE_ANGLE);
+			}
+			else{
+				endCriteria.angle = Angle(0);
+			}
 		}
 		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
 			endCriteria.angle = Angle(0);
@@ -173,7 +185,12 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		break;
 		case RIGHT: 
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(SAFE_ANGLE);
+			if (!disturbance.isPartOfObject()){
+				endCriteria.angle = Angle(SAFE_ANGLE);
+			}
+			else{
+				endCriteria.angle = Angle(0);
+			}
 		}
 		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
 			endCriteria.angle = Angle(0);
@@ -202,23 +219,47 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 	Angle a;
 	Distance d;
 	if (disturbance.isValid()){
+		b2Vec2 v = disturbance.getPosition() - robotTransform.p;
 		if (getAffIndex()== int(InnateAffordances::AVOID)){
-			a= Angle(abs(disturbance.getAngle(robotTransform)));
-			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			d= Distance(v.Length());
-			r.ended= a>= endCriteria.angle && d>=endCriteria.distance;
+			if (!disturbance.isPartOfObject()){
+				a= Angle(disturbance.getAngle(robotTransform));
+				d= Distance(v.Length());
+				r.ended= abs(a.get())>= endCriteria.angle.get() && d.get()>=endCriteria.distance.get();
+			}
+			else{
+				a = Angle(atan(robotTransform.q.GetAngle())-disturbance.getOrientation());
+				//float a = abs(a.get()); // the robot and disturbance are parallel
+				r.ended = abs(a.get()) <= endCriteria.angle.get() + ANGLE_ERROR_TOLERANCE & d.get()>=endCriteria.distance.get();
+			}
+
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r.ended = true;
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
-			a = Angle(abs(disturbance.getAngle(robotTransform)));
-			b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			d= Distance(v.Length());
-			r.ended = d.get()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
+			a = Angle(disturbance.getAngle(robotTransform));
+			//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
+			//d= Distance(v.Length());
+			r.ended = v.Length()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
 		}
 	}
 	r.errorFloat = endCriteria.getStandardError(a,d);
 	return r;
 
 }
+
+std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float radius){
+	std::pair <bool, b2Vec2> result(false, b2Vec2());
+	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
+		if (isInRadius(b->GetPosition(), v, radius)){
+			return result=std::pair<bool, b2Vec2>(true, v);
+		}
+	}
+	return result;
+}
+
+float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
+	float slope = (v1.y- v2.y)/(v1.x - v2.x);
+	return slope;
+}
+
