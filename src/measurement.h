@@ -75,4 +75,15 @@ struct EndedResult{
 
 float SignedVectorLength(b2Vec2);
 
+
+template <class PT>
+bool isInRadius(PT point1, PT point2, float radius = 0.05){ //check if this point is within a certain radius from another given point
+	if (point2.x <= point1.x+radius && point2.x >=point1.x-radius && point1.y <= point1.y+radius && point2.y >=point.y-radius){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
 #endif

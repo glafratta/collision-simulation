@@ -452,7 +452,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		applyTransitionMatrix(g, v, s.direction);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
-			addVertex(v, v1, g, g[v].disturbance); //add
+			bool added = addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d, g[v].endPose);
 			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
@@ -472,6 +472,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 	vertexDescriptor v1;
 	Leaf bestNext;
 	float error;
+	bool added;
 	if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
@@ -487,14 +488,14 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			vertexDescriptor v0=v;
 			v1 =v0;
 			do {
-			addVertex(v0, v1, g, g[v0].disturbance); //add
+			added =addVertex(v0, v1, g, g[v0].disturbance); //add
 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 			constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d);
 			v0=v1;
-			}while(s.direction !=DEFAULT);
+			}while(s.direction !=DEFAULT || added);
 			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
 			frontier.push_back(Leaf(v1,error));
 		}

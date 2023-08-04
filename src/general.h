@@ -16,6 +16,8 @@ enum M_CODES {THREE_M=3, FOUR_M=4};
 
 enum GRAPH_CONSTRUCTION {BACKTRACKING, DEPTH_FIRST_ITDE, DEPTH_FIRST_ITDE_2};
 
+enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
+
 struct Edge{
 	Direction direction;
 	//int stepDuration =0;
@@ -124,7 +126,7 @@ struct Point{
 
 
 	bool isInRadius(b2Vec2 point, float radius = 0.05){ //check if this point is within a certain radius from another given point
-		if (this->x <= point.x+radius && this->x >=point.y-radius && this->y <= point.y+radius && this->y >=point.y-radius){
+		if (this->x <= point.x+radius && this->x >=point.x-radius && this->y <= point.y+radius && this->y >=point.y-radius){
 			return true;
 		}
 		else{

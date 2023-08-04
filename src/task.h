@@ -33,9 +33,10 @@ private:
     bool valid= 0;
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     float angleToRobot=0;
+    bool partOfObject=0;
 public:
 	b2FixtureDef fixtureDef;
-    b2Vec2 position;
+    b2Transform pose;
    // bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
@@ -54,9 +55,22 @@ public:
             affordanceIndex = i;
         }
         //bodyDef.type = b2_dynamicBody;
-		position.Set(p.x, p.y);
+		pose.p.Set(p.x, p.y);
         valid =1;
-    }
+    }    
+
+        Disturbance(AffordanceIndex i, b2Vec2 p, float a){
+        if (i>affordances.size()-1){
+            throw std::invalid_argument("Not a valid affordance index\n");
+        }
+        else{
+            affordanceIndex = i;
+        }
+        //bodyDef.type = b2_dynamicBody;
+		pose.Set(p, a);
+        valid =1;
+        partOfObject=1;
+    }    
 
     void setAngle(float a){
         angleToRobot =a;
@@ -66,8 +80,8 @@ public:
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;
         b2Vec2 thisToB;
-        thisToB.x = position.x-t.p.x;
-        thisToB.y = position.y - t.p.y;
+        thisToB.x = pose.p.x-t.p.x;
+        thisToB.y = pose.p.y - t.p.y;
         float cosA = (thisToB.x * cos(t.q.GetAngle())+ thisToB.y*sin(t.q.GetAngle()))/thisToB.Length();
         angleToRobot = acos(cosA);
     }
@@ -77,8 +91,8 @@ public:
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;
         b2Vec2 thisToB;
-        thisToB.x = position.x-t.p.x;
-        thisToB.y = position.y - t.p.y;
+        thisToB.x = pose.p.x-t.p.x;
+        thisToB.y = pose.p.y - t.p.y;
         float cosA = (thisToB.x * cos(t.q.GetAngle())+ thisToB.y*sin(t.q.GetAngle()))/thisToB.Length();
         angle = acos(cosA);
         return angle;
@@ -93,15 +107,15 @@ public:
     }
 
     void setPosition(b2Vec2 pos){
-        position.Set(pos.x, pos.y);
+        pose.p.Set(pos.x, pos.y);
     }
     
     void setPosition(float x, float y){
-        position.Set(x, y);
+        pose.p.Set(x, y);
     }
     
     b2Vec2 getPosition(){
-        return position;
+        return pose.p;
     }
 
 
@@ -116,6 +130,21 @@ public:
     void invalidate(){
         valid =0;
     }
+
+    void setOrientation(float f){ //returns orientation of a point, in order 
+        pose.q.Set(f);
+        partOfObject =1;
+    }
+
+    float getOrientation(){
+        return pose.q.GetAngle();
+    }
+
+    bool isPartOfObject(){
+        return partOfObject;
+    }
+
+
 }; //sub action f
 
 
@@ -344,6 +373,9 @@ controlResult controller();
 void setGain(float f){
     pGain=f;
 }
+
+std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
+                                                                                    //finding a line passing through those points
 
 
 };
