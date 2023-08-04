@@ -255,7 +255,7 @@ std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float rad
 	std::pair <bool, b2Vec2> result(false, b2Vec2());
 	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
 		if (isInRadius(b->GetPosition(), v, radius)){
-			return result=std::pair<bool, b2Vec2>(true, v);
+			return result=std::pair<bool, b2Vec2>(true, b);
 		}
 	}
 	return result;
