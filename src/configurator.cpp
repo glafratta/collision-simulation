@@ -296,85 +296,14 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 	else{
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
-	g[v].fill(result);
-	// if (result.collision.isValid()){
-	// 	g[v].totDs++;
-	// }
-	// g[v].disturbance = result.collision;
-	// g[v].endPose = result.endPose;
-	// g[v].distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
-	// g[v].outcome = result.resultCode;
-	//IS THIS NODE LEAF? to be a leaf 1) either the maximum distance has been covered or 2) avoiding an obstacle causes the robot to crash
-	//bool fl = g[v].distanceSoFar >= BOX2DRANGE; //full length
+	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
+	std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(result.collision.getPosition());
+	if (neighbour.first){
+		float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
+		result.collision.setOrientation(orientation);
+	}
 
-	// EndedResult er;
-	// bool fl = g[v].endPose.p.Length()>= BOX2DRANGE;
-	// bool fullMemory = g[v].totDs >=4;
-	// bool better =betterThanLeaves(g, v, _leaves, er); 
-
-
-	// //float unsignedError=0;
-	// EndedResult er = controlGoal.checkEnded(g[v].endPose);
-	// //ABANDON EARLY IF CURRENT PATH IS MORE COSTLY THAN THE LAST LEAF: if this vertex is the result of more branching while traversing a smaller distance than other leaves, it is more costly
-	// for (auto l: _leaves){
-	// 	if (g[v].outcome == g[l.vertex].outcome){
-	// 		//if (er.errorFloat<= l.error){
-	// 			if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-	// 				//if (g[v].outcome == g[l.vertex].outcome){
-	// 					// Angle a = g[l.vertex].disturbance.getAngle(g[l.vertex].endPose);
-	// 					// Distance d = (g[l.vertex].disturbance.getPosition()- g[l.vertex].endPose.p).Length();
-	// 					// unsignedError = controlGoal.endCriteria.getStandardError(a, d);
-	// 					// if (unsignedError>=l.error){
-	// 					// 	growBranch=0;
-	// 					// }
-	// 					//else 
-	// 					if (g[v].totDs>=g[l.vertex].totDs){
-	// 						growBranch=0;
-	// 					}
-	// 				//}
-	// 			//growBranch =0;
-	// 			}
-	// 		// }
-	// 		// else{
-	// 		// 	growBranch =0; 
-	// 		// 	}
-	// 	}
-		
-		
-	// }
-	//ADD OPTIONS FOR CURRENT ACTIONS BASED ON THE OUTCOME OF THE Task/TASK/MOTORPLAN ETC i haven't decided a name yet
-	// if(!er.ended&& better && !fullMemory){//} && ((v==srcVertex) || (g[srcVertex].endPose !=g[v].endPose))){
-	// 	transitionMatrix3M(g, v, s.direction);	
-	// }
-
-	// isLeaf = (g[v].options.size() ==0);
-
-	// //IF THE Task COLLIDES CREATE A PLAN, DEPTH-FIRST
-	// 		//DEFINE POSSIBLE NEXT TaskS DEPENDING ON OUTCOME, only if it's not a leaf
-	// // if (!isLeaf){
-	// // 	addVertex(v, v1, g); //ADD AN EMPTY VERTEX. only info entered for the next vertex is the direction 
-	// // 	//return v1; //added now	
-	// // }
-	// //IF NO VERTICES CAN BE ADDED TO THE CURRENT BRANCH, CHECK THE CLOSEST BRANCH
-	// if (isLeaf) {
-	// 	_leaves.push_back(Leaf(v, er.errorFloat));
-	// 	backtrack(g, v);
-    //             // while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
-    //             //     if(boost::in_degree(v, g)>0){
-	//             //         inEdge = boost::in_edges(v, g).first.dereference();
-	// 			// 		v = inEdge.m_source;
-	// 			// 		if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-	// 			// 			addVertex(v,v1,g);
-	// 			// 			return v1;
-	// 			// 		}
-    //             //     }
-    //             //     else{
-    //             //         break;
-    //             //     }
-    //             // }
-	// 	}
-	// 	addVertex(v, v1, g); //if it is not leaf, will have vertex, if it is leaf, will backtrack
-	// 	return v1;
+	g[v].fill(result);	
 	}
 
 
@@ -790,4 +719,14 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 			return;
 		}
     }
+}
+
+std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
+	std::pair <bool, b2Vec2> result(false, b2Vec2());
+	for (Point p: current){
+		if (isInRadius(p.getb2Vec2(), v, radius)){
+			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
+		}
+	}
+	return result;
 }

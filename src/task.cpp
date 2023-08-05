@@ -37,11 +37,11 @@ Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				Disturbance collision = Disturbance(1, listener.collisions[index]);
-				std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(_world,listener.collisions[index]);
-				if (neighbour.first){
-					float orientation =findOrientation(listener.collisions[index], neighbour.second);
-					collision.setOrientation(orientation);
-				}
+				// std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(_world,listener.collisions[index]);
+				// if (neighbour.first){
+				// 	float orientation =findOrientation(listener.collisions[index], neighbour.second);
+				// 	collision.setOrientation(orientation);
+				// }
 				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
 					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
@@ -92,7 +92,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 	// float angle = d.getAngle(robVelocity);
 	float angle = d.getAngle(pose);
 	if (d.isPartOfObject()){
-		d.setOrientation(d.getOrientation() + tan(shift.q.GetAngle()));
+		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
 	}
 	d.setAngle(angle); //with respect to robot's velocity
 }

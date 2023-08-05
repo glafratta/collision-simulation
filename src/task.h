@@ -131,7 +131,7 @@ public:
         valid =0;
     }
 
-    void setOrientation(float f){ //returns orientation of a point, in order 
+    void setOrientation(float f){ //returns orientation (angle) of a point, in order 
         pose.q.Set(f);
         partOfObject =1;
     }
