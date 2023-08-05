@@ -262,7 +262,7 @@ std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float rad
 }
 
 float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
-	float slope = (v1.y- v2.y)/(v1.x - v2.x);
-	return slope;
+	float slope = (v2.y- v1.y)/(v2.x - v1.x);
+	return atan(slope);
 }
 
