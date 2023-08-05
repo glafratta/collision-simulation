@@ -297,10 +297,11 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
-	std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(result.collision.getPosition());
-	if (neighbour.first){
-		float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
-		result.collision.setOrientation(orientation);
+	//std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(result.collision.getPosition());
+	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition())
+	if (orientation.first) {
+		// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
+		result.collision.setOrientation(orientation.second);
 	}
 
 	g[v].fill(result);	
@@ -728,5 +729,28 @@ std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius
 			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
 		}
 	}
+	//auto vIt = current.find(Point(v));
+	return result;
+}
+
+std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
+	int count=0;
+	float sum=0;
+	float avg=0;
+	std::pair <bool, float>result(false, 0);
+	for (Point p: current){
+		if (isInRadius(p.getb2Vec2(), v, radius)){
+			auto pIt =current.find(p);
+			CoordinateContainer::iterator pItNext = pIt++;
+			float deltaM = (pItNext->y- pIt->y)/(pItNext->x - pIt->x);
+			if (abs(deltaM)<=2*abs(avg)){ //prevent outliers
+				result.first=true; //is there a neighbouring point?
+				sum+=deltaM;
+				count++;
+				avg = sum/count;
+			}
+		}
+	}
+	result.second=atan(avg);
 	return result;
 }

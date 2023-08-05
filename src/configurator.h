@@ -384,7 +384,9 @@ bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, End
 
 void backtrack(CollisionGraph&, vertexDescriptor&);
 
-std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float innerRadius = 0.03, float outerRadius = 0.05); //finds if there are bodies close to a point. Used for 
+std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float radius =0.025); //finds if there are bodies close to a point. Used for 
+
+std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points
 
 
 };
