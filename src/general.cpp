@@ -5,7 +5,7 @@ void Node::fill(Task::simResult result){
 		totDs++;
 	}
 	disturbance = result.collision;
-	endPose = result.endPose;
+	endPose = result.endPose;s
 	//distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	outcome = result.resultCode;
 	filled=true;
@@ -22,7 +22,7 @@ bool operator==(Transform const &t1, Transform const& t2){
 }
 
 bool operator<(P const & p1, P const &p2){
-	return std::tie(p1.r, p1.phi)< std::tie(p2.r, p2.phi);
+	return std::tie(p1.phi, p1.r)< std::tie(p2.phi, p2.r);
 }
 
 bool operator>(P const &p1, P const & p2){
