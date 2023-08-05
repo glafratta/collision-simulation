@@ -92,7 +92,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 	// float angle = d.getAngle(robVelocity);
 	float angle = d.getAngle(pose);
 	if (d.isPartOfObject()){
-		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
+		d.setOrientation(d.getOrientation() + tan(shift.q.GetAngle()));
 	}
 	d.setAngle(angle); //with respect to robot's velocity
 }
