@@ -232,7 +232,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			else{
 				a = Angle(robotTransform.q.GetAngle()-disturbance.getOrientation());
 				//float a = abs(a.get()); // the robot and disturbance are parallel
-				r.ended = abs(a.get()) <= endCriteria.angle.get() + ANGLE_ERROR_TOLERANCE & d.get()>=endCriteria.distance.get();
+				float angleTolerance = 1*M_PI/180;
+				r.ended = abs(a.get()) <= endCriteria.angle.get() + angleTolerance & d.get()>=endCriteria.distance.get();
 			}
 
 		}
