@@ -298,8 +298,8 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
 	//std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(result.collision.getPosition());
-	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition())
-	if (orientation.first) {
+	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition());
+	if (orientation.first){
 		// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
 		result.collision.setOrientation(orientation.second);
 	}
