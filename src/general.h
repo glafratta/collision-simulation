@@ -130,8 +130,8 @@ struct Point{
 		std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
 		float xLow = std::min(xBounds.first, xBounds.second);
 		float xHigh = std::max(xBounds.first, xBounds.second);
-		float yLow = std::min(yBounds.first, xBounds.second);
-		float yHigh = std::max(yBounds.first, xBounds.second);
+		float yLow = std::min(yBounds.first, yBounds.second);
+		float yHigh = std::max(yBounds.first, yBounds.second);
 		// if (this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow){
 		// 	return true;
 		// }
