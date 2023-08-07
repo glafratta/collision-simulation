@@ -717,7 +717,7 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
 	std::pair <bool, b2Vec2> result(false, b2Vec2());
 	for (Point p: current){
-		if (isInRadius(p.getb2Vec2(), v, radius)){
+		if (p.isInRadius(v, radius)){
 			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
 		}
 	}
@@ -731,7 +731,7 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	float avg=0;
 	std::pair <bool, float>result(false, 0);
 	for (Point p: current){
-		if (isInRadius(p.getb2Vec2(), v, radius)){
+		if (p.isInRadius(v, radius)){
 			auto pIt =current.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
 			float deltaM = (pItNext->y- pIt->y)/(pItNext->x - pIt->x);

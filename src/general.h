@@ -125,9 +125,9 @@ struct Point{
 	}
 
 
-	bool isInRadius(b2Vec2 point, float radius = 0.05){ //check if this point is within a certain radius from another given point
-		std::pair <float, float> xBounds(point.x+radius, point.x-radius);
-		std::pair <float, float> yBounds(point.y+radius, point.y-radius);		
+	bool isInRadius(b2Vec2 center, float radius = 0.05){ //check if this point is within a certain radius from another given point (center)
+		std::pair <float, float> xBounds(center.x+radius, center.x-radius);
+		std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
 		float xLow = std::min(xBounds.first, xBounds.second);
 		float xHigh = std::max(xBounds.first, xBounds.second);
 		float yLow = std::min(yBounds.first, xBounds.second);
