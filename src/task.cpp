@@ -252,15 +252,16 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 
 }
 
-std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float radius){
-	std::pair <bool, b2Vec2> result(false, b2Vec2());
-	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
-		if (isInRadius(b->GetPosition(), v, radius)){
-			return result=std::pair<bool, b2Vec2>(true, b->GetPosition());
-		}
-	}
-	return result;
-}
+// std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float radius){
+// 	std::pair <bool, b2Vec2> result(false, b2Vec2());
+// 	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
+// 		Point p(*b->GetPosition());
+// 		if (p.isInRadius(v, radius)){
+// 			return result=std::pair<bool, b2Vec2>(true, b->GetPosition());
+// 		}
+// 	}
+// 	return result;
+// }
 
 float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
 	float slope = (v2.y- v1.y)/(v2.x - v1.x);
