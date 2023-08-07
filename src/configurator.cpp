@@ -727,27 +727,31 @@ std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius
 
 std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	int count=0;
-	float sum=0;
-	float avg=0;
+	float sumY=0, sumX=0;
+	float avgY=0, avgX=0;
 	std::pair <bool, float>result(false, 0);
 	for (Point p: current){
 		if (p.isInRadius(v, radius)){
 			auto pIt =current.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
-			float deltaY =round((pItNext->y- pIt->y)*1000)/1000;
-			float deltaX = round((pItNext->x - pIt->x)*1000)/1000;
-			if (deltaX !=0){
-				float deltaM = deltaY/deltaX;
+			float deltaY =pItNext->y- pIt->y;
+			float deltaX = pItNext->x - pIt->x;
+			//if (deltaX !=0){
+				//float deltaM = deltaY/deltaX;
 			//if (abs(deltaM)<=2*abs(avg) && avg!=0){ //prevent outliers
 				result.first=true; //is there a neighbouring point?
-				sum+=deltaM;
+				//sum+=deltaM;
 				count++;
-				avg = sum/count;
+				//avg = sum/count;
+				sumY+=deltaY;
+				sumX+=deltaX;
+				avgY = sumY/count;
+				avgX = sumX/count;
 			//}
-			}
+			//}
 			
 		}
 	}
-	result.second=atan(avg);
+	result.second=atan(avgY/avgX); 
 	return result;
 }
