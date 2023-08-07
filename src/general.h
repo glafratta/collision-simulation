@@ -126,12 +126,19 @@ struct Point{
 
 
 	bool isInRadius(b2Vec2 point, float radius = 0.05){ //check if this point is within a certain radius from another given point
-		if (this->x <= point.x+radius && this->x >=point.x-radius && this->y <= point.y+radius && this->y >=point.y-radius){
-			return true;
-		}
-		else{
-			return false;
-		}
+		std::pair <float, float> xBounds(point.x+radius, point.x-radius);
+		std::pair <float, float> yBounds(point.y+radius, point.y-radius);		
+		float xLow = std::min(xBounds.first, xBounds.second);
+		float xHigh = std::max(xBounds.first, xBounds.second);
+		float yLow = std::min(yBounds.first, xBounds.second);
+		float yHigh = std::max(yBounds.first, xBounds.second);
+		// if (this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow){
+		// 	return true;
+		// }
+		// else{
+		// 	return false;
+		// }
+		return this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
 	}
 
 	b2Vec2 getb2Vec2(){
