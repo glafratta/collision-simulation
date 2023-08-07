@@ -81,13 +81,13 @@ struct Point{
 
 	Point(float _x, float _y): x(_x), y(_y){
 		r= sqrt(x*x+y*y);
-		phi = atan(y/x);
+		phi = atan2(y,x);
 		valid =1;
 	}
 
 	Point(b2Vec2 v): x(v.x), y(v.y){
 		r= sqrt(x*x+y*y);
-		phi = atan(y/x);
+		phi = atan2(y,x);
 		valid =1;
 	}
 
