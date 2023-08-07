@@ -425,19 +425,12 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d);
 			v0=v1;
-			}while(s.direction !=DEFAULT || added);
+			}while(s.direction !=DEFAULT & added);
 			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
 			frontier.push_back(Leaf(v1,error));
 		}
 		bestNext = findBestLeaf(g, frontier);
 		best = bestNext.vertex;
-		// for (Leaf f:frontier){
-		// 	if (!bestNext.valid ||f.error<bestNext.error){
-		// 		bestNext.vertex = f.vertex;
-		// 		best = f.vertex;
-		// 		bestNext.error = f.error;
-		// 	}
-		// }
 	}while(g[best].options.size()>0); //this means that v has progressed
 }
 
