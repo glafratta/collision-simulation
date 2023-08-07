@@ -735,12 +735,12 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 			auto pIt =current.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
 			float deltaM = (pItNext->y- pIt->y)/(pItNext->x - pIt->x);
-			if (abs(deltaM)<=2*abs(avg) && avg!=0){ //prevent outliers
+			//if (abs(deltaM)<=2*abs(avg) && avg!=0){ //prevent outliers
 				result.first=true; //is there a neighbouring point?
 				sum+=deltaM;
 				count++;
 				avg = sum/count;
-			}
+			//}
 		}
 	}
 	result.second=atan(avg);
