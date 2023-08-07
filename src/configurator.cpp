@@ -734,8 +734,8 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 		if (p.isInRadius(v, radius)){
 			auto pIt =current.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
-			float deltaY =(pItNext->y- pIt->y);
-			float deltaX = (pItNext->x - pIt->x);
+			float deltaY =round((pItNext->y- pIt->y)*1000)/1000;
+			float deltaX = round((pItNext->x - pIt->x)*1000)/1000;
 			if (deltaX !=0){
 				float deltaM = deltaY/deltaX;
 			//if (abs(deltaM)<=2*abs(avg) && avg!=0){ //prevent outliers
