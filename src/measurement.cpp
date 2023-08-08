@@ -53,24 +53,32 @@ float EndCriteria::getError(EndCriteria ec){ //not normalised
     return result;
 }
 
-float EndCriteria::getStandardError(EndCriteria ec){ //standard error
-    float result =0;
-    result = angle.getStandardError(ec.angle)+ distance.getStandardError(ec.distance); //max =4;
-    return result;
-}
-
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = angle.getStandardError(a)+ distance.getStandardError(d); //max =4;
+    result = weights[0]*angle.getStandardError(a)+weights[1]* distance.getStandardError(d); //max =4;
     return result;
 }
 
-// float EndCriteria::getStandardError(Node){
-//     float result =0;
+float EndCriteria::getStandardError(EndCriteria ec){ //standard error
+    float result =0;
+    //result = weights[0]*angle.getStandardError(ec.angle)+ weights[1]*distance.getStandardError(ec.distance); //max =4;
+    result = getStandardError(ec.angle, ec.distance);
+    return result;
+}
 
-
-//     return result;
-// }
+float EndCriteria::getStandardError(Angle a, Distance d, Node n){
+    float result =0;
+    float outcomeError=0;
+    if (n.filled){
+        switch (n.outcome){
+            case simResult::successful: break;
+            case simResult::safeForNow: outcomeError+=1; break;
+            case simResult::crashed: outcomeError+=2; break;
+            default:break;
+        }
+    }
+    result = getStandardError(a, d) + weights[2]*outcomeError;
+}
 
 float SignedVectorLength(b2Vec2 v){
 	float signedLength = v.Length();

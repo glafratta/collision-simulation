@@ -425,7 +425,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			applyTransitionMatrix(g, v1, d);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
-			error = controlGoal.checkEnded(g[v1].endPose).errorFloat;
+			error = controlGoal.checkEnded(g[v1]).errorFloat;
 			frontier.push_back(Leaf(v1,error));
 		}
 		bestNext = findBestLeaf(g, frontier);

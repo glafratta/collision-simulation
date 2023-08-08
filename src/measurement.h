@@ -36,7 +36,7 @@ class Angle: public Measurement{
     public:
     Angle(){}
     Angle(float f)
-    {   value =round(f*100)/100;
+    {   value =round(f*1000)/1000;
         valid =1;}
 };
 
@@ -44,10 +44,9 @@ class Distance: public Measurement{
     public:
     Distance(){}
     Distance(float f)
-    {value = round(f*100)/100;
+    {value = round(f*1000)/1000;
     valid =1;}
 };
-
 
 struct EndCriteria{
     Angle angle;
@@ -55,6 +54,8 @@ struct EndCriteria{
     float getError(EndCriteria); //expresses magnitude of error, not normalised
     float getStandardError(EndCriteria);
     float getStandardError(Angle, Distance);
+    float getStandardError(Angle, Distance, Node);
+    std::vector <float> weights = {1, 1, 1}; //0:angle, 1: distance, 2: outcome (if node)
    // float getStandardError(Node);
     bool hasEnd();
 
