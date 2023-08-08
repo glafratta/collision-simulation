@@ -33,14 +33,14 @@ struct Node{
 	int totDs=0; //error signal
 	bool filled =0;
 
-	Angle getAngle(){
-		return Angle(disturbance.getAngle(endPose));
-	}
+	// Angle getAngle(){
+	// 	return Angle(disturbance.getAngle(endPose));
+	// }
 
-	Distance getDistance(){
-		b2Vec2 v = endPose.p - disturbance.getPosition();
-		return Distance(v.Length());
-	}
+	// Distance getDistance(){
+	// 	b2Vec2 v = endPose.p - disturbance.getPosition();
+	// 	return Distance(v.Length());
+	// }
 
 	void fill(simResult);
 };
