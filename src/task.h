@@ -10,27 +10,6 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
 //struct Node;
 
-struct simResult{
-    enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
-    resultType resultCode;
-    Disturbance collision;
-    bool valid = 0;
-    float distanceCovered =0;
-    b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-  //  int step=0;
-
-
-    simResult(){}
-
-    simResult(resultType code): resultCode(code){
-        valid =1;
-    }
-
-    simResult(resultType code, Disturbance obst): resultCode(code), collision(obst){
-        valid =1;
-    }
-};
-
 class Task{
 public:
     friend class Configurator;
