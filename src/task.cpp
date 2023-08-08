@@ -2,7 +2,7 @@
 
 
 
-Task::simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
+simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result = simResult(simResult::resultType::successful);
 		Robot robot(&_world);
 		Listener listener;

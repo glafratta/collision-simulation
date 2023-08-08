@@ -1,6 +1,6 @@
 #include "general.h"
 
-void Node::fill(Task::simResult result){
+void Node::fill(simResult result){
 	if (result.collision.isValid()){
 		totDs++;
 	}

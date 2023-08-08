@@ -2,7 +2,7 @@ include(GNUInstallDirs)
 
 set(SRC configurator.cpp task.cpp general.cpp measurement.cpp)
 
-set(HEAD configurator.h robot.h task.h general.h affordance.h settings.h measurement.h)
+set(HEAD disturbance.h configurator.h robot.h task.h general.h affordance.h settings.h measurement.h)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

@@ -25,9 +25,9 @@ struct Edge{
 };
 
 struct Node{
-	Task::Disturbance disturbance; //error signal
+	Disturbance disturbance; //error signal
 	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
-	Task::simResult::resultType outcome;
+	simResult::resultType outcome;
 	std::vector <Direction> options;
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
@@ -42,7 +42,7 @@ struct Node{
 		return Distance(v.Length());
 	}
 
-	void fill(Task::simResult);
+	void fill(simResult);
 };
 
 
@@ -55,7 +55,7 @@ typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
-typedef std::pair <Task::Disturbance, Direction> TaskSummary;
+typedef std::pair <Disturbance, Direction> TaskSummary;
 typedef std::vector <TaskSummary> Sequence;
 
 struct Leaf{

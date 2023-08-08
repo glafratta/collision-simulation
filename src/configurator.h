@@ -127,7 +127,7 @@ void applyController(bool, Task &);
 
 b2Vec2 estimateDisplacementFromWheels();
 
-void reactiveAvoidance(b2World &, Task::simResult &, Task&); //adds two Tasks if crashed but always next up is picked
+void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
 vertexDescriptor evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
@@ -165,7 +165,7 @@ bool isFullLength(V v, const G & g, float length=0){
 
 }
 
-bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Task::Disturbance obs = Task::Disturbance()){
+bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
 	bool vertexAdded = false;
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);

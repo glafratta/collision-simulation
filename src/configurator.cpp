@@ -63,7 +63,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
 	if (controlEnded.ended){
-		currentTask= Task(Task::Disturbance(), STOP);
+		currentTask= Task(Disturbance(), STOP);
 		return;
 	}
 	if(tempEnded.ended|| !isObstacleStillThere){
@@ -82,7 +82,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
-	Task::simResult result;
+	simResult result;
 
 	//creating decision tree Disturbance
 	CollisionGraph g;
@@ -135,7 +135,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 				default:
 					break;
 			}
-			if (g[v0].outcome == Task::simResult::crashed){ //only change task if outcome is crashed
+			if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
 				if (!plan.empty()){
 					Sequence next= {plan[0]};
 					printf("change to:");
@@ -252,9 +252,9 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 
 
 
-void Configurator::reactiveAvoidance(b2World & world, Task::simResult &r, Task &s){ //returns true if disturbance needs to be eliminated	
+void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //returns true if disturbance needs to be eliminated	
 	r =s.willCollide(world, iteration, debugOn, SIM_DURATION);
-	if (r.resultCode == Task::simResult::crashed){
+	if (r.resultCode == simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
 		Point p(r.collision.getPosition());
@@ -274,7 +274,7 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 	vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
 		//EVALUATE NODE()
-	Task::simResult result; 
+	simResult result; 
 	float remaining=SIM_DURATION;
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
@@ -620,7 +620,7 @@ void Configurator::run(Configurator * c){
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
 	switch (numberOfM){
 		case (THREE_M):{
-			if (g[vd].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 			if (d ==DEFAULT){
 				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
 						g[vd].options= {LEFT, RIGHT};
@@ -635,7 +635,7 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 		}	
 		break;
 		case (FOUR_M):{
-			if (g[vd].outcome != Task::simResult::successful){ //accounts for simulation also being safe for now
+			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 				if (d ==DEFAULT){
 					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
 							g[vd].options= {LEFT, RIGHT, BACK};
