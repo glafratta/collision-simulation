@@ -4,7 +4,7 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h> 
-#include "disturbance.h"
+#include "general.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 #define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
 
