@@ -73,7 +73,7 @@ float EndCriteria::getStandardError(Angle a, Distance d, Node n){
         switch (n.outcome){
             case simResult::successful: break;
             case simResult::safeForNow: outcomeError+=1; break;
-            case simResult::crashed: outcomeError+=2; break;
+            case simResult::crashed: outcomeError+=2; break; //the max error is 6 (4 from angle and distance, 2 from outcome)
             default:break;
         }
     }

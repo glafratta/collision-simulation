@@ -337,7 +337,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		//bodyCount =w.GetBodyCount();
 		//evaluate
 		evaluateNode(v, g,s, w);
-		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+		EndedResult er = controlGoal.checkEnded(g[v]);
 		applyTransitionMatrix(g,v, s.direction, _leaves);
 		if (g[v].options.size()==0){
 			_leaves.push_back(Leaf(v, er.errorFloat));
