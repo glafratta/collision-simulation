@@ -334,7 +334,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		int ct = w.GetBodyCount();
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		applyTransitionMatrix(g,v, s.direction, _leaves);
+		if (betterThanLeaves(g, v, _leaves, er)){
+			applyTransitionMatrix(g,v, s.direction, _leaves);
+		}
 		if (g[v].options.size()==0){
 			_leaves.push_back(Leaf(v, er.errorFloat));
 			backtrack(g, v);
@@ -657,7 +659,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 			return;
 		}
 	}
-	else if(g[vd].totDs>4 || !betterThanLeaves(g, vd, leaves, er)){
+	else if(g[vd].totDs>4){
 			return;
 		}
 	transitionMatrix(g, vd, d);
