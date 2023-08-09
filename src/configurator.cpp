@@ -309,7 +309,7 @@ vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g
 
 void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <Leaf> &_leaves){
 	char n[250];
-	int bodyCount=0;
+	//int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
 	//PRINT DEBUG
 	if (debugOn){
@@ -331,9 +331,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
     do{		
 		v= v1;
 		//evaluate
-		int bodies = w.GetBodyCount();
+		int ct = w.GetBodyCount();
 		evaluateNode(v, g,s, w);
-		EndedResult er = controlGoal.checkEnded(g[v]);
+		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		applyTransitionMatrix(g,v, s.direction, _leaves);
 		if (g[v].options.size()==0){
 			_leaves.push_back(Leaf(v, er.errorFloat));
