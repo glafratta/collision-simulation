@@ -74,11 +74,12 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 		int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
+			b=NULL;
 		}
 		if (debugOn){
 			fclose(robotPath);
 		}
-
+		int bodies = _world.GetBodyCount();
 		return result;
 	
 }
