@@ -657,7 +657,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 			return;
 		}
 	}
-	else if(g[vd].totDs>4 && !betterThanLeaves(g, vd, leaves, er)){
+	else if(g[vd].totDs>4 || !betterThanLeaves(g, vd, leaves, er)){
 			return;
 		}
 	transitionMatrix(g, vd, d);
