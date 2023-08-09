@@ -672,7 +672,7 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 		for (auto l: _leaves){
 			if (g[v].outcome == g[l.vertex].outcome){
 				if (er.errorFloat<= l.error){
-					if (controlGoal.endCriteria.hasEnd()){
+					if (!controlGoal.endCriteria.hasEnd()){
 						if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 							if (g[v].totDs>=g[l.vertex].totDs){
 								better=0;
