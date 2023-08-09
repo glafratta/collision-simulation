@@ -312,19 +312,16 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
 	//PRINT DEBUG
-	if (debugOn){
+	if (debugOn){		
 		FILE *f = fopen(n, "w"); //erase contents from previous run
 		fclose(f);
-	}
-	if (debugOn){
 		FILE *f = fopen(n, "a+");
 		for (b2Body * b = w.GetBodyList(); b!=NULL; b= b->GetNext()){
 			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 		}
-		fclose(f);
-	}
-	if (debugOn){
+		fclose(f);		
 		printf("planfile = robot%04i.txt\n", iteration);
+
 	}
 	//END DEBUG FILE
 	vertexDescriptor v1=v;
@@ -675,12 +672,14 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 		for (auto l: _leaves){
 			if (g[v].outcome == g[l.vertex].outcome){
 				if (er.errorFloat<= l.error){
-					if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+					if (controlGoal.endCriteria.hasEnd()){
+						if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 							if (g[v].totDs>=g[l.vertex].totDs){
 								better=0;
 								break;
 							}
-					}
+						}
+					}	
 				}
 				else{
 					better =0; 
