@@ -327,14 +327,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
 	//END DEBUG FILE
-	//vertexDescriptor v1 = nextNode(v, g,s,w, _leaves); 
 	vertexDescriptor v1=v;
-	// bodyCount += w.GetBodyCount();
-	// treeSize= g.m_vertices.size();
-		//destroying world causes segfault even if it's no longer required so skipping for now
     do{		
 		v= v1;
-		//bodyCount =w.GetBodyCount();
 		//evaluate
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v]);
@@ -346,7 +341,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		if (!addVertex(v, v1, g)){
 			return;
 		}
-		//b2World newWorld({0.0f, 0.0f});
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 		vertexDescriptor v1Src = v1InEdge.m_source;
 		Direction dir = g[v1InEdge].direction;
@@ -361,8 +355,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		// 	fclose(f);
 		// }
 		//END DEBUG
-		//v1 = nextNode(v,g,s, newWorld, _leaves);
-		//treeSize= g.m_vertices.size();
 	}while (v1!= v);
 	//return !g[0].disturbance.safeForNow;
 }

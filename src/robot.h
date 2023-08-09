@@ -10,7 +10,7 @@
 #define MAX_TURN M_PI
 //#define ROBOT_HALFLENGTH 0.11 //uncomment for robot
 #define ROBOT_HALFWIDTH 0.09 //real
-#define ROBOT_HALFLENGTH 0.025 //debug value
+#define ROBOT_HALFLENGTH 0.05 //debug value
 //#define ROBOT_HALFWIDTH 0.01 //debug value
 //#define ROBOT_BOX_OFFSET_X -0.05
 #define ROBOT_BOX_OFFSET_X 0
@@ -27,12 +27,12 @@
 #define MAX_ANGLE_ERROR M_PI
 #define MAX_DISTANCE_ERROR BOX2DRANGE
 
-const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
+//const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn
 										//to be at a safe distance from an obstacle in the worst
 										//case scenario, provided that the position of the obstacle
 										//refers to the centre of mass of the robot
-
+const int maxNodesOnSpot =3;
 
 class Robot {
 private: 
