@@ -684,12 +684,8 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 			}
 		}
 		//check for repetition along the branch
-		vertexDescriptor src = v;
-		if (boost::in_degree(v, g)>0){
-			src =boost::source(boost::in_edges(v, g).first.dereference(), g);
-
-		}
-		while (v !=src){
+		while (boost::in_degree(v, g)>0){
+			vertexDescriptor src =boost::source(boost::in_edges(v, g).first.dereference(), g);
 			Point dPosition(g[v].disturbance.getPosition());
 			if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
 				better=0;
