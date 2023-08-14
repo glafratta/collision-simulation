@@ -615,7 +615,7 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 			if (d ==DEFAULT){
 				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-						g[vd].options= {LEFT, RIGHT};
+					g[vd].options= {LEFT, RIGHT};
 				}
 				}
 			}
@@ -676,17 +676,24 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 						if (g[v].endPose.p.Length() <= g[l.vertex].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 							if (g[v].totDs>=g[l.vertex].totDs){
 								better=0;
-								break;
 							}
 						}
 					}	
 				}
 				else{
 					better =0; 
-						break;
 					}
 			}
-	}
+		}
+		//check for repetition along the branch
+		vertexDescriptor src = boost::source(boost::in_edges(v, g).first.dereference(), g);
+		while (v !=src){
+			Point dPosition(g[v].disturbance.getPosition());
+			if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
+				better=0;
+				break;
+			}
+		}
 
 	//}
 	return better;
