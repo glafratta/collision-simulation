@@ -71,28 +71,28 @@ struct Leaf{
 };
 
 struct Point{
+	private:
+	bool valid=0;
+	public:
 	float x=0;
 	float y=0;
 	float r=0;
 	float phi=0;
-	bool valid =0;
+	//bool valid =0;
 
 	Point(){}
 
 	Point(float _x, float _y): x(_x), y(_y){
 		r= sqrt(x*x+y*y);
-		phi = atan2(y,x);
-		valid =1;
+		phi = atan2(y,x);;
 	}
 
 	Point(b2Vec2 v): x(v.x), y(v.y){
 		r= sqrt(x*x+y*y);
 		phi = atan2(y,x);
-		valid =1;
 	}
 
 	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){
-		valid =1;
 	}
 
 	void operator=(const Point &p){
@@ -127,7 +127,7 @@ struct Point{
 
 	bool isInRadius(b2Vec2 center, float radius = 0.05){ //check if this point is within a certain radius from another given point (center)
 		bool result = false;
-		if (center.IsValid()){
+		if (center.IsValid() & this->getb2Vec2().IsValid()){
 			std::pair <float, float> xBounds(center.x+radius, center.x-radius);
 			std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
 			float xLow = std::min(xBounds.first, xBounds.second);

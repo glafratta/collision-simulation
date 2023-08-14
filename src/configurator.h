@@ -382,6 +382,8 @@ void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::v
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
 
+bool betterThanSource(CollisionGraph&, vertexDescriptor, EndedResult &);
+
 void backtrack(CollisionGraph&, vertexDescriptor&);
 
 std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float radius =0.025); //finds if there are bodies close to a point. Used for 

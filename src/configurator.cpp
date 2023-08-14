@@ -683,20 +683,25 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 					}
 			}
 		}
-		vertexDescriptor src =v;
+}
+
+bool Configurator::betterThanSource(CollisionGraph& g, vertexDescriptor v, EndedResult & er){
+	bool better =1;
+		vertexDescriptor src =v;			
+		Point dPosition(g[v].disturbance.getPosition());
 		//check for repetition along the branch
 		while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){
 			src =boost::source(boost::in_edges(src, g).first.dereference(), g);
-			Point dPosition(g[v].disturbance.getPosition());
 			if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
 				better=0;
+				er = controlGoal.checkEnded(g[src].endPose);
 				break;
 			}
 		}
-
-	//}
 	return better;
+
 }
+
 
 void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node

@@ -1,5 +1,9 @@
 #include "measurement.h"
 
+// float EndedResult::errorSquared(){
+//     return errorFloat*errorFloat;
+// }
+
 bool Measurement::operator<(Measurement & m2){
     bool r = false;
     if (isValid() && m2.isValid()){
@@ -32,15 +36,14 @@ float Measurement::getError(Measurement m2){
 
 float Measurement::getStandardError(Measurement m2){ 
     float result =0;
-    float normValue = this->get();
     if (m2.isValid()&& this->isValid()){
-        float num = m2.get()-get();
+        float num = get()-m2.get();
         if (num ==0){
             return result;
         }
-        float den = (m2.get()+get())/2; //normalise to the arithmetic mean, max value =2
+        float den = (m2.get()+get()); //normalise to the arithmetic mean, max value =2, then normalise again, max reusl =1
         if (den==0){
-            return 2;
+            return 1;
         }
         result = num/den;
     }
@@ -55,8 +58,8 @@ float EndCriteria::getError(EndCriteria ec){ //not normalised
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = weights[0]*angle.getStandardError(a)+weights[1]* distance.getStandardError(d); //max =4;
-    return result;
+    result = weights[0]*angle.getStandardError(a)+weights[1]* distance.getStandardError(d); //max =2;
+    return result/2; //return normalise
 }
 
 float EndCriteria::getStandardError(EndCriteria ec){ //standard error
@@ -78,6 +81,7 @@ float EndCriteria::getStandardError(Angle a, Distance d, Node n){
         }
     }
     result = getStandardError(a, d) + weights[2]*outcomeError;
+    return result/3; //normalised to max value it can take
 }
 
 float SignedVectorLength(b2Vec2 v){

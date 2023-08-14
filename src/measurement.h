@@ -67,6 +67,8 @@ struct EndedResult{
 	float errorFloat=0; //dot product of end criteria
 
     EndedResult() = default;
+
+   // float errorSquared();
 };
 
 //typedef Measurement Mst;
