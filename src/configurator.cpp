@@ -529,8 +529,6 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	Sequence p;
 	edgeDescriptor e;
 	while (boost::in_degree(best, g)){
-		e = boost::in_edges(best, g).first.dereference();
-		//bestEdges.push_back(e);
 		best = e.m_source;
 		TaskSummary ts(g[best].disturbance, g[e].direction);
 		p.insert(p.begin(), ts);
@@ -686,7 +684,11 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 			}
 		}
 		//check for repetition along the branch
-		vertexDescriptor src = boost::source(boost::in_edges(v, g).first.dereference(), g);
+		vertexDescriptor src = v;
+		if (boost::in_degree(v, g)>0){
+			src =boost::source(boost::in_edges(v, g).first.dereference(), g);
+
+		}
 		while (v !=src){
 			Point dPosition(g[v].disturbance.getPosition());
 			if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
