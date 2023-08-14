@@ -137,16 +137,7 @@ void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDes
 
 void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-Direction getOppositeDirection(Direction d){
-    switch (d){
-        case Direction::LEFT: return Direction::RIGHT;break;
-        case Direction::RIGHT: return Direction::LEFT;break;
-		//case Direction::DEFAULT: return Direction::BACK; break;
-        default:
-        return Direction::DEFAULT;
-		break;
-    }
-}
+std::pair <bool, Direction> getOppositeDirection(Direction);
 
 template <typename V, typename G>
 bool isFullLength(V v, const G & g, float length=0){

@@ -177,6 +177,29 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 // 	}
 // }
 
+std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
+	std::pair <bool, Direction> result(false, DEFAULT);
+	if (numberOfM == THREE_M){
+		switch (d){
+		case Direction::LEFT: result.first = true; result.second = RIGHT;break;
+		case Direction::RIGHT: result.first = true; result.second = LEFT;break;
+		default:
+		break;
+	}
+	}
+	else if (numberOfM == FOUR_M){
+		switch (d){
+		case Direction::LEFT: result.first = true; result.second = RIGHT;break;
+		case Direction::RIGHT: result.first = true; result.second = LEFT;break;
+		case Direction::DEFAULT: result.first = true; result.second = BACK;break;
+		case Direction::BACK: result.first = true; result.second = DEFAULT;break;
+		default:
+		break;		
+	}
+	}
+	return result;
+}
+
 DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
 		DeltaPose result;
 		float theta;
@@ -613,7 +636,16 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 			if (d ==DEFAULT){
 				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-					g[vd].options= {LEFT, RIGHT};
+					//in order, try the task which represents the reflex towards the goal
+					Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
+					if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+						g[vd].options.push_back(temp.direction);
+						g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+					}
+					else{
+						g[vd].options = {LEFT, RIGHT};
+					}
+					
 				}
 				}
 			}
