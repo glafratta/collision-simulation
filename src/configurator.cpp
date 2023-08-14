@@ -693,6 +693,7 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 				better=0;
 				break;
 			}
+			v=src;
 		}
 
 	//}
