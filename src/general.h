@@ -126,19 +126,23 @@ struct Point{
 
 
 	bool isInRadius(b2Vec2 center, float radius = 0.05){ //check if this point is within a certain radius from another given point (center)
-		std::pair <float, float> xBounds(center.x+radius, center.x-radius);
-		std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
-		float xLow = std::min(xBounds.first, xBounds.second);
-		float xHigh = std::max(xBounds.first, xBounds.second);
-		float yLow = std::min(yBounds.first, yBounds.second);
-		float yHigh = std::max(yBounds.first, yBounds.second);
-		// if (this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow){
-		// 	return true;
-		// }
-		// else{
-		// 	return false;
-		// }
-		return this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
+		bool result = false;
+		if (center.IsValid()){
+			std::pair <float, float> xBounds(center.x+radius, center.x-radius);
+			std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
+			float xLow = std::min(xBounds.first, xBounds.second);
+			float xHigh = std::max(xBounds.first, xBounds.second);
+			float yLow = std::min(yBounds.first, yBounds.second);
+			float yHigh = std::max(yBounds.first, yBounds.second);
+			// if (this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow){
+			// 	return true;
+			// }
+			// else{
+			// 	return false;
+			// }
+			result = this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
+		}
+		return result;
 	}
 
 	b2Vec2 getb2Vec2(){
