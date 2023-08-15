@@ -697,7 +697,7 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 	//expands node if it leads to less error than leaf
 	for (vertexDescriptor l: _leaves){
 		if (g[v].outcome == g[l].outcome){
-			if (g[v].evaluationFunction()<= g[l].evaluationFunction()){ //if error lower, regardless of distance, keep expanding
+			if (g[v].error<= g[l].error){ //if error lower, regardless of distance, keep expanding
 				if (!controlGoal.endCriteria.hasEnd()){
 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 						if (g[v].totDs>=g[l].totDs){
