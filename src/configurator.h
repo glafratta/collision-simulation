@@ -226,7 +226,12 @@ void printPlan(Sequence);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
-	bool obStillThere=0;
+	bool obStillThere=1;
+	if (NULL !=curr){
+		if (curr->getAffIndex()==AVOID){
+			obStillThere=0;
+		}
+	}
 	const float halfWindowWidth = .1;
 	//printf("constructing\n");
 	if (d!=LEFT && d!=RIGHT){ //IF THE ROBOT IS NOT TURNING
@@ -296,7 +301,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->disturbance.isValid()){
+					if (curr->getAffIndex()==AVOID){
 						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
@@ -320,7 +325,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->disturbance.isValid()){
+					if (curr->getAffIndex()==AVOID){
 						if (p.isInRadius(currentTask.disturbance.getPosition())){
 							obStillThere =1;
 						}
