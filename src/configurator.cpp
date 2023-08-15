@@ -697,7 +697,7 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 	//expands node if it leads to less error than leaf
 	for (vertexDescriptor l: _leaves){
 		if (g[v].outcome == g[l].outcome){
-			if (abs(g[v].error)< abs(g[l].error)){ //if error lower, regardless of distance, keep expanding
+			if (abs(g[v].evaluationFunction())< abs(g[l].evaluationFunction())){ //if error lower, regardless of distance, keep expanding
 				if (!controlGoal.endCriteria.hasEnd()){
 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 						if (g[v].totDs>=g[l].totDs){
@@ -711,21 +711,22 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 			}
 		}
 	}
+	return better;
 }
 
 bool Configurator::hasStickingPoint(CollisionGraph& g, vertexDescriptor v, EndedResult & er){
 	bool has =0;
-		vertexDescriptor src =v;			
-		Point dPosition(g[v].disturbance.getPosition());
-		//check for repetition along the branch
-		while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){
-			src =boost::source(boost::in_edges(src, g).first.dereference(), g);
-			if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
-				has=1;
-				er = controlGoal.checkEnded(g[src].endPose);
-				break;
-			}
+	vertexDescriptor src =v;			
+	Point dPosition(g[v].disturbance.getPosition());
+	//check for repetition along the branch
+	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){
+		src =boost::source(boost::in_edges(src, g).first.dereference(), g);
+		if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
+			has=1;
+			er = controlGoal.checkEnded(g[src].endPose);
+			break;
 		}
+	}
 	return has;
 
 }

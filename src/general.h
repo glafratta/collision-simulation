@@ -46,7 +46,7 @@ struct Node{
 
 	void fill(simResult);
 
-	float evaluationFunction();
+	float evaluationFunction(float weight=0.02);
 };
 
 

@@ -12,8 +12,8 @@ void Node::fill(simResult result){
 	filled=true;
 }
 
-float Node::evaluationFunction(){
-	return error +cost;
+float Node::evaluationFunction(float weight){
+	return error +weight*totDs;
 }
 
 bool operator!=(Transform const &t1, Transform const& t2){
