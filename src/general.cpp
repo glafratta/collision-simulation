@@ -8,7 +8,12 @@ void Node::fill(simResult result){
 	endPose = result.endPose;
 	//distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	outcome = result.resultCode;
+	cost += result.distanceCovered/BOX2DRANGE;
 	filled=true;
+}
+
+float Node::evaluationFunction(){
+	return error +cost;
 }
 
 bool operator!=(Transform const &t1, Transform const& t2){

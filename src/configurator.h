@@ -131,7 +131,7 @@ void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crash
 
 vertexDescriptor evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
-void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <Leaf>&); //builds the whole tree and finds the best solution
+void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
 void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
@@ -164,6 +164,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
+		g[v1].cost = g[src].cost;
 		vertexAdded=true;
 	}
 	return vertexAdded;
@@ -175,7 +176,7 @@ Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor ro
 
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-Leaf findBestLeaf(CollisionGraph &, std::vector <Leaf>, EndCriteria * refEnd = NULL);
+vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, EndCriteria * refEnd = NULL);
 // {
 // 	//FIND BEST LEAF
 // 	vertexDescriptor best = _leaves[0];
@@ -369,11 +370,11 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <Leaf> leaves = std::vector <Leaf>());
+void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
-bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <Leaf>, EndedResult &);
+bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &); //evaluation function
 
-bool betterThanSource(CollisionGraph&, vertexDescriptor, EndedResult &);
+bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
 
 void backtrack(CollisionGraph&, vertexDescriptor&);
 

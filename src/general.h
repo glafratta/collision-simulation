@@ -32,6 +32,8 @@ struct Node{
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
 	bool filled =0;
+	float cost=0;
+	float error=0;
 
 	// Angle getAngle(){
 	// 	return Angle(disturbance.getAngle(endPose));
@@ -43,6 +45,8 @@ struct Node{
 	// }
 
 	void fill(simResult);
+
+	float evaluationFunction();
 };
 
 
@@ -58,17 +62,17 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 typedef std::pair <Disturbance, Direction> TaskSummary;
 typedef std::vector <TaskSummary> Sequence;
 
-struct Leaf{
-	vertexDescriptor vertex=0;
-	float error =0;
-	bool valid=0;
+// struct Leaf{
+// 	vertexDescriptor vertex=0;
+// 	float error =0;
+// 	bool valid=0;
 
-	Leaf()=default;
+// 	Leaf()=default;
 
-	Leaf(vertexDescriptor v, float e):vertex(v), error(e){
-		valid=1;
-	}
-};
+// 	Leaf(vertexDescriptor v, float e):vertex(v), error(e){
+// 		valid=1;
+// 	}
+// };
 
 struct Point{
 	private:
