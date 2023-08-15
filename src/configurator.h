@@ -372,7 +372,7 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
-bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &); //evaluation function
+bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 
 bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
 

@@ -348,13 +348,14 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	}
 	//END DEBUG FILE
 	vertexDescriptor v1=v;
+	Direction dir = s.direction;
     do{		
 		v= v1;
 		//evaluate
 		int ct = w.GetBodyCount();
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er) ){
+		if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
 			applyTransitionMatrix(g,v, s.direction, _leaves);
 		}
 		if (g[v].options.size()==0){
@@ -367,7 +368,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		}
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
 		vertexDescriptor v1Src = v1InEdge.m_source;
-		Direction dir = g[v1InEdge].direction;
+		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
 		//DEBUG
@@ -690,24 +691,26 @@ void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 
 
 
-bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er){
+bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
 	bool better =1; 
 	er = controlGoal.checkEnded(g[v].endPose); //heuristic
 	g[v].error = er.errorFloat;
 	//expands node if it leads to less error than leaf
 	for (vertexDescriptor l: _leaves){
-		if (g[v].outcome == g[l].outcome){
+		if (d==DEFAULT){
 			if (abs(g[v].evaluationFunction())< abs(g[l].evaluationFunction())){ //if error lower, regardless of distance, keep expanding
 				if (!controlGoal.endCriteria.hasEnd()){
 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 						if (g[v].totDs>=g[l].totDs){
 							better=0;
+							break;
 						}
 					}
 				}	
 			}
 			else{
-				better =0; 
+				better =0;
+				break; 
 			}
 		}
 	}
