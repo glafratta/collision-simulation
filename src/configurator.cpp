@@ -526,7 +526,7 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 	}
 	for (vertexDescriptor leaf: _leaves){
 		if (refEnd->hasEnd()){
-			if (g[leaf].error<g[best].error){
+			if (abs(g[leaf].error)<abs(g[best].error)){
 				best=leaf;
 				g[best].error= g[leaf].error;
 			}
@@ -697,7 +697,7 @@ bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::
 	//expands node if it leads to less error than leaf
 	for (vertexDescriptor l: _leaves){
 		if (g[v].outcome == g[l].outcome){
-			if (g[v].error<= g[l].error){ //if error lower, regardless of distance, keep expanding
+			if (abs(g[v].error)<= abs(g[l].error)){ //if error lower, regardless of distance, keep expanding
 				if (!controlGoal.endCriteria.hasEnd()){
 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
 						if (g[v].totDs>=g[l].totDs){
