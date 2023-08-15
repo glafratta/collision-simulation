@@ -135,10 +135,10 @@ Direction Task::H(Disturbance ob, Direction d){
 	if (ob.isValid()){
         if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
             if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
-                if (ob.getAngle()<0){//angle formed with robot at last safe pose
+                if (ob.getAngle(start)<0){//angle formed with robot at last safe pose
                     d= Direction::LEFT; //go left
                 }
-                else if (ob.getAngle()>0){ //angle formed with robot at last safe pose
+                else if (ob.getAngle(start)>0){ //angle formed with robot at last safe pose
                     d= Direction::RIGHT; //
                 }   
                 else{
@@ -150,10 +150,10 @@ Direction Task::H(Disturbance ob, Direction d){
         }
 		else if (ob.getAffIndex()==int(InnateAffordances::PURSUE)){
 			if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
-                if (ob.getAngle()<-.1){//angle formed with robot at last safe pose
+                if (ob.getAngle(start)<-.1){//angle formed with robot at last safe pose
                     d= Direction::RIGHT; //go left
                 }
-                else if (ob.getAngle()>0.1){ //angle formed with robot at last safe pose, around .1 rad tolerance
+                else if (ob.getAngle(start)>0.1){ //angle formed with robot at last safe pose, around .1 rad tolerance
                     d= Direction::LEFT; //
                 }   
                 else{
