@@ -288,7 +288,7 @@ void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //
 }
 
 
-vertexDescriptor Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
+void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default

@@ -13,7 +13,7 @@ void Node::fill(simResult result){
 }
 
 float Node::evaluationFunction(float weight){
-	return error +weight*totDs;
+	return abs(error) +weight*totDs;
 }
 
 bool operator!=(Transform const &t1, Transform const& t2){
