@@ -226,10 +226,13 @@ void printPlan(Sequence);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
-	bool obStillThere=1;
+	bool obStillThere=0;
 	if (NULL !=curr){
 		if (curr->getAffIndex()==AVOID){
 			obStillThere=0;
+		}
+		else{
+			obStillThere=1;
 		}
 	}
 	const float halfWindowWidth = .1;
