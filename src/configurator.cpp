@@ -60,6 +60,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
+	printf("obstill there! = %i\n", isObstacleStillThere);
 	EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
 	if (controlEnded.ended){
