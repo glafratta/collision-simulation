@@ -306,6 +306,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				if (curr !=NULL){ //
 					if (curr->getAffIndex()==AVOID){
 						if (p.isInRadius(currentTask.disturbance.getPosition())){
+							printf("disturbance = %f, %f \t point = %f, %f\n", curr->disturbance.pose.p.x, curr->disturbance.pose.p.y, p.x, p.y);
 							obStillThere =1;
 						}
 					}
