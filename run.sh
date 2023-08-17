@@ -13,7 +13,7 @@ then
 	sudo ./navigate $debug $planning
 	else
 	today=$(date +%d%m%y_%H%M)
-	sudo rm /tmp/*0*.*
+	sudo rm /tmp/*.txt
 	echo "writing to $today"
 	sudo ./navigate $debug $planning > /tmp/transcript$today.txt
 	fi

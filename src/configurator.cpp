@@ -162,7 +162,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	if (isSameTask){
 		currentTask.controller();
-		printf("applied controller\n");
+		printf("applied controller: wheel speeds: L=%f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 	}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
