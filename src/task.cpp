@@ -250,7 +250,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
 			//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			//d= Distance(v.Length());
+			//""d= Distance(v.Length());
 			r.ended = v.Length()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
 		}
 	}
