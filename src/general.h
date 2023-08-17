@@ -34,6 +34,7 @@ struct Node{
 	bool filled =0;
 	float cost=0;
 	float error=0;
+	bool twoStep=0;
 
 	// Angle getAngle(){
 	// 	return Angle(disturbance.getAngle(endPose));

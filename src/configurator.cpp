@@ -345,6 +345,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//END DEBUG FILE
 	vertexDescriptor v1=v;
 	Direction dir = s.direction;
+	vertexDescriptor v1Src=v;
     do{	
 		if (debugOn){		
 		f = fopen(n, "a+");
@@ -370,7 +371,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 			return;
 		}
 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
-		vertexDescriptor v1Src = v1InEdge.m_source;
+		v1Src = v1InEdge.m_source;
 		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
@@ -725,7 +726,7 @@ bool Configurator::hasStickingPoint(CollisionGraph& g, vertexDescriptor v, Ended
 	vertexDescriptor src =v;			
 	Point dPosition(g[v].disturbance.getPosition());
 	//check for repetition along the branch
-	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){
+	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid() & !g[v].twoStep){
 		src =boost::source(boost::in_edges(src, g).first.dereference(), g);
 		if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
 			has=1;
