@@ -335,14 +335,17 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	char n[250];
 	//int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
+	FILE *f;
+	if (debugOn){
+		f = fopen(n, "w"); //erase contents from previous run
+		fclose(f);
+	}
 	//PRINT DEBUG
 	//END DEBUG FILE
 	vertexDescriptor v1=v;
 	Direction dir = s.direction;
     do{	
 		if (debugOn){		
-		FILE *f = fopen(n, "w"); //erase contents from previous run
-		fclose(f);
 		f = fopen(n, "a+");
 		for (b2Body * b = w.GetBodyList(); b!=NULL; b= b->GetNext()){
 			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
