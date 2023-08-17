@@ -179,4 +179,6 @@ bool operator==(P const &, P const &);
 
 typedef std::set<Point> CoordinateContainer;
 
+typedef std::pair <bool, int> Quadrant; //a .2x.2 box used to check whether general area has been visited
+
 #endif

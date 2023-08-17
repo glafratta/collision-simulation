@@ -7,7 +7,7 @@
 //#include "general.h"
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
-#define BACK_DISTANCE 0.05 //DEFAULT backtracking distance
+#define SAFE_DISTANCE sqrt(ROBOT_HALFLENGTH*ROBOT_HALFLENGTH+ROBOT_HALFWIDTH*ROBOT_HALFWIDTH) //DEFAULT backtracking distance
 
 //struct Node;
 

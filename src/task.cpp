@@ -42,10 +42,13 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 				// 	float orientation =findOrientation(listener.collisions[index], neighbour.second);
 				// 	collision.setOrientation(orientation);
 				// }
-				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
+				if (direction==DEFAULT && distance.Length()<SAFE_DISTANCE){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
-					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);						
+					// posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+					// posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
+					posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
+					posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
 					robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result = simResult(simResult::resultType::safeForNow, collision);
 				}
@@ -207,7 +210,7 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			b2Vec2 v = disturbance.getPosition() - start.p;
 			Distance d(v.Length());
-			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
+			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
 		}
 		break;
 		}
@@ -215,7 +218,7 @@ void Task::setEndCriteria(){ //standard end criteria, can be modified by changin
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
 			b2Vec2 v = disturbance.getPosition() - start.p;
-			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
+			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
 		}
 		break;
 		}
