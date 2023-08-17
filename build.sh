@@ -11,8 +11,10 @@ if [ $temp -lt 51000 ]
 then
 	echo "temperature of $temp ok, building"
 	cmake .
-	make
+	cd src/
 	sudo make install
+	cd ..
+	make
 else
 	echo "too hot! temp = $temp , not building"
 fi
