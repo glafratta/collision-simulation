@@ -169,51 +169,57 @@ Direction Task::H(Disturbance ob, Direction d){
 
 void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
 	switch (direction){
-		case DEFAULT: 
-		if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+		case DEFAULT: {
+			if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
 			endCriteria.distance = Distance(ROBOT_HALFLENGTH); //end if D is 5 cm away
 		}
 		break;
-		case LEFT: 
-		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+		}
+		case LEFT: {
+			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			if (!disturbance.isPartOfObject()){
 				endCriteria.angle = Angle(SAFE_ANGLE);
 			}
 			else{
 				endCriteria.angle = Angle(0);
 			}
-		}
-		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-			endCriteria.angle = Angle(0);
-		}
-		break;
-		case RIGHT: 
-		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			if (!disturbance.isPartOfObject()){
-				endCriteria.angle = Angle(SAFE_ANGLE);
 			}
-			else{
+			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
 				endCriteria.angle = Angle(0);
 			}
+			break;
 		}
-		else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-			endCriteria.angle = Angle(0);
-		}
-		break;
-		case BACK: 
-		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+		case RIGHT:{
+			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+				if (!disturbance.isPartOfObject()){
+					endCriteria.angle = Angle(SAFE_ANGLE);
+				}
+				else{
+					endCriteria.angle = Angle(0);
+				}
+			}
+			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+				endCriteria.angle = Angle(0);
+			}
+			break;
+		} 
+		case BACK: {
+			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			b2Vec2 v = disturbance.getPosition() - start.p;
 			Distance d(v.Length());
 			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
 		}
 		break;
-		case STOP:
+		}
+		case STOP:{
 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
 			endCriteria.angle = Angle(SAFE_ANGLE);
 			b2Vec2 v = disturbance.getPosition() - start.p;
 			endCriteria.distance = Distance(v.Length()+BACK_DISTANCE);
 		}
 		break;
+		}
+
 		default:break;
 	}
 }
