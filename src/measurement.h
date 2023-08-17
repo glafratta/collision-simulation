@@ -24,6 +24,8 @@ public:
 
     bool operator<(Measurement &);
 
+    bool operator<=(Measurement &);
+
     bool operator>=(Measurement &);
 
     float getError(Measurement);
