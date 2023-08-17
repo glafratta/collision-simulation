@@ -6,7 +6,7 @@
 
 bool Measurement::operator<(Measurement & m2){
     bool r = false;
-    if (isValid() && m2.isValid()){
+    if (isValid() & m2.isValid()){
         r= get()<m2.get();
     }
     else{
@@ -17,7 +17,7 @@ bool Measurement::operator<(Measurement & m2){
 
 bool Measurement::operator<=(Measurement & m2){
     bool r = false;
-    if (isValid() && m2.isValid()){
+    if (isValid() & m2.isValid()){
         r= get()<=m2.get();
     }
     else{
@@ -28,7 +28,7 @@ bool Measurement::operator<=(Measurement & m2){
 
 bool Measurement::operator>=(Measurement &m2){
     bool r = false;
-    if (isValid() && m2.isValid()){
+    if (isValid() & m2.isValid()){
         r= get()>=m2.get();
     }
     else{
@@ -39,7 +39,7 @@ bool Measurement::operator>=(Measurement &m2){
 
 float Measurement::getError(Measurement m2){
     float result =0;
-    if (m2.isValid() && this->isValid()){
+    if (m2.isValid() & this->isValid()){
         result= this->get()-m2.get();
     }
     return result;
@@ -47,7 +47,7 @@ float Measurement::getError(Measurement m2){
 
 float Measurement::getStandardError(Measurement m2){ 
     float result =0;
-    if (m2.isValid()&& this->isValid()){
+    if (m2.isValid()& this->isValid()){
         float num = get()-m2.get();
         if (num ==0){
             return result;
