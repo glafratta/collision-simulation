@@ -336,7 +336,11 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//int bodyCount=0;
 	sprintf(n, "/tmp/bodies%04i.txt", iteration);
 	//PRINT DEBUG
-	if (debugOn){		
+	//END DEBUG FILE
+	vertexDescriptor v1=v;
+	Direction dir = s.direction;
+    do{	
+		if (debugOn){		
 		FILE *f = fopen(n, "w"); //erase contents from previous run
 		fclose(f);
 		f = fopen(n, "a+");
@@ -345,12 +349,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		}
 		fclose(f);		
 		printf("planfile = robot%04i.txt\n", iteration);
-
 	}
-	//END DEBUG FILE
-	vertexDescriptor v1=v;
-	Direction dir = s.direction;
-    do{		
 		v= v1;
 		//evaluate
 		int ct = w.GetBodyCount();
