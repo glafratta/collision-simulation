@@ -22,6 +22,10 @@ public:
         value =f;
     }
 
+    void setValid(bool b){
+        valid = b;
+    }
+
     bool operator<(Measurement &);
 
     bool operator<=(Measurement &);
