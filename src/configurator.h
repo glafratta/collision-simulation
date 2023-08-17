@@ -228,10 +228,10 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	if (NULL !=curr){
-		if (curr->getAffIndex()==AVOID){
+		if (curr->getAffIndex()!=PURSUE){
 			obStillThere=0;
 		}
-		else{
+		else {
 			obStillThere=1;
 		}
 	}
@@ -304,12 +304,12 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->getAffIndex()==AVOID){
-						if (p.isInRadius(currentTask.disturbance.getPosition())){
+					//if (curr->getAffIndex()!=PURSUE){
+						if (p.isInRadius(curr->disturbance.getPosition())){
 							printf("disturbance = %f, %f \t point = %f, %f\n", curr->disturbance.pose.p.x, curr->disturbance.pose.p.y, p.x, p.y);
 							obStillThere =1;
 						}
-					}
+					//}
 				}
 				bodyDef.position.Set(p.x, p.y); 
 				bodies++;
@@ -329,11 +329,12 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				fixtureDef.shape = &fixture;
 				fixture.SetAsBox(.001f, .001f); 
 				if (curr !=NULL){ //
-					if (curr->getAffIndex()==AVOID){
-						if (p.isInRadius(currentTask.disturbance.getPosition())){
+					//if (curr->getAffIndex()==AVOID){
+						if (p.isInRadius(curr->disturbance.getPosition())){
+							printf("disturbance = %f, %f \t point = %f, %f\n", curr->disturbance.pose.p.x, curr->disturbance.pose.p.y, p.x, p.y);
 							obStillThere =1;
 						}
-					}
+					//}
 				}
 				bodyDef.position.Set(p.x, p.y); 
 				body = world.CreateBody(&bodyDef);
