@@ -339,6 +339,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	if (debugOn){
 		f = fopen(n, "w"); //erase contents from previous run
 		fclose(f);
+		printf("planfile = robot%04i.txt\n", iteration);
 	}
 	//PRINT DEBUG
 	//END DEBUG FILE
@@ -351,7 +352,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 		}
 		fclose(f);		
-		printf("planfile = robot%04i.txt\n", iteration);
 	}
 		v= v1;
 		//evaluate

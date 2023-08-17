@@ -240,8 +240,9 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 				a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
 				//float a = abs(a.get()); // the robot and disturbance are parallel
 				float angleTolerance = 1*M_PI/180;
-				//Angle comparAngle =Angle(abs(endCriteria.angle.get()) + angleTolerance);
-				r.ended = a<=endCriteria.angle & d>=endCriteria.distance;
+				Angle comparAngle =Angle(abs(endCriteria.angle.get()) + angleTolerance);
+				comparAngle.setValid(endCriteria.angle.isValid());
+				r.ended = a<=comparAngle & d>=endCriteria.distance;
 			}
 
 		}
