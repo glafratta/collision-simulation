@@ -170,61 +170,93 @@ Direction Task::H(Disturbance ob, Direction d){
     return d;
 }
 
-void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
-	switch (direction){
-		case DEFAULT: {
-			if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-			endCriteria.distance = Distance(ROBOT_HALFLENGTH); //end if D is 5 cm away
-		}
-		break;
-		}
-		case LEFT: {
-			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			if (!disturbance.isPartOfObject()){
-				endCriteria.angle = Angle(SAFE_ANGLE);
+// void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
+// 	switch (direction){
+// 		case DEFAULT: {
+// 			if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+// 			endCriteria.distance = Distance(0.05); //end if D is 5 cm away
+// 		}
+// 		break;
+// 		}
+// 		case LEFT: {
+// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+// 			if (!disturbance.isPartOfObject()){
+// 				endCriteria.angle = Angle(SAFE_ANGLE);
+// 			}
+// 			else{
+// 				endCriteria.angle = Angle(0);
+// 			}
+// 			}
+// 			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+// 				endCriteria.angle = Angle(0);
+// 			}
+// 			break;
+// 		}
+// 		case RIGHT:{
+// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+// 				if (!disturbance.isPartOfObject()){
+// 					endCriteria.angle = Angle(SAFE_ANGLE);
+// 				}
+// 				else{
+// 					endCriteria.angle = Angle(0);
+// 				}
+// 			}
+// 			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
+// 				endCriteria.angle = Angle(0);
+// 			}
+// 			break;
+// 		} 
+// 		case BACK: {
+// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+// 			b2Vec2 v = disturbance.getPosition() - start.p;
+// 			Distance d(v.Length());
+// 			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
+// 		}
+// 		break;
+// 		}
+// 		case STOP:{
+// 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
+// 			endCriteria.angle = Angle(SAFE_ANGLE);
+// 			b2Vec2 v = disturbance.getPosition() - start.p;
+// 			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
+// 		}
+// 		break;
+// 		}
+
+// 		default:break;
+// 	}
+// }
+
+void Task::setEndCriteria(){
+	Distance d;
+	Angle a;
+	b2Vec2 v;
+	switch(disturbance.getAffIndex()){
+		case AVOID: {
+			if (direction !=BACK){
+				endCriteria.distance.setValid(1);
 			}
 			else{
-				endCriteria.angle = Angle(0);
+				v = disturbance.getPosition() - start.p;
+				endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
 			}
-			}
-			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-				endCriteria.angle = Angle(0);
-			}
-			break;
-		}
-		case RIGHT:{
-			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-				if (!disturbance.isPartOfObject()){
-					endCriteria.angle = Angle(SAFE_ANGLE);
+			if (disturbance.isPartOfObject()){
+				endCriteria.angle.setValid(1);
 				}
-				else{
-					endCriteria.angle = Angle(0);
-				}
+			else{
+				endCriteria.angle=Angle(SAFE_ANGLE);
 			}
-			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-				endCriteria.angle = Angle(0);
-			}
-			break;
-		} 
-		case BACK: {
-			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			b2Vec2 v = disturbance.getPosition() - start.p;
-			Distance d(v.Length());
-			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
 		}
 		break;
-		}
-		case STOP:{
-		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-			endCriteria.angle = Angle(SAFE_ANGLE);
-			b2Vec2 v = disturbance.getPosition() - start.p;
-			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
+		case PURSUE:{
+			endCriteria.angle = Angle(0);
+			endCriteria.distance = Distance(0);
 		}
 		break;
-		}
-
-		default:break;
+		default:
+		break;
 	}
+	
 }
 
 EndedResult Task::checkEnded(b2Transform robotTransform){

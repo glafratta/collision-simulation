@@ -48,7 +48,7 @@ class Angle: public Measurement{
 
 class Distance: public Measurement{
     public:
-    Distance(){}
+    Distance(){value = BOX2DRANGE+0.01;}
     Distance(float f)
     {value = round(f*1000)/1000;
     valid =1;}
