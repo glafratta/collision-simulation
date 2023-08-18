@@ -450,6 +450,10 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 	}while(g[bestNext].options.size()>0); //this means that v has progressed
 }
 
+void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+
+}
+
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
@@ -635,26 +639,29 @@ void Configurator::run(Configurator * c){
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
 	switch (numberOfM){
 		case (THREE_M):{
-			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
-			if (d ==DEFAULT){
-				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-					//in order, try the task which represents the reflex towards the goal
-					Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
-					if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
-						g[vd].options.push_back(temp.direction);
-						g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
+				if (d ==DEFAULT){
+					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
+						//in order, try the task which represents the reflex towards the goal
+						Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
+						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+							g[vd].options.push_back(temp.direction);
+							g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+						}
+						else{
+							g[vd].options = {LEFT, RIGHT};
+						}
+						if (discretized & g[vd].outcome ==simResult::safeForNow){
+							g[vd].options.push_back(DEFAULT);
+						}				
 					}
-					else{
-						g[vd].options = {LEFT, RIGHT};
-					}				
+					}
 				}
+				else { //will only enter if successful
+					if (d== LEFT || d == RIGHT){
+						g[vd].options = {DEFAULT};
+					}
 				}
-			}
-			else { //will only enter if successful
-				if (d== LEFT || d == RIGHT){
-					g[vd].options = {DEFAULT};
-				}
-			}
 		}	
 		break;
 		case (FOUR_M):{
@@ -663,6 +670,9 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
 							g[vd].options= {LEFT, RIGHT, BACK};
 					}
+					if (discretized & g[vd].outcome ==simResult::safeForNow){
+						g[vd].options.push_back(DEFAULT);
+					}	
 				}
 			}
 			else { //will only enter if successful

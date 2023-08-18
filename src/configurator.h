@@ -60,6 +60,7 @@ public:
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
+	bool discretized =0;
 
 Configurator()=default;
 
