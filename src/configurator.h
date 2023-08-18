@@ -138,7 +138,9 @@ void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDes
 
 void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-void Astar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&);
+void Astar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
+
+std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
@@ -230,7 +232,7 @@ Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan(Sequence);
 
-bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL){
+bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL, bool discrete =0){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
 	if (NULL !=curr){
@@ -243,11 +245,17 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	}
 	const float halfWindowWidth = .1;
 	//printf("constructing\n");
-	if (d!=LEFT && d!=RIGHT){ //IF THE ROBOT IS NOT TURNING
+	if ((d!=LEFT && d!=RIGHT)){ //IF THE ROBOT IS NOT TURNING
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;
-		float boxLength =BOX2DRANGE;		
+		float boxLength; 
+		if (!discrete){
+			boxLength=BOX2DRANGE;	
+		}
+		else{
+			boxLength = DISCRETE_RANGE;
+		}
 		Point positionVector, radiusVector, maxFromStart; 
 		if(d==BACK){
 			float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());

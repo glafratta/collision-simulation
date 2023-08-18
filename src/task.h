@@ -17,14 +17,12 @@ public:
     float accumulatedError=0;
     char planFile[250]; //for debug
     b2Transform start;
-    //b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     bool change =0;
     float pGain=0.063;
-    //float endAvoid = M_PI_2;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction;
+    bool discrete=0;
 protected:
-    //Type type = Type::BASELINE;
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
 struct Action{

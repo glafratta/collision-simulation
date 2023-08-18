@@ -451,8 +451,73 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 }
 
 void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
-
+	discretized=1;
+	vertexDescriptor v1=v;
+	std::vector <vertexDescriptor> priorityQueue = {v};
+	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
+	bool end=0, added =0;
+	bool discrete =0;
+	if (debugOn){
+		printf("planfile = robot%04i.txt\n", iteration);
+	}		
+	evaluateNode(priorityQueue[0], g, s, w);			
+	do {
+		std::vector <vertexDescriptor> split =splitNode(v, g, s.direction, s.start);
+		if (split.size()>1){
+			discrete =1;
+		}
+		//find error and put in queue *********
+		//v= priorityQueue[0];
+		//applyTransitionMatrix(g,v, s.direction);
+		// for (Direction d: g[v].options){ //add and evaluate all vertices
+		// vertexDescriptor v0=v;
+		// v1 =v0;
+		// do {
+		// added =addVertex(v0, v1, g, g[v0].disturbance); //add
+		// edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+		// s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+		s.discrete = discrete;
+		// constructWorldRepresentation(w, g[e].direction, s.start, discrete); //was g[v].endPose
+		// evaluateNode(v1, g, s, w); //find simulation result
+		// applyTransitionMatrix(g, v1, d);
+		// v0=v1;
+		// }while(s.direction !=DEFAULT & added);
+	// 	g[v1].error = controlGoal.checkEnded(g[v1]).errorFloat;
+	// 	frontier.push_back(v1);
+	// }
+	}while(!end);
 }
+
+std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, CollisionGraph& g, Direction d, b2Transform start){
+	std::vector <vertexDescriptor> split = {v};
+	if (d ==RIGHT || d==LEFT){
+		return;
+	}
+	if (g[v].outcome != simResult::safeForNow){
+		return;
+	}
+	vertexDescriptor v1=v;
+	float nNodes = g[v].endPose.p.Length()/DISCRETE_RANGE;
+	b2Transform endPose = g[v].endPose;
+	int i=0;
+	for (i=0; i<int(nNodes); i++){
+		g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
+		g[v].endPose.q = start.q;
+		start = g[v].endPose;
+		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+		g[v1].outcome=g[v].outcome;
+		split.push_back(v1);
+		v=v1;
+	}
+	if (i <nNodes){
+		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+		g[v1].outcome=g[v].outcome;
+		g[v1].endPose = endPose;
+		split.push_back(v1);
+	}
+	return split;
+}
+
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
@@ -650,10 +715,7 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 						}
 						else{
 							g[vd].options = {LEFT, RIGHT};
-						}
-						if (discretized & g[vd].outcome ==simResult::safeForNow){
-							g[vd].options.push_back(DEFAULT);
-						}				
+						}			
 					}
 					}
 				}
@@ -670,9 +732,6 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
 							g[vd].options= {LEFT, RIGHT, BACK};
 					}
-					if (discretized & g[vd].outcome ==simResult::safeForNow){
-						g[vd].options.push_back(DEFAULT);
-					}	
 				}
 			}
 			else { //will only enter if successful
