@@ -506,7 +506,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 			}
 			//find error and put in queue *********
 			for (vertexDescriptor vertex:split){
-				EndedResult er = findError(vertex, boost::in_edges(vertex, g).first.dereference(), g);
+				EndedResult er = findError(vertex, g);
 				applyTransitionMatrix(g, vertex,s.direction, 0);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
 				addToPriorityQueue(g, vertex, priorityQueue);
@@ -658,14 +658,17 @@ EndedResult Configurator::findError(Task s, Node &n){
 	return er;
 }
 
-EndedResult Configurator::findError(vertexDescriptor v, edgeDescriptor e, CollisionGraph& g){ 
+EndedResult Configurator::findError(vertexDescriptor v,CollisionGraph& g, Direction d){ 
 	EndedResult er = controlGoal.checkEnded(g[v]);
 	g[v].error = er.errorFloat;
 	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
+	edgeDescriptor e;
 	if(boost::in_degree(v,g)>0){
+		e = boost::in_edges(v, g). first.dereference();
 		start =g[e.m_source].endPose;
+		d = g[e].direction;
 	}
-	Task s(g[v].disturbance, g[e].direction, start);
+	Task s(g[v].disturbance, d, start);
 	g[v].cost += s.checkEnded(g[v].endPose).errorFloat;
 	return er;
 }

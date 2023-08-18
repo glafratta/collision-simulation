@@ -188,7 +188,7 @@ vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, 
 
 EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
 
-EndedResult findError(vertexDescriptor, edgeDescriptor, CollisionGraph &); //finds error of task against the control goal adn its own cost (checks against itself)
+EndedResult findError(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
 // {
 // 	//FIND BEST LEAF
