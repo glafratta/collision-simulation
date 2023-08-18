@@ -482,7 +482,6 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 	do {
 		v= priorityQueue[0];
 		priorityQueue.erase(priorityQueue.begin());
-		applyTransitionMatrix(g, v,s.direction, 0);
 		//DISCOVER AND ADD TWO VERTICES
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 		vertexDescriptor v0=v;
@@ -501,13 +500,14 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 		}
 		//SPLIT NODE IF NECESSARY
 		for (vertexDescriptor ev: evaluationQueue){
-			std::vector <vertexDescriptor> split =splitNode(v, g, s.direction, s.start);
+			std::vector <vertexDescriptor> split =splitNode(ev, g, s.direction, s.start);
 			if (split.size()>1){
 				discrete =1;
 			}
 			//find error and put in queue *********
 			for (vertexDescriptor vertex:split){
 				EndedResult er = findError(s, g[vertex]);
+				applyTransitionMatrix(g, vertex,s.direction, 0);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
 				addToPriorityQueue(g, vertex, priorityQueue);
 			}			
