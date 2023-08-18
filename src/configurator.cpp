@@ -540,16 +540,16 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 			g[v1].outcome=g[v].outcome;
 			split.push_back(v1);
-			nNodes-=1;
 			v=v1;
 		}	
-		if (nNodes<1){
+		else if (nNodes<1){
 			g[v].options = {d};
 			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 			g[v1].outcome=g[v].outcome;
 			g[v1].endPose = endPose;
 			split.push_back(v1);
 		}
+		nNodes-=1;
 	}
 	return split;
 }
