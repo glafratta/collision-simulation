@@ -506,7 +506,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 			}
 			//find error and put in queue *********
 			for (vertexDescriptor vertex:split){
-				EndedResult er = findError(vertex, g);
+				EndedResult er = findError(vertex, g, s.direction);
 				applyTransitionMatrix(g, vertex,s.direction, 0);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
 				addToPriorityQueue(g, vertex, priorityQueue);
