@@ -306,7 +306,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 
 }
 
-EndedResult Task::checkEnded(Node n){
+EndedResult Task::checkEnded(Node n){ //check error of node compared to the present Task
 	EndedResult r;
 	Angle a;
 	Distance d;

@@ -187,6 +187,9 @@ Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescrip
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, EndCriteria * refEnd = NULL);
 
 EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
+
+EndedResult findError(vertexDescriptor, edgeDescriptor, CollisionGraph &); //finds error of task against the control goal adn its own cost (checks against itself)
+
 // {
 // 	//FIND BEST LEAF
 // 	vertexDescriptor best = _leaves[0];

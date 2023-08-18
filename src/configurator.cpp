@@ -657,6 +657,14 @@ EndedResult Configurator::findError(Task s, Node &n){
 	return er;
 }
 
+EndedResult Configurator::findError(vertexDescriptor v, edgeDescriptor e, CollisionGraph& g){ 
+	EndedResult er = controlGoal.checkEnded(g[v]);
+	g[v].error = er.errorFloat;
+	Task s(g[v].disturbance, g[e].direction, boost::source(e,g));
+	g[v].cost += s.checkEnded(g[v]).errorFloat;
+	return er;
+}
+
 
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
