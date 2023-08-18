@@ -653,7 +653,7 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 EndedResult Configurator::findError(Task s, Node &n){
 	EndedResult er = controlGoal.checkEnded(n);
 	n.error = er.errorFloat;
-	n.cost += s.checkEnded().errorFloat;
+	n.cost += s.checkEnded(n).errorFloat;
 	return er;
 }
 
