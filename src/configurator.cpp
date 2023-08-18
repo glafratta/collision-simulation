@@ -509,7 +509,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 			for (vertexDescriptor vertex:split){
 				EndedResult er = findError(s, g[vertex]);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
-				addToPriorityQueue(g, v, priorityQueue);
+				addToPriorityQueue(g, vertex, priorityQueue);
 			}			
 		}
 		evaluationQueue.clear();
