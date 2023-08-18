@@ -529,7 +529,7 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	float nNodes = g[v].endPose.p.Length()/DISCRETE_RANGE;
 	b2Transform endPose = g[v].endPose;
 	int i=0;
-	while(nNodes>=1){
+	while(nNodes>1){
 		g[v].endPose = start;
 		// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
 		// g[v].endPose.q = start.q;
