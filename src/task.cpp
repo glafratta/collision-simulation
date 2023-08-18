@@ -3,7 +3,13 @@
 
 
 simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
-		simResult result = simResult(simResult::resultType::successful);
+		simResult result;
+		if ((start.p.Length()+remaining*0.5*MAX_SPEED)>=BOX2DRANGE - 0.01){
+			result = simResult(simResult::resultType::successful);
+		}
+		else{
+			result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
+		}
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
