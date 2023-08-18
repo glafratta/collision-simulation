@@ -237,7 +237,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 		if (getAffIndex()== int(InnateAffordances::AVOID)){
 			if (!disturbance.isPartOfObject()){
 				a= Angle(abs(disturbance.getAngle(robotTransform)));
-				r.ended= a>= endCriteria.angle && d>=endCriteria.distance;
+				r.ended= a>= endCriteria.angle || d>=endCriteria.distance;
 			}
 			else{
 				a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
@@ -245,7 +245,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 				float angleTolerance = 1*M_PI/180;
 				Angle comparAngle =Angle(abs(endCriteria.angle.get()) + angleTolerance);
 				comparAngle.setValid(endCriteria.angle.isValid());
-				r.ended = a<=comparAngle & d>=endCriteria.distance;
+				r.ended = a<=comparAngle || d>=endCriteria.distance;
 			}
 
 		}

@@ -137,6 +137,8 @@ void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDes
 
 void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
+void Astar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&);
+
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
 template <typename V, typename G>
@@ -247,8 +249,8 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		float boxLength =BOX2DRANGE;		
 		Point positionVector, radiusVector, maxFromStart; 
 		if(d==BACK){
-			float x = start.p.x - (BACK_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
-			float y = start.p.y - (BACK_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
+			float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
+			float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
 			start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
 			//boxLength += BACK_DISTANCE+ROBOT_HALFLENGTH;
 			//printf("modified boxlength = %f, start x = %f, y= %f\n", boxLength, start.p.x, start.p.y);
