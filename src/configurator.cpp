@@ -520,10 +520,10 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, CollisionGraph& g, Direction d, b2Transform start){
 	std::vector <vertexDescriptor> split = {v};
 	if (d ==RIGHT || d==LEFT){
-		return;
+		return split;
 	}
 	if (g[v].outcome != simResult::safeForNow){
-		return;
+		return split;
 	}
 	vertexDescriptor v1=v;
 	float nNodes = g[v].endPose.p.Length()/DISCRETE_RANGE;
