@@ -529,25 +529,27 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	float nNodes = g[v].endPose.p.Length()/DISCRETE_RANGE;
 	b2Transform endPose = g[v].endPose;
 	int i=0;
-	while(nNodes>1){
+	while(nNodes>0){
 		g[v].endPose = start;
-		// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
-		// g[v].endPose.q = start.q;
-		// start = g[v].endPose;
-		start.p =start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
-		g[v].options = {d};
-		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
-		g[v1].outcome=g[v].outcome;
-		split.push_back(v1);
-		nNodes-=1;
-		v=v1;
-	}
-	if (nNodes<1){
-		g[v].options = {d};
-		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
-		g[v1].outcome=g[v].outcome;
-		g[v1].endPose = endPose;
-		split.push_back(v1);
+		if(nNodes >1){
+			// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
+			// g[v].endPose.q = start.q;
+			// start = g[v].endPose;
+			start.p =start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
+			g[v].options = {d};
+			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+			g[v1].outcome=g[v].outcome;
+			split.push_back(v1);
+			nNodes-=1;
+			v=v1;
+		}	
+		if (nNodes<1){
+			g[v].options = {d};
+			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+			g[v1].outcome=g[v].outcome;
+			g[v1].endPose = endPose;
+			split.push_back(v1);
+		}
 	}
 	return split;
 }
