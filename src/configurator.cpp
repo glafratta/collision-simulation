@@ -110,8 +110,7 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					printPlan(plan);
 					printf("built tree\n");
 					break;
-				}
-					
+				}	
 				case DEPTH_FIRST_ITDE:{
 					vertexDescriptor bestLeaf=v0;
 					DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
@@ -132,6 +131,17 @@ void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & dat
 					printPlan(plan);
 					printf("built tree\n");
 					break;
+				}
+				case A_STAR:{
+					vertexDescriptor bestLeaf=v0;
+					Astar(v0, g, currentTask, world, bestLeaf);
+					plan = getCleanSequence(g, bestLeaf);
+					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
+					printf("plan:");
+					printPlan(plan);
+					printf("built tree\n");
+					break;
+
 				}
 				default:
 					break;
@@ -504,6 +514,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 		}
 		evaluationQueue.clear();
 	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
+	bestNext=v;
 }
 
 std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, CollisionGraph& g, Direction d, b2Transform start){
