@@ -299,14 +299,22 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 
 		//EVALUATE NODE()
 	simResult result; 
-	float remaining=SIM_DURATION;
+	float remaining=0, range=0;
+	if (s.discrete){
+		remaining = DISCRETE_SIMDURATION;
+		range =DISCRETE_RANGE;
+	}
+	else{
+		remaining=SIM_DURATION;	
+		range = BOX2DRANGE;
+	}
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
-			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+			remaining= (range-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
 		} 
 		if (remaining<0){
 			remaining=0;
@@ -360,7 +368,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
-			applyTransitionMatrix(g,v, s.direction, _leaves);
+			applyTransitionMatrix(g,v, s.direction, er.ended, _leaves);
 		}
 		if (g[v].options.size()==0){
 			g[v].error = er.errorFloat;
@@ -399,7 +407,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		applyTransitionMatrix(g, v, s.direction);
+		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			bool added = addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d, g[v].endPose);
@@ -430,7 +438,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		applyTransitionMatrix(g, v, s.direction);
+		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			vertexDescriptor v0=v;
 			v1 =v0;
@@ -440,7 +448,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 			constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v1, d);
+			applyTransitionMatrix(g, v1, d, er.ended);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
 			g[v1].error = controlGoal.checkEnded(g[v1]).errorFloat;
@@ -453,39 +461,49 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	discretized=1;
 	vertexDescriptor v1=v;
-	std::vector <vertexDescriptor> priorityQueue = {v};
+	std::vector <vertexDescriptor> priorityQueue ={v}, evaluationQueue = {v};
 	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
 	bool end=0, added =0;
 	bool discrete =0;
 	if (debugOn){
 		printf("planfile = robot%04i.txt\n", iteration);
 	}		
-	evaluateNode(priorityQueue[0], g, s, w);			
+	evaluateNode(priorityQueue[0], g, s, w);		
 	do {
-		std::vector <vertexDescriptor> split =splitNode(v, g, s.direction, s.start);
-		if (split.size()>1){
-			discrete =1;
-		}
-		//find error and put in queue *********
-		//v= priorityQueue[0];
-		//applyTransitionMatrix(g,v, s.direction);
-		// for (Direction d: g[v].options){ //add and evaluate all vertices
-		// vertexDescriptor v0=v;
-		// v1 =v0;
-		// do {
-		// added =addVertex(v0, v1, g, g[v0].disturbance); //add
-		// edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
-		// s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+		v= priorityQueue[0];
+		priorityQueue.erase(priorityQueue.begin());
+		applyTransitionMatrix(g, v,s.direction, 0);
+		//DISCOVER AND ADD TWO VERTICES
+		for (Direction d: g[v].options){ //add and evaluate all vertices
+		vertexDescriptor v0=v;
+		v1 =v0;
+		do {
+		added =addVertex(v0, v1, g, g[v0].disturbance); //add
+		edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+		s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 		s.discrete = discrete;
-		// constructWorldRepresentation(w, g[e].direction, s.start, discrete); //was g[v].endPose
-		// evaluateNode(v1, g, s, w); //find simulation result
-		// applyTransitionMatrix(g, v1, d);
-		// v0=v1;
-		// }while(s.direction !=DEFAULT & added);
-	// 	g[v1].error = controlGoal.checkEnded(g[v1]).errorFloat;
-	// 	frontier.push_back(v1);
-	// }
-	}while(!end);
+		constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+		evaluateNode(v1, g, s, w); //find simulation result
+		//applyTransitionMatrix(g, v1, d);
+		v0=v1;
+		}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
+		evaluationQueue.push_back(v1);
+		}
+		//SPLIT NODE IF NECESSARY
+		for (vertexDescriptor ev: evaluationQueue){
+			std::vector <vertexDescriptor> split =splitNode(v, g, s.direction, s.start);
+			if (split.size()>1){
+				discrete =1;
+			}
+			//find error and put in queue *********
+			for (vertexDescriptor vertex:split){
+				EndedResult er = findError(s, g[vertex]);
+				//applyTransitionMatrix(g,vertex, s.direction, er);
+				addToPriorityQueue(g, v, priorityQueue);
+			}			
+		}
+		evaluationQueue.clear();
+	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
 }
 
 std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, CollisionGraph& g, Direction d, b2Transform start){
@@ -501,9 +519,11 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	b2Transform endPose = g[v].endPose;
 	int i=0;
 	for (i=0; i<int(nNodes); i++){
-		g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
-		g[v].endPose.q = start.q;
-		start = g[v].endPose;
+		g[v].endPose = start;
+		// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
+		// g[v].endPose.q = start.q;
+		// start = g[v].endPose;
+		start.p =start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
 		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 		g[v1].outcome=g[v].outcome;
 		split.push_back(v1);
@@ -616,6 +636,14 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 	}
 	return best;
 }
+
+EndedResult Configurator::findError(Task s, Node &n){
+	EndedResult er = controlGoal.checkEnded(n);
+	n.error = er.errorFloat;
+	n.cost += s.checkEnded().errorFloat;
+	return er;
+}
+
 
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	//std::vector <edgeDescriptor> bestEdges;
@@ -749,17 +777,19 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 	}
 }
 
-void Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd, Direction d, std::vector <vertexDescriptor> leaves){
-	EndedResult er = controlGoal.checkEnded(g[vd].endPose);
+bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd, Direction d, bool ended, std::vector <vertexDescriptor> leaves){
+	bool result =0;
 	if (controlGoal.endCriteria.hasEnd()){
-		if (er.ended){
-			return;
+		if (ended){
+			return result;
 		}
 	}
 	else if(g[vd].totDs>4){
-			return;
+			return result;
 		}
 	transitionMatrix(g, vd, d);
+	result = !g[vd].options.empty();
+	return result;
 }
 
 
@@ -823,6 +853,17 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 		}
     }
 }
+
+void Configurator::addToPriorityQueue(CollisionGraph& g, vertexDescriptor v, std::vector <vertexDescriptor>& queue){
+	for (auto i =queue.begin(); i!=queue.end(); i++){
+		if (g[*i].evaluationFunction() >g[v].evaluationFunction()){
+			queue.insert(i, v);
+			return;
+		}
+	}
+	queue.push_back(v);
+}
+
 
 std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
 	std::pair <bool, b2Vec2> result(false, b2Vec2());

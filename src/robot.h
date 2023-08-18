@@ -26,7 +26,8 @@
 #define HZ 50.0
 #define MAX_ANGLE_ERROR M_PI
 #define MAX_DISTANCE_ERROR BOX2DRANGE
-#define DISCRETE_RANGE ROBOT_HALFLENGTH*2 //20 cm
+#define DISCRETE_RANGE ROBOT_HALFLENGTH*2 //22 cm, as in Ulrich (2000)
+#define DISCRETE_SIMDURATION DISCRETE_RANGE*2/MAX_SPEED
 
 //const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
 										//this is the angle that the robot would have to turn

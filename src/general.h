@@ -32,8 +32,8 @@ struct Node{
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
 	bool filled =0;
-	float cost=0;
-	float error=0;
+	float cost=0; //self-error
+	float error=0; //error with respect to control goal
 	bool twoStep=0;
 
 	// Angle getAngle(){

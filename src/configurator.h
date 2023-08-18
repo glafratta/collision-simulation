@@ -185,6 +185,8 @@ Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor ro
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, EndCriteria * refEnd = NULL);
+
+EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
 // {
 // 	//FIND BEST LEAF
 // 	vertexDescriptor best = _leaves[0];
@@ -394,13 +396,15 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-void applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
+bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 
 bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
 
 void backtrack(CollisionGraph&, vertexDescriptor&);
+
+void addToPriorityQueue(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>&);
 
 std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float radius =0.025); //finds if there are bodies close to a point. Used for 
 
