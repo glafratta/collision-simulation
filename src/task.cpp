@@ -49,12 +49,12 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 				// 	collision.setOrientation(orientation);
 				// }
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
-				if (direction==DEFAULT && distance.Length()<SAFE_DISTANCE){ //stop 2 seconds before colliding so to allow the robot to explore
+				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
 					b2Vec2 posReadjusted;
-					// posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-					// posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
-					posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
-					posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
+					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
+					// posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
+					// posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
 					robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
 					result = simResult(simResult::resultType::safeForNow, collision);
 				}
