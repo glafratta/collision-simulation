@@ -506,7 +506,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 			}
 			//find error and put in queue *********
 			for (vertexDescriptor vertex:split){
-				EndedResult er = findError(s, g[vertex]);
+				EndedResult er = findError(vertex, boost::in_edges(vertex, g).first.dereference(), g);
 				applyTransitionMatrix(g, vertex,s.direction, 0);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
 				addToPriorityQueue(g, vertex, priorityQueue);
@@ -529,7 +529,7 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	float nNodes = g[v].endPose.p.Length()/DISCRETE_RANGE;
 	b2Transform endPose = g[v].endPose;
 	int i=0;
-	for (i=0; i<int(nNodes); i++){
+	while(nNodes>=1){
 		g[v].endPose = start;
 		// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
 		// g[v].endPose.q = start.q;
@@ -539,9 +539,10 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 		g[v1].outcome=g[v].outcome;
 		split.push_back(v1);
+		nNodes-=1;
 		v=v1;
 	}
-	if (i <nNodes){
+	if (nNodes<1){
 		g[v].options = {d};
 		addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 		g[v1].outcome=g[v].outcome;
@@ -660,8 +661,12 @@ EndedResult Configurator::findError(Task s, Node &n){
 EndedResult Configurator::findError(vertexDescriptor v, edgeDescriptor e, CollisionGraph& g){ 
 	EndedResult er = controlGoal.checkEnded(g[v]);
 	g[v].error = er.errorFloat;
-	Task s(g[v].disturbance, g[e].direction, boost::source(e,g));
-	g[v].cost += s.checkEnded(g[v]).errorFloat;
+	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
+	if(boost::in_degree(v,g)>0){
+		start =g[e.m_source].endPose;
+	}
+	Task s(g[v].disturbance, g[e].direction, start);
+	g[v].cost += s.checkEnded(g[v].endPose).errorFloat;
 	return er;
 }
 
