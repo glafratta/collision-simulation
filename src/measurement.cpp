@@ -69,7 +69,7 @@ float EndCriteria::getError(EndCriteria ec){ //not normalised
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = weights[0]*angle.getStandardError(a)+weights[1]* distance.getStandardError(d); //max =2;
+    result = weights[0]*abs(angle.getStandardError(a))+weights[1]*abs(distance.getStandardError(d)); //max =2;
     return result/2; //return normalise
 }
 
