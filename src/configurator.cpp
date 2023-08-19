@@ -493,7 +493,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 		s.discrete = discrete;
 		constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 		evaluateNode(v1, g, s, w); //find simulation result
-		//applyTransitionMatrix(g, v1, d);
+		applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
 		v0=v1;
 		}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
 		evaluationQueue.push_back(v1);
@@ -507,7 +507,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 			//find error and put in queue *********
 			for (vertexDescriptor vertex:split){
 				EndedResult er = findError(vertex, g, s.direction);
-				applyTransitionMatrix(g, vertex,s.direction, 0);
+				applyTransitionMatrix(g, vertex,s.direction, er.ended);
 				//applyTransitionMatrix(g,vertex, s.direction, er);
 				addToPriorityQueue(g, vertex, priorityQueue);
 			}			
