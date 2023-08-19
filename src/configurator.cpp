@@ -538,7 +538,6 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 			start.p =start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
 			addVertex(v, v1,g); //passing on the disturbance			
 			split.push_back(v1);
-			v=v1;
 		}	
 		else if (nNodes<1){
 			addVertex(v, v1,g); //passing on the disturbance
@@ -547,6 +546,7 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 		}
 		g[v1].disturbance = g[v].disturbance;
 		g[v1].outcome = g[v].outcome;
+		v=v1;
 		nNodes-=1;
 	}
 	return split;
