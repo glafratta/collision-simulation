@@ -26,7 +26,7 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
-		ci->ready=0;
+		//ci->ready=0;
 		ci->data.clear();
 		ci->data2fp.clear();
 		mapCount++;

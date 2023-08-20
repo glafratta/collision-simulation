@@ -12,25 +12,25 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
-	printf("started spawner\n");
+	//printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
-	printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
+	//printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
 	if (data.empty()){
 		printf("data empty!\n");
 		return;
 	}
-	printf("starting vector update\n");
+	//printf("starting vector update\n");
 	previous =current;
 	//previous = CoordinateContainer(current);
-	printf("previous=current1n");
+	//printf("previous=current1n");
 	current.clear();
-	printf("current clear\n");
+	//printf("current clear\n");
 	current = CoordinateContainer(data);
-	printf("current=data\n");
+	//printf("current=data\n");
 	currentBox2D.clear();
-	printf("box2d clear\n");
+	//printf("box2d clear\n");
 	currentBox2D = CoordinateContainer(data2fp);
-	printf("updated coordinate vectors\n");
+	//printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
@@ -69,7 +69,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	printf("obstill there! = %i\n", isObstacleStillThere);
+	//printf("obstill there! = %i\n", isObstacleStillThere);
 	EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
 	if (controlEnded.ended){
@@ -77,7 +77,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	if(tempEnded.ended|| !isObstacleStillThere){
-		printf("temp ended = %i, obstill there = %i\n", tempEnded.ended, isObstacleStillThere);
+		//printf("temp ended = %i, obstill there = %i\n", tempEnded.ended, isObstacleStillThere);
 		if (!plan.empty()){
 			currentTask = Task(plan[0].first, plan[0].second);
 			Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
@@ -115,10 +115,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 					plan = getCleanSequence(g, bestLeaf);
-					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
+					//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
 					printPlan(plan);
-					printf("built tree\n");
+					//printf("built tree\n");
 					break;
 				}	
 				case DEPTH_FIRST_ITDE:{
@@ -126,10 +126,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 					DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
 					//vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
 					plan = getCleanSequence(g, bestLeaf);
-					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
+					//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 					printf("plan:");
 					printPlan(plan);
-					printf("built tree\n");
+					//printf("built tree\n");
 					break;
 				}
 				case DEPTH_FIRST_ITDE_2:{
