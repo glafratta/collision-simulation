@@ -20,7 +20,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	printf("starting vector update\n");
-	CoordinateContainer previous =current;
+	previous =current;
 	printf("previous=current1n");
 	current.clear();
 	printf("current clear\n");
@@ -219,21 +219,21 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	return result;
 }
 
-DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy	
+DeltaPose Configurator::GetRealVelocity(CoordinateContainer &current, CoordinateContainer &previous){	 //does not modify current vector, creates copy	
 		DeltaPose result;
 		float theta;
 	 	theta = currentTask.getAction().getOmega()* timeElapsed;
 		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
 		result.q.Set(currentTask.getAction().getOmega());
 
-		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
+		int diff = current.size()-previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
 		std::vector <cv::Point2f> currentTmp, previousTmp;
 		//MAKE OPENCV VECTORS
-		for (Point p: _current){
+		for (Point p:_current){
 			currentTmp.push_back(cv::Point2f(p.x, p.y));
 		}
-		for (Point p: _previous){
+		for (Point p: previous){
 			previousTmp.push_back(cv::Point2f(p.x, p.y));
 		}
 
