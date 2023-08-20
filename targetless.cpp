@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     Task controlGoal;
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
-	configurator.numberOfM = FOUR_M;
+	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = BACKTRACKING;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
