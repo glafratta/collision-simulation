@@ -166,7 +166,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				}
 			}
 		}
-	printf("tree size = %i\n", g.m_vertices.size());
+	printf("tree size = %i, bodies = %i\n", g.m_vertices.size(), bodies);
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -762,11 +762,6 @@ void Configurator::run(Configurator * c){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
-			//}
-			// else if (c->ci->data.empty()){
-			// 	c->currentTask = c->controlGoal;
-			// }
-
 		}
 	}
 }
