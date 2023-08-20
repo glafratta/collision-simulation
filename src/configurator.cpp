@@ -386,7 +386,8 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		int ct = w.GetBodyCount();
 		evaluateNode(v, g,s, w);
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
+		// if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
+		if (betterThanLeaves(g, v, _leaves, er, dir) ){
 			applyTransitionMatrix(g,v, s.direction, er.ended, _leaves);
 		}
 		if (g[v].options.size()==0){
