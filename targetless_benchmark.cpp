@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
     Task controlGoal;
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
-	configurator.numberOfM = FOUR_M;
+	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = BACKTRACKING;
 	configurator.benchmark=1;
 	if (argc>1){
