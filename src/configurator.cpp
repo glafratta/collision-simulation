@@ -20,15 +20,16 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	printf("starting vector update\n");
-	previous =current;
+	//previous =current;
+	previous = CoordinateContainer(current);
 	printf("previous=current1n");
 	current.clear();
 	printf("current clear\n");
-	current = data;
+	current = CoordinateContainer(data);
 	printf("current=data\n");
 	currentBox2D.clear();
 	printf("box2d clear\n");
-	currentBox2D = data2fp;
+	currentBox2D = CoordinateContainer(data2fp);
 	printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 
