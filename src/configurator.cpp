@@ -77,6 +77,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	if(tempEnded.ended|| !isObstacleStillThere){
+		printf("temp ended = %i, obstill there = %i\n", tempEnded.ended, isObstacleStillThere);
 		if (!plan.empty()){
 			currentTask = Task(plan[0].first, plan[0].second);
 			Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
