@@ -14,7 +14,7 @@ bool ConfiguratorInterface::isReady(){
 void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
 	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
-	printf("current size = %i, previous size = %i, currentbox2d size = %i\n", current.size(), previous.size(), currentBox2D.size());
+	printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
 	if (data.empty()){
 		printf("data empty!\n");
 		return;
