@@ -66,7 +66,9 @@ public:
 		// for (Point d:coordinates2fp){
 		// 	ci->data2fp.insert(d);
 		// }
-		ci->setReady(1);
+		if (!data.empty()){
+			ci->setReady(1);
+		}
 		//ci->ready=1;
 		ci->iteration++;
 		printf("added data to interface containers\n");

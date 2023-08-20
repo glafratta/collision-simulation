@@ -20,7 +20,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	printf("starting vector update\n");
-	//previous =current;
+	previous =current;
 	//previous = CoordinateContainer(current);
 	printf("previous=current1n");
 	current.clear();
@@ -754,10 +754,11 @@ void Configurator::run(Configurator * c){
 		}
 		if (c->ci->isReady()){
 			//printf(".");
-			if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
+			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
+				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
-			}
+			//}
 			// else if (c->ci->data.empty()){
 			// 	c->currentTask = c->controlGoal;
 			// }
