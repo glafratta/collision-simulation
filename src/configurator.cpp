@@ -21,7 +21,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	}
 	printf("starting vector update\n");
 	//previous =current;
-	previous = CoordinateContainer(current);
+	//previous = CoordinateContainer(current);
 	printf("previous=current1n");
 	current.clear();
 	printf("current clear\n");
