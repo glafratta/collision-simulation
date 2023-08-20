@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #define SAFE_ANGLE M_PI_2
-#define SAFE_DISTANCE 0.125
+#define SAFE_DISTANCE sqrt(ROBOT_HALFLENGTH*ROBOT_HALFLENGTH+ROBOT_HALFWIDTH*ROBOT_HALFWIDTH) //DEFAULT backtracking distance
 #define MAX_TURN M_PI
 #define ROBOT_HALFLENGTH 0.11 //uncomment for robot
 #define ROBOT_HALFWIDTH 0.09 //real

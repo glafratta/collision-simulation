@@ -60,7 +60,8 @@ public:
 		fclose(f);
 		printf("added data to lidar containers, coord = %i, coord2fp = %i\n", ci->data.size(), ci->data2fp.size());
 
-		if (!data.empty()){
+
+		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
 		ci->iteration++;

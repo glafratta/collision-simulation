@@ -66,7 +66,7 @@ public:
 		// for (Point d:coordinates2fp){
 		// 	ci->data2fp.insert(d);
 		// }
-		if (!data.empty()){
+		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
 		//ci->ready=1;
