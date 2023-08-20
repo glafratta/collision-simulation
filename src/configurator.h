@@ -39,6 +39,7 @@ protected:
 	FILE * dumpPath;
 	char fileNameBuffer[50];
 	Task currentTask;
+	bool benchmark=0;
 public:
 	ConfiguratorInterface * ci;
 	bool running =0;
@@ -61,42 +62,16 @@ public:
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
 	bool discretized =0;
-	bool benchmark=0;
-
-Configurator(){
-		previousTimeScan = std::chrono::high_resolution_clock::now();
-		totalTime =0.0f;
-		if (benchmark){
-			char dirName[50];
-			sprintf(dirName, "bodiesSpeedStats");
-			if (!opendir(dirName)){
-				mkdir(dirName, 0777);
-				printf("made stats directory\n");
-			}
-			else{
-				printf("opened stats directory\n");
-			}
-			//TODAYS DATE AND TIME
-			time_t now =time(0);
-			tm *ltm = localtime(&now);
-			int y,m,d, h, min;
-			y=ltm->tm_year-100;
-			m = ltm->tm_mon +1;
-			d=ltm->tm_mday;
-			h= ltm->tm_hour;
-			min = ltm->tm_min;
-			sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-			printf("%s\n", statFile);
-			FILE * f = fopen(statFile, "w");
-			fclose(f);
-		}
-
-}
+Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
-	if (benchmark){
+}
+
+void setBenchmarking(bool b){
+	benchmark =b;
+		if (benchmark){
 		char dirName[50];
 		sprintf(dirName, "bodiesSpeedStats");
 		if (!opendir(dirName)){
@@ -121,7 +96,6 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 		fclose(f);
 	}
 }
-
 
 void Spawner(CoordinateContainer, CoordinateContainer); 
 

@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = BACKTRACKING;
-	configurator.benchmark=1;
+	configurator.setBenchmark(1);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
