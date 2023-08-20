@@ -95,7 +95,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 }
 
 
-void Spawner(CoordinateContainer &, CoordinateContainer &); 
+void Spawner(CoordinateContainer, CoordinateContainer); 
 
 int getIteration(){
 	return iteration;
