@@ -14,15 +14,18 @@ bool ConfiguratorInterface::isReady(){
 void Configurator::Spawner(CoordinateContainer & data, CoordinateContainer & data2fp){ 
 	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
-	iteration++; //iteration set in getVelocity
 	CoordinateContainer previous;
 	printf("current size = %i, previous size = %i, currentbox2d size = %i\n", current.size(), previous.size(), currentBox2D.size());
+	if (data.empty()){
+		return;
+	}
 	previous =current;
 	current.clear();
 	current = data;
 	currentBox2D.clear();
 	currentBox2D = data2fp;
 	printf("updated coordinate vectors\n");
+	iteration++; //iteration set in getVelocity
 
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
