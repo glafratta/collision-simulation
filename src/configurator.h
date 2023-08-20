@@ -61,13 +61,14 @@ public:
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
 	bool discretized =0;
+	bool benchmark=0;
 
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
-	if (debugOn){
+	if (benchmark){
 		char dirName[50];
 		sprintf(dirName, "bodiesSpeedStats");
 		if (!opendir(dirName)){
