@@ -339,7 +339,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		//DEBUG
 		if (debugOn){
 			FILE *f = fopen(bodyFile, "a+");
-			for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
+			for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
 				fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 			}
 			fclose(f);
