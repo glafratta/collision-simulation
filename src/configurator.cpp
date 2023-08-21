@@ -109,6 +109,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		if (!planning){
 			printf("reacting\n");
 			reactiveAvoidance(world, result, currentTask);
+			g[v0].fill(result);
 		}	
 		else if (planning){
 			switch (graphConstruction){
@@ -158,16 +159,19 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				default:
 					break;
 			}
-			if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
-				if (!plan.empty()){
-					Sequence next= {plan[0]};
-					printf("change to:");
-					printPlan(next);
-					currentTask = Task(plan[0].first, plan[0].second);
-					plan.erase(plan.begin());
-				}
-			}
 		}
+		if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
+		if (!plan.empty()){
+			Sequence next= {plan[0]};
+			printf("change to:");
+			printPlan(next);
+			currentTask = Task(plan[0].first, plan[0].second);
+			plan.erase(plan.begin());
+		}
+		else{
+			currentTask = controlGoal;
+		}
+	}
 	printf("tree size = %i, bodies = %i\n", g.m_vertices.size(), bodies);
 	float duration=0;
 	if (benchmark){
