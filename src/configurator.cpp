@@ -104,7 +104,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	//printf("set velocity and created empty graph\n");
-
+	printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 		if (!planning){
 			printf("reacting\n");
