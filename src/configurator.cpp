@@ -399,16 +399,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		if (benchmark){
 			printf("bodies in construct= %i\n", w.GetBodyCount());
 		}
-
-		//DEBUG
-		// if (debugOn){
-		// 	FILE *f = fopen(n, "a+");
-		// 	for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
-		// 		fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-		// 	}
-		// 	fclose(f);
-		// }
-		//END DEBUG
 	}while (v1!= v);
 	//return !g[0].disturbance.safeForNow;
 }
