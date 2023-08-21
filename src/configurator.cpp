@@ -110,9 +110,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("reacting\n");
 			reactiveAvoidance(world, result, currentTask);
 		}	
-		else{
+		else if (planning){
 			switch (graphConstruction){
 				case BACKTRACKING:{
+					printf("backtracking build\n")
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 					plan = getCleanSequence(g, bestLeaf);
@@ -958,7 +959,7 @@ void Configurator::makeBody(b2World&w, Point p, bool obStillThere, Task* curr){
 	b2PolygonShape fixture; //giving the point the shape of a box
 	fixtureDef.shape = &fixture;
 	fixture.SetAsBox(.001f, .001f); 
-	if (curr !=NULL){ //
+	if (NULL!=curr){ //
 		if (p.isInRadius(curr->disturbance.getPosition())){
 			obStillThere =1;
 		}
