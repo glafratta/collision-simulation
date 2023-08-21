@@ -345,7 +345,6 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 		}
 	}
 	result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
-	printf("bodies in evaluate = %i\n", w.GetBodyCount());
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
@@ -410,8 +409,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
 		if (benchmark){
-
+			printf("bodies in construct= %i\n", w.GetBodyCount());
 		}
+
 		//DEBUG
 		// if (debugOn){
 		// 	FILE *f = fopen(n, "a+");
