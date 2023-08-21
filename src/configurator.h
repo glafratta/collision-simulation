@@ -240,6 +240,8 @@ Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan(Sequence);
 
+void makeBody(b2World&, Point, bool, Task* curr = NULL);
+
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL, bool discrete =0){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
 	bool obStillThere=0;
@@ -362,8 +364,6 @@ std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds
 
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
-
-void makeBody(b2World&, Point, bool, Task* curr = NULL);
 
 };
 
