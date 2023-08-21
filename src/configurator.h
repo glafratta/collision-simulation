@@ -358,7 +358,7 @@ void backtrack(CollisionGraph&, vertexDescriptor&);
 
 void addToPriorityQueue(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>&);
 
-std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float radius =0.025); //finds if there are bodies close to a point. Used for 
+std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines

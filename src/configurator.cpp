@@ -344,6 +344,7 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 		}
 	}
 	result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
+	printf("bodies in evaluate = %i\n", w.GetBodyCount());
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
@@ -923,7 +924,7 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	float sumY=0, sumX=0;
 	float avgY=0, avgX=0;
 	std::pair <bool, float>result(false, 0);
-	for (Point p: current){
+	for (Point p:current){
 		if (p.isInRadius(v, radius)){
 			auto pIt =current.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
