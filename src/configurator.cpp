@@ -941,7 +941,7 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	return result;
 }
 
-void Configurator::makeBody(b2World&w, Point p, bool obStillThere, Task* curr){
+void Configurator::makeBody(b2World&w, Point p, bool& obStillThere, Task* curr){
 	b2Body * body;
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;

@@ -241,7 +241,7 @@ Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan(Sequence);
 
-void makeBody(b2World&, Point, bool, Task* curr = NULL);
+void makeBody(b2World&, Point, bool&, Task* curr = NULL);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL, bool discrete =0){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
@@ -344,8 +344,6 @@ void stop();
 void registerInterface(ConfiguratorInterface *);
 
 static void run(Configurator *);
-
-void makeBody(b2World &, b2Vec2, int); //takes world, position and body count
 
 void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
 
