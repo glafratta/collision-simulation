@@ -354,9 +354,7 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 
 
 void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
-	char n[250];
-	//int bodyCount=0;
-	sprintf(n, "/tmp/bodies%04i.txt", iteration);
+	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
 	FILE *f;
 	if (debugOn){
 		f = fopen(n, "w"); //erase contents from previous run
@@ -370,7 +368,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	vertexDescriptor v1Src=v;
     do{	
 		if (debugOn){		
-		f = fopen(n, "a+");
+		f = fopen(bodyFile, "a+");
 		for (b2Body * b = w.GetBodyList(); b!=NULL; b= b->GetNext()){
 			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 		}

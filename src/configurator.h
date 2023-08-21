@@ -55,6 +55,7 @@ public:
 	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
+	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
 	int treeSize = 0; //for debug
@@ -334,6 +335,18 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		
 
 	}
+
+		//DEBUG
+		if (debugOn){
+			FILE *f = fopen(bodyFile, "a+");
+			for (b2Body * b = newWorld.GetBodyList(); b!=NULL; b= b->GetNext()){
+				fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+			}
+			fclose(f);
+		}
+		//END DEBUG
+
+
 	return obStillThere;
 }
 
