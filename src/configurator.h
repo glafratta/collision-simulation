@@ -195,49 +195,6 @@ EndedResult findError(Task, Node&); //returns whether the controlGoal has ended 
 
 EndedResult findError(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
-// {
-// 	//FIND BEST LEAF
-// 	vertexDescriptor best = _leaves[0];
-// 	for (vertexDescriptor leaf: _leaves){
-// 		if (g[leaf].distanceSoFar>g[best].distanceSoFar){
-// 			best = leaf;
-// 		}
-// 		else if (g[leaf].distanceSoFar==g[best].distanceSoFar){
-// 			if (g[leaf].predecessors< g[best].predecessors){ //the fact that this leaf has fewer predecessors implies fewer collisions
-// 				best = leaf;
-// 			}
-// 		}
-// 	}
-// 	// if (debugOn){
-// 	// 	printf("best branch has endpose: x = %f, y= %f, angle = %f\n", g[best].endPose.p.x, g[best].endPose.p.y, g[best].endPose.q.GetAngle());
-// 	// }
-// 	return best;
-// 	//FIND FIRST NODE BEFORE ORIGIN
-// 	// std::vector <edgeDescriptor> bestEdges;
-// 	// edgeDescriptor e;
-// 	// while (best != *(boost::vertices(g).first)){
-// 	// 	e = boost::in_edges(best, g).first.dereference();
-// 	// 	bestEdges.push_back(e);
-// 	// 	best = e.m_source;
-// 	// }
-// 	// if (!g[0].disturbance.safeForNow){
-// 	// printf("plan to go: ");
-// 	// for (auto eIt = bestEdges.rbegin(); eIt!=bestEdges.rend(); eIt++){
-// 	// 	edgeDescriptor edge = *eIt;
-// 	// 	switch (g[edge].direction){
-// 	// 		case Direction::DEFAULT: printf("STRAIGHT, "); break;
-// 	// 		case Direction::LEFT: printf("LEFT, "); break;
-// 	// 		case Direction::RIGHT: printf("RIGHT, "); break;
-// 	// 		case Direction::BACK: printf("BACK, "); break;
-// 	// 		default: break;
-
-// 	// 	}
-// 	// }
-// 	// }
-// 	// printf("\n");
-// 	// return e;
-// }
-
 Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan(Sequence);
@@ -332,18 +289,16 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				makeBody(world, p, obStillThere, curr);
 			}
 		}
-		
-
 	}
-
-		//DEBUG
-		if (debugOn){
-			FILE *f = fopen(bodyFile, "a+");
-			for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
-				fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-			}
-			fclose(f);
+	//DEBUG
+	FILE *f;
+	if (debugOn){
+		f = fopen(bodyFile, "a+");
+		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
+			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 		}
+		fclose(f);
+	}
 		//END DEBUG
 
 

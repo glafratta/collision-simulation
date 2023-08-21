@@ -33,6 +33,13 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 
+	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
+	FILE *f;
+	if (debugOn){
+		f = fopen(bodyFile, "w");
+		fclose(f);
+		printf("planfile = robot%04i.txt\n", iteration);
+	}
 	printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
@@ -354,26 +361,12 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 
 
 void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
-	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
-	FILE *f;
-	if (debugOn){
-		f = fopen(bodyFile, "w"); //erase contents from previous run
-		fclose(f);
-		printf("planfile = robot%04i.txt\n", iteration);
-	}
 	//PRINT DEBUG
 	//END DEBUG FILE
 	vertexDescriptor v1=v;
 	Direction dir = s.direction;
 	vertexDescriptor v1Src=v;
-    do{	
-		if (debugOn){		
-		f = fopen(bodyFile, "a+");
-		for (b2Body * b = w.GetBodyList(); b!=NULL; b= b->GetNext()){
-			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-		}
-		fclose(f);		
-	}
+    do{			
 		v= v1;
 		//evaluate
 		int ct = w.GetBodyCount();
@@ -405,9 +398,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 
 void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1 =v;
-	if (debugOn){
-		printf("planfile = robot%04i.txt\n", iteration);
-	}
 	do{		
 		v=bestNext;
 		if (!(g[v].filled)){ //for the first vertex
@@ -435,10 +425,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 	vertexDescriptor v1;
 	float error;
 	bool added;
-	if (debugOn){
-		printf("planfile = robot%04i.txt\n", iteration);
-	}
-	do{	
+		do{	
 		std::vector <vertexDescriptor> frontier;	
 		v=bestNext;
 		if (!(g[v].filled)){ //for the first vertex
@@ -472,9 +459,6 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
 	bool end=0, added =0;
 	bool discrete =0;
-	if (debugOn){
-		printf("planfile = robot%04i.txt\n", iteration);
-	}		
 	evaluateNode(priorityQueue[0], g, s, w);		
 	do {
 		v= priorityQueue[0];
