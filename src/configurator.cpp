@@ -106,61 +106,45 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("set velocity and created empty graph\n");
 	printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
-		if (!planning){
-			printf("reacting\n");
-			reactiveAvoidance(world, result, currentTask);
-			g[v0].fill(result);
-		}	
-		else if (planning){
-			switch (graphConstruction){
-				case BACKTRACKING:{
-					printf("backtracking build\n");
-					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
-					plan = getCleanSequence(g, bestLeaf);
-					//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-					printf("plan:");
-					printPlan(plan);
-					//printf("built tree\n");
-					break;
-				}	
-				case DEPTH_FIRST_ITDE:{
-					vertexDescriptor bestLeaf=v0;
-					DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
-					//vertexDescriptor bestLeaf = *(boost::vertices(g).second); //last is the best because the others are eliminate as we go
-					plan = getCleanSequence(g, bestLeaf);
-					//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-					printf("plan:");
-					printPlan(plan);
-					//printf("built tree\n");
-					break;
-				}
-				case DEPTH_FIRST_ITDE_2:{
-					vertexDescriptor bestLeaf=v0;
-					DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
-					plan = getCleanSequence(g, bestLeaf);
-					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-					printf("plan:");
-					printPlan(plan);
-					printf("built tree\n");
-					break;
-				}
-				case A_STAR:{
-					vertexDescriptor bestLeaf=v0;
-					Astar(v0, g, currentTask, world, bestLeaf);
-					plan = getCleanSequence(g, bestLeaf);
-					printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-					printf("plan:");
-					printPlan(plan);
-					printf("built tree\n");
-					break;
-
-				}
-				default:
-					break;
+	if (!planning){
+		printf("reacting\n");
+		reactiveAvoidance(world, result, currentTask);
+		g[v0].fill(result);
+	}	
+	else if (planning){
+		switch (graphConstruction){
+			case BACKTRACKING:{
+				printf("backtracking build\n");
+				backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+				vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+				break;
+			}	
+			case DEPTH_FIRST_ITDE:{
+				vertexDescriptor bestLeaf=v0;
+				DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
+				break;
 			}
+			case DEPTH_FIRST_ITDE_2:{
+				vertexDescriptor bestLeaf=v0;
+				DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
+				break;
+			}
+			case A_STAR:{
+				vertexDescriptor bestLeaf=v0;
+				Astar(v0, g, currentTask, world, bestLeaf);
+				break;
+
+			}
+			default:
+				break;
 		}
-		if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
+	}
+	plan = getCleanSequence(g, bestLeaf);
+	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
+	printf("plan:");
+	printPlan(plan);
+
+	if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
 		if (!plan.empty()){
 			Sequence next= {plan[0]};
 			printf("change to:");
@@ -169,6 +153,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			plan.erase(plan.begin());
 		}
 		else{
+			printf("no plan, switching to control goal\n");
 			currentTask = controlGoal;
 		}
 	}
