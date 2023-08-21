@@ -52,7 +52,7 @@ public:
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
 	float totalTime=0;
-	CoordinateContainer current, currentBox2D, previous;
+	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	bool timerOff=0;
@@ -318,69 +318,15 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
 			}
 			if (include){
-				b2Body * body;
-				b2BodyDef bodyDef;
-				b2FixtureDef fixtureDef;
-				bodyDef.type = b2_dynamicBody;
-				b2PolygonShape fixture; //giving the point the shape of a box
-				fixtureDef.shape = &fixture;
-				fixture.SetAsBox(.001f, .001f); 
-				if (curr !=NULL){ //
-					//if (curr->getAffIndex()!=PURSUE){
-						if (p.isInRadius(curr->disturbance.getPosition())){
-							//printf("disturbance = %f, %f \t point = %f, %f\n", curr->disturbance.pose.p.x, curr->disturbance.pose.p.y, p.x, p.y);
-							obStillThere =1;
-						}
-					//}
-				}
-				bodyDef.position.Set(p.x, p.y); 
-				bodies++;
-				body = world.CreateBody(&bodyDef);
-				body->CreateFixture(&fixtureDef);
+				makeBody(world, p, obStillThere, curr);
 			}
 		}
 		}
 		else{ //IF DIRECTION IS LEFT OR RIGHT 
 		for (auto p:currentBox2D){
-			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X + 0.01)){ //y range less than 20 cm only to ensure that robot can pass + account for error
-				b2Body * body;
-				b2BodyDef bodyDef;
-				b2FixtureDef fixtureDef;
-				bodyDef.type = b2_dynamicBody;
-				b2PolygonShape fixture; //giving the point the shape of a box
-				fixtureDef.shape = &fixture;
-				fixture.SetAsBox(.001f, .001f); 
-				if (curr !=NULL){ //
-					//if (curr->getAffIndex()==AVOID){
-						if (p.isInRadius(curr->disturbance.getPosition())){
-							//printf("disturbance = %f, %f \t point = %f, %f\n", curr->disturbance.pose.p.x, curr->disturbance.pose.p.y, p.x, p.y);
-							obStillThere =1;
-						}
-					//}
-				}
-				bodyDef.position.Set(p.x, p.y); 
-				body = world.CreateBody(&bodyDef);
-				bodies++;
-				body->CreateFixture(&fixtureDef);
+			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X)){ //y range less than 20 cm only to ensure that robot can pass + account for error
+				makeBody(world, p, obStillThere, curr);
 			}
-		// 	else if (curr!=NULL){
-		// 		if (curr->disturbance.isValid()){
-		// 			if (p.isInRadius(currentTask.disturbance.getPosition())){
-		// 				obStillThere =1;
-		// 				b2Body * body;
-		// 				b2BodyDef bodyDef;
-		// 				b2FixtureDef fixtureDef;
-		// 				bodyDef.type = b2_dynamicBody;
-		// 				b2PolygonShape fixture; //giving the point the shape of a box
-		// 				fixtureDef.shape = &fixture;
-		// 				fixture.SetAsBox(.001f, .001f); 
-		// 				bodyDef.position.Set(p.x, p.y); 
-		// 				body = world.CreateBody(&bodyDef);
-		// 				bodies++;
-		// 				body->CreateFixture(&fixtureDef);
-		// 			}
-		// 		}
-		// }
 		}
 		
 
@@ -417,6 +363,7 @@ std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2, float radius =0.025); //find
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
 
+void makeBody(b2World&, Point, bool, Task* curr = NULL);
 
 };
 

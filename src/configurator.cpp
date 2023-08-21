@@ -20,7 +20,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return;
 	}
 	//printf("starting vector update\n");
-	previous =current;
+	CoordinateContainer previous =current;
 	//previous = CoordinateContainer(current);
 	//printf("previous=current1n");
 	current.clear();
@@ -33,6 +33,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 
+	printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
@@ -406,6 +407,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
+		if (benchmark){
+
+		}
 		//DEBUG
 		// if (debugOn){
 		// 	FILE *f = fopen(n, "a+");
@@ -943,4 +947,23 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	}
 	result.second=atan(avgY/avgX); 
 	return result;
+}
+
+void Configurator::makeBody(b2World&w, Point p, bool obStillThere, Task* curr){
+	b2Body * body;
+	b2BodyDef bodyDef;
+	b2FixtureDef fixtureDef;
+	bodyDef.type = b2_dynamicBody;
+	b2PolygonShape fixture; //giving the point the shape of a box
+	fixtureDef.shape = &fixture;
+	fixture.SetAsBox(.001f, .001f); 
+	if (curr !=NULL){ //
+		if (p.isInRadius(curr->disturbance.getPosition())){
+			obStillThere =1;
+		}
+	}
+	bodyDef.position.Set(p.x, p.y); 
+	body = w.CreateBody(&bodyDef);
+	bodies++;
+	body->CreateFixture(&fixtureDef);
 }
