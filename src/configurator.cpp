@@ -111,6 +111,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("reacting\n");
 		reactiveAvoidance(world, result, currentTask);
 		g[v0].fill(result);
+		g[v0].options = {DEFAULT};
+		addVertex(v, bestLeaf, g, g[v0].disturbance);
 	}	
 	else if (planning){
 		switch (graphConstruction){
@@ -152,7 +154,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		else{
 			printf("no plan, switching to control goal\n");
-			currentTask = controlGoal;
+			currentTask = (g[v0].disturbance, );
 		}
 	}
 	printf("tree size = %i, bodies = %i\n", g.m_vertices.size(), bodies);
