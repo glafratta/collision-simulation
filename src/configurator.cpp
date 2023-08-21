@@ -113,7 +113,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		else if (planning){
 			switch (graphConstruction){
 				case BACKTRACKING:{
-					printf("backtracking build\n")
+					printf("backtracking build\n");
 					backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 					vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
 					plan = getCleanSequence(g, bestLeaf);
