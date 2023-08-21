@@ -106,6 +106,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("set velocity and created empty graph\n");
 	printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
+	vertexDescriptor bestLeaf = v0;
 	if (!planning){
 		printf("reacting\n");
 		reactiveAvoidance(world, result, currentTask);
@@ -116,21 +117,18 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			case BACKTRACKING:{
 				printf("backtracking build\n");
 				backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-				vertexDescriptor bestLeaf = findBestLeaf(g, leaves);
+				bestLeaf = findBestLeaf(g, leaves);
 				break;
 			}	
 			case DEPTH_FIRST_ITDE:{
-				vertexDescriptor bestLeaf=v0;
 				DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
 				break;
 			}
 			case DEPTH_FIRST_ITDE_2:{
-				vertexDescriptor bestLeaf=v0;
 				DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
 				break;
 			}
 			case A_STAR:{
-				vertexDescriptor bestLeaf=v0;
 				Astar(v0, g, currentTask, world, bestLeaf);
 				break;
 
