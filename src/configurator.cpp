@@ -357,7 +357,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
 	FILE *f;
 	if (debugOn){
-		f = fopen(n, "w"); //erase contents from previous run
+		f = fopen(bodyFile, "w"); //erase contents from previous run
 		fclose(f);
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
