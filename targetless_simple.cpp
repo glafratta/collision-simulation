@@ -93,8 +93,8 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	DeltaPose deltaPose;
-	c->currentTask.trackDisturbance(c->currentTask.disturbance, MOTOR_CALLBACK, deltaPose); //robot default position is 0,0
+	DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction())
+	c->getTask()->trackDisturbance(c->currentTask.disturbance, MOTOR_CALLBACK, deltaPose); //robot default position is 0,0
 	L= c->getTask()->getAction().getLWheelSpeed();
 	R = c->getTask()->getAction().getRWheelSpeed();	
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
@@ -105,7 +105,7 @@ void step( AlphaBot &motors){
 
 DeltaPose assignDeltaPose(Task::Action a){
 	DeltaPose result;
-	float theta = currentTask.getAction().getOmega()* timeElapsed;
+	float theta = a.getOmega()* timeElapsed;
 	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
 	result.q.Set(a.getOmega());
 	return result;
