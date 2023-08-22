@@ -79,12 +79,10 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
     float L=0;
 	float R=0;
 	int countDown =0; //count still end of Task
-	TaskSummary ts;
 
 public:
 
 Callback(Configurator *conf): c(conf){
-	ts = TaskSummary(c->getTask()->disturbance, c->getTask()->direction);
 }
 void step( AlphaBot &motors){
 	if (c ==NULL){
@@ -94,7 +92,10 @@ void step( AlphaBot &motors){
 		return;
 	}
 	DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction(),MOTOR_CALLBACK);
-	c->getTask()->trackDisturbance(c->getTask()->disturbance, MOTOR_CALLBACK, deltaPose); //robot default position is 0,0
+	c->getTask()->trackDisturbance(c->getTask()->disturbance, MOTOR_CALLBACK, deltaPose); //track disturbance of current task
+	for (TaskSummary ts:c->plan){ //track disturbances in the plan
+		c->getTask()->trackDisturbance(ts.first, MOTOR_CALLBACK, deltaPose);
+	}
 	L= c->getTask()->getAction().getLWheelSpeed();
 	R = c->getTask()->getAction().getRWheelSpeed();	
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
