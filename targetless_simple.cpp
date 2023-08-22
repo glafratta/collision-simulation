@@ -93,7 +93,7 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction())
+	DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction(),MOTOR_CALLBACK);
 	c->getTask()->trackDisturbance(c->currentTask.disturbance, MOTOR_CALLBACK, deltaPose); //robot default position is 0,0
 	L= c->getTask()->getAction().getLWheelSpeed();
 	R = c->getTask()->getAction().getRWheelSpeed();	
@@ -103,7 +103,7 @@ void step( AlphaBot &motors){
     //iteration++;
 }
 
-DeltaPose assignDeltaPose(Task::Action a){
+DeltaPose assignDeltaPose(Task::Action a, float timeElapsed){
 	DeltaPose result;
 	float theta = a.getOmega()* timeElapsed;
 	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
