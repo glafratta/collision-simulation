@@ -191,7 +191,7 @@ Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor ro
 
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, EndCriteria * refEnd = NULL);
+vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
 EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
 

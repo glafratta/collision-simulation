@@ -127,7 +127,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			case BACKTRACKING:{
 				printf("backtracking build\n");
 				backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-				bestLeaf = findBestLeaf(g, leaves);
+				bestLeaf = findBestLeaf(g, leaves, v0);
 				break;
 			}	
 			case DEPTH_FIRST_ITDE:{
@@ -454,7 +454,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			}
 			frontier.push_back(v1);
 		}
-		bestNext = findBestLeaf(g, frontier);
+		bestNext = findBestLeaf(g, frontier, v);
 	}while(bestNext !=v); //this means that v has progressed
 }
 
@@ -654,8 +654,11 @@ Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor
 }
 
 
-vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves, EndCriteria * refEnd){
+vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vertexDescriptor> _leaves, vertexDescriptor v, EndCriteria * refEnd){
 	//FIND BEST LEAF
+	if (_leaves.empty()){
+		return v;
+	}
 	vertexDescriptor best = _leaves[0];
 	if (refEnd==NULL){
 		refEnd = &controlGoal.endCriteria;
