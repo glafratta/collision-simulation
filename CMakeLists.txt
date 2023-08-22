@@ -4,7 +4,6 @@ project(HICS LANGUAGES CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
-set(NAME_TEST "test")
 
 find_package(Threads)
 
@@ -13,7 +12,8 @@ find_package(Threads)
 ##find_package(Boost)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
+add_subdirectory(test "${CMAKE_CURRENT_PROJECT_DIR}/test")
+(test "${CMAKE_CURRENT_BINARY_DIR}/test")if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(navigate main.cpp)
   add_executable(targetless targetless.cpp)
   add_executable(targetless_simple targetless_simple.cpp)
@@ -22,14 +22,13 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   target_link_libraries(targetless alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless_simple alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless_benchmark alphabot a1lidarrpi HICS pigpio)
-  target_link_libraries(NAME_TEST HICS alphabot a1lidarrpi pigpio)
   message("detected architecture aarch64, building executables")
 else()
 #	add_subdirectory(test)
 	message("not building any executable")
 endif()
 
-add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_compile_options(-Wall -pedantic)
