@@ -20,7 +20,7 @@
 #define MAX_SPEED 0.125
 #define MAX_OMEGA M_PI
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
-#define BOX2DRANGE 1.0
+#define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.1
 #define REACTION_TIME 1.0
 #define HZ 50.0
