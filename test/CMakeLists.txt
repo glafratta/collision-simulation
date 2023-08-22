@@ -2,10 +2,8 @@ find_package(OpenCV REQUIRED)
 
 find_package(box2d REQUIRED)
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
-	#add_executable(noMotors noMotors.cpp)
-	target_sources(Test noMotors.cpp)
-	target_link_libraries(Test box2d ${OpenCV_LIBS} HICS pthread)
-	add_test(test Test)
+	add_executable(noMotors noMotors.cpp)
+	target_link_libraries(noMotors box2d ${OpenCV_LIBS} HICS pthread)
 	message("build test cases")
 endif()
 
