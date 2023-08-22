@@ -84,7 +84,7 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
 public:
 
 Callback(Configurator *conf): c(conf){
-	ts = TaskSummary(c->getTask()->disturbance, c->currentTask.direction);
+	ts = TaskSummary(c->getTask()->disturbance, c->getTask()->direction);
 }
 void step( AlphaBot &motors){
 	if (c ==NULL){
