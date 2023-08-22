@@ -432,8 +432,8 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = findError(v, g, s.direction);
-		if (graphConstruction ==SIMPLE_TREE & g[v1].outcome !=simResult::successful){ //calculate error and then reset
-			g[v1].endPose = s.start;
+		if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
+			g[v].endPose = s.start;
 		}
 		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
