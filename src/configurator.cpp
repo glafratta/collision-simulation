@@ -161,7 +161,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 
 	}
-	printf("tree size = %i, bodies = %i\n", g.m_vertices.size(), bodies);
+	printf("tree size = %i, bodies = %i, plan size = %i\n", g.m_vertices.size(), bodies, plan.size());
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
