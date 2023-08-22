@@ -761,6 +761,7 @@ void Configurator::stop(){
 
 void Configurator::registerInterface(ConfiguratorInterface * _ci){
 	ci = _ci;
+	ci->ts = TaskSummary(controlGoal.disturbance, controalGoal.direction);
 }
 
 void Configurator::run(Configurator * c){

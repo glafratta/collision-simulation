@@ -25,6 +25,7 @@ public:
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 	bool ready=0;
+	TaskSummary ts;
 
 	void setReady(bool b);
 
