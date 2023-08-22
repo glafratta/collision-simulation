@@ -977,7 +977,7 @@ void Configurator::makeBody(b2World&w, Point p){
 	body->CreateFixture(&fixtureDef);
 }
 
-void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr =NULL){
+void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 	if (NULL!=curr){ //
 		if (p.isInRadius(curr->disturbance.getPosition())){
 			obStillThere =1;
