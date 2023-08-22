@@ -141,7 +141,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			case A_STAR:{
 				Astar(v0, g, currentTask, world, bestLeaf);
 				break;
-
+			}
+			case SIMPLE_TREE:{
+				DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
+				break;
 			}
 			default:
 				break;
@@ -419,7 +422,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 }
 
 void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
-	vertexDescriptor v1;
+	vertexDescriptor v1, v0;
 	float error;
 	bool added;
 		do{	
@@ -431,7 +434,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
-			vertexDescriptor v0=v;
+			v0=v;
 			v1 =v0;
 			do {
 			added =addVertex(v0, v1, g, g[v0].disturbance); //add
@@ -442,11 +445,14 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			applyTransitionMatrix(g, v1, d, er.ended);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
-			g[v1].error = controlGoal.checkEnded(g[v1]).errorFloat;
+			g[v1].error = findError(v1, g, s.direction).errorFloat;
+			if (graphConstruction ==SIMPLE_TREE & g[v1].outcome !=simResult::successful){ //calculate error and then reset
+				g[v1].endPose = g[v0].endPose;
+			}
 			frontier.push_back(v1);
 		}
 		bestNext = findBestLeaf(g, frontier);
-	}while(g[bestNext].options.size()>0); //this means that v has progressed
+	}while(bestNext !=v); //this means that v has progressed
 }
 
 void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
@@ -530,6 +536,47 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	return split;
 }
 
+// void simpleTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor& bestNext){ //one step above reactive
+// 	vertexDescriptor v1=v;
+// 	bool end=0, added =0;
+// 	evaluateNode(v, g, s, w);		
+// 	do {
+		
+// 		for (Direction d: g[v].options){ //add and evaluate all vertices
+// 		vertexDescriptor v0=v;
+// 		v1 =v0;
+// 		do {
+// 		added =addVertex(v0, v1, g, g[v0].disturbance); //add
+// 		edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+// 		s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+// 		constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+// 		evaluateNode(v1, g, s, w); //find simulation result
+// 		applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
+// 		v0=v1;
+// 		}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
+// 		evaluationQueue.push_back(v1);
+// 		}
+// 		//SPLIT NODE IF NECESSARY
+// 		for (vertexDescriptor ev: evaluationQueue){
+// 			std::vector <vertexDescriptor> split =splitNode(ev, g, s.direction, s.start);
+// 			if (split.size()>1){
+// 				discrete =1;
+// 			}
+// 			//find error and put in queue *********
+// 			for (vertexDescriptor vertex:split){
+// 				EndedResult er = findError(vertex, g, s.direction);
+// 				applyTransitionMatrix(g, vertex,s.direction, er.ended);
+// 				//applyTransitionMatrix(g,vertex, s.direction, er);
+// 				addToPriorityQueue(g, vertex, priorityQueue);
+// 			}			
+// 		}
+// 		evaluationQueue.clear();
+// 	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
+// 	bestNext=v;
+
+// }
+
+
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
@@ -611,20 +658,21 @@ vertexDescriptor Configurator::findBestLeaf(CollisionGraph &g, std::vector <vert
 		refEnd = &controlGoal.endCriteria;
 	}
 	for (vertexDescriptor leaf: _leaves){
-		if (refEnd->hasEnd()){
-			if (abs(g[leaf].error)<abs(g[best].error)){
+		//if (refEnd->hasEnd()){
+			if (abs(g[leaf].evaluationFunction())<abs(g[best].evaluationFunction())){
 				best=leaf;
 				g[best].error= g[leaf].error;
+				g[best].cost = g[leaf].cost;
 			}
-		}
-		else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
-			best = leaf;
-		}
-		else if (g[leaf].endPose.p.Length() == g[best].endPose.p.Length()){
-			if (g[leaf].totDs< g[best].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
-				best = leaf;
-			}
-		}
+		// }
+		// else if (g[leaf].endPose.p.Length() > g[best].endPose.p.Length()){
+		// 	best = leaf;
+		// }
+		// else if (g[leaf].endPose.p.Length() == g[best].endPose.p.Length()){
+		// 	if (g[leaf].totDs< g[best].totDs){ //the fact that this leaf has fewer predecessors implies fewer collisions
+		// 		best = leaf;
+		// 	}
+		// }
 	}
 	return best;
 }

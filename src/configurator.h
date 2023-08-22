@@ -144,6 +144,8 @@ void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexD
 
 void Astar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
 
+// void simpleTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&);
+
 std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
