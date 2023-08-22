@@ -145,8 +145,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			default:
 				break;
 		}
+		plan = getCleanSequence(g, bestLeaf);
 	}
-	plan = getCleanSequence(g, bestLeaf);
 	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 	printf("plan:");
 	printPlan(plan);
