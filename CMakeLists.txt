@@ -13,7 +13,7 @@ find_package(Threads)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 add_subdirectory(test "${CMAKE_CURRENT_PROJECT_DIR}/test")
-(test "${CMAKE_CURRENT_BINARY_DIR}/test")if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(navigate main.cpp)
   add_executable(targetless targetless.cpp)
   add_executable(targetless_simple targetless_simple.cpp)
