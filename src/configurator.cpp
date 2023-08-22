@@ -761,7 +761,7 @@ void Configurator::stop(){
 
 void Configurator::registerInterface(ConfiguratorInterface * _ci){
 	ci = _ci;
-	ci->ts = TaskSummary(controlGoal.disturbance, controalGoal.direction);
+	ci->ts = TaskSummary(controlGoal.disturbance, controlGoal.direction);
 }
 
 void Configurator::run(Configurator * c){
@@ -782,6 +782,7 @@ void Configurator::run(Configurator * c){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
+				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction);
 		}
 	}
 }
