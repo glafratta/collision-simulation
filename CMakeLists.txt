@@ -18,6 +18,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(targetless_benchmark targetless_benchmark.cpp)
   target_link_libraries(navigate alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless alphabot a1lidarrpi HICS pigpio)
+  target_link_libraries(targetless_simple alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless_benchmark alphabot a1lidarrpi HICS pigpio)
   message("detected architecture aarch64, building executables")
 else()
@@ -26,6 +27,7 @@ else()
 endif()
 
 add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
+target_link_libraries(test HICS)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_compile_options(-Wall -pedantic)

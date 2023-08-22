@@ -2,8 +2,6 @@ include(GNUInstallDirs)
 
 find_package(OpenCV REQUIRED)
 
-include_directories(../src)
-
 find_package(box2d REQUIRED)
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	add_executable(noMotors noMotors.cpp)
