@@ -203,7 +203,7 @@ Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
 void printPlan(Sequence);
 
-void makeBody(b2World&, Point, bool&, Task* curr = NULL);
+void makeBody(b2World&, Point);
 
 bool constructWorldRepresentation(b2World & world, Direction d, b2Transform start, Task * curr = NULL, bool discrete =0){
 	//TO DO : calculate field of view: has to have 10 cm on each side of the robot
@@ -283,15 +283,17 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
 			}
 			if (include){
-				makeBody(world, p, obStillThere, curr);
+				makeBody(world, p);
 			}
+			checkDisturbance(p, obStillThere, curr);
 		}
 		}
 		else{ //IF DIRECTION IS LEFT OR RIGHT 
 		for (auto p:currentBox2D){
 			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X)){ //y range less than 20 cm only to ensure that robot can pass + account for error
-				makeBody(world, p, obStillThere, curr);
+				makeBody(world, p);
 			}
+			checkDisturbance(p, obStillThere, curr);
 		}
 	}
 	//DEBUG
@@ -335,6 +337,8 @@ std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds
 
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
+void checkDisturbance(Point, bool&,Task * curr =NULL);
+									
 
 };
 

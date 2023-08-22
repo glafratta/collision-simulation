@@ -963,7 +963,7 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	return result;
 }
 
-void Configurator::makeBody(b2World&w, Point p, bool& obStillThere, Task* curr){
+void Configurator::makeBody(b2World&w, Point p){
 	b2Body * body;
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -971,13 +971,16 @@ void Configurator::makeBody(b2World&w, Point p, bool& obStillThere, Task* curr){
 	b2PolygonShape fixture; //giving the point the shape of a box
 	fixtureDef.shape = &fixture;
 	fixture.SetAsBox(.001f, .001f); 
+	bodyDef.position.Set(p.x, p.y); 
+	body = w.CreateBody(&bodyDef);
+	bodies++;
+	body->CreateFixture(&fixtureDef);
+}
+
+void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr =NULL){
 	if (NULL!=curr){ //
 		if (p.isInRadius(curr->disturbance.getPosition())){
 			obStillThere =1;
 		}
 	}
-	bodyDef.position.Set(p.x, p.y); 
-	body = w.CreateBody(&bodyDef);
-	bodies++;
-	body->CreateFixture(&fixtureDef);
 }
