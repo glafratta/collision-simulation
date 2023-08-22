@@ -117,12 +117,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (!planning){
 		printf("reacting\n");
 		reactiveAvoidance(world, result, currentTask);
-		// g[v0].fill(result);
-		// g[v0].options = {DEFAULT};
-		// addVertex(v0, bestLeaf, g, g[v0].disturbance);
-		// printf("bestLeaf = %i\n", bestLeaf);
 	}	
-	else if (planning){
+	else if (planBuild !=STATIC || plan.empty()){ 
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");

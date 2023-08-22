@@ -64,6 +64,7 @@ public:
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
 	bool discretized =0;
+	PLAN_BUILD planBuild = STATIC;
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
