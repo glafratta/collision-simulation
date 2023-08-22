@@ -77,7 +77,7 @@ void setBenchmarking(bool b){
 	benchmark =b;
 		if (benchmark){
 		char dirName[50];
-		sprintf(dirName, "bodiesSpeedStats");
+		sprintf(dirName, "bodiesSpeedStats%.1f", BOX2DRANGE);
 		if (!opendir(dirName)){
 			mkdir(dirName, 0777);
 			printf("made stats directory\n");
