@@ -78,34 +78,33 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
 	//printf("obstill there! = %i\n", isObstacleStillThere);
-	EndedResult tempEnded = currentTask.checkEnded();
+	//EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
 	if (controlEnded.ended){
 		currentTask= Task(Disturbance(), STOP);
 		return;
 	}
-	printf("temp ended = %i, obstill there = %i\n", tempEnded.ended, isObstacleStillThere);
-	if(tempEnded.ended|| !isObstacleStillThere){
-		if (!plan.empty()){
-			currentTask = Task(plan[0].first, plan[0].second);
-			Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
-			printf("switched to ");
-			printPlan(s);
-			plan.erase(plan.begin());
-		}
-		else{
-			currentTask = Task(controlGoal.disturbance, DEFAULT); //fall back to control goal
-			printf("no plan\n");
-		}
-	}
+	printf("obstill there = %i\n", isObstacleStillThere);
+	// if(tempEnded.ended|| !isObstacleStillThere){
+	// 	if (!plan.empty()){
+	// 		currentTask = Task(plan[0].first, plan[0].second);
+	// 		Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
+	// 		printf("switched to ");
+	// 		printPlan(s);
+	// 		plan.erase(plan.begin());
+	// 	}
+	// 	else{
+	// 		currentTask = Task(controlGoal.disturbance, DEFAULT); //fall back to control goal
+	// 		printf("no plan\n");
+	// 	}
+	//	}
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	simResult result;
-
+	collisionGraph.clear();
 	//creating decision tree Disturbance
-	CollisionGraph g;
-	vertexDescriptor v0 = boost::add_vertex(g);
+	vertexDescriptor v0 = boost::add_vertex(collisionGraph);
 	std::vector <vertexDescriptor> leaves;
 	Direction dir;
 
@@ -117,51 +116,54 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (!planning){
 		printf("reacting\n");
 		reactiveAvoidance(world, result, currentTask);
+		collisionGraph[v0].fill(result);
 	}	
 	else if (planBuild !=STATIC || plan.empty()){ 
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
-				backtrackingBuildTree(v0, g, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-				bestLeaf = findBestLeaf(g, leaves, v0);
+				backtrackingBuildTree(v0, collisionGraph, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
+				bestLeaf = findBestLeaf(collisionGraph, leaves, v0);
 				break;
 			}	
 			case DEPTH_FIRST_ITDE:{
-				DFIDBuildTree(v0, g, currentTask, world, bestLeaf);
+				DFIDBuildTree(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			case DEPTH_FIRST_ITDE_2:{
-				DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
+				DFIDBuildTree_2(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			case A_STAR:{
-				Astar(v0, g, currentTask, world, bestLeaf);
+				Astar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			case SIMPLE_TREE:{
-				DFIDBuildTree_2(v0, g, currentTask, world, bestLeaf);
+				DFIDBuildTree_2(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			default:
 				break;
 		}
-		plan = getCleanSequence(g, bestLeaf);
+		plan = getCleanSequence(collisionGraph, bestLeaf);
 	}
 	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 	printf("plan:");
 	printPlan(plan);
 
-	if (g[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
-		if (!plan.empty()){
-			Sequence next= {plan[0]};
-			printf("change to:");
-			printPlan(next);
-			currentTask = Task(plan[0].first, plan[0].second);
-			plan.erase(plan.begin());
-		}
+	// if (collisionGraph[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
+	// 	if (!plan.empty()){
+	// 		Sequence next= {plan[0]};
+	// 		printf("change to:");
+	// 		printPlan(next);
+	// 		currentTask = Task(plan[0].first, plan[0].second);
+	// 		plan.erase(plan.begin());
+	// 	}
 
-	}
-	printf("tree size = %i, bodies = %i, plan size = %i\n", g.m_vertices.size(), bodies, plan.size());
+	// }
+	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	//changeTask(currentTask.change, plan, collisionGraph[v0]);
+	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -169,7 +171,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	 	float duration=abs(float(d.count())/1000); //express in seconds
 		FILE * f = fopen(statFile, "a+");
 	//	printf("open stat\n");
-		fprintf(f,"%i\t%i\t%f\n", bodies, g.m_vertices.size(), duration);
+		fprintf(f,"%i\t%i\t%f\n", bodies, collisionGraph.m_vertices.size(), duration);
 		fclose(f);
 
 	}
@@ -984,3 +986,37 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 		}
 	}
 }
+
+void Configurator::trackTaskExecution(Task & t){
+	if (t.endCriteria.hasEnd()){
+		if (t.step>0){
+			t.step--;
+		}
+		else{
+			t.change=1;
+		}
+	}
+}
+
+DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
+	DeltaPose result;
+	float theta = a.getOmega()* timeElapsed;
+	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
+	result.q.Set(a.getOmega());
+	return result;
+}
+
+void Configurator::changeTask(bool b, Sequence & p, Node n){
+	if (!b){
+		return;
+	}
+	if (!p.empty()){
+		currentTask = Task(p[0].first, p[0].second);
+		p.erase(p.begin());
+	}
+	else{
+		currentTask = Task(n.disturbance, DEFAULT); //reactive
+	}
+
+}
+

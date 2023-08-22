@@ -21,6 +21,7 @@ public:
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction;
     bool discrete=0;
+    int step=0;
 protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
@@ -68,9 +69,7 @@ public:
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(L+R)/2;
     recordedSpeed=linearSpeed;
-
     valid=1;
-        
     }
 
 
@@ -179,6 +178,7 @@ Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
+    step = motorStep(action, endCriteria);
     //RecordedVelocity = action.getLinearVelocity();
 }
 
@@ -190,6 +190,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     action.init(direction);
     //RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
+    step = motorStep(action, endCriteria);
 }
 
 void init(){
@@ -237,6 +238,7 @@ std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.0
 
 float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
 
+int motorStep(Action, EndCriteria);
 
 };
 

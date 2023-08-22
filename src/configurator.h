@@ -65,6 +65,7 @@ public:
 	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
 	bool discretized =0;
 	PLAN_BUILD planBuild = STATIC;
+	CollisionGraph collisionGraph;
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
@@ -339,7 +340,11 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 									
+void trackTaskExecution(Task &);
 
+DeltaPose assignDeltaPose(Task::Action, float);
+
+void changeTask(bool, Sequence&, Node);
 };
 
 

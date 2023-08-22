@@ -91,26 +91,19 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction(),MOTOR_CALLBACK);
-	c->getTask()->trackDisturbance(c->getTask()->disturbance, MOTOR_CALLBACK, deltaPose); //track disturbance of current task
-	for (TaskSummary ts:c->plan){ //track disturbances in the plan
-		c->getTask()->trackDisturbance(ts.first, MOTOR_CALLBACK, deltaPose);
-	}
-	L= c->getTask()->getAction().getLWheelSpeed();
-	R = c->getTask()->getAction().getRWheelSpeed();	
-    motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(L);
+	// DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction(),MOTOR_CALLBACK); //too much error
+	// c->getTask()->trackDisturbance(c->getTask()->disturbance, MOTOR_CALLBACK, deltaPose); //track disturbance of current task
+	// for (TaskSummary ts:c->plan){ //track disturbances in the plan
+	// 	c->getTask()->trackDisturbance(ts.first, MOTOR_CALLBACK, deltaPose);
+	// }
+	c->trackTaskExecution(c->getTask());	
+	c->changeTask(c->getTask().change, c->plan, c->collisionGraph[0]);
+    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
+    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("step: R=%f\tL=%f, conf iteration = %i, tree size = %i\n", R, L, c->getIteration(), c->treeSize);
     //iteration++;
 }
 
-DeltaPose assignDeltaPose(Task::Action a, float timeElapsed){
-	DeltaPose result;
-	float theta = a.getOmega()* timeElapsed;
-	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
-	result.q.Set(a.getOmega());
-	return result;
-}
 
 
 };
