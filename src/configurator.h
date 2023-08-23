@@ -226,9 +226,11 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		float boxLength; 
 		if (!discrete){
 			boxLength=BOX2DRANGE;	
+			printf("using box2d range = %f", boxLength);
 		}
 		else{
 			boxLength = DISCRETE_RANGE;
+			printf("using discrete range");
 		}
 		Point positionVector, radiusVector, maxFromStart; 
 		if(d==BACK){
