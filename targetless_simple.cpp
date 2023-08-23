@@ -96,7 +96,7 @@ void step( AlphaBot &motors){
 	// for (TaskSummary ts:c->plan){ //track disturbances in the plan
 	// 	c->getTask()->trackDisturbance(ts.first, MOTOR_CALLBACK, deltaPose);
 	// }
-	c->trackTaskExecution(c->getTask());	
+	c->trackTaskExecution(*(c->getTask()));	
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0]);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
