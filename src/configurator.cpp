@@ -120,7 +120,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// reactiveAvoidance(world, result, currentTask);
 		// collisionGraph[v0].fill(result);
 		evaluateNode(v0,collisionGraph, currentTask, world);
-		printf("outcome of v0 = %i\n", int(collisionGraph[v0].outcome));
+		printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
 		switch (graphConstruction){
@@ -444,7 +444,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			g[v].outcome = simResult::crashed;
 		}
 		applyTransitionMatrix(g, v, s.direction, er.ended);
-		printf("options = %i\n", g[v].options);
+		printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
