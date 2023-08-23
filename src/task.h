@@ -238,8 +238,6 @@ std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.0
 
 float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
 
-int motorStep(Action, EndCriteria);
-
 };
 
 #endif
