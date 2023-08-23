@@ -1000,6 +1000,7 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 
 void Configurator::trackTaskExecution(Task & t){
 	if (t.endCriteria.hasEnd()){
+		printf("task in %i has end\n", iteration);
 		if (t.step>0){
 			t.step--;
 		}
@@ -1040,6 +1041,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 	}
 	else{
 		currentTask = Task(n.disturbance, DEFAULT); //reactive
+		printf("changed to reactive")
 	}
 	currentTask.step = motorStep(currentTask.getAction(), currentTask.endCriteria);
 
