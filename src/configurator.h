@@ -358,6 +358,8 @@ void changeTask(bool, Sequence&, Node);
 
 int motorStep(Task::Action, EndCriteria);
 
+int motorStep(Task::Action a);
+
 };
 
 

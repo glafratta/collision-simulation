@@ -1034,7 +1034,7 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 	return result;
 }
 
-int Configurator::motorStep(Task::Action a, EndCriteria ec){
+int Configurator::motorStep(Task::Action a){
 	int result=0;
 	if (a.getOmega()!=0){
 		result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
