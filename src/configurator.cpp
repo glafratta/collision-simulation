@@ -78,6 +78,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
+	printf("bodies = %i", world.GetBodyList());
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
@@ -442,6 +443,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			g[v].outcome = simResult::crashed;
 		}
 		applyTransitionMatrix(g, v, s.direction, er.ended);
+		printf("options = %i\n", g[v].options);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
