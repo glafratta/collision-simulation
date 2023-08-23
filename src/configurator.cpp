@@ -141,6 +141,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				break;
 			}
 			case SIMPLE_TREE:{
+				printf("simple\n");
 				DFIDBuildTree_2(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
@@ -148,10 +149,11 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				break;
 		}
 		plan = getCleanSequence(collisionGraph, bestLeaf);
+		printf("plan:");
+		printPlan(plan);
 	}
 	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-	printf("plan:");
-	printPlan(plan);
+
 
 	// if (collisionGraph[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
 	// 	if (!plan.empty()){
@@ -403,9 +405,9 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	vertexDescriptor v1 =v;
 	do{		
 		v=bestNext;
-		// if (!(g[v].filled)){ //for the first vertex
-		// 	evaluateNode(v, g, s, w);			
-		// }
+		if (!(g[v].filled)){ //for the first vertex
+			evaluateNode(v, g, s, w);			
+		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -431,9 +433,9 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 		do{	
 		std::vector <vertexDescriptor> frontier;	
 		v=bestNext;
-		// if (!(g[v].filled)){ //for the first vertex
-		// 	evaluateNode(v, g, s, w);			
-		// }
+		if (!(g[v].filled)){ //for the first vertex
+			evaluateNode(v, g, s, w);			
+		}
 		EndedResult er = findError(v, g, s.direction);
 		if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
 			g[v].endPose = s.start;
