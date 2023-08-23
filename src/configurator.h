@@ -226,11 +226,16 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		float boxLength; 
 		if (!discrete){
 			boxLength=BOX2DRANGE;	
-			printf("using box2d range = %f", boxLength);
+			if (NULL!= curr){
+
+				printf("\nusing box2d range = %f, current size = %i\n", boxLength, currentBox2D.size());
+			}
 		}
 		else{
 			boxLength = DISCRETE_RANGE;
-			printf("using discrete range");
+			if (NULL!=curr){
+				printf("\nusing discrete range\n");
+			}
 		}
 		Point positionVector, radiusVector, maxFromStart; 
 		if(d==BACK){
@@ -256,40 +261,40 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
 		bottom = bounds[0];
 		top = bounds[3];
-		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
-			//FIND PARAMETERS OF THE LINES CONNECTING THE a
-			mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
-			mPerp = -1/mHead;
-			qBottomH = bottom.y - mHead*bottom.x;
-			qTopH = top.y - mHead*top.x;
-			qBottomP = bottom.y -mPerp*bottom.x;
-			qTopP = top.y - mPerp*top.x;
-		}
-		else{
-			ceilingY = std::max(top.y, bottom.y); 
-			floorY = std::min(top.y, bottom.y); 
-			frontX = std::min(top.x, bottom.x);
-			backX = std::max(top.x, bottom.x);
-		}
-		//CREATE POINTS
-		for (auto p:currentBox2D){
-			bool include;
-			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
-				ceilingY = mHead*p.x +qTopH;
-				floorY = mHead*p.x+qBottomH;
-				float frontY= mPerp*p.x+qBottomP;
-				float backY = mPerp*p.x+qTopP;
-				//include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
-				include = p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY;
+			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
+				//FIND PARAMETERS OF THE LINES CONNECTING THE a
+				mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
+				mPerp = -1/mHead;
+				qBottomH = bottom.y - mHead*bottom.x;
+				qTopH = top.y - mHead*top.x;
+				qBottomP = bottom.y -mPerp*bottom.x;
+				qTopP = top.y - mPerp*top.x;
 			}
 			else{
-				include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
+				ceilingY = std::max(top.y, bottom.y); 
+				floorY = std::min(top.y, bottom.y); 
+				frontX = std::min(top.x, bottom.x);
+				backX = std::max(top.x, bottom.x);
 			}
-			if (include){
-				makeBody(world, p);
+			//CREATE POINTS
+			for (auto p:currentBox2D){
+				bool include;
+				if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
+					ceilingY = mHead*p.x +qTopH;
+					floorY = mHead*p.x+qBottomH;
+					float frontY= mPerp*p.x+qBottomP;
+					float backY = mPerp*p.x+qTopP;
+					//include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
+					include = p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY;
+				}
+				else{
+					include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
+				}
+				if (include){
+					makeBody(world, p);
+				}
+				checkDisturbance(p, obStillThere, curr);
 			}
-			checkDisturbance(p, obStillThere, curr);
-		}
 		}
 		else{ //IF DIRECTION IS LEFT OR RIGHT 
 		for (auto p:currentBox2D){
