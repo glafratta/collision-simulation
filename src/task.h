@@ -172,14 +172,14 @@ void setErrorWeights();
 EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
 EndedResult checkEnded(Node);
-Task()=default;
+//Task()=default;
 
-// Task(){
-//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-//     direction = DEFAULT;
-//     action.init(direction);
-//     //RecordedVelocity = action.getLinearVelocity();
-// }
+Task(){
+    start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+    direction = DEFAULT;
+    action.init(direction);
+    //RecordedVelocity = action.getLinearVelocity();
+}
 
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
     start = _start;
