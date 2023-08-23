@@ -1007,6 +1007,19 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 	return result;
 }
 
+int Configurator::motorStep(Task::Action a, EndCriteria ec){
+	int result=0, angleResult=0, distanceResult=0;
+	if (ec.angle.isValid()){
+		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
+	}
+	if (ec.distance.isValid()){
+		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
+	} 
+	result =std::max(angleResult, distanceResult);
+	printf("task has %i steps", result);
+	return result;
+}
+
 void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!b){
 		return;
@@ -1018,6 +1031,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 	else{
 		currentTask = Task(n.disturbance, DEFAULT); //reactive
 	}
+	currentTask.step = motorStep(currentTask.getAction(), currentTask.endCriteria);
 
 }
 

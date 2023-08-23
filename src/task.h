@@ -178,7 +178,7 @@ Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
-    step = motorStep(action, endCriteria);
+   // step = motorStep(action, endCriteria);
     //RecordedVelocity = action.getLinearVelocity();
 }
 
@@ -190,7 +190,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     action.init(direction);
     //RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
-    step = motorStep(action, endCriteria);
+    //step = motorStep(action, endCriteria);
 }
 
 void init(){

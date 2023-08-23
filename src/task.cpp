@@ -355,16 +355,3 @@ float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
 	float slope = (v2.y- v1.y)/(v2.x - v1.x);
 	return atan(slope);
 }
-
-int Task::motorStep(Action a, EndCriteria ec){
-	int result=0, angleResult=0, distanceResult=0;
-	if (endCriteria.angle.isValid()){
-		angleResult = endCriteria.angle.get()/(MOTOR_CALLBACK * a.getOmega());
-	}
-	if (endCriteria.distance.isValid()){
-		distanceResult = endCriteria.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
-	} 
-	result =std::max(angleResult, distanceResult);
-	printf("task has %i steps", result);
-	return result;
-}
