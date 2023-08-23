@@ -365,5 +365,6 @@ int Task::motorStep(Action a, EndCriteria ec){
 		distanceResult = endCriteria.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
 	} 
 	result =std::max(angleResult, distanceResult);
+	printf("task has %i steps", result);
 	return result;
 }
