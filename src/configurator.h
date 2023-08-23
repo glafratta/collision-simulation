@@ -219,7 +219,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	}
 	const float halfWindowWidth = .1;
 	//printf("constructing\n");
-	if ((d!=LEFT && d!=RIGHT)){ //IF THE ROBOT IS NOT TURNING
+	if ((d==DEFAULT || d==BACK)){ //IF THE ROBOT IS NOT TURNING
 		printf("direction is not turning\n");
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
