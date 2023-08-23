@@ -55,7 +55,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 
 	//CREATE BOX2D ENVIRONMENT
-	b2World world = b2World({0.0f,0.0f});
+	b2Vec2 gravity = {0.0, 0.0};
+	b2World world(gravity);
 	char name[256];
 
 	//CALCULATE VELOCITY 
