@@ -114,12 +114,13 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (!planning){
-		printf("reacting\n");
-		reactiveAvoidance(world, result, currentTask);
-		collisionGraph[v0].fill(result);
-	}	
-	else if (planBuild !=STATIC || plan.empty()){ 
+	//if (!planning){
+		printf("evaluating current task\n");
+		// reactiveAvoidance(world, result, currentTask);
+		// collisionGraph[v0].fill(result);
+		evaluateNode(v0,collisionGraph, currentTask, world);
+	//}	
+	if (planning & (g[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
@@ -370,7 +371,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		v= v1;
 		//evaluate
 		int ct = w.GetBodyCount();
-		evaluateNode(v, g,s, w);
+		if (!g[v].filled){
+			evaluateNode(v, g,s, w);
+		}
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		// if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
 		if (betterThanLeaves(g, v, _leaves, er, dir) ){
@@ -400,9 +403,9 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 	vertexDescriptor v1 =v;
 	do{		
 		v=bestNext;
-		if (!(g[v].filled)){ //for the first vertex
-			evaluateNode(v, g, s, w);			
-		}
+		// if (!(g[v].filled)){ //for the first vertex
+		// 	evaluateNode(v, g, s, w);			
+		// }
 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 		applyTransitionMatrix(g, v, s.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -428,9 +431,9 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 		do{	
 		std::vector <vertexDescriptor> frontier;	
 		v=bestNext;
-		if (!(g[v].filled)){ //for the first vertex
-			evaluateNode(v, g, s, w);			
-		}
+		// if (!(g[v].filled)){ //for the first vertex
+		// 	evaluateNode(v, g, s, w);			
+		// }
 		EndedResult er = findError(v, g, s.direction);
 		if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
 			g[v].endPose = s.start;
@@ -466,7 +469,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
 	bool end=0, added =0;
 	bool discrete =0;
-	evaluateNode(priorityQueue[0], g, s, w);		
+//	evaluateNode(priorityQueue[0], g, s, w);		
 	do {
 		v= priorityQueue[0];
 		priorityQueue.erase(priorityQueue.begin());
