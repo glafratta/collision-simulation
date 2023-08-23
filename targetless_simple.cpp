@@ -114,7 +114,7 @@ void step( AlphaBot &motors){
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
-    Task controlGoal;
+    Task controlGoal(Disturbance(), DEFAULT);
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
