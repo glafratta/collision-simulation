@@ -116,10 +116,11 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
 	//if (!planning){
-		printf("evaluating current task\n");
+		//printf("evaluating current task\n");
 		// reactiveAvoidance(world, result, currentTask);
 		// collisionGraph[v0].fill(result);
 		evaluateNode(v0,collisionGraph, currentTask, world);
+		printf("outcome of v0 = %i\n", int(collisionGraph[v0].outcome));
 	//}	
 	if (planning & (collisionGraph[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
 		switch (graphConstruction){
