@@ -220,6 +220,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 	const float halfWindowWidth = .1;
 	//printf("constructing\n");
 	if ((d!=LEFT && d!=RIGHT)){ //IF THE ROBOT IS NOT TURNING
+		printf("direction is not turning\n");
 		std::vector <Point> bounds;
 		float qBottomH, qTopH, qBottomP, qTopP, mHead, mPerp;
 		float ceilingY, floorY, frontX, backX;
@@ -227,7 +228,6 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		if (!discrete){
 			boxLength=BOX2DRANGE;	
 			if (NULL!= curr){
-
 				printf("\nusing box2d range = %f, current size = %i\n", boxLength, currentBox2D.size());
 			}
 		}
@@ -295,8 +295,9 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 				}
 				checkDisturbance(p, obStillThere, curr);
 			}
-		}
-		else{ //IF DIRECTION IS LEFT OR RIGHT 
+	}
+	else{ //IF DIRECTION IS LEFT OR RIGHT 
+	printf("direction is turning\n");
 		for (auto p:currentBox2D){
 			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				makeBody(world, p);
@@ -304,6 +305,7 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 			checkDisturbance(p, obStillThere, curr);
 		}
 	}
+
 	//DEBUG
 	FILE *f;
 	if (debugOn){
