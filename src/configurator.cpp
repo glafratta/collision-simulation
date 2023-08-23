@@ -162,6 +162,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	// }
 	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	printf("change task cause it fails = %i\n", currentTask.change);
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
 	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
