@@ -1035,7 +1035,7 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 
 void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!b){
-		printf("do not change\n")
+		printf("do not change\n");
 		return;
 	}
 	if (!p.empty()){
