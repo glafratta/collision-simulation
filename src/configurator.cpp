@@ -1009,6 +1009,7 @@ void Configurator::trackTaskExecution(Task & t){
 			printf("task set to change\n");
 		}
 	}
+	printf("task has no end, change =%i\n", t.change);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1034,6 +1035,7 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 
 void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!b){
+		printf("do not change\n")
 		return;
 	}
 	if (!p.empty()){
@@ -1046,6 +1048,6 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		printf("changed to reactive\n");
 	}
 	currentTask.step = motorStep(currentTask.getAction(), currentTask.endCriteria);
-
+	printf("set step\n");
 }
 
