@@ -69,7 +69,7 @@ public:
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
-	motorStep(currentTask.getAction(), currentTask.endCriteria);
+	motorStep(currentTask.getAction());
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	totalTime =0.0f;
 }

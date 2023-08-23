@@ -1056,7 +1056,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		currentTask = Task(n.disturbance, DEFAULT); //reactive
 		printf("changed to reactive\n");
 	}
-	currentTask.step = motorStep(currentTask.getAction(), currentTask.endCriteria);
+	currentTask.step = motorStep(currentTask.getAction());
 	printf("set step\n");
 }
 
