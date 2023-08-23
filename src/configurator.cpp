@@ -356,12 +356,13 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
-	//std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(result.collision.getPosition());
-	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition());
-	if (orientation.first){
-		// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
-		result.collision.setOrientation(orientation.second);
-	}
+//	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition());
+
+	// if (orientation.first){
+	// 	// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
+	// 	result.collision.setOrientation(orientation.second);
+	// }
+	result.collision.setOrientation(atan(g[v].endPose.q.c/g[v].endPose.q.s)); //90 deg turn
 	g[v].fill(result);	
 	}
 
@@ -1030,6 +1031,14 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 	} 
 	result =std::max(angleResult, distanceResult);
 	printf("task has %i steps\n", result);
+	return result;
+}
+
+int Configurator::motorStep(Task::Action a, EndCriteria ec){
+	int result=0;
+	if (a.getOmega()!=0){
+		result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
+	}
 	return result;
 }
 
