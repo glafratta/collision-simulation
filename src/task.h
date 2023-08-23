@@ -19,7 +19,7 @@ public:
     bool change =0;
     float pGain=0.063;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
-    Direction direction;
+    Direction direction= DEFAULT;
     bool discrete=0;
     int step=0;
 protected:

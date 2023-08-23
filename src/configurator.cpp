@@ -1006,6 +1006,7 @@ void Configurator::trackTaskExecution(Task & t){
 		}
 		else{
 			t.change=1;
+			printf("task set to change\n");
 		}
 	}
 }
@@ -1027,7 +1028,7 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
 	} 
 	result =std::max(angleResult, distanceResult);
-	printf("task has %i steps", result);
+	printf("task has %i steps\n", result);
 	return result;
 }
 
@@ -1038,10 +1039,11 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!p.empty()){
 		currentTask = Task(p[0].first, p[0].second);
 		p.erase(p.begin());
+		printf("canged to next in plan\n");
 	}
 	else{
 		currentTask = Task(n.disturbance, DEFAULT); //reactive
-		printf("changed to reactive");
+		printf("changed to reactive\n");
 	}
 	currentTask.step = motorStep(currentTask.getAction(), currentTask.endCriteria);
 
