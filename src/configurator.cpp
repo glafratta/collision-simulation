@@ -120,7 +120,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// collisionGraph[v0].fill(result);
 		evaluateNode(v0,collisionGraph, currentTask, world);
 	//}	
-	if (planning & (g[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
+	if (planning & (collisionGraph[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
