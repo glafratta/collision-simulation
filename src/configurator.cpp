@@ -1062,6 +1062,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 	}
 	if (planning){
 		if (plan.empty()){
+			currentTask.change=1;
 			return;
 		}
 		currentTask = Task(p[0].first, p[0].second);
