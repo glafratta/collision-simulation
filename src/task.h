@@ -215,6 +215,7 @@ void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0
     action.init(direction);
    // RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
+    step = action.motorStep();
 }
 
 void setRecordedVelocity(b2Vec2 vel){
