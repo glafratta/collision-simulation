@@ -121,7 +121,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("evaluating current task\n");
 		// reactiveAvoidance(world, result, currentTask);
 		// collisionGraph[v0].fill(result);
-		evaluateNode(v0,collisionGraph, currentTask, world);
+		result = evaluateNode(v0,collisionGraph, currentTask, world);
+		
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome !=simResult::successful || planBuild!=STATIC || plan.empty())){ 
@@ -320,7 +321,7 @@ void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //
 }
 
 
-void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
+simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -368,6 +369,7 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 	// }
 	result.collision.setOrientation(atan(g[v].endPose.q.c/g[v].endPose.q.s)); //90 deg turn
 	g[v].fill(result);	
+	return result;
 	}
 
 
