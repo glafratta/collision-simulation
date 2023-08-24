@@ -1057,13 +1057,16 @@ int Configurator::motorStep(Task::Action a){
 
 
 void Configurator::changeTask(bool b, Sequence & p, Node n){
+	if (currentTask.direction !=DEFAULT & currentTask.step==0){
+		b=1;
+	}
 	if (!b){
 		//printf("do not change\n");
 		return;
 	}
 	if (planning){
 		if (plan.empty()){
-			currentTask = controlGoal;
+			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].first, p[0].second);
