@@ -130,7 +130,7 @@ public:
         if (getOmega()!=0){
            result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
         }
-	    return abs(result)*FRICTION_DAMPENING;
+	    return abs(result);
     }
 };
 
