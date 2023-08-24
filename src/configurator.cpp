@@ -1009,6 +1009,7 @@ void Configurator::trackTaskExecution(Task & t){
 		}
 		if(t.step==0){
 			t.change=1;
+			printf("change task cause it ends = %i\n", t.change);
 			//printf("task set to change\n");
 		}
 	}
