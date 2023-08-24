@@ -1046,7 +1046,7 @@ int Configurator::motorStep(Task::Action a){
            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
         }
         printf("number of steps at creation = %i\n", abs(result));
-	    return abs(result);
+	    return abs(result)*FRICTION_DAMPENING;
     }
 
 
