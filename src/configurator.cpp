@@ -167,13 +167,13 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	// 	}
 
 	// }
-	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	currentTask.change = result.resultCode==simResult::crashed;
 	if (currentTask.change){
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		printf("plan:");
 		printPlan(plan);
 	}
-	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
+	printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(result.resultCode), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
 	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
