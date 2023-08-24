@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = SIMPLE;
+	configurator.graphConstruction = SIMPLE_TREE;
 	configurator.setBenchmarking(1);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
