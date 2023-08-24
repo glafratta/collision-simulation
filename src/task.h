@@ -125,14 +125,6 @@ public:
         return recordedOmega;
     }
     //friend class Configurator;
-    int motorStep(){
-	    int result=0;
-        if (getOmega()!=0){
-           result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
-        }
-        printf("number of steps at creation = %i\n", abs(result));
-	    return abs(result);
-    }
 };
 
 
@@ -198,15 +190,15 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     action.init(direction);
     //RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
-    step = action.motorStep();
-    printf("step =%i\n", step);
+   // step = action.motorStep();
+    //printf("step =%i\n", step);
 }
 
 void init(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
-    printf("default init \n");
+   // printf("default init \n");
    // RecordedVelocity = action.getLinearVelocity();
 }
 
@@ -218,8 +210,8 @@ void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0
     action.init(direction);
    // RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
-    step = action.motorStep();
-    printf("step =%i\n", step);
+   // step = action.motorStep();
+   // printf("step =%i\n", step);
 
 }
 
