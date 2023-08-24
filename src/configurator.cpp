@@ -1012,7 +1012,7 @@ void Configurator::trackTaskExecution(Task & t){
 			//printf("task set to change\n");
 		}
 	}
-	//printf("task has no end, change =%i\n", t.change);
+	printf("task has no end, change =%i, step =%i\n", t.change, t.step);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
