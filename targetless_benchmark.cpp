@@ -125,9 +125,10 @@ int main(int argc, char** argv) {
 	}
 	if (argc>3){
 		box2drange = atof(argv[3]);
+		printf("received %f\n", box2drange);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
-	printf("box2drange = %f", BOX2DRANGE);
+	printf("box2drange = %f\n", box2drange);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);
