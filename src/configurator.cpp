@@ -121,7 +121,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("evaluating current task\n");
 		// reactiveAvoidance(world, result, currentTask);
 		// collisionGraph[v0].fill(result);
-		evaluateNode(v0,collisionGraph, currentTask, world);
+		result = evaluateNode(v0,collisionGraph, currentTask, world);
+		
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome !=simResult::successful || planBuild!=STATIC || plan.empty())){ 
@@ -167,13 +168,13 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	// 	}
 
 	// }
-	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	currentTask.change = result.resultCode==simResult::crashed;
 	if (currentTask.change){
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		printf("plan:");
 		printPlan(plan);
 	}
-	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
+	printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(result.resultCode), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
 	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
@@ -320,7 +321,7 @@ void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //
 }
 
 
-void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
+simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
 	edgeDescriptor inEdge;
 	vertexDescriptor srcVertex=v; //default
@@ -368,6 +369,7 @@ void Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task  s, b
 	// }
 	result.collision.setOrientation(atan(g[v].endPose.q.c/g[v].endPose.q.s)); //90 deg turn
 	g[v].fill(result);	
+	return result;
 	}
 
 
