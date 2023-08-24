@@ -1060,7 +1060,10 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		//printf("do not change\n");
 		return;
 	}
-	if (!p.empty()){
+	if (planning){
+		if (plan.empty()){
+			return;
+		}
 		currentTask = Task(p[0].first, p[0].second);
 		p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
