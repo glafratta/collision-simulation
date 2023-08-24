@@ -125,6 +125,13 @@ public:
         return recordedOmega;
     }
     //friend class Configurator;
+    int motorStep(){
+	    int result=0;
+        if (getOmega()!=0){
+            result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
+        }
+	    return result;
+    }
 };
 
 
@@ -189,6 +196,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     action.init(direction);
     //RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
+    step = action.motorStep();
 }
 
 void init(){

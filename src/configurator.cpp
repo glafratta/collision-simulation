@@ -1036,13 +1036,7 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 	return result;
 }
 
-int Configurator::motorStep(Task::Action a){
-	int result=0;
-	if (a.getOmega()!=0){
-		result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-	}
-	return result;
-}
+
 
 void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!b){
@@ -1058,7 +1052,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		currentTask = Task(n.disturbance, DEFAULT); //reactive
 		printf("changed to reactive\n");
 	}
-	currentTask.step = motorStep(currentTask.getAction());
+	//currentTask.step = motorStep(currentTask.getAction());
 	//printf("set step\n");
 }
 
