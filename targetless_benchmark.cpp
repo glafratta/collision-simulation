@@ -116,11 +116,15 @@ int main(int argc, char** argv) {
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = SIMPLE_TREE;
 	configurator.setBenchmarking(1);
+	float box2drange=BOX2DRANGE;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
+	}
+	if (argc>3){
+		box2drange = atof(argv[3]);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	printf("box2drange = %f", BOX2DRANGE);
