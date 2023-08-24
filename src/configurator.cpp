@@ -125,6 +125,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
+		printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
@@ -1013,7 +1014,7 @@ void Configurator::trackTaskExecution(Task & t){
 			//printf("task set to change\n");
 		}
 	}
-	printf("task has no end, change =%i, step =%i\n", t.change, t.step);
+	printf("change =%i, step =%i\n", t.change, t.step);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
