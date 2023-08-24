@@ -186,6 +186,7 @@ Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
+    printf("default constructro\n");
     //RecordedVelocity = action.getLinearVelocity();
 }
 
@@ -205,6 +206,7 @@ void init(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
+    printf("default init \n");
    // RecordedVelocity = action.getLinearVelocity();
 }
 
