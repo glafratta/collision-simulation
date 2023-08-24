@@ -40,7 +40,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		fclose(f);
 		printf("planfile = robot%04i.txt\n", iteration);
 	}
-	printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
+	//printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
@@ -78,9 +78,9 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
-	printf("currentTask direction =%i\n", int(currentTask.direction));
+	//printf("currentTask direction =%i\n", int(currentTask.direction));
 	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	printf("bodies = %i\n", bodies);
+	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
@@ -88,7 +88,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask= Task(Disturbance(), STOP);
 		return;
 	}
-	printf("obstill there = %i\n", isObstacleStillThere);
+	//printf("obstill there = %i\n", isObstacleStillThere);
 	// if(tempEnded.ended|| !isObstacleStillThere){
 	// 	if (!plan.empty()){
 	// 		currentTask = Task(plan[0].first, plan[0].second);
@@ -114,7 +114,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	//printf("set velocity and created empty graph\n");
-	printf("planning =%i\n", planning);
+	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
 	//if (!planning){
@@ -122,7 +122,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// reactiveAvoidance(world, result, currentTask);
 		// collisionGraph[v0].fill(result);
 		evaluateNode(v0,collisionGraph, currentTask, world);
-		printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
+		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome != simResult::successful || planBuild!=STATIC || plan.empty())){ 
 		switch (graphConstruction){
@@ -190,7 +190,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	if (isSameTask){
 		currentTask.controller();
-		printf("applied controller: wheel speeds: L=%f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
+		//printf("applied controller: wheel speeds: L=%f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 	}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
@@ -399,9 +399,9 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
 		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
-		if (benchmark){
-			printf("bodies in construct= %i\n", w.GetBodyCount());
-		}
+		// if (benchmark){
+		// 	printf("bodies in construct= %i\n", w.GetBodyCount());
+		// }
 	}while (v1!= v);
 	//return !g[0].disturbance.safeForNow;
 }
@@ -447,7 +447,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			g[v].outcome = simResult::crashed;
 		}
 		applyTransitionMatrix(g, v, s.direction, er.ended);
-		printf("options = %i\n", g[v].options.size());
+		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
@@ -1002,17 +1002,17 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 
 void Configurator::trackTaskExecution(Task & t){
 	if (t.endCriteria.hasEnd()){
-		printf("task in %i has end\n", iteration);
+		//printf("task in %i has end\n", iteration);
 		if (t.step>0){
 			t.step--;
 			printf("step =%i\n", t.step);
 		}
 		if(t.step==0){
 			t.change=1;
-			printf("task set to change\n");
+			//printf("task set to change\n");
 		}
 	}
-	printf("task has no end, change =%i\n", t.change);
+	//printf("task has no end, change =%i\n", t.change);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1046,7 +1046,7 @@ int Configurator::motorStep(Task::Action a){
 
 void Configurator::changeTask(bool b, Sequence & p, Node n){
 	if (!b){
-		printf("do not change\n");
+		//printf("do not change\n");
 		return;
 	}
 	if (!p.empty()){
@@ -1059,6 +1059,6 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		printf("changed to reactive\n");
 	}
 	currentTask.step = motorStep(currentTask.getAction());
-	printf("set step\n");
+	//printf("set step\n");
 }
 
