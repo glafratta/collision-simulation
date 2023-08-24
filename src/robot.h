@@ -23,7 +23,7 @@
 #define BOX2DRANGE 0.5
 #define LIDAR_RANGE 1.1
 #define REACTION_TIME 1.0
-#define HZ 50.0
+#define HZ 60.0
 #define MAX_ANGLE_ERROR M_PI
 #define MAX_DISTANCE_ERROR BOX2DRANGE
 const float DISCRETE_RANGE =ROBOT_HALFLENGTH*2; //22 cm, as in Ulrich (2000)
