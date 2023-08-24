@@ -61,7 +61,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//CALCULATE VELOCITY 
 	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
-	DeltaPose deltaPose= GetRealVelocity(current, previous);
+	//DeltaPose deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
+	DeltaPose deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
 	if (currentTask.direction ==DEFAULT){
 		//currentTask.action.setOmega(deltaPose.q.GetAngle()); //NO SETTING ANGLE
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
@@ -1004,8 +1005,9 @@ void Configurator::trackTaskExecution(Task & t){
 		printf("task in %i has end\n", iteration);
 		if (t.step>0){
 			t.step--;
+			printf("step =%i\n", t.step);
 		}
-		else{
+		if(t.step==0){
 			t.change=1;
 			printf("task set to change\n");
 		}
