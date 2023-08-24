@@ -154,6 +154,9 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			default:
 				break;
 		}
+		plan = getCleanSequence(collisionGraph, bestLeaf);
+		printf("plan:");
+		printPlan(plan);
 	}
 	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 
@@ -169,11 +172,9 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	// }
 	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
-	if (currentTask.change){
-		plan = getCleanSequence(collisionGraph, bestLeaf);
-		printf("plan:");
-		printPlan(plan);
-	}
+	//if (currentTask.change){
+
+	//}
 	printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(collisionGraph[v0].outcome), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
 	printf("action: recLInSpeed = %f, recOmega= %f, direction = %i\n", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega(), int(currentTask.direction));
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
