@@ -175,7 +175,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printPlan(plan);
 	}
 	printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(collisionGraph[v0].outcome), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
-	printf("action: recLInSpeed = %f, recOmega= %f", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega());
+	printf("action: recLInSpeed = %f, recOmega= %f, direction = %i\n", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega(), int(currentTask.direction));
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
 	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
