@@ -128,9 +128,9 @@ public:
     int motorStep(){
 	    int result=0;
         if (getOmega()!=0){
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
+           result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
         }
-	    return abs(result);
+	    return abs(result)*FRICTION_DAMPENING;
     }
 };
 
@@ -244,7 +244,6 @@ std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.0
 
 float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
 
-int motorStep(Action, EndCriteria);
 };
 
 #endif
