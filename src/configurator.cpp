@@ -125,8 +125,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
+	printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
 	if (planning & (collisionGraph[v0].outcome !=simResult::successful || planBuild!=STATIC || plan.empty())){ 
-		printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
@@ -1062,7 +1062,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 	}
 	if (planning){
 		if (plan.empty()){
-			currentTask.change=1;
+
 			return;
 		}
 		currentTask = Task(p[0].first, p[0].second);
