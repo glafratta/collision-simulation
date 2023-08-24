@@ -128,9 +128,9 @@ public:
     int motorStep(){
 	    int result=0;
         if (getOmega()!=0){
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * abs(getOmega()));
+            result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
         }
-	    return result;
+	    return abs(result);
     }
 };
 
