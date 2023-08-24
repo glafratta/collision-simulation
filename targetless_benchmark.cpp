@@ -123,6 +123,7 @@ int main(int argc, char** argv) {
 		configurator.planning= atoi(argv[2]);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
+	printf("box2drange = %f", BOX2DRANGE);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);
