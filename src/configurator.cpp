@@ -125,7 +125,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	if (planning & (collisionGraph[v0].outcome !=simResult::successful || planBuild!=STATIC || plan.empty())){ 
-		printf("planning = %i, collisionGraph[v0],outcome is success =%i, planbuild.dynamic = %i, plan.empty= %i", planning, collisionGraph[v0].outcome !=simResult::successful, planBuild!=STATIC, plan.empty() );
+		printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
@@ -153,9 +153,6 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			default:
 				break;
 		}
-		plan = getCleanSequence(collisionGraph, bestLeaf);
-		printf("plan:");
-		printPlan(plan);
 	}
 	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
 
@@ -171,6 +168,11 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	// }
 	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	if (currentTask.change){
+		plan = getCleanSequence(collisionGraph, bestLeaf);
+		printf("plan:");
+		printPlan(plan);
+	}
 	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
 	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
