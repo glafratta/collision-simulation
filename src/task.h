@@ -198,6 +198,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     //RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
     step = action.motorStep();
+    printf("step =%i\n", step);
 }
 
 void init(){
@@ -216,6 +217,8 @@ void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0
    // RecordedVelocity = action.getLinearVelocity();
     setEndCriteria();
     step = action.motorStep();
+    printf("step =%i\n", step);
+
 }
 
 void setRecordedVelocity(b2Vec2 vel){
