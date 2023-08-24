@@ -130,6 +130,7 @@ public:
         if (getOmega()!=0){
            result = SAFE_ANGLE/(MOTOR_CALLBACK * getOmega());
         }
+        printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
     }
 };
