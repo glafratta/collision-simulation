@@ -116,7 +116,6 @@ int main(int argc, char** argv) {
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = SIMPLE_TREE;
 	configurator.setBenchmarking(1);
-	float box2drange=BOX2DRANGE;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 	}
@@ -124,7 +123,7 @@ int main(int argc, char** argv) {
 		configurator.planning= atoi(argv[2]);
 	}
 	if (argc>3){
-		box2drange = atof(argv[3]);
+		BOX2DRANGE = atof(argv[3]);
 		printf("received %f\n", box2drange);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
