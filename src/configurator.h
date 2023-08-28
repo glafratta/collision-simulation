@@ -11,8 +11,9 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-#include "task.h"
+//#include "task.h"
 //#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
+#include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
 
@@ -262,48 +263,50 @@ bool constructWorldRepresentation(b2World & world, Direction d, b2Transform star
 		std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
 		bottom = bounds[0];
 		top = bounds[3];
-			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
-				//FIND PARAMETERS OF THE LINES CONNECTING THE a
-				mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
-				mPerp = -1/mHead;
-				qBottomH = bottom.y - mHead*bottom.x;
-				qTopH = top.y - mHead*top.x;
-				qBottomP = bottom.y -mPerp*bottom.x;
-				qTopP = top.y - mPerp*top.x;
+		if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
+			//FIND PARAMETERS OF THE LINES CONNECTING THE a
+			mHead = sin(start.q.GetAngle())/cos(start.q.GetAngle()); //slope of heading direction
+			mPerp = -1/mHead;
+			qBottomH = bottom.y - mHead*bottom.x;
+			qTopH = top.y - mHead*top.x;
+			qBottomP = bottom.y -mPerp*bottom.x;
+			qTopP = top.y - mPerp*top.x;
+		}
+		else{
+			ceilingY = std::max(top.y, bottom.y); 
+			floorY = std::min(top.y, bottom.y); 
+			frontX = std::min(top.x, bottom.x);
+			backX = std::max(top.x, bottom.x);
+		}
+		//CREATE POINTS
+		for (auto p:currentBox2D){
+			bool include;
+			if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
+				ceilingY = mHead*p.x +qTopH;
+				floorY = mHead*p.x+qBottomH;
+				float frontY= mPerp*p.x+qBottomP;
+				float backY = mPerp*p.x+qTopP;
+				//include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
+				include = p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY;
 			}
 			else{
-				ceilingY = std::max(top.y, bottom.y); 
-				floorY = std::min(top.y, bottom.y); 
-				frontX = std::min(top.x, bottom.x);
-				backX = std::max(top.x, bottom.x);
+				include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
 			}
-			//CREATE POINTS
-			for (auto p:currentBox2D){
-				bool include;
-				if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle()!=0)){
-					ceilingY = mHead*p.x +qTopH;
-					floorY = mHead*p.x+qBottomH;
-					float frontY= mPerp*p.x+qBottomP;
-					float backY = mPerp*p.x+qTopP;
-					//include = (p!= *(&p-1)&& p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY);
-					include = p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY;
-				}
-				else{
-					include = (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX);
-				}
-				if (include){
-					makeBody(world, p);
-				}
-				checkDisturbance(p, obStillThere, curr);
+			checkDisturbance(p, obStillThere, curr);
+			if (include){
+				makeBody(world, p);
 			}
+			
+		}
 	}
 	else{ //IF DIRECTION IS LEFT OR RIGHT 
 //	printf("direction is turning\n");
 		for (auto p:currentBox2D){
+			checkDisturbance(p, obStillThere, curr);
 			if (p.isInRadius(start.p, ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X)){ //y range less than 20 cm only to ensure that robot can pass + account for error
 				makeBody(world, p);
 			}
-			checkDisturbance(p, obStillThere, curr);
+			
 		}
 	}
 
