@@ -4,6 +4,7 @@ std::pair<Point, Point> WorldBuilder::bounds(Direction d, b2Transform start, flo
     float halfWindowWidth=0.1;
     std::pair <Point, Point> result;
     if (d !=DEFAULT & d!=BACK){
+        boxLength =ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X; //og 16 cm
         result.first =Point(start.p.x-boxLength, start.p.y-boxLength);
         result.first =Point(start.p.x+boxLength, start.p.y+boxLength);
     }
@@ -29,15 +30,6 @@ std::pair<Point, Point> WorldBuilder::bounds(Direction d, b2Transform start, flo
     return result;
     }
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-    std::vector <BodyFeatures> result;
-    for (Point p: points){
-        BodyFeatures feature = BodyFeatures();
-        feature.pose.p = p.getb2Vec2(); 
-        result.push_back(feature);
-    }
-    return result;
-}
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2Body * body;
@@ -117,6 +109,11 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
 }
 
 bool WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, bool discrete){
+    //sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
+    // if (iteration=0){
+    //     FILE *f = fopen(bodyFile, "w+");
+    //     fclose(f);
+    // }
     float boxLength=BOX2DRANGE;
     if (discrete){
         boxLength = DISCRETE_RANGE;
@@ -132,6 +129,14 @@ bool WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Tran
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
+	FILE *f;
+	if (debug){
+		f = fopen(bodyFile, "a+");
+		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
+			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+		}
+		fclose(f);
+	}
     return salient.second;
 }
 
@@ -144,16 +149,16 @@ void WorldBuilder::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 }
 
     
-std::vector <BodyFeatures> AlternateBuilder::processData(CoordinateContainer points){
-    int count =0;
-    std::vector <BodyFeatures> result;
-    for (Point p: points){
-        if (count%2==0){
-            BodyFeatures feature;
-            feature.pose.p = p.getb2Vec2(); 
-            result.push_back(feature);  
-        }
-        count++;
-    }
-    return result;
-}
+// std::vector <BodyFeatures> AlternateBuilder::processData(CoordinateContainer points){
+//     int count =0;
+//     std::vector <BodyFeatures> result;
+//     for (Point p: points){
+//         if (count%2==0){
+//             BodyFeatures feature;
+//             feature.pose.p = p.getb2Vec2(); 
+//             result.push_back(feature);  
+//         }
+//         count++;
+//     }
+//     return result;
+// }

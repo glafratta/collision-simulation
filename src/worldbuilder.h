@@ -23,6 +23,9 @@ class BodyFeatures{
 class WorldBuilder{
     int bodies=0;
     public:
+    int iteration=0;
+    bool debug =0;
+    char bodyFile[100];
     std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Point, Point>, Task*curr=NULL); //gets points from the raw data that are relevant to the task based on bounding boxes
 
     void makeBody(b2World&, BodyFeatures);
@@ -38,7 +41,7 @@ class WorldBuilder{
 
 };
 
-class AlternateBuilder: public WorldBuilder{
-    public:
-    std::vector <BodyFeatures> processData(CoordinateContainer); //makes every other body
-};
+// class AlternateBuilder: public WorldBuilder{
+//     public:
+//     std::vector <BodyFeatures> processData(CoordinateContainer); //makes every other body
+// };
