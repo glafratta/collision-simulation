@@ -12,7 +12,7 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
-	//printf("started spawner\n");
+	printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	//printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
 	if (data.empty()){
@@ -30,7 +30,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentBox2D.clear();
 	//printf("box2d clear\n");
 	currentBox2D = CoordinateContainer(data2fp);
-	//printf("updated coordinate vectors\n");
+	printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 
 	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
@@ -47,7 +47,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	timeElapsed=float(diff.count())/1000; //express in seconds
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
-	//printf("calculated time elapsed = %f\n", timeElapsed);
+	printf("calculated time elapsed = %f\n", timeElapsed);
 
 	if (timerOff){
 		timeElapsed = .2;
@@ -68,7 +68,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 	}
-	//printf("calculated velocity\n");
+	printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = currentTask.disturbance.isValid();
@@ -79,7 +79,8 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	//printf("currentTask direction =%i\n", int(currentTask.direction));
-	bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
+	//bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
+	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
 	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
@@ -369,7 +370,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	// 	// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
 	// 	result.collision.setOrientation(orientation.second);
 	// }
-	result.collision.setOrientation(atan(g[v].endPose.q.c/g[v].endPose.q.s)); //90 deg turn
+	result.collision.setOrientation(atan(result.endPose.q.c/result.endPose.q.s)); //90 deg turn
 	g[v].fill(result);	
 	return result;
 	}
@@ -405,7 +406,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		v1Src = v1InEdge.m_source;
 		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
-		constructWorldRepresentation(w, dir, g[v1Src].endPose); //was g[v].endPose
+		worldBuilder.buildWorld(w, currentBox2D, g[v1Src].endPose, dir); //was g[v].endPose
 		// if (benchmark){
 		// 	printf("bodies in construct= %i\n", w.GetBodyCount());
 		// }
@@ -425,7 +426,8 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			bool added = addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d, g[v].endPose);
-			constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
+			//constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			g[v1].error= controlGoal.checkEnded(g[v1].endPose).errorFloat;
 			if (bestNext==0|| g[bestNext].error >g[v1].error){ //find error
@@ -462,7 +464,8 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			added =addVertex(v0, v1, g, g[v0].disturbance); //add
 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
-			constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d, er.ended);
 			v0=v1;
@@ -496,7 +499,8 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 		added =addVertex(v0, v1, g, g[v0].disturbance); //add
 		edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 		s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
-		constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+		//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+		worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 		evaluateNode(v1, g, s, w); //find simulation result
 		applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
 		v0=v1;
@@ -784,6 +788,7 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 }
 
 void Configurator::run(Configurator * c){
+	printf("run\n");
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
@@ -796,7 +801,7 @@ void Configurator::run(Configurator * c){
 			return;
 		}
 		if (c->ci->isReady()){
-			//printf(".");
+			printf(".");
 			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
@@ -985,19 +990,19 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	return result;
 }
 
-void Configurator::makeBody(b2World&w, Point p){
-	b2Body * body;
-	b2BodyDef bodyDef;
-	b2FixtureDef fixtureDef;
-	bodyDef.type = b2_dynamicBody;
-	b2PolygonShape fixture; //giving the point the shape of a box
-	fixtureDef.shape = &fixture;
-	fixture.SetAsBox(.001f, .001f); 
-	bodyDef.position.Set(p.x, p.y); 
-	body = w.CreateBody(&bodyDef);
-	bodies++;
-	body->CreateFixture(&fixtureDef);
-}
+// void Configurator::makeBody(b2World&w, Point p){
+// 	b2Body * body;
+// 	b2BodyDef bodyDef;
+// 	b2FixtureDef fixtureDef;
+// 	bodyDef.type = b2_dynamicBody;
+// 	b2PolygonShape fixture; //giving the point the shape of a box
+// 	fixtureDef.shape = &fixture;
+// 	fixture.SetAsBox(.001f, .001f); 
+// 	bodyDef.position.Set(p.x, p.y); 
+// 	body = w.CreateBody(&bodyDef);
+// 	bodies++;
+// 	body->CreateFixture(&fixtureDef);
+// }
 
 void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 	if (NULL!=curr){ //
