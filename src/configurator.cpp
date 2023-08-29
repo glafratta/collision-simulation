@@ -337,14 +337,14 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//EVALUATE NODE()
 	simResult result; 
 	float remaining=0, range=0;
-	if (s.discrete){
+	//if (s.discrete){
 		remaining = DISCRETE_SIMDURATION;
 		range =DISCRETE_RANGE;
-	}
-	else{
-		remaining=SIM_DURATION;	
-		range = BOX2DRANGE;
-	}
+	//}
+	//else{
+	//	remaining=SIM_DURATION;	
+	//	range = BOX2DRANGE;
+	//}
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
@@ -816,12 +816,12 @@ void Configurator::run(Configurator * c){
 
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
 	switch (numberOfM){
+		Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
 		case (THREE_M):{
 				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 				if (d ==DEFAULT){
 					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
 						//in order, try the task which represents the reflex towards the goal
-						Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
 						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
 							g[vd].options.push_back(temp.direction);
 							g[vd].options.push_back(getOppositeDirection(temp.direction).second);
@@ -836,6 +836,18 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 					if (d== LEFT || d == RIGHT){
 						g[vd].options = {DEFAULT};
 					}
+					else if (d==DEFAULT){
+						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+							g[vd].options.push_back(temp.direction);
+							g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+							g[vd].options.push_back(DEFAULT);
+						}
+						else{
+							g[vd].options = {DEFAULT, LEFT, RIGHT};
+						}
+
+					}
+
 				}
 		}	
 		break;
@@ -1054,10 +1066,13 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()!=0){
-        //    result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		//    result *=FRICTION_DAMPENING;
-		result =15;
+            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
+		    result *=FRICTION_DAMPENING;
+		//result =15;
         }
+		else if (a.getLinearSpeed()>0){
+			result = DISCRETE_RANGE/(MOTOR_CALLBACK*a.getLinearSpeed());
+		}
         printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
     }
