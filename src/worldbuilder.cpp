@@ -153,7 +153,6 @@ std::vector <BodyFeatures> AlternateBuilder::processData(CoordinateContainer poi
             feature.pose.p = p.getb2Vec2(); 
             result.push_back(feature);  
         }
-
         count++;
     }
     return result;

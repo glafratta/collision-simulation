@@ -38,7 +38,7 @@ class WorldBuilder{
 
 };
 
-class AlternateBuilder:WorldBuilder{
+class AlternateBuilder: public WorldBuilder{
     public:
     std::vector <BodyFeatures> processData(CoordinateContainer); //makes every other body
 };
