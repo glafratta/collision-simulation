@@ -4,9 +4,9 @@
 
 simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
-		if (discrete & action.getOmega()==0){
-			result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
-		}
+		// if (discrete & action.getOmega()==0){
+		// 	result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
+		// }
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
@@ -46,16 +46,16 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 				// 	collision.setOrientation(orientation);
 				// }
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
-				if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
-					b2Vec2 posReadjusted;
-					posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-					posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
-					// posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
-					// posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
-					robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
-					result = simResult(simResult::resultType::safeForNow, collision);
-				}
-				else{
+				// if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
+				// 	b2Vec2 posReadjusted;
+				// 	posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
+				// 	posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
+				// 	// posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
+				// 	// posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
+				// 	robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
+				// 	result = simResult(simResult::resultType::safeForNow, collision);
+				// }
+				// else{
 					result = simResult(simResult::resultType::crashed, collision);
 					//DEBUG PRINT STATEMTNS
 // 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
@@ -64,7 +64,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 					//END DEBUG
 					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 					//result.collision.safeForNow =0;
-					}
+				//	}
 				break;
 			}
 			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
