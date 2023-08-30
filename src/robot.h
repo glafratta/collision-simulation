@@ -37,7 +37,7 @@ const float FRICTION_DAMPENING =15/18;
 										//to be at a safe distance from an obstacle in the worst
 										//case scenario, provided that the position of the obstacle
 										//refers to the centre of mass of the robot
-const int maxNodesOnSpot =3;
+const int maxNodesOnSpot =4;
 
 class Robot {
 private: 

@@ -25,6 +25,11 @@ std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points)
     return result;
 }
 
+void Configurator::buildTree(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
+
+}
+
+
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
 // CoordinateContainer coordinates = {};

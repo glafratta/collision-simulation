@@ -142,15 +142,15 @@ void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crash
 
 simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
+void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
+
 void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
-void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
+//void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-void DFIDBuildTree_2(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+void classicalAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-void Astar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
-
-// void simpleTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&);
+void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
 
 std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 

@@ -137,21 +137,21 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				bestLeaf = findBestLeaf(collisionGraph, leaves, v0);
 				break;
 			}	
-			case DEPTH_FIRST_ITDE:{
-				DFIDBuildTree(v0, collisionGraph, currentTask, world, bestLeaf);
-				break;
-			}
+			// case DEPTH_FIRST_ITDE:{
+			// 	DFIDBuildTree(v0, collisionGraph, currentTask, world, bestLeaf);
+			// 	break;
+			// }
 			case DEPTH_FIRST_ITDE_2:{
-				DFIDBuildTree_2(v0, collisionGraph, currentTask, world, bestLeaf);
+				classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			case A_STAR:{
-				Astar(v0, collisionGraph, currentTask, world, bestLeaf);
+				onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			case SIMPLE_TREE:{
 				printf("simple\n");
-				DFIDBuildTree_2(v0, collisionGraph, currentTask, world, bestLeaf);
+				classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
 			default:
@@ -337,14 +337,14 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//EVALUATE NODE()
 	simResult result; 
 	float remaining=0, range=0;
-	//if (s.discrete){
+	if (s.discrete){
 		remaining = DISCRETE_SIMDURATION;
 		range =DISCRETE_RANGE;
-	//}
-	//else{
-	//	remaining=SIM_DURATION;	
-	//	range = BOX2DRANGE;
-	//}
+	}
+	else{
+		remaining=SIM_DURATION;	
+		range = BOX2DRANGE;
+	}
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
@@ -416,47 +416,47 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//return !g[0].disturbance.safeForNow;
 }
 
-void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
-	vertexDescriptor v1 =v;
-	do{		
-		v=bestNext;
-		if (!(g[v].filled)){ //for the first vertex
-			evaluateNode(v, g, s, w);			
-		}
-		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		applyTransitionMatrix(g, v, s.direction, er.ended);
-		for (Direction d: g[v].options){ //add and evaluate all vertices
-			bool added = addVertex(v, v1, g, g[v].disturbance); //add
-			s = Task(g[v].disturbance, d, g[v].endPose);
-			worldBuilder.buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
-			//constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
-			evaluateNode(v1, g, s, w); //find simulation result
-			g[v1].error= controlGoal.checkEnded(g[v1].endPose).errorFloat;
-			if (bestNext==0|| g[bestNext].error >g[v1].error){ //find error
-				// if (bestNext.vertex!=0){
-				// 	boost::remove_vertex(bestNext.vertex, g);
-				// }
-				bestNext = v1;
-			}
-		}
-	}while(bestNext!=v); //this means that v has progressed
-}
+// void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+// 	vertexDescriptor v1 =v;
+// 	do{		
+// 		v=bestNext;
+// 		if (!(g[v].filled)){ //for the first vertex
+// 			evaluateNode(v, g, s, w);			
+// 		}
+// 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+// 		applyTransitionMatrix(g, v, s.direction, er.ended);
+// 		for (Direction d: g[v].options){ //add and evaluate all vertices
+// 			bool added = addVertex(v, v1, g, g[v].disturbance); //add
+// 			s = Task(g[v].disturbance, d, g[v].endPose);
+// 			worldBuilder.buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
+// 			//constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
+// 			evaluateNode(v1, g, s, w); //find simulation result
+// 			g[v1].error= controlGoal.checkEnded(g[v1].endPose).errorFloat;
+// 			if (bestNext==0|| g[bestNext].error >g[v1].error){ //find error
+// 				// if (bestNext.vertex!=0){
+// 				// 	boost::remove_vertex(bestNext.vertex, g);
+// 				// }
+// 				bestNext = v1;
+// 			}
+// 		}
+// 	}while(bestNext!=v); //this means that v has progressed
+// }
 
-void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	float error;
 	bool added;
-		do{	
+	do{	
 		std::vector <vertexDescriptor> frontier;	
 		v=bestNext;
 		if (!(g[v].filled)){ //for the first vertex
 			evaluateNode(v, g, s, w);			
 		}
 		EndedResult er = findError(v, g, s.direction);
-		if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
-			g[v].endPose = s.start;
-			g[v].outcome = simResult::crashed;
-		}
+		// if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
+		// 	g[v].endPose = s.start;
+		// 	g[v].outcome = simResult::crashed;
+		// }
 		applyTransitionMatrix(g, v, s.direction, er.ended);
 		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -473,16 +473,16 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
 			g[v1].error = findError(v1, g, s.direction).errorFloat;
-			if (graphConstruction ==SIMPLE_TREE & g[v1].outcome !=simResult::successful){ //calculate error and then reset
-				g[v1].endPose = g[v0].endPose;
-			}
+			// if (graphConstruction ==SIMPLE_TREE & g[v1].outcome !=simResult::successful){ //calculate error and then reset
+			// 	g[v1].endPose = g[v0].endPose;
+			// }
 			frontier.push_back(v1);
 		}
 		bestNext = findBestLeaf(g, frontier, v);
 	}while(bestNext !=v); //this means that v has progressed
 }
 
-void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+void Configurator::onDemandAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	discretized=1;
 	vertexDescriptor v1=v;
 	std::vector <vertexDescriptor> priorityQueue ={v}, evaluationQueue = {v};
