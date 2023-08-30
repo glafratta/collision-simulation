@@ -67,7 +67,7 @@ public:
 	bool discretized =0;
 	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
-	WorldBuilder *worldBuilder;
+	WorldBuilder worldBuilder;
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){

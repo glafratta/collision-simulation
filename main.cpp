@@ -11,6 +11,20 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+    int count =0;
+    std::vector <BodyFeatures> result;
+    for (Point p: points){
+        if (count%2==0){
+            BodyFeatures feature;
+            feature.pose.p = p.getb2Vec2(); 
+            result.push_back(feature);  
+        }
+        count++;
+    }
+    return result;
+}
+
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
 // CoordinateContainer coordinates = {};

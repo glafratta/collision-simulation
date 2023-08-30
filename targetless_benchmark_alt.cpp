@@ -12,11 +12,15 @@
 #define _USE_MATH_DEFINES
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+    int count =0;
     std::vector <BodyFeatures> result;
     for (Point p: points){
+        if (count%2==0){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
             result.push_back(feature);  
+        }
+        count++;
     }
     return result;
 }
@@ -70,6 +74,12 @@ public:
 		fclose(f);
 		printf("added data to lidar containers, coord = %i, coord2fp = %i\n", ci->data.size(), ci->data2fp.size());
 
+		// for (Point d:coordinates){
+		// 	ci->data.insert(d);
+		// }
+		// for (Point d:coordinates2fp){
+		// 	ci->data2fp.insert(d);
+		// }
 		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
@@ -88,7 +98,6 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
     Configurator * c;
     float L=0;
 	float R=0;
-	int countDown =0; //count still end of Task
 
 public:
 
@@ -101,21 +110,13 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	// DeltaPose deltaPose = assignDeltaPose(c->getTask()->getAction(),MOTOR_CALLBACK); //too much error
-	// c->getTask()->trackDisturbance(c->getTask()->disturbance, MOTOR_CALLBACK, deltaPose); //track disturbance of current task
-	// for (TaskSummary ts:c->plan){ //track disturbances in the plan
-	// 	c->getTask()->trackDisturbance(ts.first, MOTOR_CALLBACK, deltaPose);
-	// }
 	c->trackTaskExecution(*(c->getTask()));	
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0]);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("R=%f\tL=%f, conf iteration = %i, tree size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->treeSize);
+	printf("step: R=%f\tL=%f, conf iteration = %i, tree size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->treeSize);
     //iteration++;
 }
-
-
-
 };
 
 
@@ -123,19 +124,24 @@ void step( AlphaBot &motors){
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
-    Task controlGoal(Disturbance(), DEFAULT);
+    Task controlGoal;
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = SIMPLE_TREE;
+	configurator.setBenchmarking(1);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
-		configuratorInterface.debugOn = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
 	}
+	// if (argc>3){ 
+	// 	BOX2DRANGE = atof(argv[3]);
+	// 	//printf("received %f\n", BOX2DRANGE);
+	// }
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
+	printf("box2drange = %f\n", BOX2DRANGE);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);

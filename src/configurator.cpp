@@ -32,10 +32,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentBox2D = CoordinateContainer(data2fp);
 	printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
-	worldBuilder->iteration++;
+	worldBuilder.iteration++;
 
 	sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
-	sprintf(worldBuilder->bodyFile, "%s",bodyFile);
+	sprintf(worldBuilder.bodyFile, "%s",bodyFile);
 	FILE *f;
 	if (debugOn){
 		f = fopen(bodyFile, "w");
@@ -82,7 +82,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	//printf("currentTask direction =%i\n", int(currentTask.direction));
 	//bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
-	bool isObstacleStillThrere = worldBuilder->buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
+	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
 	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
@@ -408,7 +408,7 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 		v1Src = v1InEdge.m_source;
 		dir = g[v1InEdge].direction;
 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
-		worldBuilder->buildWorld(w, currentBox2D, g[v1Src].endPose, dir); //was g[v].endPose
+		worldBuilder.buildWorld(w, currentBox2D, g[v1Src].endPose, dir); //was g[v].endPose
 		// if (benchmark){
 		// 	printf("bodies in construct= %i\n", w.GetBodyCount());
 		// }
@@ -428,7 +428,7 @@ void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, 
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			bool added = addVertex(v, v1, g, g[v].disturbance); //add
 			s = Task(g[v].disturbance, d, g[v].endPose);
-			worldBuilder->buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
 			//constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			g[v1].error= controlGoal.checkEnded(g[v1].endPose).errorFloat;
@@ -467,7 +467,7 @@ void Configurator::DFIDBuildTree_2(vertexDescriptor v, CollisionGraph& g, Task s
 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
-			worldBuilder->buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
 			applyTransitionMatrix(g, v1, d, er.ended);
 			v0=v1;
@@ -502,7 +502,7 @@ void Configurator::Astar(vertexDescriptor v, CollisionGraph& g, Task s, b2World 
 		edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 		s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 		//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
-		worldBuilder->buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
+		worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 		evaluateNode(v1, g, s, w); //find simulation result
 		applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
 		v0=v1;
@@ -815,8 +815,8 @@ void Configurator::run(Configurator * c){
 
 
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
+	Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
 	switch (numberOfM){
-		Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
 		case (THREE_M):{
 				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
 				if (d ==DEFAULT){
