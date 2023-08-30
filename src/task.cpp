@@ -298,6 +298,10 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			r.ended = d<=endCriteria.distance & lowAngle <=a & hiAngle>=a;
 		}
 	}
+	else if (robotTransform.p.Length()>=BOX2DRANGE){
+		r.ended =true;
+
+	}
 	r.errorFloat = endCriteria.getStandardError(a,d);
 	return r;
 
@@ -307,33 +311,34 @@ EndedResult Task::checkEnded(Node n){ //check error of node compared to the pres
 	EndedResult r;
 	Angle a;
 	Distance d;
-	if (disturbance.isValid()){
-		b2Vec2 v = disturbance.getPosition() - n.endPose.p; //distance between disturbance and robot
-		if (getAffIndex()== int(InnateAffordances::AVOID)){
-			if (!disturbance.isPartOfObject()){
-				a= Angle(disturbance.getAngle(n.endPose));
-				d= Distance(v.Length());
-				r.ended= abs(a.get())>= endCriteria.angle.get() && d.get()>=endCriteria.distance.get();
-			}
-			else{
-				a = Angle(atan(n.endPose.q.s/n.endPose.q.c)-disturbance.getOrientation()); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
-				//float a = abs(a.get()); // the robot and disturbance are parallel
-				float angleTolerance = 1*M_PI/180;
-				r.ended = abs(a.get()) <= abs(endCriteria.angle.get()) + angleTolerance & d.get()>=endCriteria.distance.get();
-			}
+	// if (disturbance.isValid()){
+	// 	b2Vec2 v = disturbance.getPosition() - n.endPose.p; //distance between disturbance and robot
+	// 	if (getAffIndex()== int(InnateAffordances::AVOID)){
+	// 		if (!disturbance.isPartOfObject()){
+	// 			a= Angle(disturbance.getAngle(n.endPose));
+	// 			d= Distance(v.Length());
+	// 			r.ended= abs(a.get())>= endCriteria.angle.get() && d.get()>=endCriteria.distance.get();
+	// 		}
+	// 		else{
+	// 			a = Angle(atan(n.endPose.q.s/n.endPose.q.c)-disturbance.getOrientation()); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+	// 			//float a = abs(a.get()); // the robot and disturbance are parallel
+	// 			float angleTolerance = 1*M_PI/180;
+	// 			r.ended = abs(a.get()) <= abs(endCriteria.angle.get()) + angleTolerance & d.get()>=endCriteria.distance.get();
+	// 		}
 
-		}
-		else if (getAffIndex()== int(InnateAffordances::NONE)){
-			r.ended = true;
-		}
-		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
-			a = Angle(disturbance.getAngle(n.endPose));
-			//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			d= Distance(v.Length());
-			r.ended = v.Length()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
-		}
-	}
-	r.errorFloat = endCriteria.getStandardError(a,d, n);
+	// 	}
+	// 	else if (getAffIndex()== int(InnateAffordances::NONE)){
+	// 		r.ended = true;
+	// 	}
+	// 	else if (getAffIndex()==int(InnateAffordances::PURSUE)){
+	// 		a = Angle(disturbance.getAngle(n.endPose));
+	// 		//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
+	// 		d= Distance(v.Length());
+	// 		r.ended = v.Length()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
+	// 	}
+	// }
+	r = checkEnded(n.endPose);
+	r.errorFloat+= endCriteria.getStandardError(a,d, n);
 	return r;
 
 
