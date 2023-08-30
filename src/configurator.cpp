@@ -353,7 +353,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		if(g[inEdge].direction == Direction::DEFAULT){
 			remaining= (range-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
 		} 
-		if (remaining<0){
+		if (remaining<0.01){
 			remaining=0;
 		}
 	}
