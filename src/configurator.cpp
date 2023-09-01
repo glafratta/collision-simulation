@@ -1024,7 +1024,7 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 }
 
 void Configurator::trackTaskExecution(Task & t){
-	if (t.endCriteria.hasEnd()){
+	//if (t.endCriteria.hasEnd()){
 		//printf("task in %i has end\n", iteration);
 		if (t.step>0){
 			t.step--;
@@ -1035,7 +1035,7 @@ void Configurator::trackTaskExecution(Task & t){
 			printf("change task cause it ends = %i\n", t.change);
 			//printf("task set to change\n");
 		}
-	}
+	//}
 	printf("change =%i, step =%i\n", t.change, t.step);
 }
 
