@@ -881,7 +881,7 @@ bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 			return result;
 		}
 	}
-	else if(g[vd].totDs>4){
+	else if(g[vd].totDs>4 || round(g[vd].endPose.p.Length()*100)/100>=BOX2DRANGE){
 			return result;
 		}
 	transitionMatrix(g, vd, d);
