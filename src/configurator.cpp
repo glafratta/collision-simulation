@@ -1063,9 +1063,9 @@ int Configurator::motorStep(Task::Action a, EndCriteria ec){
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()!=0){
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		    result *=FRICTION_DAMPENING;
-		//result =15;
+            //result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
+		    //result *=FRICTION_DAMPENING;
+		result =15;
         }
 		else if (a.getLinearSpeed()>0){
 			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
