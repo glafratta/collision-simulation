@@ -262,7 +262,7 @@ void Task::setEndCriteria(){
 	
 }
 
-EndedResult Task::checkEnded(b2Transform robotTransform){
+EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 	EndedResult r;
 	Angle a;
 	Distance d;
@@ -298,9 +298,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			r.ended = d<=endCriteria.distance & lowAngle <=a & hiAngle>=a;
 		}
 	}
-	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){
+	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || abs(robotTransform.q.GetAngle()-start.q.GetAngle())>=M_PI_2){ //if length reached or turn
 		r.ended =true;
-
 	}
 	r.errorFloat = endCriteria.getStandardError(a,d);
 	return r;
