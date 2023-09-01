@@ -137,23 +137,19 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 				bestLeaf = findBestLeaf(collisionGraph, leaves, v0);
 				break;
 			}	
-			// case DEPTH_FIRST_ITDE:{
-			// 	DFIDBuildTree(v0, collisionGraph, currentTask, world, bestLeaf);
-			// 	break;
-			// }
-			case DEPTH_FIRST_ITDE_2:{
+			case A_STAR:{
 				classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
-			case A_STAR:{
+			case A_STAR_DEMAND:{
 				onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 				break;
 			}
-			case SIMPLE_TREE:{
-				printf("simple\n");
-				classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-				break;
-			}
+			// case SIMPLE_TREE:{
+			// 	printf("simple\n");
+			// 	classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
+			// 	break;
+			// }
 			default:
 				break;
 		}
@@ -336,23 +332,24 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 
 		//EVALUATE NODE()
 	simResult result; 
-	float remaining=0, range=0;
-	if (s.discrete){
-		remaining = DISCRETE_SIMDURATION;
-		range =DISCRETE_RANGE;
-	}
-	else{
-		remaining=SIM_DURATION;	
-		range = BOX2DRANGE;
-	}
+	float remaining = simulationStep*2/MAX_SPEED;
+	// if (s.discrete){
+	// 	remaining = DISCRETE_SIMDURATION;
+	// 	range =DISCRETE_RANGE;
+	// }
+	// else{
+	// 	remaining=SIM_DURATION;	
+	// 	range = BOX2DRANGE;
+	// }
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
 		srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
-		if(g[inEdge].direction == Direction::DEFAULT){
-			remaining= (range-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
-		} 
+//		if(g[inEdge].direction == Direction::DEFAULT){
+		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
+			//remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+//		} 
 		if (remaining<0.01){
 			remaining=0;
 		}

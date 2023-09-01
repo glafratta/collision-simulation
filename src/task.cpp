@@ -298,7 +298,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){
 			r.ended = d<=endCriteria.distance & lowAngle <=a & hiAngle>=a;
 		}
 	}
-	else if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){
+	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){
 		r.ended =true;
 
 	}

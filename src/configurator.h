@@ -37,8 +37,6 @@ class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	//b2Vec2 absPosition = {0.0f, 0.0f};
-	//FILE * dumpPath;
 	char fileNameBuffer[50];
 	Task currentTask;
 	bool benchmark=0;
@@ -47,9 +45,7 @@ public:
 	bool running =0;
 	std::thread * t=NULL;
 	bool debugOn=0;
-	//float affineTransError =0;
-	//char *folder;
-	//char readMap[50];
+	float simulationStep=BOX2DRANGE;
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
@@ -68,6 +64,7 @@ public:
 	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
+
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
@@ -117,16 +114,6 @@ void controller();
 void addIteration(){
 	iteration++;
 }
-
-
-// void updateAbsPos(b2Vec2 vel){
-// 	absPosition.x += vel.x*timeElapsed;
-// 	absPosition.y += vel.y*timeElapsed;
-// }
-
-// b2Vec2 getAbsPos(){
-// 	return absPosition;
-// }
 
 Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
