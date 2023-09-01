@@ -127,13 +127,16 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = SIMPLE_TREE;
+	configurator.graphConstruction = A_STAR;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
+	}
+	if (argc>3){
+		configurator.simulationStep = atof(argv[3]);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	LidarInterface dataInterface(&configuratorInterface);
