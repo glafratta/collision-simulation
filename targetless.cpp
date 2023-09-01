@@ -88,7 +88,6 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
     Configurator * c;
     float L=0;
 	float R=0;
-	int step=0;
 
 public:
 
