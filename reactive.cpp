@@ -12,23 +12,14 @@
 #define _USE_MATH_DEFINES
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-    int count =0;
     std::vector <BodyFeatures> result;
     for (Point p: points){
-        if (count%2==0){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
             result.push_back(feature);  
-        }
-        count++;
     }
     return result;
 }
-
-void Configurator::buildTree(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
-
-}
-
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
@@ -79,10 +70,10 @@ public:
 		fclose(f);
 		printf("added data to lidar containers, coord = %i, coord2fp = %i\n", ci->data.size(), ci->data2fp.size());
 
-
 		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
+		//ci->ready=1;
 		ci->iteration++;
 		printf("added data to interface containers\n");
 
@@ -123,20 +114,18 @@ void step( AlphaBot &motors){
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;
-	Disturbance target(2, b2Vec2(BOX2DRANGE, 0));
-    Task controlGoal(target, DEFAULT);
+    Task controlGoal; //this line can be removed, it is for illustation purposes
 	ConfiguratorInterface configuratorInterface;
-    Configurator configurator(controlGoal);
-	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = A_STAR;
-	configurator.planning =1;
+    Configurator configurator(controlGoal); //this line can be removed, it is for illustation purposes
+	configurator.planning=0;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
 	}
-	printf("CHASING A TARGET\n");
+	printf("REACTIVE NAVIGATION\n");
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);

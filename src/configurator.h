@@ -59,7 +59,7 @@ public:
 	//int treeSize = 0; //for debug
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
-	GRAPH_CONSTRUCTION graphConstruction = BACKTRACKING;
+	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
 	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
