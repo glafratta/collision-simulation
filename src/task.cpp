@@ -108,15 +108,10 @@ Task::controlResult Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded().ended;
-if (disturbance.isValid() & action.getOmega()!=0){}
-else {
+if (action.getOmega()==0){
 	float timeStepError =action.getOmega()/0.2; 
-	accumulatedError += timeStepError; 
-	if (timeStepError<tolerance){
-		action.L = 0.5;
-		action.R = 0.5;
-	}
-	else{
+	//accumulatedError += timeStepError; 
+	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/M_PI_2;
 		action.L -= normAccErr*pGain;  
 		action.R += normAccErr *pGain; 
