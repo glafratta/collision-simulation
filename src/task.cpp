@@ -108,7 +108,7 @@ Task::controlResult Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded().ended;
-if (disturbance.isValid() & disturbance.getAffIndex() == int(InnateAffordances::AVOID)){}
+if (disturbance.isValid() & action.getOmega()!=0){}
 else {
 	float timeStepError =action.getOmega()/0.2; 
 	accumulatedError += timeStepError; 

@@ -70,7 +70,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 	}
-	printf("calculated velocity\n");
+//	printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = currentTask.disturbance.isValid();
@@ -80,6 +80,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
 	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
+	printf("control goal is %f away\n", controlGoal.disturbance.getPosition().Length());
 	//printf("currentTask direction =%i\n", int(currentTask.direction));
 	//bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
 	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
@@ -128,11 +129,11 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
-	printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
+	//printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
 	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful || 
 		switch (graphConstruction){
 			case BACKTRACKING:{
-				printf("backtracking build\n");
+				//printf("backtracking build\n");
 				backtrackingBuildTree(v0, collisionGraph, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
 				bestLeaf = findBestLeaf(collisionGraph, leaves, v0);
 				break;
@@ -174,10 +175,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//if (currentTask.change){
 
 	//}
-	printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(collisionGraph[v0].outcome), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
-	printf("action: recLInSpeed = %f, recOmega= %f, direction = %i\n", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega(), int(currentTask.direction));
+	//printf("outcome code = %i, change task cause it fails = %i, disturbance x = %f, y=%f\n", int(collisionGraph[v0].outcome), currentTask.change, result.collision.getPosition().x, result.collision.getPosition().y);
+	//printf("action: recLInSpeed = %f, recOmega= %f, direction = %i\n", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega(), int(currentTask.direction));
 	//changeTask(currentTask.change, plan, collisionGraph[v0]);
-	printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
+	//printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -194,7 +195,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	if (isSameTask){
-		//currentTask.controller();
+		currentTask.controller();
 		//printf("applied controller: wheel speeds: L=%f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 	}
 
