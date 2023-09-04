@@ -1,5 +1,5 @@
 # HICS - hierarchical input controller sequences
-This library allows obstacle avoidance in an indoor robot by creating Tasks, i.e. input controllers, in order to eliminate Disturbances. With this perspective, we view spatial navigation as an effort to maintain and restore homeostasis. This means that the robot has a preferred default Task, and new Tasks are created and executed upon its disruption, with the goal of returning to the steady state. This process is orchestrated by a Configurator and it is sufficient to perform reactive avoidance. However, Tasks may also be chained in a tree graph and simulated internally in order to find a Task which, if executed next, leads to fulfilment of a control goal.In this implementation the control goal is to maximise the amount of time spent by the robot in the steady state. The Task graph is created based on continuously updating visual information about the robot's surroundings and simulation of each Task in game engine [Box2D](https://github.com/erincatto/box2d).
+This library is designed for spatial navigation in a wheeled robot equipped with a LIDAR sensor. The navigation problem is broken down in individual Tasks which correspond to the act of performing a single motor Action (go straight, turn left/right 90 degrees, go back) in order to eliminate a Disturbance, which is a process that occurs in a closed-loop fashion. Disturbances are identified by the Configurator, an overarching module capable of predicting the outcome of each Task by simulating it in game engine [Box2D](https://github.com/erincatto/box2d) over a certain time/distance horizon. Using this framework, sequences of Tasks representing plans towards a control goal can be generated into a graph structure, and evaluated using the simulation environment. In this implementation, nodes are discovered in the graph using the A* algorithm.
 
 ## Hardware
 The indoor robot is equipped with 
@@ -37,5 +37,7 @@ sudo make install
 
 ## Run
 ### Navigation demo (Raspberry Pi)
-* `sudo ./targetless` : this program demonstrates optimal next mode selection based on its own and its child branches' outcome. By default, this only print out statements which allow to follow the robot's behaviour; you can turn on debug mode by instead typing `sudo ./navigate 1`. This prints out in `/tmp` a) LIDAR data with the prefix `map`, b) the bodies included in Box2D withthe prefix `bodies` and c) the trajectory descried by the robot during simulation with the prefix `robot`
-* `sudo ./navigate`: under construction for target-oriented navigation
+* `sudo ./reactive`: this program demonstrates reactive avoidance
+* `sudo ./targetless` : this program demonstrates planning over a 1m distance horizon for a control goal that is not a target location but rather an objective to drive straight for the longest time with the least amount of disturbances
+* `sudo ./target`: this program (under construction) demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0.0m
+* `sudo ./targetless_benchmark`: for data collection; the program creates a folder called bodiesSpeedStats1.0, which you can navigate to and run the script `sh ../speed_analysis.sh`
