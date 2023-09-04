@@ -298,7 +298,11 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 			r.ended = d<=endCriteria.distance & lowAngle <=a & hiAngle>=a;
 		}
 	}
-	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
+	else if (fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
+		r.ended =true;
+	}
+	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
+	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
 	r.errorFloat = endCriteria.getStandardError(a,d);

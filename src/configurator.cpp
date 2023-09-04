@@ -129,7 +129,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
 	//}	
 	printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
-	if (planning & (collisionGraph[v0].outcome !=simResult::successful || planBuild!=STATIC || plan.empty())){ 
+	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful || 
 		switch (graphConstruction){
 			case BACKTRACKING:{
 				printf("backtracking build\n");
@@ -443,18 +443,19 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 	vertexDescriptor v1, v0;
 	float error;
 	bool added;
+	Direction direction = s.direction;
 	do{	
 		std::vector <vertexDescriptor> frontier;	
 		v=bestNext;
 		if (!(g[v].filled)){ //for the first vertex
 			evaluateNode(v, g, s, w);			
 		}
-		EndedResult er = findError(v, g, s.direction);
+		EndedResult er = findError(v, g, direction);
 		// if (graphConstruction ==SIMPLE_TREE & g[v].outcome !=simResult::successful){ //calculate error and then reset
 		// 	g[v].endPose = s.start;
 		// 	g[v].outcome = simResult::crashed;
 		// }
-		applyTransitionMatrix(g, v, s.direction, er.ended);
+		applyTransitionMatrix(g, v, direction, er.ended);
 		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
@@ -466,7 +467,7 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v1, d, er.ended);
+			applyTransitionMatrix(g, v1, g[e].direction, er.ended);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
 			g[v1].error = findError(v1, g, s.direction).errorFloat;
@@ -476,6 +477,7 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 			frontier.push_back(v1);
 		}
 		bestNext = findBestLeaf(g, frontier, v);
+		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(bestNext !=v); //this means that v has progressed
 }
 
@@ -816,18 +818,18 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 	switch (numberOfM){
 		case (THREE_M):{
 				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
-				if (d ==DEFAULT){
-					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-						//in order, try the task which represents the reflex towards the goal
-						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
-							g[vd].options.push_back(temp.direction);
-							g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+					if (d ==DEFAULT){
+						if (g[vd].nodesInSameSpot<maxNodesOnSpot){
+							//in order, try the task which represents the reflex towards the goal
+							if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+								g[vd].options.push_back(temp.direction);
+								g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+							}
+							else{
+								g[vd].options = {LEFT, RIGHT};
+							}			
 						}
-						else{
-							g[vd].options = {LEFT, RIGHT};
-						}			
-					}
-					}
+						}
 				}
 				else { //will only enter if successful
 					if (d== LEFT || d == RIGHT){
