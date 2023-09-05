@@ -109,7 +109,7 @@ void step( AlphaBot &motors){
 		return;
 	}
 	if (c->getTask()->change){
-		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->direction, ogStep-c->getTask()->step);
+		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction(), ogStep-c->getTask()->step);
 	}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
