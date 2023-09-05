@@ -106,8 +106,8 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 
 void Task::trackDisturbance(Disturbance & d, Action a, int s){
 	//switch(dir){
-	d.pose.q.Set(d.pose.q.GetAngle()-(step*MOTOR_CALLBACK*a.getOmega()));
-	float length = d.pose.p.Length()+step*MOTOR_CALLBACK*a.getLinearSpeed();
+	d.pose.q.Set(d.pose.q.GetAngle()-(s*MOTOR_CALLBACK*a.getOmega()));
+	float length = d.pose.p.Length()+s*MOTOR_CALLBACK*a.getLinearSpeed();
 	float angle = atan2(d.pose.p.y, d.pose.p.x);
 	d.pose.p.x = cos(angle)* length;
 	d.pose.p.y = sin(angle)* length;
