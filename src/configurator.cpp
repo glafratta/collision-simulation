@@ -334,6 +334,9 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//EVALUATE NODE()
 	simResult result; 
 	float remaining = simulationStep*2/MAX_SPEED;
+	if (s.action.getOmega()!=0){
+		remaining =113*2/MAX_SPEED;
+	}
 	// if (s.discrete){
 	// 	remaining = DISCRETE_SIMDURATION;
 	// 	range =DISCRETE_RANGE;
