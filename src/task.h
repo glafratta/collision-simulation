@@ -228,6 +228,9 @@ b2Vec2 getRecordedVelocity(){
 
 void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transform(b2Vec2(0,0), b2Rot(0)));
 
+void trackDisturbance(Disturbance &, Action, int);
+
+
 simResult willCollide(b2World &, int, bool, float);
 
 enum controlResult{DONE =0, CONTINUE =1};

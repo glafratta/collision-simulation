@@ -345,7 +345,7 @@ void trackTaskExecution(Task &);
 
 DeltaPose assignDeltaPose(Task::Action, float);
 
-void changeTask(bool, Sequence&, Node);
+void changeTask(bool, Sequence&, Node, int&);
 
 int motorStep(Task::Action, EndCriteria);
 

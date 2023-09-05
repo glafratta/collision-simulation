@@ -79,7 +79,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
-	controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
+	//controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
 	printf("control goal is %f away, x= %f, y=%f\n", controlGoal.disturbance.getPosition().Length(), controlGoal.disturbance.pose.p.x, controlGoal.disturbance.pose.p.y);
 	//printf("currentTask direction =%i\n", int(currentTask.direction));
 	//bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
@@ -88,10 +88,10 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
 	EndedResult controlEnded = controlGoal.checkEnded();
-	if (controlEnded.ended){
-		currentTask= Task(Disturbance(), STOP);
-		return;
-	}
+	// if (controlEnded.ended){
+	// 	currentTask= Task(Disturbance(), STOP);
+	// 	return;
+	// }
 	//printf("obstill there = %i\n", isObstacleStillThere);
 	// if(tempEnded.ended|| !isObstacleStillThere){
 	// 	if (!plan.empty()){
@@ -1081,7 +1081,7 @@ int Configurator::motorStep(Task::Action a){
     }
 
 
-void Configurator::changeTask(bool b, Sequence & p, Node n){
+void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	if (currentTask.direction !=DEFAULT & currentTask.step==0){
 		b=1;
 	}
@@ -1103,6 +1103,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n){
 		printf("changed to reactive\n");
 	}
 	currentTask.step = motorStep(currentTask.getAction());
+	ogStep = currentTask.step;
 	//printf("set step\n");
 }
 

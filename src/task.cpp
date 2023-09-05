@@ -104,6 +104,16 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 	d.setAngle(angle); //with respect to robot's velocity
 }
 
+void Task::trackDisturbance(Disturbance & d, Action a, int s){
+	//switch(dir){
+	d.pose.q.Set(d.pose.q.GetAngle()-(step*MOTOR_CALLBACK*a.getOmega()));
+	float length = d.pose.p.Length()+step*MOTOR_CALLBACK*a.getLinearSpeed();
+	float angle = atan2(d.pose.p.y, d.pose.p.x);
+	d.pose.p.x = cos(angle)* length;
+	d.pose.p.x = cos(angle)* length;
+	//}
+}
+
 Task::controlResult Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
