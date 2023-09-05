@@ -12,7 +12,7 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
-	printf("started spawner\n");
+	//printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	//printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
 	if (data.empty()){
@@ -30,7 +30,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentBox2D.clear();
 	//printf("box2d clear\n");
 	currentBox2D = CoordinateContainer(data2fp);
-	printf("updated coordinate vectors\n");
+	//printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
 
@@ -49,7 +49,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	timeElapsed=float(diff.count())/1000; //express in seconds
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
-	printf("calculated time elapsed = %f\n", timeElapsed);
+	//printf("calculated time elapsed = %f\n", timeElapsed);
 
 	if (timerOff){
 		timeElapsed = .2;
