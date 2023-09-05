@@ -1074,10 +1074,10 @@ int Configurator::motorStep(Task::Action a){
         if (a.getOmega()>0){ //LEFT
             //result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
 		    //result *=FRICTION_DAMPENING;
-			result =15;
+			result =14;
         }
 		else if (a.getOmega()<0){ //RIGHT
-			result=16;
+			result=15;
 		}
 		else if (a.getLinearSpeed()>0){
 			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
