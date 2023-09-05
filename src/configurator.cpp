@@ -87,7 +87,11 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();
-	EndedResult controlEnded = controlGoal.checkEnded();
+	if (controlGoal.change){
+		currentTask=Task(Disturbance(), STOP);
+		return;
+	}
+	//EndedResult controlEnded = controlGoal.checkEnded();
 	// if (controlEnded.ended){
 	// 	currentTask= Task(Disturbance(), STOP);
 	// 	return;

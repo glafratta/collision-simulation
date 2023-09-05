@@ -96,6 +96,7 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
 	float R=0;
 
 public:
+	int ogStep=0;
 
 Callback(Configurator *conf): c(conf){
 }
@@ -109,9 +110,8 @@ void step( AlphaBot &motors){
 	c->trackTaskExecution(*(c->getTask()));	
 //	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
 	//EndedResult controlEnded = controlGoal.checkEnded();
-	if (controlGoal.checkEnded().ended){
-		controlGoal.change =1;
-		currentTask= Task(Disturbance(), STOP);
+	if (c->controlGoal.checkEnded().ended){
+		c->controlGoal.change =1;
 		return;
 	}
 	if (c->getTask()->change){
