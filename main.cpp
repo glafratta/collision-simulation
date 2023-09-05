@@ -71,7 +71,7 @@ public:
 				//coordinates2fp.insert(p2f);
 				ci->data.insert(p);
 				ci->data2fp.insert(p2f);
-				if (ci->debugOn){
+				if (c->debugOn){
 					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
 				}
             }
