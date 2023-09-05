@@ -30,7 +30,7 @@ public:
             affordanceIndex = i;
         }
         //bodyDef.type = b2_dynamicBody;
-		pose.Set(p, b2Rot(0));
+		pose.Set(p, 0);
         valid =1;
     }    
 
