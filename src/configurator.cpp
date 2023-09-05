@@ -1105,7 +1105,12 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
 	else{
-		currentTask = Task(n.disturbance, DEFAULT); //reactive
+		if (n.disturbance.isValid()){
+			currentTask = Task(n.disturbance, DEFAULT); //reactive
+		}
+		else{
+			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
+		}
 		printf("changed to reactive\n");
 	}
 	currentTask.step = motorStep(currentTask.getAction());
