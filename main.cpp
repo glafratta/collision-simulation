@@ -71,7 +71,7 @@ public:
 				//coordinates2fp.insert(p2f);
 				ci->data.insert(p);
 				ci->data2fp.insert(p2f);
-				if (c->debugOn){
+				if (ci->debugOn){
 					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
 				}
             }
@@ -141,6 +141,7 @@ int main(int argc, char** argv) {
 	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
