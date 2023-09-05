@@ -119,6 +119,7 @@ void step( AlphaBot &motors){
 	}
 	if (c->getTask()->change){
 		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction(), ogStep-c->getTask()->step);
+		printf("tracking \n");
 	}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around

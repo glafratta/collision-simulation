@@ -1086,9 +1086,9 @@ int Configurator::motorStep(Task::Action a){
 
 
 void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
-	if (currentTask.direction !=DEFAULT & currentTask.step==0){
-		b=1;
-	}
+	// if (currentTask.step==0){
+	// 	b=1;
+	// }
 	if (!b){
 		//printf("do not change\n");
 		return;

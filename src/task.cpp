@@ -110,7 +110,7 @@ void Task::trackDisturbance(Disturbance & d, Action a, int s){
 	float length = d.pose.p.Length()+step*MOTOR_CALLBACK*a.getLinearSpeed();
 	float angle = atan2(d.pose.p.y, d.pose.p.x);
 	d.pose.p.x = cos(angle)* length;
-	d.pose.p.x = cos(angle)* length;
+	d.pose.p.y = sin(angle)* length;
 	//}
 }
 
