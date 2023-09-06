@@ -39,5 +39,8 @@ sudo make install
 ### Navigation demo (Raspberry Pi)
 * `sudo ./reactive`: this program demonstrates reactive avoidance
 * `sudo ./targetless` : this program demonstrates planning over a 1m distance horizon for a control goal that is not a target location but rather an objective to drive straight for the longest time with the least amount of disturbances
-* `sudo ./target`: this program (under construction) demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0.0m
+* `sudo ./target`: this program (under construction) demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0m.
 * `sudo ./targetless_benchmark`: for data collection; the program creates a folder called bodiesSpeedStats1.0, which you can navigate to and run the script `sh ../speed_analysis.sh`
+
+### Settings
+The automatic settings is for debug files to be turned off and for the robot to simulate its plans in chunks of 1m each (half the sensor range). To change these settings just run the above executables as `your_executable 1 your_step_size`. From experimental findings, we recommend using a step the size of the robot's diameter.
