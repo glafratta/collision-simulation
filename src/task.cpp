@@ -29,6 +29,9 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
+			if (checkEnded(robot.body->GetTransform()).ended){
+				break;
+			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getRecOmega()/HZ; //= omega *t
 			if (listener.collisions.size()>0){ //
