@@ -45,18 +45,14 @@ float Measurement::getError(Measurement m2){
     return result;
 }
 
-float Measurement::getStandardError(Measurement m2){ 
+float Measurement::getStandardError(Measurement m2, float max){ 
     float result =0;
     if (m2.isValid()& this->isValid()){
         float num = get()-m2.get();
         if (num ==0){
             return result;
         }
-        float den = (m2.get()+get()); //normalise to the arithmetic mean, max value =2, then normalise again, max reusl =1
-        if (den==0){
-            return 1;
-        }
-        result = num/den;
+        result = num/max;
     }
     return result;
 }
@@ -69,7 +65,7 @@ float EndCriteria::getError(EndCriteria ec){ //not normalised
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = weights[0]*abs(angle.getStandardError(a))+weights[1]*abs(distance.getStandardError(d)); //max =2;
+    result = weights[0]*fabs(angle.getStandardError(a, MAX_ANGLE_ERROR))+weights[1]*fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR)); //max =2;
     return result/2; //return normalise
 }
 
@@ -83,14 +79,12 @@ float EndCriteria::getStandardError(EndCriteria ec){ //standard error
 float EndCriteria::getStandardError(Angle a, Distance d, Node n){
     float result =0;
     float outcomeError=0;
-    // if (n.filled){
-    //     switch (n.outcome){
-    //         case simResult::successful: break;
-    //         case simResult::safeForNow: outcomeError+=1; break;
-    //         case simResult::crashed: outcomeError+=2; break; //the max error is 6 (4 from angle and distance, 2 from outcome)
-    //         default:break;
-    //     }
-    // }
+    if (n.filled){
+        switch (n.outcome){
+            case simResult::crashed: outcomeError+=2; break; //the max error is 6 (4 from angle and distance, 2 from outcome)
+            default:break;
+        }
+    }
     result = getStandardError(a, d) + weights[2]*outcomeError;
     return result/2; //normalised to max value it can take
 }

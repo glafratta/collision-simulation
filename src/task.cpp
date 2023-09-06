@@ -31,40 +31,12 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, flo
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getRecOmega()/HZ; //= omega *t
-			if (checkEnded(robot.body->GetTransform()).ended){
-				if (direction==BACK){
-					result = simResult(simResult::resultType::successful, disturbance);
-				}
-				break;
-			}
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				Disturbance collision = Disturbance(1, listener.collisions[index]);
-				// std::pair<bool, b2Vec2> neighbour = findNeighbourPoint(_world,listener.collisions[index]);
-				// if (neighbour.first){
-				// 	float orientation =findOrientation(listener.collisions[index], neighbour.second);
-				// 	collision.setOrientation(orientation);
-				// }
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
-				// if (direction==DEFAULT && step/HZ >REACTION_TIME){ //stop 2 seconds before colliding so to allow the robot to explore
-				// 	b2Vec2 posReadjusted;
-				// 	posReadjusted.x = start.p.x+ instVelocity.x*(step/HZ-REACTION_TIME);						
-				// 	posReadjusted.y = start.p.y+ instVelocity.y*(step/HZ-REACTION_TIME);
-				// 	// posReadjusted.x = robot.body->GetTransform().p.x -cos(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
-				// 	// posReadjusted.y = robot.body->GetTransform().p.y -sin(action.getOmega())*(SAFE_DISTANCE-distance.Length());						
-				// 	robot.body->SetTransform(posReadjusted, start.q.GetAngle()); //if the simulation crashes reset position for 
-				// 	result = simResult(simResult::resultType::safeForNow, collision);
-				// }
-				// else{
-					result = simResult(simResult::resultType::crashed, collision);
-					//DEBUG PRINT STATEMTNS
-// 					if ((direction==BACK) & (start.p == b2Vec2(0,0)) & (start.q.GetAngle()==0)){
-// //						printf("SSSSHIIIIITTTTTTTTTTTTTTT SOMETHING BEHIND EMEEEEEEEEEEEEEE at %f, %f, step = %i\n", listener.collisions[index].x, listener.collisions[index].y, step);
-// 					}
-					//END DEBUG
-					robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
-					//result.collision.safeForNow =0;
-				//	}
+				result = simResult(simResult::resultType::crashed, collision);
+				robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 				break;
 			}
 			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
@@ -179,63 +151,6 @@ Direction Task::H(Disturbance ob, Direction d){
     return d;
 }
 
-// void Task::setEndCriteria(){ //standard end criteria, can be modified by changing angle/distnace
-// 	switch (direction){
-// 		case DEFAULT: {
-// 			if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-// 			endCriteria.distance = Distance(0.05); //end if D is 5 cm away
-// 		}
-// 		break;
-// 		}
-// 		case LEFT: {
-// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-// 			if (!disturbance.isPartOfObject()){
-// 				endCriteria.angle = Angle(SAFE_ANGLE);
-// 			}
-// 			else{
-// 				endCriteria.angle = Angle(0);
-// 			}
-// 			}
-// 			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-// 				endCriteria.angle = Angle(0);
-// 			}
-// 			break;
-// 		}
-// 		case RIGHT:{
-// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-// 				if (!disturbance.isPartOfObject()){
-// 					endCriteria.angle = Angle(SAFE_ANGLE);
-// 				}
-// 				else{
-// 					endCriteria.angle = Angle(0);
-// 				}
-// 			}
-// 			else if (disturbance.getAffIndex()==int(InnateAffordances::PURSUE)){
-// 				endCriteria.angle = Angle(0);
-// 			}
-// 			break;
-// 		} 
-// 		case BACK: {
-// 			if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-// 			b2Vec2 v = disturbance.getPosition() - start.p;
-// 			Distance d(v.Length());
-// 			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
-// 		}
-// 		break;
-// 		}
-// 		case STOP:{
-// 		if (disturbance.getAffIndex()==int(InnateAffordances::AVOID)){
-// 			endCriteria.angle = Angle(SAFE_ANGLE);
-// 			b2Vec2 v = disturbance.getPosition() - start.p;
-// 			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
-// 		}
-// 		break;
-// 		}
-
-// 		default:break;
-// 	}
-// }
-
 void Task::setEndCriteria(){
 	Distance d;
 	Angle a;
@@ -258,7 +173,7 @@ void Task::setEndCriteria(){
 		}
 		break;
 		case PURSUE:{
-			endCriteria.angle = Angle(0);
+//			endCriteria.angle = Angle(0);
 			endCriteria.distance = Distance(0);
 		}
 		break;
@@ -305,7 +220,6 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 		}
 	}
 	else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
-	//else if (getAffIndex()==int(InnateAffordances::NONE)& fabs(atan2(start.p.y, start.p.x)-atan2(robotTransform.p.y, robotTransform.p.x))<0.01){
 		r.ended =true;
 	}
 	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn

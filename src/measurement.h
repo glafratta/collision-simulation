@@ -33,7 +33,7 @@ public:
 
     float getError(Measurement);
 
-    float getStandardError(Measurement); //relative standard error
+    float getStandardError(Measurement, float); //relative standard error
 
 };
 
