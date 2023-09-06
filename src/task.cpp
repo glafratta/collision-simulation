@@ -81,7 +81,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 
 void Task::trackDisturbance(Disturbance & d, Action a, int s){
 	//switch(dir){
-	float angleTurned =s*MOTOR_CALLBACK*a.getOmega()
+	float angleTurned =s*MOTOR_CALLBACK*a.getOmega();
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);
 	//float deltaLength = d.pose.p.Length()-s*MOTOR_CALLBACK*a.getLinearSpeed();
 	printf("omega = %f, linear speed %f, pose = %f", a.getOmega(), a.getLinearSpeed(), d.pose.q.GetAngle());
