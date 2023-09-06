@@ -882,6 +882,9 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 
 bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd, Direction d, bool ended, std::vector <vertexDescriptor> leaves){
 	bool result =0;
+	if (!g[vd].options.empty()){
+		return result;
+	}
 	if (controlGoal.endCriteria.hasEnd()){
 		if (ended){
 			return result;
