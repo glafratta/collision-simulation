@@ -63,12 +63,14 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//CALCULATE VELOCITY 
 	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
-	//DeltaPose deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
-	DeltaPose deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
-	if (currentTask.direction ==DEFAULT){
-		//currentTask.action.setOmega(deltaPose.q.GetAngle()); //NO SETTING ANGLE
+	DeltaPose deltaPose;
+	if (currentTask.action.getOmega()==0){
+		deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
+	}
+	else{
+		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
 	}
 //	printf("calculated velocity\n");
 
@@ -78,10 +80,6 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	//currentTask.trackDisturbance(currentTask.disturbance, timeElapsed, deltaPose); //robot default position is 0,0
-	//controlGoal.trackDisturbance(controlGoal.disturbance,timeElapsed, deltaPose);
-	//printf("currentTask direction =%i\n", int(currentTask.direction));
-	//bool isObstacleStillThere=constructWorldRepresentation(world, currentTask.direction, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), &currentTask); 
 	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
 	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
@@ -124,64 +122,15 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	//if (!planning){
-		//printf("evaluating current task\n");
-		// reactiveAvoidance(world, result, currentTask);
-		// collisionGraph[v0].fill(result);
-		result = evaluateNode(v0,collisionGraph, currentTask, world);
-		
-		//printf("outcome of v0 = %i, linear speed = %f, omega = %f\n", int(collisionGraph[v0].outcome), currentTask.getAction().getRecSpeed(), currentTask.getAction().getRecOmega());
-	//}	
-	//printf("planning = %i, collisionGraph[v0],outcome =%i, planbuild.dynamic = %i, plan.empty= %i", planning, int(collisionGraph[v0].outcome), planBuild!=STATIC, plan.empty() );
+	result = evaluateNode(v0,collisionGraph, currentTask, world);
 	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful || 
-		switch (graphConstruction){
-			case BACKTRACKING:{
-				//printf("backtracking build\n");
-				backtrackingBuildTree(v0, collisionGraph, currentTask, world, leaves); //for now should produce the same behaviour because the tree is not being pruned. original build_tree returned bool, now currentTask.change is changed directly
-				bestLeaf = findBestLeaf(collisionGraph, leaves, v0);
-				break;
-			}	
-			case A_STAR:{
-				classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-				break;
-			}
-			case A_STAR_DEMAND:{
-				onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-				break;
-			}
-			// case SIMPLE_TREE:{
-			// 	printf("simple\n");
-			// 	classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-			// 	break;
-			// }
-			default:
-				break;
-		}
+		classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		printf("plan:");
 		printPlan(plan);
 	}
-	//printf("best leaf ends at %f %f\n",g[bestLeaf].endPose.p.x, g[bestLeaf].endPose.p.y);
-
-
-	// if (collisionGraph[v0].outcome == simResult::crashed){ //only change task if outcome is crashed
-	// 	if (!plan.empty()){
-	// 		Sequence next= {plan[0]};
-	// 		printf("change to:");
-	// 		printPlan(next);
-	// 		currentTask = Task(plan[0].first, plan[0].second);
-	// 		plan.erase(plan.begin());
-	// 	}
-
-	// }
 	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
-	//if (currentTask.change){
-
-	//}
 	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
-	//printf("action: recLInSpeed = %f, recOmega= %f, direction = %i\n", currentTask.action.getRecSpeed(), currentTask.action.getRecOmega(), int(currentTask.direction));
-	//changeTask(currentTask.change, plan, collisionGraph[v0]);
-	//printf("tree size = %i, bodies = %i, plan size = %i\n", collisionGraph.m_vertices.size(), bodies, plan.size());
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -199,21 +148,12 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 
 	if (isSameTask){
 		currentTask.controller();
-		//printf("applied controller: wheel speeds: L=%f, R=%f\n", currentTask.getAction().L, currentTask.getAction().R);
 	}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
 
 }
 
-
-// void Configurator::applyController(bool isSameTask, Task & task){
-// 	if (isSameTask){
-// 		if (task.controller()==Task::controlResult::DONE){
-// 			task = controlGoal;
-// 		}
-// 	}
-// }
 
 std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	std::pair <bool, Direction> result(false, DEFAULT);
@@ -340,14 +280,6 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	if (s.action.getOmega()!=0){
 		remaining =fabs(M_PI_2/s.getAction().getOmega());
 	}
-	// if (s.discrete){
-	// 	remaining = DISCRETE_SIMDURATION;
-	// 	range =DISCRETE_RANGE;
-	// }
-	// else{
-	// 	remaining=SIM_DURATION;	
-	// 	range = BOX2DRANGE;
-	// }
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
@@ -420,31 +352,6 @@ void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, 
 	//return !g[0].disturbance.safeForNow;
 }
 
-// void Configurator::DFIDBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
-// 	vertexDescriptor v1 =v;
-// 	do{		
-// 		v=bestNext;
-// 		if (!(g[v].filled)){ //for the first vertex
-// 			evaluateNode(v, g, s, w);			
-// 		}
-// 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-// 		applyTransitionMatrix(g, v, s.direction, er.ended);
-// 		for (Direction d: g[v].options){ //add and evaluate all vertices
-// 			bool added = addVertex(v, v1, g, g[v].disturbance); //add
-// 			s = Task(g[v].disturbance, d, g[v].endPose);
-// 			worldBuilder.buildWorld(w, currentBox2D, g[v].endPose, d); //was g[v].endPose
-// 			//constructWorldRepresentation(w, d, g[v].endPose); //was g[v].endPose
-// 			evaluateNode(v1, g, s, w); //find simulation result
-// 			g[v1].error= controlGoal.checkEnded(g[v1].endPose).errorFloat;
-// 			if (bestNext==0|| g[bestNext].error >g[v1].error){ //find error
-// 				// if (bestNext.vertex!=0){
-// 				// 	boost::remove_vertex(bestNext.vertex, g);
-// 				// }
-// 				bestNext = v1;
-// 			}
-// 		}
-// 	}while(bestNext!=v); //this means that v has progressed
-// }
 
 void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
@@ -569,48 +476,6 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	}
 	return split;
 }
-
-// void simpleTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor& bestNext){ //one step above reactive
-// 	vertexDescriptor v1=v;
-// 	bool end=0, added =0;
-// 	evaluateNode(v, g, s, w);		
-// 	do {
-		
-// 		for (Direction d: g[v].options){ //add and evaluate all vertices
-// 		vertexDescriptor v0=v;
-// 		v1 =v0;
-// 		do {
-// 		added =addVertex(v0, v1, g, g[v0].disturbance); //add
-// 		edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
-// 		s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
-// 		constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
-// 		evaluateNode(v1, g, s, w); //find simulation result
-// 		applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
-// 		v0=v1;
-// 		}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
-// 		evaluationQueue.push_back(v1);
-// 		}
-// 		//SPLIT NODE IF NECESSARY
-// 		for (vertexDescriptor ev: evaluationQueue){
-// 			std::vector <vertexDescriptor> split =splitNode(ev, g, s.direction, s.start);
-// 			if (split.size()>1){
-// 				discrete =1;
-// 			}
-// 			//find error and put in queue *********
-// 			for (vertexDescriptor vertex:split){
-// 				EndedResult er = findError(vertex, g, s.direction);
-// 				applyTransitionMatrix(g, vertex,s.direction, er.ended);
-// 				//applyTransitionMatrix(g,vertex, s.direction, er);
-// 				addToPriorityQueue(g, vertex, priorityQueue);
-// 			}			
-// 		}
-// 		evaluationQueue.clear();
-// 	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
-// 	bestNext=v;
-
-// }
-
-
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
@@ -1083,7 +948,7 @@ int Configurator::motorStep(Task::Action a){
 			result=15;
 		}
 		else if (a.getLinearSpeed()>0){
-			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed())*.76;
+			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
 		}
         printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
