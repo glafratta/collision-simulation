@@ -92,8 +92,9 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// //}
 	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
-	d.pose.p.x-=(cos(angleTurned)*distanceTraversed);
-	d.pose.p.y-=(sin(angleTurned)*distanceTraversed);
+	float initialL = d.pose.p.Length();
+	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
+	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
 Task::controlResult Task::controller(){
