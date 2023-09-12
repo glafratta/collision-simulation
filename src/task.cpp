@@ -80,15 +80,20 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 }
 
 void Task::trackDisturbance(Disturbance & d, Action a, int s){
-	//switch(dir){
-	float angleTurned =s*MOTOR_CALLBACK*a.getOmega();
-	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);
-	//float deltaLength = d.pose.p.Length()-s*MOTOR_CALLBACK*a.getLinearSpeed();
-	printf("omega = %f, linear speed %f, pose = %f", a.getOmega(), a.getLinearSpeed(), d.pose.q.GetAngle());
-	//float angle = atan2(d.pose.p.y, d.pose.p.x);
-	d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	//}
+	// //switch(dir){
+	float angleTurned =s*MOTOR_CALLBACK*a.getOmega()*(1/FRICTION_DAMPENING);
+	// printf("initial angle =%f, angle turned = %f\n", d.pose.q.GetAngle(), angleTurned);
+	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
+	// printf("NEW angle =%f\n", d.pose.q.GetAngle());
+	// //float deltaLength = d.pose.p.Length()-s*MOTOR_CALLBACK*a.getLinearSpeed();
+	// printf("omega = %f, linear speed %f, pose = %f", a.getOmega(), a.getLinearSpeed(), d.pose.q.GetAngle());
+	// //float angle = atan2(d.pose.p.y, d.pose.p.x);
+	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
+	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
+	// //}
+	float distanceTraversed = s*MOTOR_CALLBACK*a.getLinearSpeed();
+	d.pose.p.x-=(cos(angleTurned)*distanceTraversed);
+	d.pose.p.y-=(sin(angleTurned)*distanceTraversed);
 }
 
 Task::controlResult Task::controller(){
