@@ -91,7 +91,7 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// //}
-	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed();
+	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
 	d.pose.p.x-=(cos(angleTurned)*distanceTraversed);
 	d.pose.p.y-=(sin(angleTurned)*distanceTraversed);
 }
