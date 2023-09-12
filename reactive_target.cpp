@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
-const float LEFT_WHEEL_WEIGHT =.9;
+const float LEFT_WHEEL_WEIGHT =1;
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
@@ -122,7 +122,7 @@ void step( AlphaBot &motors){
 //	}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed()*LEFT_WHEEL_WEIGHT);
+    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("og step: %i ,R=%f\tL=%f, conf iteration = %i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
     //iteration++;
 }
