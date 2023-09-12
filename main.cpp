@@ -114,7 +114,6 @@ void step( AlphaBot &motors){
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
 		c->controlGoal.change =1;
-		return;
 	}
 //	if (c->getTask()->change){
 		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());

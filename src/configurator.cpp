@@ -11,7 +11,7 @@ bool ConfiguratorInterface::isReady(){
 	return ready;
 }
 
-void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
+bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
 	//printf("started spawner\n");
 	//PREPARE VECTORS TO RECEIVE DATA
 	//printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
@@ -86,7 +86,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//EndedResult tempEnded = currentTask.checkEnded();
 	if (controlGoal.change){
 		currentTask=Task(Disturbance(), STOP);
-		return;
+		return 0;
 	}
 	// EndedResult controlEnded = controlGoal.checkEnded();
 	// if (controlEnded.ended){
@@ -151,7 +151,7 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
-
+	return 1;
 }
 
 
@@ -678,7 +678,7 @@ void Configurator::run(Configurator * c){
 			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
-				c->Spawner(c->ci->data, c->ci->data2fp);
+				running =!c->Spawner(c->ci->data, c->ci->data2fp);
 				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction);
 		}
 	}

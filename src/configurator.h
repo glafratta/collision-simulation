@@ -101,7 +101,7 @@ void setBenchmarking(bool b){
 	}
 }
 
-void Spawner(CoordinateContainer, CoordinateContainer); 
+bool Spawner(CoordinateContainer, CoordinateContainer); 
 
 int getIteration(){
 	return iteration;
