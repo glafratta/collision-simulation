@@ -950,7 +950,7 @@ int Configurator::motorStep(Task::Action a){
 			//result=12;
 		}
 		else if (a.getLinearSpeed()>0){
-			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
+			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed())*FRICTION_DAMPENING;
 		}
         printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
