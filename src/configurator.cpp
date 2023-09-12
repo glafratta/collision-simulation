@@ -64,14 +64,14 @@ void Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//CALCULATE VELOCITY 
 	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
 	DeltaPose deltaPose;
-	if (currentTask.action.getOmega()==0){
-		deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
+	// if (currentTask.action.getOmega()==0){
+	// 	deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
+	// }
+	// else{
+		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
+	//}
 		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
-	}
-	else{
-		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
-	}
 //	printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
