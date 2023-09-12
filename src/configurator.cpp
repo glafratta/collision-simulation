@@ -945,7 +945,7 @@ int Configurator::motorStep(Task::Action a){
 			result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
-			result=15;
+			result=12;
 		}
 		else if (a.getLinearSpeed()>0){
 			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
