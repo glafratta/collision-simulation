@@ -111,7 +111,8 @@ void step( AlphaBot &motors){
 		return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
-	if (c->controlGoal.checkEnded().ended){
+	EndedResult er = c->controlGoal.checkEnded();
+	if (er.ended){
 		c->controlGoal.change =1;
 		return;
 	}
