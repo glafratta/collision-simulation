@@ -226,7 +226,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 			lowAngle.setValid(endCriteria.angle.isValid());
 			Angle hiAngle =Angle(endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE);
 			hiAngle.setValid(endCriteria.angle.isValid());
-			r.ended = d<=endCriteria.distance & lowAngle <=a & hiAngle>=a;
+			r.ended = d<=endCriteria.distance; //& lowAngle <=a & hiAngle>=a;
 		}
 	}
 	else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
