@@ -80,7 +80,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask);
+	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
 	//printf("bodies = %i\n", bodies);
 	//printf("obstill there! = %i\n", isObstacleStillThere);
 	//EndedResult tempEnded = currentTask.checkEnded();

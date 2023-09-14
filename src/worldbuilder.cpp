@@ -70,8 +70,9 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	// body->CreateFixture(fixtureDef.shape, 0.0f);
 }
 
-std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task*curr){
+std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task *curr){
     std::pair <CoordinateContainer, bool> result(CoordinateContainer(), 0);
+    CoordinateContainer dCloud;
     float qBottomH=0, qTopH=0, qBottomP=0, qTopP=0, mHead=0, mPerp=0, ceilingY=0, floorY=0, frontX=0, backX=0;
     if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
         //FIND PARAMETERS OF THE LINES CONNECTING THE a
@@ -89,7 +90,9 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY){
                 result.first.insert(p);
             }
-            checkDisturbance(p, result.second, curr);
+            if (checkDisturbance(p, result.second, curr)){
+                dCloud.insert(p);
+            }
         }
 
     }
@@ -102,18 +105,21 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
             }
-            checkDisturbance(p, result.second, curr);
+            if (checkDisturbance(p, result.second, curr)){
+                dCloud.insert(p);
+            }        
         }
     }
     return result;
 }
 
-bool WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, bool discrete){
+  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, bool discrete){
     //sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
     // if (iteration=0){
     //     FILE *f = fopen(bodyFile, "w+");
     //     fclose(f);
     // }
+    std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=BOX2DRANGE;
     if (discrete){
         boxLength = DISCRETE_RANGE;
@@ -125,6 +131,9 @@ bool WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Tran
     }
     std::pair <Point, Point> bt = bounds(d, start, boxLength, curr);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr);
+    // if (NULL!=curr){
+    //     result.second = averagePoint(&&&.first, curr->disturbance);
+    // }
     std::vector <BodyFeatures> features =processData(salient.first);
     for (BodyFeatures f: features){
         makeBody(world, f);
@@ -137,17 +146,33 @@ bool WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Tran
 		}
 		fclose(f);
 	}
-    return salient.second;
+    result.first = salient.second;
+    return result;
 }
 
-void WorldBuilder::checkDisturbance(Point p, bool& obStillThere, Task * curr){
+bool WorldBuilder::checkDisturbance(Point p, bool& obStillThere, Task * curr){
+    bool result=0;
 	if (NULL!=curr){ //
 		if (p.isInRadius(curr->disturbance.getPosition())){
 			obStillThere =1;
+            result =1;
 		}
 	}
+    return result;
 }
 
+b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
+    b2Vec2 result(0,0), centroid(0,0);
+    for (Point p: c){
+       centroid.x+=p.x;
+       centroid.y +=p.y; 
+    }
+    centroid.x/=c.size();
+    centroid.y/=c.size();
+    result = d.getPosition()- centroid;
+    d.setPosition(centroid);
+    return result;
+}
     
 // std::vector <BodyFeatures> AlternateBuilder::processData(CoordinateContainer points){
 //     int count =0;

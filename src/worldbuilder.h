@@ -27,17 +27,18 @@ class WorldBuilder{
     bool debug =0;
     char bodyFile[100];
     std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Point, Point>, Task*curr=NULL); //gets points from the raw data that are relevant to the task based on bounding boxes
-
+                                                                                                                                        //std::pair<points, obstaclestillthere>
     void makeBody(b2World&, BodyFeatures);
 
     std::vector <BodyFeatures> processData(CoordinateContainer);
 
-    void checkDisturbance(Point, bool&,Task * curr =NULL);
+    bool checkDisturbance(Point, bool&,Task * curr =NULL);
 
-    bool buildWorld(b2World&,CoordinateContainer, b2Transform, Direction, Task*curr=NULL, bool discrete =0);
+    std::pair<bool, b2Vec2> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction, Task*curr=NULL, bool discrete =0);
 
     std::pair <Point, Point> bounds(Direction, b2Transform t, float boxLength, Task* curr=NULL); //returns bottom and top of bounding box
 
+    b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 
 };
 
