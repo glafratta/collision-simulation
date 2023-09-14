@@ -518,7 +518,10 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
 		if (g[leaf].endPose != g[src].endPose){ //if the node was successful
-			TaskSummary ts(g[src].disturbance, g[e].direction);
+			Task::Action a;
+			a.init(g[e].direction);
+			float step = motorStep(a);
+			TaskSummary ts(g[src].disturbance, g[e].direction, step);
 			p.insert(p.begin(), ts);	
 		}
 		leaf = src; //go back
@@ -540,7 +543,10 @@ Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor
 		else{ 
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
-		TaskSummary ts(g[src].disturbance, g[e].direction);
+		Task::Action a;
+		a.init(g[e].direction);
+		float step = motorStep(a);
+		TaskSummary ts(g[src].disturbance, g[e].direction, step);
 		p.insert(p.begin(), ts);	
 		leaf = src; //go back
 		}
@@ -609,7 +615,10 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 	edgeDescriptor e;
 	while (boost::in_degree(best, g)){
 		best = e.m_source;
-		TaskSummary ts(g[best].disturbance, g[e].direction);
+		Task::Action a;
+		a.init(g[e].direction);
+		float step = motorStep(a);
+		TaskSummary ts(g[best].disturbance, g[e].direction, step);
 		p.insert(p.begin(), ts);
 		//p[size-1]=ts; //fill the plan from the end backwards
 		//size--;
@@ -619,7 +628,7 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 
 void Configurator::printPlan(Sequence p){
 	for (TaskSummary ts: p){
-		switch (ts.second){
+		switch (ts.direction){
 			case DEFAULT: printf("DEFAULT");break;
 			case LEFT: printf("LEFT"); break;
 			case RIGHT: printf("RIGHT"); break;
@@ -657,7 +666,7 @@ void Configurator::stop(){
 
 void Configurator::registerInterface(ConfiguratorInterface * _ci){
 	ci = _ci;
-	ci->ts = TaskSummary(controlGoal.disturbance, controlGoal.direction);
+	ci->ts = TaskSummary(controlGoal.disturbance, controlGoal.direction, motorStep(controlGoal.action));
 }
 
 void Configurator::run(Configurator * c){
@@ -679,7 +688,7 @@ void Configurator::run(Configurator * c){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
-				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction);
+				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);
 		}
 	}
 }
@@ -796,7 +805,7 @@ bool Configurator::hasStickingPoint(CollisionGraph& g, vertexDescriptor v, Ended
 	vertexDescriptor src =v;			
 	Point dPosition(g[v].disturbance.getPosition());
 	//check for repetition along the branch
-	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid() & !g[v].twoStep){
+	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){ //&has two step
 		src =boost::source(boost::in_edges(src, g).first.dereference(), g);
 		if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
 			has=1;
@@ -900,6 +909,28 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 	}
 }
 
+std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, Task t, b2Transform start){
+	std::pair <bool, int> result(0, -1); //1 is fials, 0 is ok
+	for (TaskSummary ts: seq){
+		CoordinateContainer dCloud;
+		result.second++;
+		t = Task(ts.disturbance, ts.direction, start);
+		std::pair <bool, b2Vec2> dData = worldBuilder.buildWorld(world, currentBox2D, start, ts.direction, &t, &dCloud);
+		simResult sim = t.willCollide(world, iteration); //check if plan is successful
+		start = sim.endPose;
+		b2Vec2 differenceVector = ts.disturbance - dData.second;
+		ts.disturbance = dData.second;
+		int additionalSteps = SignedVectorLength(differenceVector);
+		ts.step +=additionalSteps;
+		if (sim.resultCode != simResult::successful){
+			result.first = 1;
+			break;
+		}
+	}
+	return result;
+}
+
+
 void Configurator::trackTaskExecution(Task & t){
 	//if (t.endCriteria.hasEnd()){
 		//printf("task in %i has end\n", iteration);
@@ -970,20 +1001,23 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 			//currentTask = controlGoal;
 			return;
 		}
-		currentTask = Task(p[0].first, p[0].second);
+		currentTask = Task(p[0].disturbance, p[0].direction);
+		currentTask.step = p[0].step;
 		p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
 	else{
 		if (n.disturbance.isValid()){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
+			currentTask.step = motorStep(currentTask.getAction());
 		}
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
+			currentTask.step = motorStep(currentTask.getAction());
 		}
 		printf("changed to reactive\n");
 	}
-	currentTask.step = motorStep(currentTask.getAction());
+	//currentTask.step = motorStep(currentTask.getAction());
 	ogStep = currentTask.step;
 	//printf("set step\n");
 }

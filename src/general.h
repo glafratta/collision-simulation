@@ -36,22 +36,19 @@ struct Node{
 	bool filled =0;
 	float cost=0; //self-error
 	float error=0; //error with respect to control goal
-	bool twoStep=0;
-
-	// Angle getAngle(){
-	// 	return Angle(disturbance.getAngle(endPose));
-	// }
-
-	// Distance getDistance(){
-	// 	b2Vec2 v = endPose.p - disturbance.getPosition();
-	// 	return Distance(v.Length());
-	// }
-
+	
 	void fill(simResult);
 
 	float evaluationFunction(float weight=0.02);
 };
 
+struct TaskSummary{
+	Disturbance disturbance;
+	Direction direction = DEFAULT;
+	float step=0;
+
+	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){}
+};
 
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
@@ -62,7 +59,6 @@ typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
-typedef std::pair <Disturbance, Direction> TaskSummary;
 typedef std::vector <TaskSummary> Sequence;
 
 // struct Leaf{

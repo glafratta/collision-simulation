@@ -170,9 +170,9 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		g[v1].totDs=g[src].totDs;
 		g[v1].cost = g[src].cost;
 		g[v1].disturbance = obs;
-		if (g[e].direction==BACK){
-			g[v1].twoStep =1;
-		}
+		// if (g[e].direction==BACK){
+		// 	g[v1].twoStep =1;
+		// }
 		vertexAdded=true;
 	}
 	return vertexAdded;
@@ -340,6 +340,8 @@ std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
+
+std::pair <bool, int> checkPlan(b2World&, Sequence &, Task, b2Transform); //returns if plan fails and at what index in the plan
 									
 void trackTaskExecution(Task &);
 

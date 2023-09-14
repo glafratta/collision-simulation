@@ -70,9 +70,8 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	// body->CreateFixture(fixtureDef.shape, 0.0f);
 }
 
-std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task *curr){
+std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task *curr, CoordinateContainer * dCloud){
     std::pair <CoordinateContainer, bool> result(CoordinateContainer(), 0);
-    CoordinateContainer dCloud;
     float qBottomH=0, qTopH=0, qBottomP=0, qTopP=0, mHead=0, mPerp=0, ceilingY=0, floorY=0, frontX=0, backX=0;
     if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
         //FIND PARAMETERS OF THE LINES CONNECTING THE a
@@ -90,8 +89,8 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY){
                 result.first.insert(p);
             }
-            if (checkDisturbance(p, result.second, curr)){
-                dCloud.insert(p);
+            if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
+                dCloud->insert(p);
             }
         }
 
@@ -105,15 +104,15 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
             }
-            if (checkDisturbance(p, result.second, curr)){
-                dCloud.insert(p);
-            }        
+            if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
+                dCloud->insert(p);
+            }      
         }
     }
     return result;
 }
 
-  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, bool discrete){
+  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, CoordinateContainer * dCloud = NULL){
     //sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
     // if (iteration=0){
     //     FILE *f = fopen(bodyFile, "w+");
@@ -121,16 +120,13 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     // }
     std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=BOX2DRANGE;
-    if (discrete){
-        boxLength = DISCRETE_RANGE;
-    }
     if(d==BACK){
         float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
         float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
         start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
     }
     std::pair <Point, Point> bt = bounds(d, start, boxLength, curr);
-    std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr);
+    std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr, dCloud);
     // if (NULL!=curr){
     //     result.second = averagePoint(&&&.first, curr->disturbance);
     // }
