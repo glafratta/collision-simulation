@@ -918,8 +918,8 @@ std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, T
 		std::pair <bool, b2Vec2> dData = worldBuilder.buildWorld(world, currentBox2D, start, ts.direction, &t, &dCloud);
 		simResult sim = t.willCollide(world, iteration); //check if plan is successful
 		start = sim.endPose;
-		b2Vec2 differenceVector = ts.disturbance - dData.second;
-		ts.disturbance = dData.second;
+		b2Vec2 differenceVector = ts.disturbance.pose.p - dData.second;
+		ts.disturbance.pose.p = dData.second;
 		int additionalSteps = SignedVectorLength(differenceVector);
 		ts.step +=additionalSteps;
 		if (sim.resultCode != simResult::successful){

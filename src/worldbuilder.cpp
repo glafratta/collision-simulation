@@ -112,7 +112,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, CoordinateContainer * dCloud = NULL){
+  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, CoordinateContainer * dCloud){
     //sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
     // if (iteration=0){
     //     FILE *f = fopen(bodyFile, "w+");

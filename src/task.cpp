@@ -2,7 +2,7 @@
 
 
 
-simResult Task::willCollide(b2World & _world, int iteration, bool debugOn=0, float remaining=8.0){ //CLOSED LOOP CONTROL, og return simreult
+simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
 		// if (discrete & action.getOmega()==0){
 		// 	result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized

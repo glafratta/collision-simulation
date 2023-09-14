@@ -231,7 +231,7 @@ void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transfor
 void trackDisturbance(Disturbance &, Action);
 
 
-simResult willCollide(b2World &, int, bool, float);
+simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0);
 
 enum controlResult{DONE =0, CONTINUE =1};
 
