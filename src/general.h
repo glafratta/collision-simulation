@@ -47,6 +47,8 @@ struct TaskSummary{
 	Direction direction = DEFAULT;
 	float step=0;
 
+	TaskSummary()=default;
+
 	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){}
 };
 

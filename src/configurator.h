@@ -168,7 +168,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
-		g[v1].cost = g[src].cost;
+		//g[v1].cost = g[src].cost;
 		g[v1].disturbance = obs;
 		// if (g[e].direction==BACK){
 		// 	g[v1].twoStep =1;
