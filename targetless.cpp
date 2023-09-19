@@ -104,6 +104,10 @@ void step( AlphaBot &motors){
 	c->trackTaskExecution(*(c->getTask()));	
 //	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
 	//EndedResult controlEnded = controlGoal.checkEnded();
+	if (c->plan.empty()){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+ 		motors.setLeftWheelSpeed(0);		
+	}
 	if (c->controlGoal.checkEnded().ended){
 		c->controlGoal.change =1;
 		return;
