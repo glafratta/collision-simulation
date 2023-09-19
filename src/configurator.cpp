@@ -125,9 +125,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful || 
 		collisionGraph[v0].filled =1;
 		collisionGraph[v0].outcome = simResult::successful;
-		currentTask.change=1;
 		classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		plan = getCleanSequence(collisionGraph, bestLeaf);
+		currentTask.change=1;
 		printf("plan:");
 		printPlan(plan);
 	}
