@@ -122,14 +122,18 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	result = evaluateNode(v0,collisionGraph, currentTask, world);
 	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful || 
+		collisionGraph[v0].filled =1;
+		currentTask.change=1;
 		classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		printf("plan:");
 		printPlan(plan);
 	}
-	currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	else{
+		result = evaluateNode(v0,collisionGraph, currentTask, world);
+		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+	}
 	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
 	float duration=0;
 	if (benchmark){
