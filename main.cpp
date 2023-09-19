@@ -108,6 +108,8 @@ void step( AlphaBot &motors){
 		printf("null pointer to configurator in stepcallback\n");
 	}
 	if (c->getIteration() <=0){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+ 	   motors.setLeftWheelSpeed(0);
 		return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
