@@ -106,7 +106,8 @@ void step( AlphaBot &motors){
 	//EndedResult controlEnded = controlGoal.checkEnded();
 	if (c->plan.empty()){
 		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
- 		motors.setLeftWheelSpeed(0);		
+ 		motors.setLeftWheelSpeed(0);
+		return;		
 	}
 	if (c->controlGoal.checkEnded().ended){
 		c->controlGoal.change =1;
@@ -118,7 +119,7 @@ void step( AlphaBot &motors){
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
+	printf("step: R=%f\tL=%f, conf iteration = %i, plan size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), plan.size());
     //iteration++;
 }
 };
