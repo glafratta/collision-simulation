@@ -116,7 +116,7 @@ void step( AlphaBot &motors){
 		c->controlGoal.change =1;
 	}
 //	if (c->getTask()->change){
-	c->currentTask.trackDisturbance(c->getTask()->disturbance, c->getTask()->getAction());
+	c->getTask()->trackDisturbance(c->getTask()->disturbance, c->getTask()->getAction());
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
 	printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose.p.x, c->controlGoal.disturbance.pose.p.y);
 //	}
