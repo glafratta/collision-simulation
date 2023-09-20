@@ -119,7 +119,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     //     fclose(f);
     // }
     std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
-    float boxLength=BOX2DRANGE;
+    float boxLength=simulationStep;
     if(d==BACK){
         float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
         float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());

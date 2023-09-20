@@ -131,7 +131,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("plan:");
 		printPlan(plan);
 	}
-	else{
+	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
 		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
 	}

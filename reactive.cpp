@@ -126,6 +126,7 @@ int main(int argc, char** argv) {
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
 	}
+	configurator.worldBuilder.simulationStep = configurator.simulationStep;
 	printf("REACTIVE NAVIGATION\n");
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
