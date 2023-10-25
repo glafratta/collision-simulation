@@ -1014,7 +1014,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
 			//currentTask.step = motorStep(currentTask.getAction());
 		}
-		else if(currentTask.getAffIndex()==AVOID){
+		else if(currentTask.direction!=DEFAULT){
 				currentTask = Task(n.disturbance, DEFAULT); //reactive
 		}
 		else{
