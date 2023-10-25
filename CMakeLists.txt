@@ -17,7 +17,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(target main.cpp)
   add_executable(targetless targetless.cpp)
   add_executable(targetless_benchmark targetless_benchmark.cpp)  
-  add_executable(targetl_benchmark targetl_benchmark.cpp)
+  add_executable(target_benchmark target_benchmark.cpp)
   add_executable(reactive reactive.cpp)
   add_executable(reactive_target reactive_target.cpp)
   target_link_libraries(reactive alphabot a1lidarrpi HICS pigpio)
