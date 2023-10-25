@@ -10,7 +10,7 @@ temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
 if [ $temp -lt 51000 ]
 then
 	echo "temperature of $temp ok, building"
-	rm targetless targetless_benchmark navigate targetless_simple
+	rm targetless targetless_benchmark navigate targetless_simple reactive target
 	cmake .
 	cd src/
 	sudo make install

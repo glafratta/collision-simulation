@@ -131,7 +131,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("plan:");
 		printPlan(plan);
 	}
-	else{
+	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
 		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
 	}
@@ -1012,12 +1012,17 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	else{
 		if (n.disturbance.isValid()){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
-			currentTask.step = motorStep(currentTask.getAction());
+			//currentTask.step = motorStep(currentTask.getAction());
+		}
+		else if(currentTask.getAffIndex()==AVOID){
+				currentTask = Task(n.disturbance, DEFAULT); //reactive
 		}
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
-			currentTask.step = motorStep(currentTask.getAction());
 		}
+//			currentTask.step = motorStep(currentTask.getAction());
+		
+		currentTask.step = motorStep(currentTask.getAction());
 		printf("changed to reactive\n");
 	}
 	//currentTask.step = motorStep(currentTask.getAction());
