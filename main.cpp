@@ -113,7 +113,6 @@ void step( AlphaBot &motors){
 	if (c->plan.empty()){
 		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
  	   motors.setLeftWheelSpeed(0);		
-	   return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
 	EndedResult er = c->controlGoal.checkEnded();
