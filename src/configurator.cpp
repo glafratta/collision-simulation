@@ -398,6 +398,55 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 	}while(g[bestNext].options.size()!=0);
 }
 
+//ALGORITHM E: TS IS ONE TASK BUT SPLIT IN CHUNKS, SO DISTRUBANCE GETS PROPAGATED ALONG CHUNKS
+void Configurator::AlgorithmE(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+	vertexDescriptor v1, v0;
+	float error;
+	bool added;
+	Direction direction = s.direction;
+	std::vector <vertexDescriptor> priorityQueue = {v};	
+	do{	
+		v=bestNext;
+		priorityQueue.erase(priorityQueue.begin());
+		if (!(g[v].filled)){ //for the first vertex
+			evaluateNode(v, g, s, w);			
+		}
+		EndedResult er = findError(v, g, direction);
+		applyTransitionMatrix(g, v, direction, er.ended);
+		for (vertexDescriptor b:propagateD(v, g)){
+			//applyTransitionMatrix(g, b, direction, 0); //always default, assumed not ended
+			g[b].error = findError(b, g, direction).errorFloat;
+			addToPriorityQueue(g, b, priorityQueue);
+		}
+		//printf("options = %i\n", g[v].options.size());
+		for (Direction d: g[v].options){ //add and evaluate all vertices
+			v0=v;
+			v1 =v0;
+			do {
+			added =addVertex(v0, v1, g, g[v0].disturbance); //add
+			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
+			evaluateNode(v1, g, s, w); //find simulation result
+			applyTransitionMatrix(g, v1, g[e].direction, er.ended);
+			v0=v1;
+			}while(s.direction !=DEFAULT & added);
+			g[v1].error = findError(v1, g, s.direction).errorFloat;
+			//priorityQueue.push_back(v1);
+			addToPriorityQueue(g,v1, priorityQueue); //add the vertices in the task to PQ (done automat)
+			//create backup locations (could add to PQ when propagating D)
+		}
+		//bestNext = findBestLeaf(g, frontier, v);			
+
+		bestNext=priorityQueue[0];
+		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
+	//}while(bestNext !=v); //this means that v has progressed
+	//}while(!controlGoal.checkEnded(g[bestNext].endPose).ended);
+	}while(g[bestNext].options.size()!=0);
+}
+
+
 void Configurator::onDemandAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	discretized=1;
 	vertexDescriptor v1=v;
@@ -480,6 +529,30 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 	}
 	return split;
 }
+
+std::vector <vertexDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph& g){
+	std::vector <vertexDescriptor> result;
+	if (g[v].outcome == simResult::successful){
+		return result;
+	}
+	edgeDescriptor e;
+	if (boost::in_degree(v, g)>0){
+		e = boost::in_edges(v, g).first.dereference();
+	}
+	else{
+		return result;
+	}
+	while (g[e].direction == DEFAULT){
+		g[e.m_source].disturbance = g[e.m_target].disturbance;
+		g[e.m_source].outcome = g[e.m_target].outcome;
+		g[e.m_source].options = g[e.m_target].options;
+		v= e.m_source;
+		result.push_back(v);
+		e= boost::in_edges(v, g).first.dereference();
+	}
+}
+
+
 
 void Configurator::removeIdleNodes(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
 	if (leaf <root){
@@ -699,7 +772,7 @@ void Configurator::run(Configurator * c){
 
 
 void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
-	Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose);
+	Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose); //reflex to disturbance
 	switch (numberOfM){
 		case (THREE_M):{
 				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
@@ -722,12 +795,19 @@ void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direc
 					}
 					else if (d==DEFAULT){
 						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
-							g[vd].options.push_back(temp.direction);
-							g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+							if (graphConstruction != E){
+								g[vd].options.push_back(temp.direction);
+								g[vd].options.push_back(getOppositeDirection(temp.direction).second);
+							}
 							g[vd].options.push_back(DEFAULT);
 						}
 						else{
-							g[vd].options = {DEFAULT, LEFT, RIGHT};
+							if (graphConstruction != E){
+								g[vd].options = {DEFAULT, LEFT, RIGHT};
+							}
+							else{
+								g[vd].options ={DEFAULT};
+							}
 						}
 
 					}
