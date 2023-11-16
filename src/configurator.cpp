@@ -421,6 +421,7 @@ void Configurator::AlgorithmE(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 		for (vertexDescriptor b:propagateD(v, g)){
 			//applyTransitionMatrix(g, b, direction, 0); //always default, assumed not ended
 			g[b].error = findError(b, g, direction).errorFloat;
+ 			//discount the outcome error
 			addToPriorityQueue(g, b, priorityQueue);
 		}
 		//printf("options = %i\n", g[v].options.size());
@@ -537,24 +538,33 @@ std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, Colli
 
 std::vector <vertexDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph& g){
 	std::vector <vertexDescriptor> result;
-	if (g[v].outcome == simResult::successful){
+	if (g[v].outcome == simResult::successful ){
 		return result;
 	}
 	edgeDescriptor e;
-	if (boost::in_degree(v, g)>0){
-		e = boost::in_edges(v, g).first.dereference();
-	}
+	if(boost::in_degree(v,g)>0){
+			e= boost::in_edges(v, g).first.dereference();
+		}
 	else{
 		return result;
 	}
-	while (g[e].direction == DEFAULT){
+	while (g[e].direction ==DEFAULT){
 		g[e.m_source].disturbance = g[e.m_target].disturbance;
-		g[e.m_source].outcome = g[e.m_target].outcome;
+		g[e.m_source].outcome = simResult::safeForNow;
 		g[e.m_source].options = g[e.m_target].options;
 		v= e.m_source;
+		if(boost::in_degree(v,g)>0){
+			e= boost::in_edges(v, g).first.dereference();
+			}
+		else{
+			break;
+		}
 		result.push_back(v);
-		e= boost::in_edges(v, g).first.dereference();
+		// if (edgeIterator ei = boost::in_edges(v, g).first ==NULL){
+		// 	return result;
+		// }
 	}
+	return result;
 }
 
 
@@ -924,6 +934,9 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 }
 
 void Configurator::addToPriorityQueue(CollisionGraph& g, vertexDescriptor v, std::vector <vertexDescriptor>& queue){
+	if (g[v].outcome ==simResult::crashed){
+		return;
+	}
 	for (auto i =queue.begin(); i!=queue.end(); i++){
 		if (abs(g[*i].evaluationFunction()) >abs(g[v].evaluationFunction())){
 			queue.insert(i, v);

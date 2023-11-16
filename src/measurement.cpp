@@ -81,12 +81,12 @@ float EndCriteria::getStandardError(Angle a, Distance d, Node n){
     float outcomeError=0;
     if (n.filled){
         switch (n.outcome){
-            case simResult::crashed: outcomeError+=2; break; //the max error is 6 (4 from angle and distance, 2 from outcome)
+            case simResult::crashed: outcomeError+=2; break; //the max error is 3 (1 from norm angle and distance, 2 from outcome)
             default:break;
         }
     }
     result = getStandardError(a, d) + weights[2]*outcomeError;
-    return result/2; //normalised to max value it can take
+    return result/3; //normalised to max value it can take
 }
 
 float SignedVectorLength(b2Vec2 v){
