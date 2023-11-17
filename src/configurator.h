@@ -166,6 +166,9 @@ bool isFullLength(V v, const G & g, float length=0){
 }
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
+	if (!obs.isValid()){
+		obs = controlGoal.disturbance;
+	}
 	bool vertexAdded = false;
 	if (g[src].options.size()>0){
 		v1 = boost::add_vertex(g);
