@@ -152,7 +152,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	 	float duration=abs(float(d.count())/1000); //express in seconds
 		FILE * f = fopen(statFile, "a+");
 	//	printf("open stat\n");
-		fprintf(f,"%i\t%i\t%f\n", bodies, collisionGraph.m_vertices.size(), duration);
+		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
 		fclose(f);
 		return 0; //stops when finished and doesn't execute
 
@@ -785,7 +785,7 @@ void Configurator::run(Configurator * c){
 			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
 				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
-				c->Spawner(c->ci->data, c->ci->data2fp);
+				c->running = c->Spawner(c->ci->data, c->ci->data2fp);
 				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);
 		}
 	}
