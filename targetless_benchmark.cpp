@@ -102,9 +102,7 @@ int ogStep=0;
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	if (c ==NULL || !c->running){
-		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
-		motors.setLeftWheelSpeed(0);
+	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
 	if (c->getIteration() <=0){
@@ -113,17 +111,22 @@ void step( AlphaBot &motors){
 	c->trackTaskExecution(*(c->getTask()));	
 //	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
 	//EndedResult controlEnded = controlGoal.checkEnded();
+	if (c->plan.empty()|| !c->running){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+ 		motors.setLeftWheelSpeed(0);
+		return;		
+	}
 	if (c->controlGoal.checkEnded().ended){
 		c->controlGoal.change =1;
 		return;
 	}
 	//if (c->getTask()->change){
-	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
-	//}
+		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
+//	}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
+	printf("step: R=%f\tL=%f, conf iteration = %i, plan size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->plan.size());
     //iteration++;
 }
 };
