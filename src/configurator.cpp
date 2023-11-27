@@ -157,7 +157,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		return 0; //stops when finished and doesn't execute
 
 	}
-	bodies =0;
+	worldBuilder.resetBodies();
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH 

@@ -14,6 +14,7 @@ const float LEFT_WHEEL_WEIGHT =.9;
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
+	buildType=1;
     for (Point p: points){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
