@@ -100,6 +100,8 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
 	float R=0;
 
 public:
+int ogStep=0;
+
 
 Callback(Configurator *conf): c(conf){
 }
