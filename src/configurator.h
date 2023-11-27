@@ -94,7 +94,7 @@ void setBenchmarking(bool b){
 		d=ltm->tm_mday;
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
-		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i_t%i_b%i.txt",dirName, d,m,y,h,min, controlGoal.disturbance.isValid(), worldBuilder.buildType);
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		fclose(f);
