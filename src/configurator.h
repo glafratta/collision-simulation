@@ -99,6 +99,7 @@ void setBenchmarking(bool b){
 		FILE * f = fopen(statFile, "w");
 		fclose(f);
 	}
+	printf("set\n");
 }
 
 bool Spawner(CoordinateContainer, CoordinateContainer); 
