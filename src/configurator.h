@@ -77,7 +77,7 @@ void setBenchmarking(bool b){
 	benchmark =b;
 		if (benchmark){
 		char dirName[50];
-		sprintf(dirName, "bodiesSpeedStats%.1f", BOX2DRANGE);
+		sprintf(dirName, "benchmark");
 		if (!opendir(dirName)){
 			mkdir(dirName, 0777);
 			printf("made stats directory\n");
@@ -94,7 +94,8 @@ void setBenchmarking(bool b){
 		d=ltm->tm_mday;
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
-		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
+		//sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
+		sprintf(statFile,"stat");
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		printf("open\n");
