@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = A_STAR;
 	configurator.setBenchmarking(1);
-	configurator.planning =0;
+	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
