@@ -106,7 +106,9 @@ int ogStep=0;
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	if (c ==NULL){
+	if (c ==NULL || !c->running){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+		motors.setLeftWheelSpeed(0);
 		printf("null pointer to configurator in stepcallback\n");
 	}
 	if (c->getIteration() <=0){
@@ -142,14 +144,12 @@ int main(int argc, char** argv) {
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = A_STAR;
 	configurator.setBenchmarking(1);
+	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 	}
 	if (argc>2){
-		configurator.planning= atoi(argv[2]);
-	}
-	if (argc>3){
-		configurator.simulationStep = atof(argv[3]);
+		configurator.simulationStep = atof(argv[2]);
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	printf("box2drange = %f\n", BOX2DRANGE);

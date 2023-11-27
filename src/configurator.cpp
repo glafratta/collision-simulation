@@ -789,6 +789,7 @@ void Configurator::run(Configurator * c){
 				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);
 		}
 	}
+
 }
 
 
