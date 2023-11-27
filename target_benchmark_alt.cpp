@@ -104,7 +104,6 @@ public:
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-void step( AlphaBot &motors){
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
