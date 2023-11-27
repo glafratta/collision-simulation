@@ -154,7 +154,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//	printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
 		fclose(f);
-		return 0; //stops when finished and doesn't execute
+		//return 0; //stops when finished and doesn't execute
 
 	}
 	bodies =0;
