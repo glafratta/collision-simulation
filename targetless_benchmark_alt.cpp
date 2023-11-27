@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
 		configurator.worldBuilder.debug = atoi(argv[1]);
 	}
 	if (argc>2){
-		configurator.simulationStep = atof(argv[2]);
+		configurator.setSimulationStep(atof(argv[3]));
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	printf("box2drange = %f\n", BOX2DRANGE);

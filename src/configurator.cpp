@@ -40,7 +40,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (debugOn){
 		f = fopen(bodyFile, "w");
 		fclose(f);
-		printf("planfile = robot%04i.txt\n", iteration);
+		//printf("planfile = robot%04i.txt\n", iteration);
 	}
 	//printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
 	//BENCHMARK + FIND TRUE SAMPLING RATE
@@ -137,14 +137,14 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		currentTask.change=1;
-		printf("plan:");
-		printPlan(plan);
+		//printf("plan:");
+		//printPlan(plan);
 	}
 	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
 		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
 	}
-	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
+//	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -768,7 +768,7 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 }
 
 void Configurator::run(Configurator * c){
-	printf("run\n");
+	//printf("run\n");
 	while (c->running){
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
@@ -783,7 +783,7 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			printf(".");
 			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
-				printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
+	//			printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
 				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);

@@ -361,6 +361,10 @@ int motorStep(Task::Action, EndCriteria);
 
 int motorStep(Task::Action a);
 
+void setSimulationStep(float f){
+	simulationStep=f;
+	worldBuilder.simulationStep=f;
+}
 };
 
 
