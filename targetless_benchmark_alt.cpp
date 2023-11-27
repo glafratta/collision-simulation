@@ -146,6 +146,8 @@ int main(int argc, char** argv) {
 	configurator.planning =0;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
+		configurator.worldBuilder.debug = atoi(argv[1]);
 	}
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
