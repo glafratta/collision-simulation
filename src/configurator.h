@@ -97,6 +97,7 @@ void setBenchmarking(bool b){
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
+		printf("open\n");
 		fclose(f);
 	}
 	printf("set\n");
