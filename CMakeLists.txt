@@ -26,6 +26,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   target_link_libraries(target alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(targetless_benchmark alphabot a1lidarrpi HICS pigpio)
+ 	target_link_libraries(targetless_benchmark_alt alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(target_benchmark alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(target_benchmark_alt alphabot a1lidarrpi HICS pigpio)
   target_link_libraries(reactive_target alphabot a1lidarrpi HICS pigpio)
