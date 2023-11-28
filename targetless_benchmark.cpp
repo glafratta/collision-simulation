@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
 		configurator.setSimulationStep(atof(argv[3]));
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
-	printf("box2drange = %f\n", BOX2DRANGE);
+	//printf("box2drange = %f\n", BOX2DRANGE);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);

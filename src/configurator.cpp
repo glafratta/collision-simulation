@@ -151,7 +151,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
 	 	float duration=abs(float(d.count())/1000); //express in seconds
 		FILE * f = fopen(statFile, "a+");
-	//	printf("open stat\n");
+		printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
 		fclose(f);
 		return 0; //stops when finished and doesn't execute
