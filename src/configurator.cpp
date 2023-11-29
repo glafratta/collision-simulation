@@ -393,7 +393,8 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v1, g[e].direction, er.ended);
+			bool end = controlGoal.checkEnded(g[v1]).ended;
+			applyTransitionMatrix(g, v1, g[e].direction, end);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
 			g[v1].error = findError(v1, g, s.direction).errorFloat;
@@ -434,7 +435,8 @@ void Configurator::AlgorithmE(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v1, g[e].direction,  controlGoal.checkEnded(g[v1]).ended);
+			bool end = controlGoal.checkEnded(g[v1]).ended;
+			applyTransitionMatrix(g, v1, g[e].direction,  end);
 			v0=v1;
 			}while(s.direction !=DEFAULT & added);
 			g[v1].error = findError(v1, g, s.direction).errorFloat;
