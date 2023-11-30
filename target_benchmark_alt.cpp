@@ -1,13 +1,7 @@
 //#include "Box2D/Box2D.h"
-<<<<<<< HEAD
 #include "configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
-=======
-#include "a1lidarrpi.h"
-#include "alphabot.h"
-#include "configurator.h"
->>>>>>> non_paper
 #include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,18 +10,18 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
-const float LEFT_WHEEL_WEIGHT =.9;
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+    int count =0;
+	buildType =2;
     std::vector <BodyFeatures> result;
-<<<<<<< HEAD
-=======
-	buildType=1;
->>>>>>> non_paper
     for (Point p: points){
+        if (count%2==0){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
             result.push_back(feature);  
+        }
+        count++;
     }
     return result;
 }
@@ -109,16 +103,13 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
 public:
 int ogStep=0;
 
+
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-<<<<<<< HEAD
-	if (c ==NULL){
-=======
 	if (c ==NULL || !c->running){
 		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
 		motors.setLeftWheelSpeed(0);
->>>>>>> non_paper
 		printf("null pointer to configurator in stepcallback\n");
 	}
 	if (c->getIteration() <=0){
@@ -178,7 +169,6 @@ int main(int argc, char** argv) {
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
-
 }
 	
 	

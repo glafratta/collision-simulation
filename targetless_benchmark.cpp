@@ -1,7 +1,7 @@
 //#include "Box2D/Box2D.h"
-#include "configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
+#include "configurator.h"
 #include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +14,7 @@ const float LEFT_WHEEL_WEIGHT =.9;
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
+	buildType=1;
     for (Point p: points){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
@@ -111,17 +112,22 @@ void step( AlphaBot &motors){
 	c->trackTaskExecution(*(c->getTask()));	
 //	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
 	//EndedResult controlEnded = controlGoal.checkEnded();
+	if (c->plan.empty()|| !c->running){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+ 		motors.setLeftWheelSpeed(0);
+		return;		
+	}
 	if (c->controlGoal.checkEnded().ended){
 		c->controlGoal.change =1;
 		return;
 	}
 	//if (c->getTask()->change){
-	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
-	//}
+		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
+//	}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
+	printf("step: R=%f\tL=%f, conf iteration = %i, plan size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->plan.size());
     //iteration++;
 }
 };
@@ -136,18 +142,18 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = A_STAR;
+	configurator.planning =1;
 	configurator.setBenchmarking(1);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
+		configurator.worldBuilder.debug = atoi(argv[1]);
 	}
 	if (argc>2){
-		configurator.planning= atoi(argv[2]);
-	}
-	if (argc>3){
-		configurator.simulationStep = atof(argv[3]);
+		configurator.setSimulationStep(atof(argv[2]));
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
-	printf("box2drange = %f\n", BOX2DRANGE);
+	//printf("box2drange = %f\n", BOX2DRANGE);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	Callback cb(&configurator);

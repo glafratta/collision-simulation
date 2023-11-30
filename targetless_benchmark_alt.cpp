@@ -1,7 +1,7 @@
 //#include "Box2D/Box2D.h"
-#include "configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
+#include "configurator.h"
 #include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
+	buildType=2;
     std::vector <BodyFeatures> result;
     for (Point p: points){
         if (count%2==0){
@@ -100,6 +101,8 @@ class Callback :public AlphaBot::StepCallback { //every 100ms the callback updat
 	float R=0;
 
 public:
+int ogStep=0;
+
 
 Callback(Configurator *conf): c(conf){
 }
@@ -111,10 +114,24 @@ void step( AlphaBot &motors){
 		return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
-	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0]);
+//	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
+	//EndedResult controlEnded = controlGoal.checkEnded();
+	if (c->plan.empty()|| !c->running){
+		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+ 		motors.setLeftWheelSpeed(0);
+		return;		
+	}
+	if (c->controlGoal.checkEnded().ended){
+		c->controlGoal.change =1;
+		return;
+	}
+	//if (c->getTask()->change){
+		c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
+//	}
+	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i, tree size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->treeSize);
+	printf("step: R=%f\tL=%f, conf iteration = %i, plan size = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration(), c->plan.size());
     //iteration++;
 }
 };
@@ -130,14 +147,14 @@ int main(int argc, char** argv) {
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = A_STAR;
 	configurator.setBenchmarking(1);
+	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
+		configuratorInterface.debugOn = atoi(argv[1]);
+		configurator.worldBuilder.debug = atoi(argv[1]);
 	}
 	if (argc>2){
-		configurator.planning= atoi(argv[2]);
-	}
-	if (argc>3){
-		configurator.simulationStep = atof(argv[3]);
+		configurator.setSimulationStep(atof(argv[2]));
 	}
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	printf("box2drange = %f\n", BOX2DRANGE);
