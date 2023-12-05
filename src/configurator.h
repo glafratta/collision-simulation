@@ -1,8 +1,6 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 #include "opencv2/opencv.hpp"
-//#include "box2d/box2d.h"
-//#include "robot.h"
 #include <dirent.h>
 #include <vector>
 #include <thread>
@@ -11,8 +9,6 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-//#include "task.h"
-//#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
@@ -82,9 +78,7 @@ void setBenchmarking(bool b){
 			mkdir(dirName, 0777);
 			printf("made stats directory\n");
 		}
-		else{
-			printf("opened stats directory\n");
-		}
+
 		//TODAYS DATE AND TIME
 		time_t now =time(0);
 		tm *ltm = localtime(&now);
@@ -95,13 +89,9 @@ void setBenchmarking(bool b){
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-		//sprintf(statFile,"stat");
-		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
-		printf("open\n");
 		fclose(f);
 	}
-	printf("set\n");
 }
 
 bool Spawner(CoordinateContainer, CoordinateContainer); 
@@ -134,20 +124,9 @@ simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
-std::vector<vertexDescriptor> propagateD(vertexDescriptor, CollisionGraph&);
-
-
 void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
-//void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
-
 void classicalAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
-
-void AlgorithmE(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
-
-void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
-
-std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
@@ -179,11 +158,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
-		//g[v1].cost = g[src].cost;
 		g[v1].disturbance = obs;
-		// if (g[e].direction==BACK){
-		// 	g[v1].twoStep =1;
-		// }
 		vertexAdded=true;
 	}
 	return vertexAdded;
@@ -214,8 +189,6 @@ void registerInterface(ConfiguratorInterface *);
 static void run(Configurator *);
 
 void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
-
-//void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
 bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 

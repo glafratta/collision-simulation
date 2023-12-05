@@ -61,7 +61,6 @@ struct EndCriteria{
     float getStandardError(Angle, Distance);
     float getStandardError(Angle, Distance, Node);
     std::vector <float> weights = {1, 1, 1}; //0:angle, 1: distance, 2: outcome (if node)
-   // float getStandardError(Node);
     bool hasEnd();
 
 };
@@ -73,26 +72,10 @@ struct EndedResult{
 
     EndedResult() = default;
 
-   // float errorSquared();
 };
-
-//typedef Measurement Mst;
-// bool operator<(Meas &, Meas &);
-
-// bool operator>=(Meas &, Meas &);
 
 
 float SignedVectorLength(b2Vec2);
 
-
-// template <class PT>
-// bool isInRadius(PT point1, PT point2, float radius = 0.05){ //check if this point is within a certain radius from another given point
-// 	if (point2.x <= point1.x+radius && point2.x >=point1.x-radius && point1.y <= point1.y+radius && point2.y >=point1.y-radius){
-// 		return true;
-// 	}
-// 	else{
-// 		return false;
-// 	}
-// }
 
 #endif

@@ -10,10 +10,7 @@
 #define MAX_TURN M_PI
 #define ROBOT_HALFLENGTH 0.11 //uncomment for robot
 #define ROBOT_HALFWIDTH 0.09 //real
-//#define ROBOT_HALFLENGTH 0.05 //debug value
-//#define ROBOT_HALFWIDTH 0.01 //debug value
 #define ROBOT_BOX_OFFSET_X -0.05
-//#define ROBOT_BOX_OFFSET_X 0
 #define ROBOT_BOX_OFFSET_Y 0
 #define ROBOT_BOX_OFFSET_ANGLE 0
 #define BETWEEN_WHEELS .15
@@ -43,8 +40,6 @@ const int maxNodesOnSpot =4;
 class Robot {
 private: 
 	b2FixtureDef fixtureDef;
-	//b2PolygonShape box;
-	//b2Vec2 centroid;
 public:
 	b2Vec2 velocity = {0,0};
 	b2Body* body;
@@ -54,13 +49,10 @@ public:
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world->CreateBody(&bodyDef);
-		//body->SetUserData(this);  
-		//uintptr_t ptr = static_cast<uintptr_t>(this);
 		body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
 		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE);
-		//centroid = box.m_centroid; 
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;
 		body->CreateFixture(&fixtureDef);

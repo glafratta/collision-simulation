@@ -4,9 +4,6 @@
 
 simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
-		// if (discrete & action.getOmega()==0){
-		// 	result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
-		// }
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
@@ -42,9 +39,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 				break;
 			}
-			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
-			// 	result.step =step;
-			// }
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
 		b2Vec2 distance; //= robot.body->GetPosition();
@@ -55,7 +49,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
-			//b=NULL;
 		}
 		if (debugOn){
 			fclose(robotPath);
@@ -66,12 +59,10 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 }
 
 
-//void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2VEc2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 	b2Transform shift(b2Vec2(-robVelocity.p.x*timeElapsed, -robVelocity.p.y*timeElapsed), b2Rot(-robVelocity.q.GetAngle()*timeElapsed)); //calculates shift in the time step
 	b2Vec2 newPos(d.getPosition().x+shift.p.x,d.getPosition().y + shift.p.y);
 	d.setPosition(newPos);
-	// float angle = d.getAngle(robVelocity);
 	float angle = d.getAngle(pose);
 	if (d.isPartOfObject()){
 		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
@@ -80,17 +71,8 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 }
 
 void Task::trackDisturbance(Disturbance & d, Action a){
-	// //switch(dir){
 	float angleTurned =MOTOR_CALLBACK*a.getOmega()*(1/FRICTION_DAMPENING);
-	printf("initial angle =%f, angle turned = %f\n", d.pose.q.GetAngle(), angleTurned);
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
-	// printf("NEW angle =%f\n", d.pose.q.GetAngle());
-	// //float deltaLength = d.pose.p.Length()-s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// printf("omega = %f, linear speed %f, pose = %f", a.getOmega(), a.getLinearSpeed(), d.pose.q.GetAngle());
-	// //float angle = atan2(d.pose.p.y, d.pose.p.x);
-	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// //}
 	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
 	float initialL = d.pose.p.Length();
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
@@ -98,12 +80,10 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 }
 
 Task::controlResult Task::controller(){
-//float recordedAngle = action.getOmega()/0.2;
 float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 bool ended = checkEnded().ended;
 if (action.getOmega()==0){
 	float timeStepError =action.getOmega()/0.2; 
-	//accumulatedError += timeStepError; 
 	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/M_PI_2;
 		action.L -= normAccErr*pGain;  
@@ -156,7 +136,6 @@ Direction Task::H(Disturbance ob, Direction d){
                 }
             }
 		}
-    //printf("angle to ob = %f\n", ob.getAngle());
 }
     return d;
 }
@@ -183,7 +162,6 @@ void Task::setEndCriteria(){
 		}
 		break;
 		case PURSUE:{
-//			endCriteria.angle = Angle(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
@@ -220,8 +198,6 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
-			//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-			//""d= Distance(v.Length());
 			Angle lowAngle = Angle(endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE);
 			lowAngle.setValid(endCriteria.angle.isValid());
 			Angle hiAngle =Angle(endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE);
@@ -232,7 +208,6 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 	else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
 		r.ended =true;
 	}
-	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
 	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
@@ -245,50 +220,10 @@ EndedResult Task::checkEnded(Node n){ //check error of node compared to the pres
 	EndedResult r;
 	Angle a;
 	Distance d;
-	// if (disturbance.isValid()){
-	// 	b2Vec2 v = disturbance.getPosition() - n.endPose.p; //distance between disturbance and robot
-	// 	if (getAffIndex()== int(InnateAffordances::AVOID)){
-	// 		if (!disturbance.isPartOfObject()){
-	// 			a= Angle(disturbance.getAngle(n.endPose));
-	// 			d= Distance(v.Length());
-	// 			r.ended= abs(a.get())>= endCriteria.angle.get() && d.get()>=endCriteria.distance.get();
-	// 		}
-	// 		else{
-	// 			a = Angle(atan(n.endPose.q.s/n.endPose.q.c)-disturbance.getOrientation()); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
-	// 			//float a = abs(a.get()); // the robot and disturbance are parallel
-	// 			float angleTolerance = 1*M_PI/180;
-	// 			r.ended = abs(a.get()) <= abs(endCriteria.angle.get()) + angleTolerance & d.get()>=endCriteria.distance.get();
-	// 		}
-
-	// 	}
-	// 	else if (getAffIndex()== int(InnateAffordances::NONE)){
-	// 		r.ended = true;
-	// 	}
-	// 	else if (getAffIndex()==int(InnateAffordances::PURSUE)){
-	// 		a = Angle(disturbance.getAngle(n.endPose));
-	// 		//b2Vec2 v = disturbance.getPosition() - robotTransform.p;
-	// 		d= Distance(v.Length());
-	// 		r.ended = v.Length()<=endCriteria.distance.get() & (endCriteria.angle.get()-ANGLE_ERROR_TOLERANCE) <=a.get() & (endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE)>=a.get();
-	// 	}
-	// }
 	r = checkEnded(n.endPose);
 	r.errorFloat+= endCriteria.getStandardError(a,d, n);
 	return r;
-
-
-	
 }
-
-// std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float radius){
-// 	std::pair <bool, b2Vec2> result(false, b2Vec2());
-// 	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
-// 		Point p(*b->GetPosition());
-// 		if (p.isInRadius(v, radius)){
-// 			return result=std::pair<bool, b2Vec2>(true, b->GetPosition());
-// 		}
-// 	}
-// 	return result;
-// }
 
 float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
 	float slope = (v2.y- v1.y)/(v2.x - v1.x);

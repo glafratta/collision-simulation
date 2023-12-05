@@ -12,7 +12,6 @@ private:
 public:
 	b2FixtureDef fixtureDef;
     b2Transform pose;
-   // bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
         if (i>affordances.size()-1){
@@ -29,7 +28,6 @@ public:
         else{
             affordanceIndex = i;
         }
-        //bodyDef.type = b2_dynamicBody;
 		pose.Set(p, 0);
         valid =1;
     }    
@@ -41,7 +39,6 @@ public:
         else{
             affordanceIndex = i;
         }
-        //bodyDef.type = b2_dynamicBody;
 		pose.Set(p, a);
         valid =1;
         partOfObject=1;
@@ -130,8 +127,6 @@ struct simResult{
     bool valid = 0;
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-  //  int step=0;
-
 
     simResult(){}
 
