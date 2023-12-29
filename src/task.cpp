@@ -218,7 +218,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 
 		// }
 		if (action.getOmega()!=0){
-			r.ended=(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2;
+			r.ended=fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2;
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r.ended = true;
