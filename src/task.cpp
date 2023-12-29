@@ -40,6 +40,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
 				robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
+				collision.setOrientation(robot.body->GetTransform().q.GetAngle());
 				break;
 			}
 			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
@@ -52,7 +53,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		distance.y = robot.body->GetPosition().y - start.p.y;
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
-		int roboCount=0;
+		//int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
 			//b=NULL;

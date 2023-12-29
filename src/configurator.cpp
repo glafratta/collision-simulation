@@ -323,7 +323,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	// 	// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
 	// 	result.collision.setOrientation(orientation.second);
 	// }
-	result.collision.setOrientation(atan(result.endPose.q.c/result.endPose.q.s)); //90 deg turn
+	//result.collision.setOrientation(result.endPose.q.GetAngle()); //90 deg turn
 	g[v].fill(result);
 	return result;
 	}
