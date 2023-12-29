@@ -219,7 +219,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 		// }
 		if (action.getOmega()!=0){
 			float angleL = start.q.GetAngle()+M_PI_2;
-			float angleR = start.q.GetAngle()-M_PI_2
+			float angleR = start.q.GetAngle()-M_PI_2;
 			r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
 			//r.ended=fabs(fabs(atan(robotTransform.q.s/robotTransform.q.c))-fabs(atan(start.q.s/start.q.c)))>=M_PI_2;
 		}
