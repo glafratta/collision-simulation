@@ -302,8 +302,8 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-			//remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
-			remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
