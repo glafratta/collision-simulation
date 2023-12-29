@@ -126,7 +126,7 @@ if (action.getOmega()==0){
 	return CONTINUE;
 }
 
-Direction Task::H(Disturbance ob, Direction d){
+Direction Task::H(Disturbance ob, Direction d, bool topDown){
 	if (ob.isValid()){
         if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
             if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
@@ -144,17 +144,13 @@ Direction Task::H(Disturbance ob, Direction d){
             }
         }
 		else if (ob.getAffIndex()==int(InnateAffordances::PURSUE)){
-			if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
+			if (d == Direction::DEFAULT & !topDown){ //REACTIVE BEHAVIOUR
                 if (ob.getAngle(start)<-.1){//angle formed with robot at last safe pose
                     d= Direction::RIGHT; //go left
                 }
                 else if (ob.getAngle(start)>0.1){ //angle formed with robot at last safe pose, around .1 rad tolerance
                     d= Direction::LEFT; //
                 }   
-                else{
-                    d = DEFAULT;
-
-                }
             }
 		}
     //printf("angle to ob = %f\n", ob.getAngle());

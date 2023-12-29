@@ -163,7 +163,7 @@ AffordanceIndex getAffIndex(){
     return disturbance.getAffIndex();
 }
 
-Direction H(Disturbance, Direction);
+Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 
 void setEndCriteria();
 
@@ -182,10 +182,10 @@ Task(){
     //RecordedVelocity = action.getLinearVelocity();
 }
 
-Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
-    direction = H(disturbance, d);  
+    direction = H(disturbance, d, topDown);  
     //action = Action(direction);
     action.init(direction);
     //RecordedVelocity = action.getLinearVelocity();
