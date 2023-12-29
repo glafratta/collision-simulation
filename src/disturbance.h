@@ -50,7 +50,6 @@ public:
     void setAngle(float a){
         angleToRobot =a;
     }
-
     void setAngle(b2Transform t){ //gets the angle of an Disturbance wrt to another Disturbance (robot)
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;

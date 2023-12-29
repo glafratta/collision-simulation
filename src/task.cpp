@@ -168,13 +168,13 @@ void Task::setEndCriteria(){
 	b2Vec2 v;
 	switch(disturbance.getAffIndex()){
 		case AVOID: {
-			if (direction !=BACK){
+	//		if (direction !=BACK){
 				endCriteria.distance.setValid(1);
-			}
-			else{
-				v = disturbance.getPosition() - start.p;
-				endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
-			}
+	//		}
+	//		else{
+	//			v = disturbance.getPosition() - start.p;
+	//			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
+	//		}
 			if (disturbance.isPartOfObject()){
 				endCriteria.angle.setValid(1);
 				}
@@ -201,21 +201,24 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 	if (disturbance.isValid()){
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
-		if (getAffIndex()== int(InnateAffordances::AVOID)){
-			if (!disturbance.isPartOfObject()){
-				a= Angle(fabs(disturbance.getAngle(robotTransform)));
-				r.ended= a>= endCriteria.angle || d>=endCriteria.distance;
-			}
-			else{
-				//a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
-				a = Angle(fabs((robotTransform.q.GetAngle())-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
-				//float a = abs(a.get()); // the robot and disturbance are parallel
-				//float angleTolerance = 1*M_PI/180;
-				Angle comparAngle =Angle(fabs(endCriteria.angle.get()));
-				comparAngle.setValid(endCriteria.angle.isValid());
-				r.ended = a<=comparAngle || d>=endCriteria.distance;
-			}
+		// if (getAffIndex()== int(InnateAffordances::AVOID)){
+		// 	if (!disturbance.isPartOfObject()){
+		// 		a= Angle(fabs(disturbance.getAngle(robotTransform)));
+		// 		r.ended= a>= endCriteria.angle || d>=endCriteria.distance;
+		// 	}
+		// 	else{
+		// 		//a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+		// 		a = Angle(fabs((robotTransform.q.GetAngle())-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+		// 		//float a = abs(a.get()); // the robot and disturbance are parallel
+		// 		//float angleTolerance = 1*M_PI/180;
+		// 		Angle comparAngle =Angle(fabs(endCriteria.angle.get()));
+		// 		comparAngle.setValid(endCriteria.angle.isValid());
+		// 		r.ended = a<=comparAngle || d>=endCriteria.distance;
+		// 	}
 
+		// }
+		if (action.getOmega()!=0){
+			r.ended=(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2;
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			r.ended = true;
@@ -232,9 +235,9 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 			r.ended = d<=endCriteria.distance; 
 		}
 	}
-	else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
-		r.ended =true;
-	}
+	// else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
+	// 	r.ended =true;
+	// }
 	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
 	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
