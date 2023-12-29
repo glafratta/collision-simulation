@@ -206,7 +206,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 				r.ended= a>= endCriteria.angle || d>=endCriteria.distance;
 			}
 			else{
-				a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+				//a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+				a = Angle(abs((robotTransform.q.GetAngle())-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
 				//float a = abs(a.get()); // the robot and disturbance are parallel
 				float angleTolerance = 1*M_PI/180;
 				Angle comparAngle =Angle(abs(endCriteria.angle.get()) + angleTolerance);
