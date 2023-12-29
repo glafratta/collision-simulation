@@ -390,7 +390,7 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 			do {
 			added =addVertex(v0, v1, g, g[v0].disturbance); //add
 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
-			s = Task(g[v1].disturbance, g[e].direction, g[v0].endPose);
+			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
