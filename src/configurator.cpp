@@ -268,7 +268,7 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 
 
 void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //returns true if disturbance needs to be eliminated
-	r =s.willCollide(world, iteration, debugOn, SIM_DURATION);
+	r =s.willCollide(world, iteration, debugOn, SIM_DURATION, simulationStep);
 	if (r.resultCode == simResult::crashed){
 		printf("crashed\n");
 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
@@ -302,13 +302,13 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-			//remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
 		}
 	}
-	result =s.willCollide(w, iteration, debugOn, remaining); //default start from 0
+	result =s.willCollide(w, iteration, debugOn, remaining, simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (result.distanceCovered <=.01){ //CYCLE PREVENTING HEURISTICS
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
@@ -1024,7 +1024,7 @@ std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, T
 		result.second++;
 		t = Task(ts.disturbance, ts.direction, start);
 		std::pair <bool, b2Vec2> dData = worldBuilder.buildWorld(world, currentBox2D, start, ts.direction, &t, &dCloud);
-		simResult sim = t.willCollide(world, iteration); //check if plan is successful
+		simResult sim = t.willCollide(world, iteration, 0, SIM_DURATION, simulationStep); //check if plan is successful
 		start = sim.endPose;
 		b2Vec2 differenceVector = ts.disturbance.pose.p - dData.second;
 		ts.disturbance.pose.p = dData.second;

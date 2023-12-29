@@ -2,7 +2,7 @@
 
 
 
-simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining){ //CLOSED LOOP CONTROL, og return simreult
+simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
 		// if (discrete & action.getOmega()==0){
 		// 	result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
@@ -29,7 +29,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			if (checkEnded(robot.body->GetTransform()).ended){
+			if (checkEnded(robot.body->GetTransform()).ended || (start.p-robot.body->GetTransform().p).Length()==simulationStep){
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
