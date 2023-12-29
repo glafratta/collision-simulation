@@ -237,6 +237,11 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 	// else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){
 	// 	r.ended =true;
 	// }
+	else{
+		float angleL = start.q.GetAngle()+M_PI_2;
+		float angleR = start.q.GetAngle()-M_PI_2;
+		r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
+	}
 	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
 	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
