@@ -291,7 +291,8 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 
 		//EVALUATE NODE()
 	simResult result;
-	float remaining = simulationStep*2/MAX_SPEED;
+	//float remaining = simulationStep*2/MAX_SPEED;
+	float remaining = BOX2DRANGE*2/MAX_SPEED;
 	// if (s.action.getOmega()!=0){
 	// 	remaining =fabs(M_PI_2/s.getAction().getOmega());
 	// }

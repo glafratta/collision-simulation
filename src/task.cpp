@@ -203,15 +203,15 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 		d= Distance(v.Length());
 		if (getAffIndex()== int(InnateAffordances::AVOID)){
 			if (!disturbance.isPartOfObject()){
-				a= Angle(abs(disturbance.getAngle(robotTransform)));
+				a= Angle(fabs(disturbance.getAngle(robotTransform)));
 				r.ended= a>= endCriteria.angle || d>=endCriteria.distance;
 			}
 			else{
 				//a = Angle(abs(atan(robotTransform.q.s/robotTransform.q.c)-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
-				a = Angle(abs((robotTransform.q.GetAngle())-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
+				a = Angle(fabs((robotTransform.q.GetAngle())-disturbance.getOrientation())); //operations on angles between -Pi/2 and +pi/2, difference between orientation of d and robot
 				//float a = abs(a.get()); // the robot and disturbance are parallel
 				//float angleTolerance = 1*M_PI/180;
-				Angle comparAngle =Angle(abs(endCriteria.angle.get()));
+				Angle comparAngle =Angle(fabs(endCriteria.angle.get()));
 				comparAngle.setValid(endCriteria.angle.isValid());
 				r.ended = a<=comparAngle || d>=endCriteria.distance;
 			}
@@ -228,8 +228,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 			// lowAngle.setValid(endCriteria.angle.isValid());
 			// Angle hiAngle =Angle(endCriteria.angle.get() +ANGLE_ERROR_TOLERANCE);
 			// hiAngle.setValid(endCriteria.angle.isValid());
-			bool angleEnd = (fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2;
-			r.ended = angleEnd || d<=endCriteria.distance; 
+			//bool angleEnd = (fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2;
+			r.ended = d<=endCriteria.distance; 
 		}
 	}
 	else if ((fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2 & getAffIndex()==int(InnateAffordances::NONE)){

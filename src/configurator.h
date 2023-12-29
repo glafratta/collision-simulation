@@ -170,7 +170,7 @@ bool isFullLength(V v, const G & g, float length=0){
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
 	if (!obs.isValid()){
-		obs = controlGoal.disturbance;
+		obs=Disturbance(0, controlGoal.disturbance.getPosition(), controlGoal.disturbance.getOrientation);
 	}
 	bool vertexAdded = false;
 	if (g[src].options.size()>0){
