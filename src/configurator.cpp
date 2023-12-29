@@ -302,7 +302,8 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+			//remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
+			remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
@@ -389,7 +390,7 @@ void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s,
 			do {
 			added =addVertex(v0, v1, g, g[v0].disturbance); //add
 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
-			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+			s = Task(g[v1].disturbance, g[e].direction, g[v0].endPose);
 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
 			evaluateNode(v1, g, s, w); //find simulation result
