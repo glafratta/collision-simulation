@@ -719,8 +719,8 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 		best = e.m_source;
 		Task::Action a;
 		a.init(g[e].direction);
-		float step = motorStep(a);
-		TaskSummary ts(g[best].disturbance, g[e].direction, step);
+		//float step = motorStep(a);
+		TaskSummary ts(g[best].disturbance, g[e].direction, g[best].step);
 		p.insert(p.begin(), ts);
 		//p[size-1]=ts; //fill the plan from the end backwards
 		//size--;

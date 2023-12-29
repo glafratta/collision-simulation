@@ -53,6 +53,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		distance.y = robot.body->GetPosition().y - start.p.y;
 		result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
+		result.step=step;
 		//int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
