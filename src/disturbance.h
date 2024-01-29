@@ -5,11 +5,11 @@
 
 struct Disturbance{ //this generates error
 private:
-    bool valid= 0;
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     float angleToRobot=0;
     bool partOfObject=0;
 public:
+    bool valid= 0;
 	b2FixtureDef fixtureDef;
     b2Transform pose;
    // bool safeForNow=1;

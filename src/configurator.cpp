@@ -121,8 +121,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
-		collisionGraph[v0].filled =1;
+	if (planning & ){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+		if ( planBuild!=STATIC || plan.empty()){
+					collisionGraph[v0].filled =1;
 		collisionGraph[v0].disturbance = controlGoal.disturbance;
 		collisionGraph[v0].outcome = simResult::successful;
 		if (graphConstruction ==A_STAR){
@@ -136,8 +137,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		currentTask.change=1;
-		//printf("plan:");
-		//printPlan(plan);
+		}
 	}
 	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
@@ -790,7 +790,7 @@ void Configurator::run(Configurator * c){
 	//			printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
-				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);
+				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
 	}
 
@@ -1022,16 +1022,19 @@ void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, Task t, b2Transform start){
 	std::pair <bool, int> result(0, -1); //1 is fials, 0 is ok
 	for (TaskSummary ts: seq){
+		float remaining;
+		//if (ts == seq[0]){
+		//}
 		CoordinateContainer dCloud;
 		result.second++;
 		t = Task(ts.disturbance, ts.direction, start);
 		std::pair <bool, b2Vec2> dData = worldBuilder.buildWorld(world, currentBox2D, start, ts.direction, &t, &dCloud);
 		simResult sim = t.willCollide(world, iteration, 0, SIM_DURATION, simulationStep); //check if plan is successful
 		start = sim.endPose;
-		b2Vec2 differenceVector = ts.disturbance.pose.p - dData.second;
-		ts.disturbance.pose.p = dData.second;
-		int additionalSteps = SignedVectorLength(differenceVector);
-		ts.step +=additionalSteps;
+		// b2Vec2 differenceVector = ts.disturbance.pose.p - dData.second; ///originally added steps if disturbance was futher away
+		// ts.disturbance.pose.p = dData.second;
+		// int additionalSteps = SignedVectorLength(differenceVector);
+		// ts.step +=additionalSteps;
 		if (sim.resultCode != simResult::successful){
 			result.first = 1;
 			break;
@@ -1042,19 +1045,18 @@ std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, T
 
 
 void Configurator::trackTaskExecution(Task & t){
-	//if (t.endCriteria.hasEnd()){
-		//printf("task in %i has end\n", iteration);
-		if (t.step>0){
-			t.step--;
-			printf("step =%i\n", t.step);
+		if (t.motorStep>0){
+			t.motorStep--;
+			//Distance and angle traversed in deltat
+			float v=t.action.getLinearSpeed()*MOTOR_CALLBACK;
+			float th = t.action.getOmega()*MOTOR_CALLBACK;
+			printf("step =%i\n", t.motorStep);
 		}
-		if(t.step==0){
+		if(t.motorStep==0){
 			t.change=1;
 			printf("change task cause it ends = %i\n", t.change);
-			//printf("task set to change\n");
 		}
-	//}
-	printf("change =%i, step =%i\n", t.change, t.step);
+	printf("change =%i, step =%i\n", t.change, t.motorStep);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1065,18 +1067,18 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 	return result;
 }
 
-int Configurator::motorStep(Task::Action a, EndCriteria ec){
-	int result=0, angleResult=0, distanceResult=0;
-	if (ec.angle.isValid()){
-		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
-	}
-	if (ec.distance.isValid()){
-		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
-	}
-	result =std::max(angleResult, distanceResult);
-	printf("task has %i steps\n", result);
-	return result;
-}
+// int Configurator::motorStep(Task::Action a, EndCriteria ec){
+// 	int result=0, angleResult=0, distanceResult=0;
+// 	if (ec.angle.isValid()){
+// 		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
+// 	}
+// 	if (ec.distance.isValid()){
+// 		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
+// 	}
+// 	result =std::max(angleResult, distanceResult);
+// 	printf("task has %i steps\n", result);
+// 	return result;
+// }
 
 int Configurator::motorStep(Task::Action a){
 	int result=0;
@@ -1099,7 +1101,7 @@ int Configurator::motorStep(Task::Action a){
 
 
 void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
-	// if (currentTask.step==0){
+	// if (currentTask.motorStep==0){
 	// 	b=1;
 	// }
 	if (!b){
@@ -1112,14 +1114,14 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
-		currentTask.step = p[0].step;
+		currentTask.motorStep = p[0].step;
 		p.erase(p.begin());
-		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
+		printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
 		if (n.disturbance.isValid()){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
-			//currentTask.step = motorStep(currentTask.getAction());
+			//currentTask.motorStep = motorStep(currentTask.getAction());
 		}
 		else if(currentTask.direction!=DEFAULT){
 				currentTask = Task(n.disturbance, DEFAULT); //reactive
@@ -1127,13 +1129,12 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
 		}
-//			currentTask.step = motorStep(currentTask.getAction());
 
-		currentTask.step = motorStep(currentTask.getAction());
+		currentTask.motorStep = motorStep(currentTask.getAction());
 		printf("changed to reactive\n");
 	}
-	//currentTask.step = motorStep(currentTask.getAction());
-	ogStep = currentTask.step;
+	//currentTask.motorStep = motorStep(currentTask.getAction());
+	ogStep = currentTask.motorStep;
 	//printf("set step\n");
 }
 

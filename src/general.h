@@ -37,6 +37,7 @@ struct Node{
 	float cost=0; //self-error
 	float error=0; //error with respect to control goal
 	int step=0;
+	float probability =1.0;
 	
 	void fill(simResult);
 

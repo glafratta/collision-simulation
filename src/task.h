@@ -21,7 +21,7 @@ public:
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     bool discrete=0;
-    int step=0;
+    int motorStep=0;
 protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
@@ -165,7 +165,7 @@ AffordanceIndex getAffIndex(){
 
 Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 
-void setEndCriteria();
+void setEndCriteria(float distance=BOX2DRANGE, float angle=);
 
 void setErrorWeights();
 
