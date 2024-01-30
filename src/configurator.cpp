@@ -386,7 +386,6 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 		applyTransitionMatrix(g, v, direction, er.ended);
 		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
-			propagateD(v, g);
 			v0=v;
 			v1 =v0;
 			do {
@@ -404,6 +403,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 			//g[v1].heuristic = estimateCost(v1, g, s.direction).estimatedCost;
 			float phi = er.evaluationFunction();
 			addToPriorityQueue(v1, priorityQueue, phi);
+			propagateD(v, g);
 		}
 		//bestNext = findBestLeaf(g, frontier, v);
 		bestNext=priorityQueue[0].first;
@@ -549,7 +549,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 
 void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 	if (g[v].outcome == simResult::successful ){
-		return result;
+		return;
 	}
 	edgeDescriptor e;
 	if(boost::in_degree(v,g)>0){
@@ -559,7 +559,7 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 		return;
 	}
 	while (g[e].direction ==DEFAULT){
-		std::vector <vertexDescriptor> toPropagate = {e.m_source}
+		std::vector <vertexDescriptor> toPropagate = {e.m_source};
 		//g[e.m_source].disturbance = g[e.m_target].disturbance;
 		auto es = boost::out_edges(e.m_source, g);
 		for (auto f =es.first; f!= es.second;f++){
