@@ -190,7 +190,7 @@ void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0)
 
 Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-std::vector <vertexDescriptor> getPlanVertices(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
@@ -224,7 +224,7 @@ bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
 
 void backtrack(CollisionGraph&, vertexDescriptor&);
 
-void addToPriorityQueue(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>&);
+void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 
 std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 
@@ -232,7 +232,7 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-Sequence checkPlan(b2World&, std::vector <vertexDescriptor> &, b2Transform); //returns if plan fails and at what index in the plan
+CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, b2Transform); //returns if plan fails and at what index in the plan
 									
 void trackTaskExecution(Task &);
 

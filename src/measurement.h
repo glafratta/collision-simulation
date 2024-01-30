@@ -70,8 +70,11 @@ struct EndCriteria{
 struct EndedResult{
 	bool ended=0;
 	float estimatedCost=0; //dot product of end criteria
+    float cost=0;
 
     EndedResult() = default;
+
+    float evaluationFunction();
 
    // float errorSquared();
 };

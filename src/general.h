@@ -22,6 +22,7 @@ enum PLAN_BUILD{CONTINUOUS, STATIC};
 
 struct Edge{
 	Direction direction;
+	float probability=1.0;
 	//int stepDuration =0;
 	//float distanceCovered=0;
 };
@@ -34,13 +35,13 @@ struct State{
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
 	bool filled =0;
-	float cost=0; //self-error
-	float heuristic=0; //error with respect to control goal
+	// float cost=0; //self-error
+	// float heuristic=0; //error with respect to control goal
 	int step=0;
 	
 	void fill(simResult);
 
-	float evaluationFunction(float weight=0.02);
+//	float evaluationFunction(float weight=0.02);
 };
 
 struct TaskSummary{

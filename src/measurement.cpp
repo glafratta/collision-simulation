@@ -101,3 +101,7 @@ float SignedVectorLength(b2Vec2 v){
 bool EndCriteria::hasEnd(){
     return angle.isValid() || distance.isValid();
 }
+
+float EndedResult::evaluationFunction(){ //h(n) = error, cost is the n of D
+	return abs(estimatedCost) +abs(cost);
+	}
