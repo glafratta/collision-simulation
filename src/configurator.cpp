@@ -398,11 +398,11 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 			er  = estimateCost(v1, g, s.direction);
 			applyTransitionMatrix(g, v1, g[e].direction, er.ended);
 			v0=v1;
+			propagateD(v1, g);
 			}while(s.direction !=DEFAULT & added);
 			//g[v1].heuristic = estimateCost(v1, g, s.direction).estimatedCost;
 			float phi = er.evaluationFunction();
 			addToPriorityQueue(v1, priorityQueue, phi);
-			propagateD(v1, g);
 		}
 		//bestNext = findBestLeaf(g, frontier, v);
 		bestNext=priorityQueue[0].first;
