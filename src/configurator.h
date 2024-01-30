@@ -135,7 +135,7 @@ simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 //void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
-std::vector<vertexDescriptor> propagateD(vertexDescriptor, CollisionGraph&);
+void propagateD(vertexDescriptor, CollisionGraph&);
 
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution

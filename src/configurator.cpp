@@ -326,6 +326,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	// }
 	//result.collision.setOrientation(result.endPose.q.GetAngle()); //90 deg turn
 	g[v].fill(result);
+	propagateD(v,g); //retroactively assigning disturbances
 	return result;
 	}
 
@@ -385,6 +386,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 		applyTransitionMatrix(g, v, direction, er.ended);
 		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
+			propagateD(v, g);
 			v0=v;
 			v1 =v0;
 			do {
@@ -545,8 +547,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 // 	return split;
 // }
 
-std::vector <vertexDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph& g){
-	std::vector <vertexDescriptor> result;
+void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 	if (g[v].outcome == simResult::successful ){
 		return result;
 	}
@@ -555,12 +556,22 @@ std::vector <vertexDescriptor> Configurator::propagateD(vertexDescriptor v, Coll
 			e= boost::in_edges(v, g).first.dereference();
 		}
 	else{
-		return result;
+		return;
 	}
 	while (g[e].direction ==DEFAULT){
-		g[e.m_source].disturbance = g[e.m_target].disturbance;
-		g[e.m_source].outcome = simResult::safeForNow;
-		g[e.m_source].options = g[e.m_target].options;
+		std::vector <vertexDescriptor> toPropagate = {e.m_source}
+		//g[e.m_source].disturbance = g[e.m_target].disturbance;
+		auto es = boost::out_edges(e.m_source, g);
+		for (auto f =es.first; f!= es.second;f++){
+			if (f.dereference().m_target!=e.m_target){
+				toPropagate.push_back(f.dereference().m_target);
+			}
+		}
+		for (vertexDescriptor prop: toPropagate){
+			g[prop].disturbance = g[v].disturbance;
+			g[prop].outcome = simResult::safeForNow;
+		}
+		//g[e.m_source].options = g[e.m_target].options;
 		v=e.m_source;
 		//g[v].endPose = g[e.m_source].endPose;
 		if(boost::in_degree(v,g)>0){
@@ -568,13 +579,11 @@ std::vector <vertexDescriptor> Configurator::propagateD(vertexDescriptor v, Coll
 			if (g[e].direction != DEFAULT ){
 				break;
 			}
-			result.push_back(v);
 		}
 		else{
 			break;
 		}
 	}
-	return result;
 }
 
 
@@ -645,9 +654,10 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 		else{
 			edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 			vertexDescriptor src = boost::source(e,g);
-			if (g[leaf].endPose != g[src].endPose){ //if the node was successful
+			// if (g[leaf].endPose != g[src].endPose){ //if the node was successful
+			if (g[leaf].step>0){
 				vertices.insert(vertices.begin(), leaf);
-					}
+			}
 		leaf = src; //go back
 		}
 	}
@@ -1057,7 +1067,10 @@ CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescr
 		simResult sim = t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance); //check if plan is successful
 		start = sim.endPose;
 		if (1){ //if disturbance is different
-			//result = seq.
+			//add node to graphError with the new D
+			//observation higher probability than prediction
+		}
+		if (sim.resultCode == simResult::crashed){
 			break;
 		}
 		stepDistance = simulationStep;
