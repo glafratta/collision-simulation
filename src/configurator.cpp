@@ -559,20 +559,23 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 		return;
 	}
 	while (g[e].direction ==DEFAULT){
-		std::vector <vertexDescriptor> toPropagate = {e.m_source};
-		//g[e.m_source].disturbance = g[e.m_target].disturbance;
-		auto es = boost::out_edges(e.m_source, g);
-		for (auto f =es.first; f!= es.second;f++){
-			if (f.dereference().m_target!=e.m_target){
-				toPropagate.push_back(f.dereference().m_target);
-			}
+		//std::vector <vertexDescriptor> toPropagate = {e.m_source};
+		if (!g[e.m_source].disturbance.isValid()){
+			g[e.m_source].disturbance = g[e.m_target].disturbance;
+			g[e.m_source].outcome = simResult::safeForNow;
 		}
-		for (vertexDescriptor prop: toPropagate){
-			if(!g[prop].disturbance.isValid()){
-				g[prop].disturbance = g[v].disturbance;
-				g[prop].outcome = simResult::safeForNow;
-			}
-		}
+		//auto es = boost::out_edges(e.m_source, g);
+		// for (auto f =es.first; f!= es.second;f++){
+		// 	if (f.dereference().m_target!=e.m_target){
+		// 		toPropagate.push_back(f.dereference().m_target);
+		// 	}
+		// }
+		// for (vertexDescriptor prop: toPropagate){
+		// 	if(!g[prop].disturbance.isValid()){
+		// 		g[prop].disturbance = g[v].disturbance;
+		// 		g[prop].outcome = simResult::safeForNow;
+		// 	}
+		// }
 		//g[e.m_source].options = g[e.m_target].options;
 		v=e.m_source;
 		//g[v].endPose = g[e.m_source].endPose;
