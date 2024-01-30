@@ -8,7 +8,7 @@
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
-//struct Node;
+//struct State;
 
 class Task{
 public:
@@ -165,13 +165,13 @@ AffordanceIndex getAffIndex(){
 
 Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 
-void setEndCriteria(float distance=BOX2DRANGE, float angle=);
+void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
 void setErrorWeights();
 
 EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
 
-EndedResult checkEnded(Node);
+EndedResult checkEnded(State);
 //Task()=default;
 
 Task(){

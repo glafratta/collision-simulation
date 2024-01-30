@@ -1,6 +1,6 @@
 #include "general.h"
 
-void Node::fill(simResult result){
+void State::fill(simResult result){
 	if (result.collision.isValid()){
 		totDs++;
 	}
@@ -8,12 +8,12 @@ void Node::fill(simResult result){
 	endPose = result.endPose;
 	//distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	outcome = result.resultCode;
-	step = (result.step*MOTOR_CALLBACK*FRICTION_DAMPENING)/HZ;
+	step = (result.step*FRICTION_DAMPENING)/(HZ*MOTOR_CALLBACK);
 	filled=true;
 }
 
-float Node::evaluationFunction(float weight){ //h(n) = error, cost is the n of D
-	return abs(error) +abs(cost);
+float State::evaluationFunction(float weight){ //h(n) = error, cost is the n of D
+	return abs(heuristic) +abs(cost);
 	}
 
 bool operator!=(Transform const &t1, Transform const& t2){

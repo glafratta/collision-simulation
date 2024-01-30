@@ -47,7 +47,7 @@ class Angle: public Measurement{
 
 class Distance: public Measurement{
     public:
-    Distance(){value = 2*BOX2DRANGE+0.01;}
+    Distance(){}
     Distance(float f)
     {value = round(f*1000)/1000;
     valid =1;}
@@ -55,11 +55,11 @@ class Distance: public Measurement{
 
 struct EndCriteria{
     Angle angle;
-    Distance distance;    
+    Distance distance;    //max distance, ideal
     float getError(EndCriteria); //expresses magnitude of error, not normalised
     float getStandardError(EndCriteria);
     float getStandardError(Angle, Distance);
-    float getStandardError(Angle, Distance, Node);
+    float getStandardError(Angle, Distance, State);
     std::vector <float> weights = {1, 1, 1}; //0:angle, 1: distance, 2: outcome (if node)
    // float getStandardError(Node);
     bool hasEnd();
@@ -69,7 +69,7 @@ struct EndCriteria{
 
 struct EndedResult{
 	bool ended=0;
-	float errorFloat=0; //dot product of end criteria
+	float estimatedCost=0; //dot product of end criteria
 
     EndedResult() = default;
 

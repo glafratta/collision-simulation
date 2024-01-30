@@ -1,7 +1,7 @@
 #include "measurement.h"
 
 // float EndedResult::errorSquared(){
-//     return errorFloat*errorFloat;
+//     return estimatedCost*estimatedCost;
 // }
 
 bool Measurement::operator<(Measurement & m2){
@@ -76,7 +76,7 @@ float EndCriteria::getStandardError(EndCriteria ec){ //standard error
     return result;
 }
 
-float EndCriteria::getStandardError(Angle a, Distance d, Node n){
+float EndCriteria::getStandardError(Angle a, Distance d, State n){
     float result =0;
     float outcomeError=0;
     if (n.filled){

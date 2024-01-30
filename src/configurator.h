@@ -58,6 +58,7 @@ public:
 	int bodies=0;
 	//int treeSize = 0; //for debug
 	Sequence plan;
+	std::vector <vertexDescriptor> planVertices;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
@@ -132,41 +133,41 @@ void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crash
 
 simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
-void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
+//void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
 std::vector<vertexDescriptor> propagateD(vertexDescriptor, CollisionGraph&);
 
 
-void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
+//void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
 //void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-void classicalAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+void explorer(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-void AlgorithmE(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+// void AlgorithmE(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
+// void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
 
 std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
-template <typename V, typename G>
-bool isFullLength(V v, const G & g, float length=0){
-    if (boost::in_degree(v, g)==0 && length < BOX2DRANGE){
-        return false;
-    }
-    else if (length >=BOX2DRANGE){
-        return true;
-    }
-    else{
-        edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-        length += g[inEdge].distanceCovered;
-		g[v].predecessors++;
-        return isFullLength(boost::source(inEdge, g), g, length);
-    }
+// template <typename V, typename G>
+// bool isFullLength(V v, const G & g, float length=0){
+//     if (boost::in_degree(v, g)==0 && length < BOX2DRANGE){
+//         return false;
+//     }
+//     else if (length >=BOX2DRANGE){
+//         return true;
+//     }
+//     else{
+//         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
+//         length += g[inEdge].distanceCovered;
+// 		g[v].predecessors++;
+//         return isFullLength(boost::source(inEdge, g), g, length);
+//     }
 
-}
+// }
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
 	if (!obs.isValid()){
@@ -179,11 +180,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
-		//g[v1].cost = g[src].cost;
 		g[v1].disturbance = obs;
-		// if (g[e].direction==BACK){
-		// 	g[v1].twoStep =1;
-		// }
 		vertexAdded=true;
 	}
 	return vertexAdded;
@@ -193,13 +190,15 @@ void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0)
 
 Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
+std::vector <vertexDescriptor> getPlanVertices(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+
 Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
 vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
-EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
+EndedResult estimateCost(Task, State&); //returns whether the controlGoal has ended and fills node with cost and error
 
-EndedResult findError(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
+EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
 Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
@@ -233,13 +232,15 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-std::pair <bool, int> checkPlan(b2World&, Sequence &, Task, b2Transform); //returns if plan fails and at what index in the plan
+Sequence checkPlan(b2World&, std::vector <vertexDescriptor> &, b2Transform); //returns if plan fails and at what index in the plan
 									
 void trackTaskExecution(Task &);
 
 DeltaPose assignDeltaPose(Task::Action, float);
 
-void changeTask(bool, Sequence&, Node, int&);
+void changeTask(bool, Sequence&, State, int&);
+
+void changeTask(bool, std::vector <vertexDescriptor>&, int&);
 
 int motorStep(Task::Action, EndCriteria);
 

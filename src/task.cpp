@@ -41,6 +41,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				result = simResult(simResult::resultType::crashed, collision);
 				robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 				collision.setOrientation(robot.body->GetTransform().q.GetAngle());
+				stepb2d=0;
 				break;
 			}
 			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
@@ -159,34 +160,33 @@ Direction Task::H(Disturbance ob, Direction d, bool topDown){
     return d;
 }
 
-void Task::setEndCriteria(){
-	Distance d;
-	Angle a;
-	b2Vec2 v;
+void Task::setEndCriteria(Angle angle, Distance distance){
 	switch(disturbance.getAffIndex()){
-		case AVOID: {
-	//		if (direction !=BACK){
-				endCriteria.distance.setValid(1);
-	//		}
-	//		else{
-	//			v = disturbance.getPosition() - start.p;
-	//			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
-	//		}
-			if (disturbance.isPartOfObject()){
-				endCriteria.angle.setValid(1);
-				}
-			else{
-				endCriteria.angle=Angle(SAFE_ANGLE);
-			}
-		}
-		break;
+	// 	case AVOID: {
+	// //		if (direction !=BACK){
+	// 			endCriteria.distance.setValid(1);
+	// //		}
+	// //		else{
+	// //			v = disturbance.getPosition() - start.p;
+	// //			endCriteria.distance = Distance(v.Length()+SAFE_DISTANCE);
+	// //		}
+	// 		//if (disturbance.isPartOfObject()){
+	// 		//	endCriteria.angle.setValid(1);
+	// 		//	}
+	// 		else{
+	// 			endCriteria.angle=Angle(SAFE_ANGLE);
+	// 		}
+	// 	}
+	//	break;
 		case PURSUE:{
-			endCriteria.angle=Angle(SAFE_ANGLE);
+			endCriteria.angle=angle;
 			endCriteria.angle.setValid(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
 		default:
+		endCriteria.distance = distance;
+		endCriteria.angle = angle;
 		break;
 	}
 	
@@ -224,17 +224,17 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
-	r.errorFloat = endCriteria.getStandardError(a,d);
+	r.estimatedCost = endCriteria.getStandardError(a,d);
 	return r;
 
 }
 
-EndedResult Task::checkEnded(Node n){ //check error of node compared to the present Task
+EndedResult Task::checkEnded(State n){ //check error of node compared to the present Task
 	EndedResult r;
 	Angle a;
 	Distance d;
 	r = checkEnded(n.endPose);
-	r.errorFloat+= endCriteria.getStandardError(a,d, n);
+	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }
 

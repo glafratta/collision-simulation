@@ -26,8 +26,8 @@ struct Edge{
 	//float distanceCovered=0;
 };
 
-struct Node{
-	Disturbance disturbance; //error signal
+struct State{
+	Disturbance disturbance; //disturbance encounters
 	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
 	simResult::resultType outcome;
 	std::vector <Direction> options;
@@ -35,9 +35,8 @@ struct Node{
 	int totDs=0; //error signal
 	bool filled =0;
 	float cost=0; //self-error
-	float error=0; //error with respect to control goal
+	float heuristic=0; //error with respect to control goal
 	int step=0;
-	float probability =1.0;
 	
 	void fill(simResult);
 
@@ -45,7 +44,7 @@ struct Node{
 };
 
 struct TaskSummary{
-	Disturbance disturbance;
+	Disturbance disturbance; //disturbance initialisation
 	Direction direction = DEFAULT;
 	float step=0;
 
@@ -58,7 +57,7 @@ typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, Node, Edge> CollisionGraph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
