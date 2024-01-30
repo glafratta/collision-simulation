@@ -402,7 +402,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 			//g[v1].heuristic = estimateCost(v1, g, s.direction).estimatedCost;
 			float phi = er.evaluationFunction();
 			addToPriorityQueue(v1, priorityQueue, phi);
-			propagateD(v, g);
+			propagateD(v1, g);
 		}
 		//bestNext = findBestLeaf(g, frontier, v);
 		bestNext=priorityQueue[0].first;
@@ -552,7 +552,7 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 	}
 	edgeDescriptor e;
 	if(boost::in_degree(v,g)>0){
-			e= boost::in_edges(v, g).first.dereference();
+			e= *(boost::in_edges(v, g).first);
 		}
 	else{
 		return;
