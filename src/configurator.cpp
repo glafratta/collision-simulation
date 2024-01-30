@@ -568,8 +568,10 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 			}
 		}
 		for (vertexDescriptor prop: toPropagate){
-			g[prop].disturbance = g[v].disturbance;
-			g[prop].outcome = simResult::safeForNow;
+			if(!g[prop].disturbance.isValid()){
+				g[prop].disturbance = g[v].disturbance;
+				g[prop].outcome = simResult::safeForNow;
+			}
 		}
 		//g[e.m_source].options = g[e.m_target].options;
 		v=e.m_source;
