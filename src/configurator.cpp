@@ -969,7 +969,7 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 
 void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair<vertexDescriptor, float>>& queue, float phi){
 	for (auto i =queue.begin(); i!=queue.end(); i++){
-		if (abs(phi) >abs((*i).second)){
+		if (abs(phi) <abs((*i).second)){
 			queue.insert(i, std::pair(v, phi));
 			return;
 		}
