@@ -137,6 +137,8 @@ simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 void propagateD(vertexDescriptor, CollisionGraph&);
 
+void updatePlan(); //search disturbances and update their expectation
+
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 

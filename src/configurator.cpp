@@ -579,8 +579,15 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 		v=e.m_source;
 		//g[v].endPose = g[e.m_source].endPose;
 		if(boost::in_degree(v,g)>0){
-			e= boost::in_edges(v, g).first.dereference();
-			if (g[e].direction != DEFAULT ){
+			bool assigned=0;
+			for (auto ei =boost::in_edges(v, g).first; ei!=boost::in_edges(v, g).second; ei++){
+				if (g[*ei].direction == DEFAULT )
+				{
+					e= *ei;
+					assigned=1;
+				}
+			}
+			if (!assigned){
 				break;
 			}
 		}
