@@ -326,7 +326,6 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	// }
 	//result.collision.setOrientation(result.endPose.q.GetAngle()); //90 deg turn
 	g[v].fill(result);
-	propagateD(v,g); //retroactively assigning disturbances
 	return result;
 	}
 
