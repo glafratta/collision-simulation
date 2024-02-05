@@ -59,6 +59,7 @@ public:
 	//int treeSize = 0; //for debug
 	Sequence plan;
 	std::vector <vertexDescriptor> planVertices;
+	StateMatcher matcher;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
@@ -235,6 +236,8 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
 CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, b2Transform); //returns if plan fails and at what index in the plan
+
+std::vector <vertexDescriptor> indStateMatches(vertexDescriptor);
 									
 void trackTaskExecution(Task &);
 

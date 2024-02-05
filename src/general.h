@@ -20,11 +20,36 @@ enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
 
 enum PLAN_BUILD{CONTINUOUS, STATIC};
 
+typedef std::vector <float> WeightVector;
+typedef std::vector <float> DistanceVector;
+
 struct Edge{
 	Direction direction;
 	float probability=1.0;
 	//int stepDuration =0;
 	//float distanceCovered=0;
+};
+
+
+struct StateMatcher{
+        WeightVector weights[6]; //disturbance, position vector, angle
+		//assume mean difference 0
+		std::vector <float> SDvector={0.11, 0.11, 0, 0.11, 0.11, M_PI/6};//hard-coded standard deviations for matching
+        StateMatcher(){}
+
+		void initOnes(){
+			for (auto i=weights->begin(); i!= weights->end(); i++){
+				*i=1.0;
+			}
+		}
+
+		DistanceVector getDistance(State, State);  //DO NOT TRY TO LEARN DISTRIBUTION
+
+		float sumVector(DistanceVector);
+
+		bool isPerfectMatch(DistanceVector); // is this the same state?
+
+
 };
 
 struct State{
@@ -40,6 +65,7 @@ struct State{
 	int step=0;
 	
 	void fill(simResult);
+
 
 //	float evaluationFunction(float weight=0.02);
 };

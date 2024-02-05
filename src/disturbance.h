@@ -11,7 +11,7 @@ private:
 public:
     bool valid= 0;
 	b2FixtureDef fixtureDef;
-    b2Transform pose;
+    b2Transform pose = {b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)};
    // bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
@@ -117,7 +117,6 @@ public:
     bool isPartOfObject(){
         return partOfObject;
     }
-
 
 }; //sub action f
 

@@ -311,7 +311,8 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	}
 	result =s.willCollide(w, iteration, debugOn, remaining, simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
-	if (result.distanceCovered <=.01){ //CYCLE PREVENTING HEURISTICS
+	if (b2Vec2(result.endPose.p -g[srcVertex].endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
+	//if (result.distanceCovered <=.01){ //CYCLE PREVENTING HEURISTICS
 		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
 	}
 	else{
@@ -1077,10 +1078,8 @@ CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescr
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		simResult sim = t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance); //check if plan is successful
 		start = sim.endPose;
-		if (1){ //if disturbance is different
-			//add node to graphError with the new D
-			//observation higher probability than prediction
-		}
+
+		//for node in graph: find distance, find if match: if match put in vector, pick best match, if not add new node
 		if (sim.resultCode == simResult::crashed){
 			break;
 		}
@@ -1092,6 +1091,12 @@ CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescr
 	return graphError;
 }
 
+std::vector <vertexDescriptor> Configurator::findStateMatches(vertexDescriptor v){
+	std::vector <vertexDescriptor> result;
+	for (vertexDescriptor stateV: collisionGraph.m_vertices){
+		if (matcher.isPerfectMatch(collisionGraph[v]))
+	}
+}
 
 void Configurator::trackTaskExecution(Task & t){
 		if (t.motorStep>0){
