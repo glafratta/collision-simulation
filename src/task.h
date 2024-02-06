@@ -80,6 +80,10 @@ public:
         return velocity;
     }
 
+    b2Transform getTransform(){
+    return b2Transform(getLinearVelocity(), b2Rot(omega));
+}
+
     float getRWheelSpeed(){
         return R;
     }
@@ -162,6 +166,7 @@ Task::Action getAction(){
 AffordanceIndex getAffIndex(){
     return disturbance.getAffIndex();
 }
+
 
 Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 

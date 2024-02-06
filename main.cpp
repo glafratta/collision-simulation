@@ -111,7 +111,7 @@ void step( AlphaBot &motors){
 		return;
 	}
 	if (c->plan.empty()){
-		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
+		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
 	c->trackTaskExecution(*(c->getTask()));	
@@ -122,6 +122,7 @@ void step( AlphaBot &motors){
 //	if (c->getTask()->change){
 	c->getTask()->trackDisturbance(c->getTask()->disturbance, c->getTask()->getAction());
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
+	c->updateGraph(c->collisionGraph);
 	printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose.p.x, c->controlGoal.disturbance.pose.p.y);
 //	}
 	c->changeTask(c->getTask()->change, c->planVertices, ogStep);

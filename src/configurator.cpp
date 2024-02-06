@@ -1130,6 +1130,7 @@ CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescr
 // 	return result;
 // }
 
+
 void Configurator::trackTaskExecution(Task & t){
 		if (t.motorStep>0){
 			t.motorStep--;
@@ -1262,3 +1263,13 @@ void Configurator::changeTask(bool b, std::vector <vertexDescriptor>& vertices, 
 	//printf("set step\n");
 }
 
+void Configurator::updateGraph(CollisionGraph&g){
+	b2Transform deltaPose(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK/FRICTION_DAMPENING,
+						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK/FRICTION_DAMPENING), 
+						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK/FRICTION_DAMPENING));
+	auto vPair =boost::vertices(g);
+	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){
+		g[*vIt].endPose-=deltaPose;
+		g[*vIt].disturbance.pose-=deltaPose;
+	}
+}

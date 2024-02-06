@@ -75,3 +75,9 @@ bool operator>(P const &p1, P const & p2){
 bool operator==(P const &p1, P const & p2){
 	return (p1.x == p2.x && p1.y == p2.y);
 }
+
+void operator-=(Transform & t1, Transform const&t2){
+	t1.p.x-=t2.p.x;
+	t1.p.y-=t2.p.y;
+	t1.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+}

@@ -84,6 +84,7 @@ struct TaskSummary{
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
+void operator-=(Transform &, Transform const&);
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
