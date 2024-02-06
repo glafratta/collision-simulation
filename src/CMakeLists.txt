@@ -1,8 +1,8 @@
 include(GNUInstallDirs)
 
-set(SRC configurator.cpp task.cpp general.cpp measurement.cpp worldbuilder.cpp)
+set(SRC configurator.cpp task.cpp general.cpp measurement.cpp worldbuilder.cpp statematcher.cpp)
 
-set(HEAD disturbance.h configurator.h robot.h task.h general.h affordance.h settings.h measurement.h worldbuilder.h statematcher.h)
+set(HEAD disturbance.h configurator.h robot.h task.h general.h affordance.h settings.h measurement.h worldbuilder.h )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

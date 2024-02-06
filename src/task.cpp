@@ -49,10 +49,10 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			// }
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
-		b2Vec2 distance; //= robot.body->GetPosition();
-		distance.x = robot.body->GetPosition().x - start.p.x;
-		distance.y = robot.body->GetPosition().y - start.p.y;
-		result.distanceCovered = distance.Length() ;
+		//b2Vec2 distance; //= robot.body->GetPosition();
+		//distance.x = robot.body->GetPosition().x - start.p.x;
+		//distance.y = robot.body->GetPosition().y - start.p.y;
+		//result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
 		result.step=stepb2d;
 		//int roboCount=0;

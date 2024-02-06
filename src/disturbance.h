@@ -126,7 +126,7 @@ struct simResult{
     resultType resultCode;
     Disturbance collision;
     bool valid = 0;
-    float distanceCovered =0;
+    //float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     int step=0;
   //  int step=0;

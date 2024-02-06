@@ -16,7 +16,9 @@ enum M_CODES {THREE_M=3, FOUR_M=4};
 
 enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 
-enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
+//enum GRAPH_CONSTRUCTION {A_STAR};
+
+//enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
 
 enum PLAN_BUILD{CONTINUOUS, STATIC};
 
@@ -25,11 +27,28 @@ typedef std::vector <float> DistanceVector;
 
 struct Edge{
 	Direction direction;
-	float probability=1.0;
-	//int stepDuration =0;
-	//float distanceCovered=0;
-};
+	float probability=1.0;};
 
+
+
+struct State{
+	Disturbance disturbance; //disturbance encounters
+	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
+	simResult::resultType outcome;
+	std::vector <Direction> options;
+	int nodesInSameSpot =0;
+	int totDs=0; //error signal
+	bool filled =0;
+	// float cost=0; //self-error
+	// float heuristic=0; //error with respect to control goal
+	int step=0;
+	int nObs=1;
+	
+	void fill(simResult);
+
+	simResult getSimResult();
+//	float evaluationFunction(float weight=0.02);
+};
 
 struct StateMatcher{
         WeightVector weights[6]; //disturbance, position vector, angle
@@ -50,24 +69,6 @@ struct StateMatcher{
 		bool isPerfectMatch(DistanceVector); // is this the same state?
 
 
-};
-
-struct State{
-	Disturbance disturbance; //disturbance encounters
-	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
-	simResult::resultType outcome;
-	std::vector <Direction> options;
-	int nodesInSameSpot =0;
-	int totDs=0; //error signal
-	bool filled =0;
-	// float cost=0; //self-error
-	// float heuristic=0; //error with respect to control goal
-	int step=0;
-	
-	void fill(simResult);
-
-
-//	float evaluationFunction(float weight=0.02);
 };
 
 struct TaskSummary{

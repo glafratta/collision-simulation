@@ -172,22 +172,27 @@ std::pair <bool, Direction> getOppositeDirection(Direction);
 
 // }
 
-bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
+bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(), bool topDown=0){
 	if (!obs.isValid()){
 		obs = controlGoal.disturbance;
 	}
 	bool vertexAdded = false;
-	if (g[src].options.size()>0){
+	if (g[src].options.size()>0 || topDown){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		g[e].direction =g[src].options[0];
 		g[src].options.erase(g[src].options.begin());
 		g[v1].totDs=g[src].totDs;
-		g[v1].disturbance = obs;
+		if (!g[v1].filled){
+			g[v1].disturbance = obs;
+		}
 		vertexAdded=true;
+		adjustProbability(g, e); //for now predictions and observations carry the same weight
 	}
 	return vertexAdded;
 }
+
+void adjustProbability(CollisionGraph&, edgeDescriptor);
 
 void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
@@ -235,7 +240,7 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, b2Transform); //returns if plan fails and at what index in the plan
+CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform); //returns if plan fails and at what index in the plan
 
 std::vector <vertexDescriptor> indStateMatches(vertexDescriptor);
 									

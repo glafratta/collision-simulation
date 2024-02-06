@@ -1,5 +1,6 @@
 #include "general.h"
 
+
 void State::fill(simResult result){
 	if (result.collision.isValid()){
 		totDs++;
@@ -12,6 +13,43 @@ void State::fill(simResult result){
 	filled=true;
 }
 
+simResult State::getSimResult(){
+	simResult result;
+	result.collision= disturbance;
+	result.endPose=endPose;
+	result.step= step;
+	result.valid = filled;
+	result.resultCode=outcome;
+	return result;
+}
+
+DistanceVector StateMatcher::getDistance(State s1, State s2){
+	DistanceVector result;
+	result[0]= s1.disturbance.pose.p.x - s2.disturbance.pose.p.x; //disturbance x
+	result[1]= s1.disturbance.pose.p.y - s2.disturbance.pose.p.y; //disturbance y
+	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
+	result[3]= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+	result[4]=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+	result[5]=s1.endPose.q.GetAngle()-s2.endPose.q.GetAngle(); //endpose angle
+	return result;
+}
+
+
+float StateMatcher::sumVector(DistanceVector vec){
+	float result=0;
+	for (float i:vec){
+		result+=abs(i);
+	}
+	return result;
+}
+
+bool StateMatcher::isPerfectMatch(DistanceVector vec){
+    bool result =false;
+    if (b2Vec2(vec[4], vec[5]).Length()<SDvector[4] && b2Vec2(vec[0], vec[1]).Length()<SDvector[0] && vec[3]==SDvector[3]){ //match position and disturbance
+        result=true;
+    }
+    return result;
+}
 
 
 
