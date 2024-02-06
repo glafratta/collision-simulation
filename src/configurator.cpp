@@ -329,43 +329,43 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	}
 
 
-void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
-	//PRINT DEBUG
-	//END DEBUG FILE
-	vertexDescriptor v1=v;
-	Direction dir = s.direction;
-	vertexDescriptor v1Src=v;
-    do{
-		v= v1;
-		//evaluate
-		int ct = w.GetBodyCount();
-		if (!g[v].filled){
-			evaluateNode(v, g,s, w);
-		}
-		EndedResult er = controlGoal.checkEnded(g[v].endPose);
-		// if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
-		if (betterThanLeaves(g, v, _leaves, er, dir) ){
-			applyTransitionMatrix(g,v, s.direction, er.ended, _leaves);
-		}
-		if (g[v].options.size()==0){
-			g[v].error = er.errorFloat;
-			_leaves.push_back(v);
-			backtrack(g, v);
-		}
-		if (!addVertex(v, v1, g)){
-			return;
-		}
-		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
-		v1Src = v1InEdge.m_source;
-		dir = g[v1InEdge].direction;
-		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
-		worldBuilder.buildWorld(w, currentBox2D, g[v1Src].endPose, dir); //was g[v].endPose
-		// if (benchmark){
-		// 	printf("bodies in construct= %i\n", w.GetBodyCount());
-		// }
-	}while (v1!= v);
-	//return !g[0].disturbance.safeForNow;
-}
+// void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+// 	//PRINT DEBUG
+// 	//END DEBUG FILE
+// 	vertexDescriptor v1=v;
+// 	Direction dir = s.direction;
+// 	vertexDescriptor v1Src=v;
+//     do{
+// 		v= v1;
+// 		//evaluate
+// 		int ct = w.GetBodyCount();
+// 		if (!g[v].filled){
+// 			evaluateNode(v, g,s, w);
+// 		}
+// 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
+// 		// if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
+// 		if (betterThanLeaves(g, v, _leaves, er, dir) ){
+// 			applyTransitionMatrix(g,v, s.direction, er.ended, _leaves);
+// 		}
+// 		if (g[v].options.size()==0){
+// 			g[v].error = er.errorFloat;
+// 			_leaves.push_back(v);
+// 			backtrack(g, v);
+// 		}
+// 		if (!addVertex(v, v1, g)){
+// 			return;
+// 		}
+// 		edgeDescriptor v1InEdge = boost::in_edges(v1, g).first.dereference();
+// 		v1Src = v1InEdge.m_source;
+// 		dir = g[v1InEdge].direction;
+// 		s = Task(g[v1Src].disturbance, dir, g[v1Src].endPose);
+// 		worldBuilder.buildWorld(w, currentBox2D, g[v1Src].endPose, dir); //was g[v].endPose
+// 		// if (benchmark){
+// 		// 	printf("bodies in construct= %i\n", w.GetBodyCount());
+// 		// }
+// 	}while (v1!= v);
+// 	//return !g[0].disturbance.safeForNow;
+// }
 
 
 void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
