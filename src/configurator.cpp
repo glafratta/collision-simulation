@@ -137,7 +137,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		currentTask.change=1;
 		//printf("plan:");
-		//printPlan(plan);
+		printPlan(plan);
 	}
 	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
@@ -1128,7 +1128,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 		}
 //			currentTask.step = motorStep(currentTask.getAction());
 
-		currentTask.step = motorStep(currentTask.getAction());
+		currentTask.step = motorStep(currentTask.getAction()); //reflex
 		printf("changed to reactive\n");
 	}
 	//currentTask.step = motorStep(currentTask.getAction());
