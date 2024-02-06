@@ -128,12 +128,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		if (graphConstruction ==A_STAR){
 			classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		}
-		else if (graphConstruction == E){
-			AlgorithmE(v0, collisionGraph, currentTask, world, bestLeaf);
-		}
-		else if (graphConstruction == A_STAR_DEMAND){
-			onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-		}
+		// else if (graphConstruction == E){
+		// 	AlgorithmE(v0, collisionGraph, currentTask, world, bestLeaf);
+		// }
+		// else if (graphConstruction == A_STAR_DEMAND){
+		// 	onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
+		// }
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		currentTask.change=1;
 		//printf("plan:");
@@ -620,10 +620,10 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
 		if (g[leaf].endPose != g[src].endPose){ //if the node was successful
-			Task::Action a;
-			a.init(g[e].direction);
-			float step = motorStep(a);
-			TaskSummary ts(g[src].disturbance, g[e].direction, step);
+			//Task::Action a;
+			//a.init(g[e].direction);
+			//float step = motorStep(a);
+			TaskSummary ts(g[src].disturbance, g[e].direction, g[leaf].step);
 			p.insert(p.begin(), ts);
 		}
 		leaf = src; //go back
