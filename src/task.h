@@ -194,26 +194,26 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     //printf("step =%i\n", step);
 }
 
-void init(){
-    start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-    direction = DEFAULT;
-    action.init(direction);
-   // printf("default init \n");
-   // RecordedVelocity = action.getLinearVelocity();
-}
+// void init(){
+//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+//     direction = DEFAULT;
+//     action.init(direction);
+//    // printf("default init \n");
+//    // RecordedVelocity = action.getLinearVelocity();
+// }
 
-void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
-    start = _start;
-    disturbance = ob;
-    direction = H(disturbance, d);  
-    //action = Action(direction);
-    action.init(direction);
-   // RecordedVelocity = action.getLinearVelocity();
-    setEndCriteria();
-   // step = action.motorStep();
-   // printf("step =%i\n", step);
+// void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool T){
+//     start = _start;
+//     disturbance = ob;
+//     direction = H(disturbance, d);  
+//     //action = Action(direction);
+//     action.init(direction);
+//    // RecordedVelocity = action.getLinearVelocity();
+//     setEndCriteria();
+//    // step = action.motorStep();
+//    // printf("step =%i\n", step);
 
-}
+// }
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
