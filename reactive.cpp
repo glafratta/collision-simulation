@@ -102,7 +102,7 @@ void step( AlphaBot &motors){
 		return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
-	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
+	c->changeTask(c->getTask()->change, c->planVertices, ogStep);
 	motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
