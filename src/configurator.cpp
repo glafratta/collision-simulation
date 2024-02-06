@@ -302,8 +302,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-			remaining= (BOX2DRANGE-g[srcVertex].endPose.p.Length())/controlGoal.getAction().getLinearSpeed();
-			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+		remaining= (BOX2DRANGE-fabs(g[srcVertex].endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
@@ -884,31 +883,31 @@ bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 
 
 
-bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
-	bool better =1;
-	er = controlGoal.checkEnded(g[v].endPose); //heuristic
-	g[v].error = er.errorFloat;
-	//expands node if it leads to less error than leaf
-	for (vertexDescriptor l: _leaves){
-		if (d==DEFAULT){
-			if (abs(g[v].evaluationFunction())< abs(g[l].evaluationFunction())){ //if error lower, regardless of distance, keep expanding
-				if (!controlGoal.endCriteria.hasEnd()){
-					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-						if (g[v].totDs>=g[l].totDs){
-							better=0;
-							break;
-						}
-					}
-				}
-			}
-			else{
-				better =0;
-				break;
-			}
-		}
-	}
-	return better;
-}
+// bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
+// 	bool better =1;
+// 	er = controlGoal.checkEnded(g[v].endPose); //heuristic
+// 	g[v].error = er.errorFloat;
+// 	//expands node if it leads to less error than leaf
+// 	for (vertexDescriptor l: _leaves){
+// 		if (d==DEFAULT){
+// 			if (abs(g[v].evaluationFunction())< abs(g[l].evaluationFunction())){ //if error lower, regardless of distance, keep expanding
+// 				if (!controlGoal.endCriteria.hasEnd()){
+// 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
+// 						if (g[v].totDs>=g[l].totDs){
+// 							better=0;
+// 							break;
+// 						}
+// 					}
+// 				}
+// 			}
+// 			else{
+// 				better =0;
+// 				break;
+// 			}
+// 		}
+// 	}
+// 	return better;
+// }
 
 bool Configurator::hasStickingPoint(CollisionGraph& g, vertexDescriptor v, EndedResult & er){
 	bool has =0;
