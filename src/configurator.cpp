@@ -121,7 +121,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning & ( planBuild!=STATIC || (plan.empty()))){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+		currentTask.change=1;
+		printf("executing = %i", executing);
 		collisionGraph[v0].filled =1;
 		collisionGraph[v0].disturbance = controlGoal.disturbance;
 		collisionGraph[v0].outcome = simResult::successful;
@@ -135,7 +137,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// 	onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		// }
 		plan = getCleanSequence(collisionGraph, bestLeaf);
-		currentTask.change=1;
 		//printf("plan:");
 		printPlan(plan);
 	}
@@ -1104,13 +1105,13 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	}
 	if (planning){
 		if (plan.empty()){
-			//executing=false;
+			executing=false;
 			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
 		currentTask.step = p[0].step;
-		//executing=true;
+		/executing=true;
 		p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
