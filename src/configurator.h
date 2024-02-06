@@ -57,6 +57,7 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 	//bool executing=0;
+	bool ex=0;
 	//int treeSize = 0; //for debug
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
