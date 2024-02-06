@@ -1104,13 +1104,13 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	}
 	if (planning){
 		if (plan.empty()){
-			executing=false;
+			//executing=false;
 			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
 		currentTask.step = p[0].step;
-		executing=true;
+		//executing=true;
 		p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
