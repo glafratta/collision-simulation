@@ -137,7 +137,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		currentTask.change=1;
 		//printf("plan:");
-		//printPlan(plan);
+		printPlan(plan);
 	}
 	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
