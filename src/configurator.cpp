@@ -629,7 +629,7 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 		leaf = src; //go back
 		}
 	}
-	p.insert(p.begin(), TaskSummary(g[0].disturbance, currentTask.direction, 0));
+	p.insert(p.begin(), TaskSummary(g[0].disturbance, Direction::STOP, 0));
 	return p;
 
 }
@@ -1109,13 +1109,11 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	}
 	if (planning){
 		if (plan.empty()){
-			//executingPlan=false;
 			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
 		currentTask.step = p[0].step;
-		//executingPlan=true;
 		//p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
