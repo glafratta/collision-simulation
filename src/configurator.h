@@ -56,13 +56,11 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	//bool executing=0;
-	bool ex=0;
-	//int treeSize = 0; //for debug
+	bool executingPlan=0;
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
-	bool discretized =0;
+	// bool discretized =0;
 	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
