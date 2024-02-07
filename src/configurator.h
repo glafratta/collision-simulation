@@ -56,7 +56,7 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	bool executingPlan=0;
+	//bool executingPlan=0;
 	Sequence plan;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
