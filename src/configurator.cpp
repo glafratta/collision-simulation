@@ -85,6 +85,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//EndedResult tempEnded = currentTask.checkEnded();
 	if (controlGoal.change){
 		currentTask=Task(Disturbance(), STOP);
+		running=0;
 		return 0;
 	}
 	// EndedResult controlEnded = controlGoal.checkEnded();
@@ -121,7 +122,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning & (plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+	if (planning & (plan.empty()) & ){ //og. collisionGraph[v0].outcome !=simResult::successful ||
 		currentTask.change=1;
 		//printf("executing = %i", executing);
 		collisionGraph[v0].filled =1;
