@@ -121,7 +121,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+	if (planning & (plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
 		currentTask.change=1;
 		//printf("executing = %i", executing);
 		collisionGraph[v0].filled =1;
