@@ -121,7 +121,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//printf("planning =%i\n", planning);
 	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning & ( planBuild!=STATIC || plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+	if (planning & ( planBuild!=STATIC || !executingPlan)){ //og. collisionGraph[v0].outcome !=simResult::successful ||
 		currentTask.change=1;
 		//printf("executing = %i", executing);
 		collisionGraph[v0].filled =1;
@@ -462,51 +462,51 @@ void Configurator::AlgorithmE(vertexDescriptor v, CollisionGraph& g, Task s, b2W
 }
 
 
-void Configurator::onDemandAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
-	discretized=1;
-	vertexDescriptor v1=v;
-	std::vector <vertexDescriptor> priorityQueue ={v}, evaluationQueue = {v};
-	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
-	bool end=0, added =0;
-	bool discrete =0;
-//	evaluateNode(priorityQueue[0], g, s, w);
-	do {
-		v= priorityQueue[0];
-		priorityQueue.erase(priorityQueue.begin());
-		//DISCOVER AND ADD TWO VERTICES
-		for (Direction d: g[v].options){ //add and evaluate all vertices
-		vertexDescriptor v0=v;
-		v1 =v0;
-			do {
-			added =addVertex(v0, v1, g, g[v0].disturbance); //add
-			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
-			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
-			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
-			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
-			evaluateNode(v1, g, s, w); //find simulation result
-			applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
-			v0=v1;
-			}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
-		evaluationQueue.push_back(v1);
-		}
-		//SPLIT NODE IF NECESSARY
-		for (vertexDescriptor ev: evaluationQueue){
-			std::vector <vertexDescriptor> split =splitNode(ev, g, s.direction, s.start);
-			if (split.size()>1){
-				discrete =1;
-			}
-			//find error and put in queue *********
-			for (vertexDescriptor vertex:split){
-				EndedResult er = findError(vertex, g, s.direction);
-				applyTransitionMatrix(g, vertex,s.direction, er.ended);
-				//applyTransitionMatrix(g,vertex, s.direction, er);
-				addToPriorityQueue(g, vertex, priorityQueue);
-			}
-		}
-		evaluationQueue.clear();
-	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
-	bestNext=v;
-}
+// void Configurator::onDemandAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
+// 	discretized=1;
+// 	vertexDescriptor v1=v;
+// 	std::vector <vertexDescriptor> priorityQueue ={v}, evaluationQueue = {v};
+// 	//std::map <vertexDescriptor, std::vector <b2Transform>> steps;
+// 	bool end=0, added =0;
+// 	bool discrete =0;
+// //	evaluateNode(priorityQueue[0], g, s, w);
+// 	do {
+// 		v= priorityQueue[0];
+// 		priorityQueue.erase(priorityQueue.begin());
+// 		//DISCOVER AND ADD TWO VERTICES
+// 		for (Direction d: g[v].options){ //add and evaluate all vertices
+// 		vertexDescriptor v0=v;
+// 		v1 =v0;
+// 			do {
+// 			added =addVertex(v0, v1, g, g[v0].disturbance); //add
+// 			edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
+// 			s = Task(g[v0].disturbance, g[e].direction, g[v0].endPose);
+// 			//constructWorldRepresentation(w, g[e].direction, s.start); //was g[v].endPose
+// 			worldBuilder.buildWorld(w, currentBox2D, s.start, g[e].direction); //was g[v].endPose
+// 			evaluateNode(v1, g, s, w); //find simulation result
+// 			applyTransitionMatrix(g, v1, d, controlGoal.checkEnded(g[v1]).ended);
+// 			v0=v1;
+// 			}while(s.direction !=DEFAULT & added); //evaluate the straight nodes
+// 		evaluationQueue.push_back(v1);
+// 		}
+// 		//SPLIT NODE IF NECESSARY
+// 		for (vertexDescriptor ev: evaluationQueue){
+// 			std::vector <vertexDescriptor> split =splitNode(ev, g, s.direction, s.start);
+// 			if (split.size()>1){
+// 				discrete =1;
+// 			}
+// 			//find error and put in queue *********
+// 			for (vertexDescriptor vertex:split){
+// 				EndedResult er = findError(vertex, g, s.direction);
+// 				applyTransitionMatrix(g, vertex,s.direction, er.ended);
+// 				//applyTransitionMatrix(g,vertex, s.direction, er);
+// 				addToPriorityQueue(g, vertex, priorityQueue);
+// 			}
+// 		}
+// 		evaluationQueue.clear();
+// 	}while(g[v].evaluationFunction()>=g[priorityQueue[0]].evaluationFunction());
+// 	bestNext=v;
+// }
 
 std::vector <vertexDescriptor> Configurator::splitNode(vertexDescriptor v, CollisionGraph& g, Direction d, b2Transform start){
 	std::vector <vertexDescriptor> split = {v};
@@ -1105,13 +1105,13 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 	}
 	if (planning){
 		if (plan.empty()){
-		//	executing=false;
+			executingPlan=false;
 			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
 		currentTask.step = p[0].step;
-		//executing=true;
+		executingPlan=true;
 		p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
 	}
