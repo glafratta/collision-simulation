@@ -128,6 +128,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		collisionGraph[v0].disturbance = controlGoal.disturbance;
 		collisionGraph[v0].outcome = simResult::successful;
 		if (graphConstruction ==A_STAR){
+			printf("planning");
 			classicalAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		}
 		// else if (graphConstruction == E){
@@ -137,7 +138,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// 	onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
 		// }
 		plan = getCleanSequence(collisionGraph, bestLeaf);
-		//printf("plan:");
 		printPlan(plan);
 	}
 	else if (!planning){
