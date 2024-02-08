@@ -292,11 +292,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 
 		//EVALUATE NODE()
 	simResult result;
-	//float remaining = simulationStep*2/MAX_SPEED;
-	float remaining = BOX2DRANGE*2/MAX_SPEED;
-	// if (s.action.getOmega()!=0){
-	// 	remaining =fabs(M_PI_2/s.getAction().getOmega());
-	// }
+	float remaining = BOX2DRANGE/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
@@ -1084,16 +1080,16 @@ int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()>0){ //LEFT
             result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		    result *=FRICTION_DAMPENING;
+		    //result *=FRICTION_DAMPENING;
 			//result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
             result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		    result *=FRICTION_DAMPENING;
+		    //result *=FRICTION_DAMPENING;
 			//result=12;
 		}
 		else if (a.getLinearSpeed()>0){
-			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed())*FRICTION_DAMPENING;
+			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed());
 		}
         printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
