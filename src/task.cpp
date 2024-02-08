@@ -103,14 +103,14 @@ void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 	bool ended = checkEnded().ended;
-	if (direction !=Direction::DEFAULT || motorStep<1 || motorStep%5!=0){ //only check every second
+	if (direction !=Direction::DEFAULT || motorStep<1 || motorStep%15!=0){ //only check every 2 sec
 		return;
 	}
 	float timeStepError =action.getRecOmega()/timeElapsed; 
 	//accumulatedError += timeStepError; 
 	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/SAFE_ANGLE;
-		printf("error = %f\n", normAccErr);
+		printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
 		action.L -= normAccErr*pGain;  
 		action.R += normAccErr *pGain; 
 		if (action.L>1.0){

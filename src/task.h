@@ -17,7 +17,7 @@ public:
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
-    float pGain=0.063;
+    float pGain=0.01;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     bool discrete=0;
@@ -236,10 +236,6 @@ simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, floa
 //enum controlResult{DONE =0, CONTINUE =1};
 
 void controller(float timeElapsed=0.2);
-
-void setGain(float f){
-    pGain=f;
-}
 
 std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
                                                                                     //finding a line passing through those points
