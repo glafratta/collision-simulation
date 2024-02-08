@@ -1063,28 +1063,28 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 	return result;
 }
 
-int Configurator::motorStep(Task::Action a, EndCriteria ec){
-	int result=0, angleResult=0, distanceResult=0;
-	if (ec.angle.isValid()){
-		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
-	}
-	if (ec.distance.isValid()){
-		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
-	}
-	result =std::max(angleResult, distanceResult);
-	printf("task has %i steps\n", result);
-	return result;
-}
+// int Configurator::motorStep(Task::Action a, EndCriteria ec){
+// 	int result=0, angleResult=0, distanceResult=0;
+// 	if (ec.angle.isValid()){
+// 		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
+// 	}
+// 	if (ec.distance.isValid()){
+// 		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
+// 	}
+// 	result =std::max(angleResult, distanceResult);
+// 	printf("task has %i steps\n", result);
+// 	return result;
+// }
 
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()>0){ //LEFT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
+            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega()*FRICTION);
 		    //result *=FRICTION_DAMPENING;
 			//result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
+            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega()*FRICTION);
 		    //result *=FRICTION_DAMPENING;
 			//result=12;
 		}
