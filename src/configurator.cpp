@@ -69,8 +69,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	else{
 		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
 	}
-		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
-		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
+	currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
+	currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 //	printf("calculated velocity\n");
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
