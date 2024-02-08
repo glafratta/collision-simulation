@@ -103,7 +103,7 @@ void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 	bool ended = checkEnded().ended;
-	if (action.getOmega()!=0|| motorStep<1 || motorStep%15!=0){ //only check every 2 sec
+	if (action.getOmega()!=0|| motorStep<1 || motorStep%10!=0){ //only check every 2 sec
 		return;
 	}
 	float timeStepError =action.getRecOmega()/timeElapsed; 
@@ -111,10 +111,10 @@ void Task::controller(float timeElapsed){
 	if (fabs(timeStepError)>tolerance){
 		float normAccErr = timeStepError/SAFE_ANGLE;
 		printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		if (normAccErr>0){
+		if (normAccErr<0){
 			action.L -= normAccErr*pGain;  //-
 		}
-		else if (normAccErr<0){
+		else if (normAccErr>0){
 			action.R += normAccErr *pGain; //+
 		}
 		if (action.L>1.0){
