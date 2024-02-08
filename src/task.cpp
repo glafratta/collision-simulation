@@ -99,12 +99,14 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
-Task::controlResult Task::controller(){
+void Task::controller(){
 //float recordedAngle = action.getOmega()/0.2;
-float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-bool ended = checkEnded().ended;
-if (action.getOmega()==0){
-	float timeStepError =action.getOmega()/0.2; 
+	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
+	bool ended = checkEnded().ended;
+	if (direction !=Direction::DEFAULT){
+		return;
+	}
+	float timeStepError =action.getRecOmega()/time; 
 	//accumulatedError += timeStepError; 
 	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/M_PI_2;
@@ -123,8 +125,7 @@ if (action.getOmega()==0){
 			action.R=-1;
 		}
 	}
-}
-	return CONTINUE;
+
 }
 
 Direction Task::H(Disturbance ob, Direction d, bool topDown){
