@@ -235,7 +235,7 @@ simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, floa
 
 //enum controlResult{DONE =0, CONTINUE =1};
 
-void controller();
+void controller(float timeElapsed=0.2);
 
 void setGain(float f){
     pGain=f;
