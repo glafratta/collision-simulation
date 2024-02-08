@@ -110,7 +110,7 @@ void Task::controller(float timeElapsed){
 	//accumulatedError += timeStepError; 
 	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/SAFE_ANGLE;
-		printf("error = %f\n", normAccError);
+		printf("error = %f\n", normAccErr);
 		action.L -= normAccErr*pGain;  
 		action.R += normAccErr *pGain; 
 		if (action.L>1.0){
