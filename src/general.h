@@ -47,7 +47,7 @@ struct Node{
 struct TaskSummary{
 	Disturbance disturbance;
 	Direction direction = DEFAULT;
-	float step=0;
+	int step=0;
 
 	TaskSummary()=default;
 

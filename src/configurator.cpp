@@ -788,7 +788,7 @@ void Configurator::run(Configurator * c){
 	//			printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
 				c->ci->ready=0;
 				c->Spawner(c->ci->data, c->ci->data2fp);
-				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.step);
+				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
 	}
 
@@ -1042,17 +1042,17 @@ std::pair <bool, int>  Configurator::checkPlan(b2World& world, Sequence & seq, T
 void Configurator::trackTaskExecution(Task & t){
 	//if (t.endCriteria.hasEnd()){
 		//printf("task in %i has end\n", iteration);
-		if (t.step>0){
-			t.step--;
-			printf("step =%i\n", t.step);
+		if (t.motorStep>0){
+			t.motorStep--;
+			printf("step =%i\n", t.motorStep);
 		}
-		if(t.step==0){
+		if(t.motorStep==0){
 			t.change=1;
 			printf("change task cause it ends = %i\n", t.change);
 			//printf("task set to change\n");
 		}
 	//}
-	printf("change =%i, step =%i\n", t.change, t.step);
+	printf("change =%i, step =%i\n", t.change, t.motorStep);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1113,14 +1113,14 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
-		currentTask.step = p[0].step;
+		currentTask.motorStep = p[0].step;
 		//p.erase(p.begin());
-		printf("canged to next in plan, new task has %i steps\n", currentTask.step);
+		printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
 		if (n.disturbance.isValid()){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
-			//currentTask.step = motorStep(currentTask.getAction());
+			//currentTask.motorStep = motorStep(currentTask.getAction());
 		}
 		else if(currentTask.direction!=DEFAULT){
 				currentTask = Task(n.disturbance, DEFAULT); //reactive
@@ -1128,13 +1128,13 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
 		}
-//			currentTask.step = motorStep(currentTask.getAction());
+//			currentTask.motorStep = motorStep(currentTask.getAction());
 
-		currentTask.step = motorStep(currentTask.getAction()); //reflex
+		currentTask.motorStep = motorStep(currentTask.getAction()); //reflex
 		printf("changed to reactive\n");
 	}
-	//currentTask.step = motorStep(currentTask.getAction());
-	ogStep = currentTask.step;
+	//currentTask.motorStep = motorStep(currentTask.getAction());
+	ogStep = currentTask.motorStep;
 	//printf("set step\n");
 }
 
