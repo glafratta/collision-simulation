@@ -17,7 +17,7 @@
 #define ROBOT_BOX_OFFSET_Y 0
 #define ROBOT_BOX_OFFSET_ANGLE 0
 #define BETWEEN_WHEELS .15
-#define MAX_SPEED 0.156
+const float MAX_SPEED=0.156;
 #define MAX_OMEGA 2 //2 radians
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
 const float BOX2DRANGE =1.0;
@@ -29,7 +29,7 @@ const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
 //const float DISCRETE_RANGE =ROBOT_HALFLENGTH*2; //22 cm, as in Ulrich (2000)
 //#define DISCRETE_SIMDURATION DISCRETE_RANGE*2/MAX_SPEED
 const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
-const float FRICTION =0.895;
+const float FRICTION =0.798; //.875
 const float DISTANCE_ERROR_TOLERANCE=.00;
 
 

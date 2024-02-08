@@ -21,10 +21,10 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		robot.body->SetTransform(start.p, theta);
 		int step=0;
 		for (step; step < (HZ*remaining); step++) {//3 second
-			instVelocity.x = action.getRecSpeed()*cos(theta);
-			instVelocity.y = action.getRecSpeed()*sin(theta);
+			instVelocity.x = action.getLinearSpeed()*cos(theta);
+			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
-			robot.body->SetAngularVelocity(action.getRecOmega());
+			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
