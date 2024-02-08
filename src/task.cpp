@@ -108,11 +108,15 @@ void Task::controller(float timeElapsed){
 	}
 	float timeStepError =action.getRecOmega()/timeElapsed; 
 	//accumulatedError += timeStepError; 
-	if (timeStepError>tolerance){
+	if (fabs(timeStepError)>tolerance){
 		float normAccErr = timeStepError/SAFE_ANGLE;
 		printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		action.L -= normAccErr*pGain;  //-
-		action.R += normAccErr *pGain; //+
+		if (normAccErr>0){
+			action.L -= normAccErr*pGain;  //-
+		}
+		else if (normAccErr<0){
+			action.R += normAccErr *pGain; //+
+		}
 		if (action.L>1.0){
 		action.L=1.0;
 		}
