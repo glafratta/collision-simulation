@@ -83,7 +83,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 
 void Task::trackDisturbance(Disturbance & d, Action a){
 	// //switch(dir){
-	float angleTurned =MOTOR_CALLBACK*a.getOmega()*(1/FRICTION_DAMPENING);
+	float angleTurned =MOTOR_CALLBACK*a.getOmega();
 	printf("initial angle =%f, angle turned = %f\n", d.pose.q.GetAngle(), angleTurned);
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
 	// printf("NEW angle =%f\n", d.pose.q.GetAngle());
@@ -93,7 +93,7 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// //}
-	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
+	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed();
 	float initialL = d.pose.p.Length();
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
