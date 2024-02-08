@@ -163,7 +163,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
 	if (isSameTask){
-		//currentTask.controller(timeElapsed);
+		currentTask.controller(timeElapsed);
 	}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
@@ -1131,7 +1131,7 @@ void Configurator::changeTask(bool b, Sequence & p, Node n, int&ogStep){
 //			currentTask.motorStep = motorStep(currentTask.getAction());
 
 		currentTask.motorStep = motorStep(currentTask.getAction()); //reflex
-		printf("changed to reactive\n");
+		printf("changed to reactive, %i steps\n", currentTask.motorStep);
 	}
 	//currentTask.motorStep = motorStep(currentTask.getAction());
 	ogStep = currentTask.motorStep;
