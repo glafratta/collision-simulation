@@ -103,7 +103,7 @@ void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 	bool ended = checkEnded().ended;
-	if (direction !=Direction::DEFAULT || motorStep<1 || motorStep%15!=0){ //only check every 2 sec
+	if (action.getOmega()!=0|| motorStep<1 || motorStep%15!=0){ //only check every 2 sec
 		return;
 	}
 	float timeStepError =action.getRecOmega()/timeElapsed; 
