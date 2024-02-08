@@ -83,7 +83,7 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 
 void Task::trackDisturbance(Disturbance & d, Action a){
 	// //switch(dir){
-	float angleTurned =MOTOR_CALLBACK*a.getOmega()*(1/FRICTION_DAMPENING);
+	float angleTurned =MOTOR_CALLBACK*a.getOmega()/FRICTION;
 	printf("initial angle =%f, angle turned = %f\n", d.pose.q.GetAngle(), angleTurned);
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
 	// printf("NEW angle =%f\n", d.pose.q.GetAngle());
@@ -93,18 +93,20 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
 	// //}
-	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
+	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed();
 	float initialL = d.pose.p.Length();
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
-Task::controlResult Task::controller(){
+void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;
-float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-bool ended = checkEnded().ended;
-if (action.getOmega()==0){
-	float timeStepError =action.getOmega()/0.2; 
+	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
+	bool ended = checkEnded().ended;
+	if (direction !=Direction::DEFAULT){
+		return;
+	}
+	float timeStepError =action.getRecOmega()/timeElapsed; 
 	//accumulatedError += timeStepError; 
 	if (timeStepError>tolerance){
 		float normAccErr = timeStepError/M_PI_2;
@@ -123,8 +125,7 @@ if (action.getOmega()==0){
 			action.R=-1;
 		}
 	}
-}
-	return CONTINUE;
+
 }
 
 Direction Task::H(Disturbance ob, Direction d, bool topDown){

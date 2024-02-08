@@ -10,6 +10,7 @@
 #include <boost/graph/adjacency_list.hpp>
 //#include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
+#include <cmath>
 #include "disturbance.h"
 
 enum M_CODES {THREE_M=3, FOUR_M=4};

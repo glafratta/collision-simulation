@@ -233,9 +233,9 @@ void trackDisturbance(Disturbance &, Action);
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
-enum controlResult{DONE =0, CONTINUE =1};
+//enum controlResult{DONE =0, CONTINUE =1};
 
-controlResult controller();
+void controller(float timeElapsed=0.2);
 
 void setGain(float f){
     pGain=f;

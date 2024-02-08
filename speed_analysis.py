@@ -27,12 +27,12 @@ with open(file_list) as file:
     
 #remove outliers
 # print("hi")
-speed_clean = np.empty(1)
-branches_clean=np.empty(1)
-bodies_clean=np.empty(1)
+speed_clean = np.empty(0)
+branches_clean=np.empty(0)
+bodies_clean=np.empty(0)
 indices = np.ones(speed.size, dtype =bool)
 for i in range(0,speed.size):
-    if speed[i]>3.0:
+    if speed[i]>3.0 or branches[i]>100 or branches[i]<= 1 or bodies[i]<=1 or bodies[i]>400 or speed[i]<=0.05:
         #print(speed[i])
         indices[i]=0
 # speed_clean = np.delete(speed, indices,0)
