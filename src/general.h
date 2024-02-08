@@ -51,7 +51,11 @@ struct TaskSummary{
 
 	TaskSummary()=default;
 
-	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){}
+	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
+		if (direction==Direction::DEFAULT){
+			step*=STRAIGHT_FRICTION;
+		}
+	}
 };
 
 typedef b2Transform Transform;

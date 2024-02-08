@@ -1079,17 +1079,17 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()>0){ //LEFT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega()*FRICTION);
+            result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
 		    //result *=FRICTION_DAMPENING;
 			//result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega()*FRICTION);
+            result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
 		    //result *=FRICTION_DAMPENING;
 			//result=12;
 		}
 		else if (a.getLinearSpeed()>0){
-			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed()*FRICTION);
+			result = (simulationStep*STRAIGHT_FRICTION)/(MOTOR_CALLBACK*a.getLinearSpeed());
 		}
         printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);

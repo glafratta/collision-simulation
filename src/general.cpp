@@ -9,7 +9,7 @@ void Node::fill(simResult result){
 	endPose = result.endPose;
 	//distanceSoFar = g[srcVertex].distanceSoFar + (round(result.distanceCovered*100))/100; //rounding to 2 decimals to eliminate floating point errors
 	outcome = result.resultCode;
-	step = std::floor(result.step*FRICTION/(HZ*MOTOR_CALLBACK)+0.5);
+	step = std::floor(result.step/(HZ*MOTOR_CALLBACK)+0.5);
 	filled=true;
 }
 
