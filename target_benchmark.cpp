@@ -120,7 +120,7 @@ void step( AlphaBot &motors){
 	}
 	//if (c->getTask()->change){
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
-	float gain=0.85;
+	float gain=0.875;
 	// if (c->getTask()->direction==Direction::DEFAULT){
 	// 	gain=0.9;
 	// }
