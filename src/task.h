@@ -17,7 +17,7 @@ public:
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
-    float pGain=0.01;
+    float pGain=0.1;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     bool discrete=0;
