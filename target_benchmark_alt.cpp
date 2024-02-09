@@ -126,8 +126,12 @@ void step( AlphaBot &motors){
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
 	//}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
-    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*.9); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
+	float gain=1;
+	if (c->getTask()->direction==Direction::DEFAULT){
+		gain=0.9;
+	}
+    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
+    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed()*1.1);
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
     //iteration++;
 }
