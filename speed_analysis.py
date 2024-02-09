@@ -105,4 +105,7 @@ print("min speed:", min(speed_clean), "max bodies: ", max(speed_clean))
 print("min branches:", min(branches_clean), "max branches: " ,max(branches_clean))
 print("sample size:", len(bodies_clean), "og sample size: ", len(bodies))
 
+f=open("results.txt", "w")
+s=str(avg_speed)+" "+str(speed_sd)
+f.write(s)
         
