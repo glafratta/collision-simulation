@@ -120,6 +120,7 @@ void step( AlphaBot &motors){
 	}
 	//if (c->getTask()->change){
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
+	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
 	float gain=1;
 	//  if (c->getTask()->direction==Direction::DEFAULT){
 	//  	gain=0.95;
