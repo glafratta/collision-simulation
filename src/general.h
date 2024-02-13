@@ -9,6 +9,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include </usr/include/boost/container/map.hpp>
+#include <cmath>
 #include "disturbance.h"
 
 enum M_CODES {THREE_M=3, FOUR_M=4};
@@ -33,6 +34,7 @@ struct Node{
 	bool filled =0;
 	float cost=0; //self-error
 	float error=0; //error with respect to control goal
+	int step=0;
 	
 	void fill(simResult);
 
@@ -42,11 +44,15 @@ struct Node{
 struct TaskSummary{
 	Disturbance disturbance;
 	Direction direction = DEFAULT;
-	float step=0;
+	int step=0;
 
 	TaskSummary()=default;
 
-	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){}
+	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
+		// if (direction==Direction::DEFAULT){
+		// 	step*=STRAIGHT_FRICTION;
+		// }
+	}
 };
 
 typedef b2Transform Transform;

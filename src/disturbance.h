@@ -47,7 +47,6 @@ public:
     void setAngle(float a){
         angleToRobot =a;
     }
-
     void setAngle(b2Transform t){ //gets the angle of an Disturbance wrt to another Disturbance (robot)
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;
@@ -127,6 +126,9 @@ struct simResult{
     bool valid = 0;
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+    int step=0;
+  //  int step=0;
+
 
     simResult(){}
 

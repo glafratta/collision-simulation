@@ -14,11 +14,11 @@ public:
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
-    float pGain=0.063;
+    float pGain=0.1;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     bool discrete=0;
-    int step=0;
+    int motorStep=0;
 protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
@@ -62,7 +62,7 @@ public:
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
-    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS)*TURN_FRICTION; //instant velocity, determines angle increment in willcollide
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(L+R)/2;
     recordedSpeed=linearSpeed;
@@ -159,7 +159,7 @@ AffordanceIndex getAffIndex(){
     return disturbance.getAffIndex();
 }
 
-Direction H(Disturbance, Direction);
+Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 
 void setEndCriteria();
 
@@ -176,27 +176,35 @@ Task(){
     printf("default constructro\n");
 }
 
-Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
+Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
-    direction = H(disturbance, d);  
+    direction = H(disturbance, d, topDown);  
+    //action = Action(direction);
     action.init(direction);
     setEndCriteria();
 }
 
-void init(){
-    start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-    direction = DEFAULT;
-    action.init(direction);
-}
+// void init(){
+//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
+//     direction = DEFAULT;
+//     action.init(direction);
+//    // printf("default init \n");
+//    // RecordedVelocity = action.getLinearVelocity();
+// }
 
-void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))){
-    start = _start;
-    disturbance = ob;
-    direction = H(disturbance, d);  
-    action.init(direction);
-    setEndCriteria();
-}
+// void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool T){
+//     start = _start;
+//     disturbance = ob;
+//     direction = H(disturbance, d);  
+//     //action = Action(direction);
+//     action.init(direction);
+//    // RecordedVelocity = action.getLinearVelocity();
+//     setEndCriteria();
+//    // step = action.motorStep();
+//    // printf("step =%i\n", step);
+
+// }
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
@@ -214,15 +222,11 @@ void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transfor
 void trackDisturbance(Disturbance &, Action);
 
 
-simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0);
+simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
-enum controlResult{DONE =0, CONTINUE =1};
+//enum controlResult{DONE =0, CONTINUE =1};
 
-controlResult controller();
-
-void setGain(float f){
-    pGain=f;
-}
+void controller(float timeElapsed=0.2);
 
 std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
                                                                                     //finding a line passing through those points

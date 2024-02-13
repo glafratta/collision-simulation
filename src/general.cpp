@@ -1,5 +1,6 @@
 #include "general.h"
 
+
 void Node::fill(simResult result){
 	if (result.collision.isValid()){
 		totDs++;
@@ -7,6 +8,7 @@ void Node::fill(simResult result){
 	disturbance = result.collision;
 	endPose = result.endPose;
 	outcome = result.resultCode;
+	step = std::floor(result.step/(HZ*MOTOR_CALLBACK)+0.5);
 	filled=true;
 }
 
