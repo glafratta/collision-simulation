@@ -1,5 +1,5 @@
-# HICS - hierarchical input controller sequences
-This library is designed for spatial navigation in a wheeled robot equipped with a LIDAR sensor. The navigation problem is broken down in individual Tasks which correspond to the act of performing a single motor Action (go straight, turn left/right 90 degrees, go back) in order to eliminate a Disturbance, which is a process that occurs in a closed-loop fashion. Disturbances are identified by the Configurator, an overarching module capable of predicting the outcome of each Task by simulating it in game engine [Box2D](https://github.com/erincatto/box2d) over a certain time/distance horizon. Using this framework, sequences of Tasks representing plans towards a control goal can be generated into a graph structure, and evaluated using the simulation environment. In this implementation, nodes are discovered in the graph using the A* algorithm.
+# CKnow-Homeo: Core knowledge and Homeostatic control
+The purpose of this library is to showcase a framework for multi-step ahead plannign using pure input control. The navigation problem is broken down into several unique closed-loop input controllers, called Tasks. Each tasks produces a unique control behaviour (go straight, turn left/right 90 degrees) in response to a disturbance object. A supervising module, called the Configurator, can simulate sequences of Tasks  in game engine [Box2D](https://github.com/erincatto/box2d), extracts plans in the discrete and continuous domain, and queue them for execution.
 
 ## Hardware
 The indoor robot is equipped with 
@@ -40,7 +40,4 @@ sudo make install
 * `sudo ./reactive`: this program demonstrates reactive avoidance
 * `sudo ./targetless` : this program demonstrates planning over a 1m distance horizon for a control goal that is not a target location but rather an objective to drive straight for the longest time with the least amount of disturbances
 * `sudo ./target`: this program (under construction) demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0m.
-* `sudo ./targetless_benchmark`: for data collection; the program creates a folder called bodiesSpeedStats1.0, which you can navigate to and run the script `sh ../speed_analysis.sh`
-
-### Settings
-The automatic settings is for debug files to be turned off and for the robot to simulate its plans in chunks of 1m each (half the sensor range). To change these settings just run the above executables as `your_executable 1 your_step_size`. From experimental findings, we recommend using a step the size of the robot's diameter.
+Run with options `0 [custom-stepDistance]`: for turning debug options off. In debug mode, LIDAR coordinates, Box2D objects and robot trajectories are dumped into the `/tmp` folder. The stepDistance is the maximum distance covered by a single task, 1.0m by default.
