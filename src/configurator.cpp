@@ -242,6 +242,30 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 	return result;
 	}
 
+Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+	Sequence p;
+	if (leaf <root){
+		throw std::invalid_argument("wrong order of vertices for iteration\n");
+	}
+	while (leaf !=root){
+		if (boost::in_degree(leaf, g)<1){
+			break;
+		}
+		else{
+		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
+		vertexDescriptor src = boost::source(e,g);
+		if (g[leaf].endPose != g[src].endPose){ //if the node was successful
+			TaskSummary ts(g[src].disturbance, g[e].direction, g[leaf].step);
+			p.insert(p.begin(), ts);
+		}
+		leaf = src; //go back
+		}
+	}
+	p.insert(p.begin(), TaskSummary(g[0].disturbance, Direction::STOP, 0));
+	return p;
+
+}
+
 
 void Configurator::classicalAStar(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
