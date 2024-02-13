@@ -121,7 +121,6 @@ public:
     float getRecOmega(){
         return recordedOmega;
     }
-    //friend class Configurator;
 };
 
 
@@ -180,31 +179,9 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     start = _start;
     disturbance = ob;
     direction = H(disturbance, d, topDown);  
-    //action = Action(direction);
     action.init(direction);
     setEndCriteria();
 }
-
-// void init(){
-//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-//     direction = DEFAULT;
-//     action.init(direction);
-//    // printf("default init \n");
-//    // RecordedVelocity = action.getLinearVelocity();
-// }
-
-// void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool T){
-//     start = _start;
-//     disturbance = ob;
-//     direction = H(disturbance, d);  
-//     //action = Action(direction);
-//     action.init(direction);
-//    // RecordedVelocity = action.getLinearVelocity();
-//     setEndCriteria();
-//    // step = action.motorStep();
-//    // printf("step =%i\n", step);
-
-// }
 
 void setRecordedVelocity(b2Vec2 vel){
     RecordedVelocity = vel;
@@ -224,7 +201,6 @@ void trackDisturbance(Disturbance &, Action);
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
-//enum controlResult{DONE =0, CONTINUE =1};
 
 void controller(float timeElapsed=0.2);
 

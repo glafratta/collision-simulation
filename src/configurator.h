@@ -52,12 +52,7 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	//bool executingPlan=0;
 	Sequence plan;
-	M_CODES numberOfM =THREE_M;
-	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
-	// bool discretized =0;
-	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
 
@@ -96,56 +91,28 @@ void setBenchmarking(bool b){
 
 bool Spawner(CoordinateContainer, CoordinateContainer); 
 
-int getIteration(){
-	return iteration;
-}
-
 DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
 void controller();
 
-void addIteration(){
-	iteration++;
-}
-
-Task * getTask(int advance=0){ //returns Task being executed
+Task * getTask(){ //returns Task being executed
 	return &currentTask;
 }
 
-
 void applyController(bool, Task &);
 
+int getIteration(){
+	return iteration;
+}
 
-b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
 simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
-void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
-
-void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
-
 void classicalAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
-
-template <typename V, typename G>
-bool isFullLength(V v, const G & g, float length=0){
-    if (boost::in_degree(v, g)==0 && length < BOX2DRANGE){
-        return false;
-    }
-    else if (length >=BOX2DRANGE){
-        return true;
-    }
-    else{
-        edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-        length += g[inEdge].distanceCovered;
-		g[v].predecessors++;
-        return isFullLength(boost::source(inEdge, g), g, length);
-    }
-
-}
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance()){
 	if (!obs.isValid()){
@@ -164,13 +131,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	return vertexAdded;
 }
 
-void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
-
 Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
-
-Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
-
-vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
 EndedResult findError(Task, Node&); //returns whether the controlGoal has ended and fills node with cost and error
 
@@ -192,29 +153,16 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
-bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
-
-bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
-
-void backtrack(CollisionGraph&, vertexDescriptor&);
-
 void addToPriorityQueue(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>&);
 
-std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
-
-std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
-																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-std::pair <bool, int> checkPlan(b2World&, Sequence &, Task, b2Transform); //returns if plan fails and at what index in the plan
-									
 void trackTaskExecution(Task &);
 
 DeltaPose assignDeltaPose(Task::Action, float);
 
 void changeTask(bool, Sequence&, Node, int&);
 
-int motorStep(Task::Action, EndCriteria);
 
 int motorStep(Task::Action a);
 

@@ -1,12 +1,5 @@
 #include "task.h"
 
-// class BoxFeatures{
-//     private:
-//     float halfWindowWidth =.1;
-//     public:
-    
-
-// };
 
 class BodyFeatures{
     public:
@@ -29,7 +22,7 @@ class WorldBuilder{
     float simulationStep=BOX2DRANGE;
     int buildType=0;
     std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Point, Point>, Task*curr=NULL, CoordinateContainer * dCloud=NULL); //gets points from the raw data that are relevant to the task based on bounding boxes
-                                                                                                                                        //std::pair<points, obstaclestillthere>
+                                                                                                                                        
     void makeBody(b2World&, BodyFeatures);
 
     std::vector <BodyFeatures> processData(CoordinateContainer);

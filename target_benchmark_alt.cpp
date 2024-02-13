@@ -28,32 +28,25 @@ std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points)
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
-// CoordinateContainer coordinates = {};
-// CoordinateContainer coordinates2fp = {};
 public: 
     int mapCount =0;
 
     LidarInterface(ConfiguratorInterface * _ci): ci(_ci){}
 
 	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
-	    //ci->setReady(0);
 		if (ci == NULL){
 			printf("null pointer to ci\n");
 			return;
 		}
-		//ci->ready=0;
 		ci->data.clear();
 		ci->data2fp.clear();
 		mapCount++;
-		//std::vector <Point> current;
 		Point p, p2f;
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
 		printf("%s\n", name);
 		f=fopen(name, "w");
-		// coordinates.clear();
-		// coordinates2fp.clear();
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <LIDAR_RANGE){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -63,8 +56,6 @@ public:
 				float y2 = round(data.y*100)/100;
 				p= (Point(x, y));
 				p2f=Point(x2, y2);
-				//coordinates.insert(p);
-				//coordinates2fp.insert(p2f);
 				ci->data.insert(p);
 				ci->data2fp.insert(p2f);
 				if (ci->debugOn){
@@ -73,20 +64,10 @@ public:
             }
 		}
 		fclose(f);
-		printf("added data to lidar containers, coord = %i, coord2fp = %i\n", ci->data.size(), ci->data2fp.size());
-
-		// for (Point d:coordinates){
-		// 	ci->data.insert(d);
-		// }
-		// for (Point d:coordinates2fp){
-		// 	ci->data2fp.insert(d);
-		// }
 		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
-		//ci->ready=1;
 		ci->iteration++;
-		printf("added data to interface containers\n");
 
 	}
 
@@ -94,8 +75,6 @@ public:
 };
 
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
-    //int iteration=0;
-    //int confIteration=0;
     Configurator * c;
     float L=0;
 	float R=0;
@@ -116,24 +95,15 @@ void step( AlphaBot &motors){
 		return;
 	}
 	c->trackTaskExecution(*(c->getTask()));	
-//	c->controlGoal.trackDisturbance(controlGoal.disturbance, MOTOR_CALLBACK, deltaPose)
-	//EndedResult controlEnded = controlGoal.checkEnded();
 	if (c->controlGoal.checkEnded().ended){
 		c->controlGoal.change =1;
 		return;
 	}
-	//if (c->getTask()->change){
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
-	//}
 	c->changeTask(c->getTask()->change, c->plan, c->collisionGraph[0], ogStep);
 	float gain=1;
-	//  if (c->getTask()->direction==Direction::DEFAULT){
-	//  	gain=0.95;
-	//  }
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*gain); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());
-    //iteration++;
 }
 };
 
@@ -146,8 +116,6 @@ int main(int argc, char** argv) {
     Task controlGoal(target, DEFAULT);
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
-	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = A_STAR;
 	configurator.setBenchmarking(1);
 	configurator.planning =1;
 	if (argc>1){

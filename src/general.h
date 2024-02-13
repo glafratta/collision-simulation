@@ -12,13 +12,6 @@
 #include <cmath>
 #include "disturbance.h"
 
-enum M_CODES {THREE_M=3, FOUR_M=4};
-
-enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
-
-enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
-
-enum PLAN_BUILD{CONTINUOUS, STATIC};
 
 struct Edge{
 	Direction direction;
@@ -48,11 +41,7 @@ struct TaskSummary{
 
 	TaskSummary()=default;
 
-	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
-		// if (direction==Direction::DEFAULT){
-		// 	step*=STRAIGHT_FRICTION;
-		// }
-	}
+	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){	}
 };
 
 typedef b2Transform Transform;

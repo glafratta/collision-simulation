@@ -6,11 +6,4 @@ const Affordance Avoid(std::vector<Direction>{LEFT, RIGHT, BACK},1);
 const Affordance Pursue(std::vector <Direction> {DEFAULT, LEFT, RIGHT},2);
 const std::vector <Affordance> affordances{None, Avoid, Pursue};
 
-class Knowledge{
-    public:
-    std::vector <Direction> primitives = primitives;
-    std::vector <Direction> affordances = affordances;
-};
-
-
 #endif

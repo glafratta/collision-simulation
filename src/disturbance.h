@@ -1,5 +1,4 @@
 #include "settings.h"
-//#include "measurement.h"
 #include "robot.h"
 #include <stdexcept>
 
@@ -127,8 +126,6 @@ struct simResult{
     float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     int step=0;
-  //  int step=0;
-
 
     simResult(){}
 
