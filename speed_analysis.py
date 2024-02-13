@@ -91,7 +91,9 @@ ax2.set_ylabel("Speed (s)")
 ax2.set_xlabel("Branches no.")
 ax3.set_ylabel("Bodies no.")
 ax3.set_xlabel("Branches no.")
-#plt.show()
+plt1.show()
+plt1.savefig('speed_body_Corr.eps', transparent=True, format='eps')
+
 
 
 
