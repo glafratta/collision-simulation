@@ -89,13 +89,13 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		collisionGraph[v0].filled =1;
 		collisionGraph[v0].disturbance = controlGoal.disturbance;
 		collisionGraph[v0].outcome = simResult::successful;
-		if (graphConstruction ==A_STAR){
-			explorer(v0, collisionGraph, currentTask, world, bestLeaf);
-		}
-		plan = getCleanSequence(collisionGraph, bestLeaf);
+		explorer(v0, collisionGraph, currentTask, world, bestLeaf);
+		//plan = getCleanSequence(collisionGraph, bestLeaf);
 		planVertices = planner(collisionGraph, bestLeaf);
 		currentTask.change=1;
-		}
+	}
+	else if(!plan.empty()){
+		checkPlan(world, planVertices,collisionGraph);
 	}
 	else if (!planning){
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
@@ -926,15 +926,15 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 }
 
 
-std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
-	std::pair <bool, b2Vec2> result(false, b2Vec2());
-	for (Point p: current){
-		if (p.isInRadius(v, radius)){
-			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
-		}
-	}
-	return result;
-}
+// std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
+// 	std::pair <bool, b2Vec2> result(false, b2Vec2());
+// 	for (Point p: current){
+// 		if (p.isInRadius(v, radius)){
+// 			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
+// 		}
+// 	}
+// 	return result;
+// }
 
 std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 	int count=0;
@@ -981,6 +981,7 @@ void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
 
 
 CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, CollisionGraph &g, b2Transform start){
+	updateGraph(g);
 	CollisionGraph graphError; //1 is fials, 0 is ok
 	Task t= currentTask;
 	int stepsTraversed= t.motorStep- g[0].step;
@@ -1169,9 +1170,9 @@ void Configurator::changeTask(bool b, std::vector <vertexDescriptor>& vertices, 
 }
 
 void Configurator::updateGraph(CollisionGraph&g){
-	b2Transform deltaPose(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK/FRICTION_DAMPENING,
-						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK/FRICTION_DAMPENING), 
-						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK/FRICTION_DAMPENING));
+	b2Transform deltaPose(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
+						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK));
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){
 		g[*vIt].endPose-=deltaPose;

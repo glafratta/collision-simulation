@@ -1,6 +1,8 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 #include "opencv2/opencv.hpp"
+//#include "box2d/box2d.h"
+//#include "robot.h"
 #include <dirent.h>
 #include <vector>
 #include <thread>
@@ -9,6 +11,8 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
+//#include "task.h"
+//#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
@@ -52,13 +56,13 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	//bool executingPlan=0;
+	//int treeSize = 0; //for debug
 	Sequence plan;
 	std::vector <vertexDescriptor> planVertices;
 	StateMatcher matcher;
 	M_CODES numberOfM =THREE_M;
 	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
-	// bool discretized =0;
+	bool discretized =0;
 	PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
@@ -80,7 +84,9 @@ void setBenchmarking(bool b){
 			mkdir(dirName, 0777);
 			printf("made stats directory\n");
 		}
-
+		else{
+			printf("opened stats directory\n");
+		}
 		//TODAYS DATE AND TIME
 		time_t now =time(0);
 		tm *ltm = localtime(&now);
@@ -91,9 +97,13 @@ void setBenchmarking(bool b){
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
+		//sprintf(statFile,"stat");
+		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
+		printf("open\n");
 		fclose(f);
 	}
+	printf("set\n");
 }
 
 bool Spawner(CoordinateContainer, CoordinateContainer); 
@@ -213,6 +223,8 @@ static void run(Configurator *);
 
 void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
 
+//void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
+
 bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
 bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
@@ -229,9 +241,9 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform); //returns if plan fails and at what index in the plan
+CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 
-std::vector <vertexDescriptor> indStateMatches(vertexDescriptor);
+//std::vector <vertexDescriptor> (vertexDescriptor);
 									
 void trackTaskExecution(Task &);
 
