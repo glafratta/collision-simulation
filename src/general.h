@@ -8,8 +8,8 @@
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-//#include <boost/graph/depth_first_search.hpp>
 #include </usr/include/boost/container/map.hpp>
+#include <cmath>
 #include "disturbance.h"
 
 enum M_CODES {THREE_M=3, FOUR_M=4};
@@ -74,11 +74,15 @@ struct StateMatcher{
 struct TaskSummary{
 	Disturbance disturbance; //disturbance initialisation
 	Direction direction = DEFAULT;
-	float step=0;
+	int step=0;
 
 	TaskSummary()=default;
 
-	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){}
+	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
+		// if (direction==Direction::DEFAULT){
+		// 	step*=STRAIGHT_FRICTION;
+		// }
+	}
 };
 
 typedef b2Transform Transform;
@@ -93,17 +97,6 @@ typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 typedef std::vector <TaskSummary> Sequence;
 
-// struct Leaf{
-// 	vertexDescriptor vertex=0;
-// 	float error =0;
-// 	bool valid=0;
-
-// 	Leaf()=default;
-
-// 	Leaf(vertexDescriptor v, float e):vertex(v), error(e){
-// 		valid=1;
-// 	}
-// };
 
 struct Point{
 	private:
@@ -113,7 +106,6 @@ struct Point{
 	float y=0;
 	float r=0;
 	float phi=0;
-	//bool valid =0;
 
 	Point(){}
 
@@ -169,12 +161,6 @@ struct Point{
 			float xHigh = std::max(xBounds.first, xBounds.second);
 			float yLow = std::min(yBounds.first, yBounds.second);
 			float yHigh = std::max(yBounds.first, yBounds.second);
-			// if (this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow){
-			// 	return true;
-			// }
-			// else{
-			// 	return false;
-			// }
 			result = this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
 		}
 		return result;

@@ -10,26 +10,17 @@ bool ConfiguratorInterface::isReady(){
 	return ready;
 }
 
-bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){
-	//printf("started spawner\n");
+bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
 	//PREPARE VECTORS TO RECEIVE DATA
-	//printf("current size = %i, previous size = 0, currentbox2d size = %i\n", current.size(), currentBox2D.size());
 	if (data.empty()){
 		printf("data empty!\n");
 		return 1;
 	}
-	//printf("starting vector update\n");
 	CoordinateContainer previous =current;
-	//previous = CoordinateContainer(current);
-	//printf("previous=current1n");
 	current.clear();
-	//printf("current clear\n");
 	current = CoordinateContainer(data);
-	//printf("current=data\n");
 	currentBox2D.clear();
-	//printf("box2d clear\n");
 	currentBox2D = CoordinateContainer(data2fp);
-	//printf("updated coordinate vectors\n");
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
 
@@ -39,16 +30,13 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (debugOn){
 		f = fopen(bodyFile, "w");
 		fclose(f);
-		//printf("planfile = robot%04i.txt\n", iteration);
 	}
-	//printf("current = %i, vurrentbox2d = %i", current.size(), currentBox2D.size());
 	//BENCHMARK + FIND TRUE SAMPLING RATE
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
 	timeElapsed=float(diff.count())/1000; //express in seconds
 	totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
-	//printf("calculated time elapsed = %f\n", timeElapsed);
 
 	if (timerOff){
 		timeElapsed = .2;
@@ -60,8 +48,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	b2World world= b2World(gravity);
 	char name[256];
 
-	//CALCULATE VELOCITY
-	//printf("current = %i\t previous = %i\n", current.size(), previous.size());
+	//CALCULATE VELOCITY 
 	DeltaPose deltaPose;
 	 if (currentTask.action.getOmega()==0){
 	 	deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
@@ -69,9 +56,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	else{
 		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
 	}
-		currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
-		currentTask.action.setRecOmega(deltaPose.q.GetAngle());
-//	printf("calculated velocity\n");
+	currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
+	currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
 	bool wasAvoiding = currentTask.disturbance.isValid();
@@ -80,32 +66,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
-	//printf("bodies = %i\n", bodies);
-	//printf("obstill there! = %i\n", isObstacleStillThere);
-	//EndedResult tempEnded = currentTask.checkEnded();
 	if (controlGoal.change){
 		currentTask=Task(Disturbance(), STOP);
+		running=0;
 		return 0;
 	}
-	// EndedResult controlEnded = controlGoal.checkEnded();
-	// if (controlEnded.ended){
-	// 	currentTask= Task(Disturbance(), STOP);
-	// 	return;
-	// }
-	//printf("obstill there = %i\n", isObstacleStillThere);
-	// if(tempEnded.ended|| !isObstacleStillThere){
-	// 	if (!plan.empty()){
-	// 		currentTask = Task(plan[0].first, plan[0].second);
-	// 		Sequence s = {TaskSummary(plan[0].first, plan[0].second)};
-	// 		printf("switched to ");
-	// 		printPlan(s);
-	// 		plan.erase(plan.begin());
-	// 	}
-	// 	else{
-	// 		currentTask = Task(controlGoal.disturbance, DEFAULT); //fall back to control goal
-	// 		printf("no plan\n");
-	// 	}
-	//	}
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
@@ -117,24 +82,16 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
-	//printf("set velocity and created empty graph\n");
-	//printf("planning =%i\n", planning);
-	/////////////REACTIVE AVOIDANCE: substitute the currentTask
 	vertexDescriptor bestLeaf = v0;
-	if (planning){ //og. collisionGraph[v0].outcome !=simResult::successful ||
-		if ( planBuild!=STATIC || plan.empty()){
-					collisionGraph[v0].filled =1;
+	if (planning & (plan.empty())){ //og. collisionGraph[v0].outcome !=simResult::successful ||
+		currentTask.change=1;
+		//printf("executing = %i", executing);
+		collisionGraph[v0].filled =1;
 		collisionGraph[v0].disturbance = controlGoal.disturbance;
 		collisionGraph[v0].outcome = simResult::successful;
 		if (graphConstruction ==A_STAR){
 			explorer(v0, collisionGraph, currentTask, world, bestLeaf);
 		}
-		// else if (graphConstruction == E){
-		// 	AlgorithmE(v0, collisionGraph, currentTask, world, bestLeaf);
-		// }
-		// else if (graphConstruction == A_STAR_DEMAND){
-		// 	onDemandAStar(v0, collisionGraph, currentTask, world, bestLeaf);
-		// }
 		plan = getCleanSequence(collisionGraph, bestLeaf);
 		planVertices = planner(collisionGraph, bestLeaf);
 		currentTask.change=1;
@@ -144,7 +101,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		result = evaluateNode(v0,collisionGraph, currentTask, world);
 		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
 	}
-//	printf("outcome code = %i, change task cause it fails = %i\n", int(collisionGraph[v0].outcome), currentTask.change);
 	float duration=0;
 	if (benchmark){
 	 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -154,7 +110,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
 		fclose(f);
-		return 0; //stops when finished and doesn't execute
+		//return 0; //stops when finished and doesn't execute
 
 	}
 	worldBuilder.resetBodies();
@@ -162,7 +118,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
 	if (isSameTask){
-		currentTask.controller();
+	//	currentTask.controller(timeElapsed);
 	}
 
 	return 1;
@@ -228,9 +184,7 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		else if (diff<0){
 			if (currentTmp.empty()){
 				printf("no data\n");
-				//for (cv::Point2f p:previousTmp){
 					return result;
-				//}
 				}
 			else{
 				for (int i=0; i<abs(diff); i++){
@@ -254,14 +208,6 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		}
 
 	}
-	// else if (transformMatrix.empty()){ //if the plan is empty look at the default wheel speed
-	// 	theta = currentTask.getAction().getOmega()* timeElapsed;
-	// 	result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-	// 	result.q.Set(currentTask.getAction().getOmega());
-	// }
-	// else{
-	// 	printf("could not find velocity\n");
-	// }
 	return result;
 	}
 
@@ -290,11 +236,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 
 		//EVALUATE NODE()
 	simResult result;
-	//float remaining = simulationStep*2/MAX_SPEED;
-	float remaining = BOX2DRANGE*2/MAX_SPEED;
-	// if (s.action.getOmega()!=0){
-	// 	remaining =fabs(M_PI_2/s.getAction().getOmega());
-	// }
+	float remaining = BOX2DRANGE/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
 	if (notRoot){
 		inEdge = boost::in_edges(v, g).first.dereference();
@@ -302,8 +244,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		//find remaining distance to calculate
 		if(g[inEdge].direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-			remaining= (BOX2DRANGE-fabs(g[srcVertex].endPose.p.y))/controlGoal.getAction().getLinearSpeed();
-			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+		remaining= (BOX2DRANGE-fabs(g[srcVertex].endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
@@ -319,12 +260,6 @@ simResult Configurator::evaluateNode(vertexDescriptor v, CollisionGraph&g, Task 
 		g[v].nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
-//	std::pair <bool, float> orientation = findOrientation(result.collision.getPosition());
-
-	// if (orientation.first){
-	// 	// float orientation =s.findOrientation(result.collision.getPosition(), neighbour.second);
-	// 	result.collision.setOrientation(orientation.second);
-	// }
 	//result.collision.setOrientation(result.endPose.q.GetAngle()); //90 deg turn
 	g[v].fill(result);
 	return result;
@@ -384,7 +319,6 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 		// }
 		EndedResult er = estimateCost(v, g, direction);
 		applyTransitionMatrix(g, v, direction, er.ended);
-		//printf("options = %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
@@ -408,8 +342,6 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task s, b2Wor
 		//bestNext = findBestLeaf(g, frontier, v);
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
-	//}while(bestNext !=v); //this means that v has progressed
-	//}while(!controlGoal.checkEnded(g[bestNext].endPose).ended);
 	}while(g[bestNext].options.size()!=0);
 }
 
@@ -641,8 +573,8 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 		vertexDescriptor src = boost::source(e,g);
 		if (g[leaf].endPose != g[src].endPose){ //if the node was successful
-			Task::Action a;
-			a.init(g[e].direction);
+			//Task::Action a;
+			//a.init(g[e].direction);
 			//float step = motorStep(a);
 			TaskSummary ts(g[src].disturbance, g[e].direction, g[leaf].step);
 			p.insert(p.begin(), ts);
@@ -650,6 +582,7 @@ Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf,
 		leaf = src; //go back
 		}
 	}
+	p.insert(p.begin(), TaskSummary(g[0].disturbance, Direction::STOP, 0));
 	return p;
 
 }
@@ -756,8 +689,6 @@ EndedResult Configurator::estimateCost(vertexDescriptor v,CollisionGraph& g, Dir
 
 
 Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
-	//std::vector <edgeDescriptor> bestEdges;
-	//int size = g[best].predecessors;
 	Sequence p;
 	edgeDescriptor e;
 	while (boost::in_degree(best, g)){
@@ -767,8 +698,7 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 		//float step = motorStep(a);
 		TaskSummary ts(g[best].disturbance, g[e].direction, g[best].step);
 		p.insert(p.begin(), ts);
-		//p[size-1]=ts; //fill the plan from the end backwards
-		//size--;
+
 	}
 	return p;
 }
@@ -776,10 +706,10 @@ Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
 void Configurator::printPlan(Sequence p){
 	for (TaskSummary ts: p){
 		switch (ts.direction){
-			case DEFAULT: printf("DEFAULT");break;
-			case LEFT: printf("LEFT"); break;
-			case RIGHT: printf("RIGHT"); break;
-			case BACK: printf("BACK"); break;
+			case DEFAULT: printf("DEFAULT: %i", ts.step);break;
+			case LEFT: printf("LEFT: %i", ts.step); break;
+			case RIGHT: printf("RIGHT: %i", ts.step); break;
+			case BACK: printf("BACK: %i", ts.step); break;
 			case STOP: printf("STOP");break;
 			default:break;
 		}
@@ -830,12 +760,9 @@ void Configurator::run(Configurator * c){
 			return;
 		}
 		if (c->ci->isReady()){
-			printf(".");
-			//if (c->ci->data2fp != c->currentBox2D & !(c->ci->data.empty())){
-	//			printf("\nc->ci->data2fp size = %i, currentBox2D size = %i\n", c->ci->data2fp.size(), c->currentBox2D.size());
-				c->ci->ready=0;
-				c->Spawner(c->ci->data, c->ci->data2fp);
-				c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
+			c->ci->ready=0;
+			c->Spawner(c->ci->data, c->ci->data2fp);
+			c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
 	}
 
@@ -979,7 +906,6 @@ void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
 			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
 			v = inEdge.m_source;
 			if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-				//addVertex(v,v1,g);
 				return;
 			}
 		}
@@ -1007,7 +933,6 @@ std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius
 			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
 		}
 	}
-	//auto vIt = current.find(Point(v));
 	return result;
 }
 
@@ -1022,39 +947,18 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 			CoordinateContainer::iterator pItNext = pIt++;
 			float deltaY =pItNext->y- pIt->y;
 			float deltaX = pItNext->x - pIt->x;
-			//if (deltaX !=0){
-				//float deltaM = deltaY/deltaX;
-			//if (abs(deltaM)<=2*abs(avg) && avg!=0){ //prevent outliers
 				result.first=true; //is there a neighbouring point?
-				//sum+=deltaM;
 				count++;
-				//avg = sum/count;
 				sumY+=deltaY;
 				sumX+=deltaX;
 				avgY = sumY/count;
 				avgX = sumX/count;
-			//}
-			//}
-
 		}
 	}
 	result.second=atan(avgY/avgX);
 	return result;
 }
 
-// void Configurator::makeBody(b2World&w, Point p){
-// 	b2Body * body;
-// 	b2BodyDef bodyDef;
-// 	b2FixtureDef fixtureDef;
-// 	bodyDef.type = b2_dynamicBody;
-// 	b2PolygonShape fixture; //giving the point the shape of a box
-// 	fixtureDef.shape = &fixture;
-// 	fixture.SetAsBox(.001f, .001f);
-// 	bodyDef.position.Set(p.x, p.y);
-// 	body = w.CreateBody(&bodyDef);
-// 	bodies++;
-// 	body->CreateFixture(&fixtureDef);
-// }
 
 void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 	if (NULL!=curr){ //
@@ -1132,16 +1036,15 @@ CollisionGraph  Configurator::checkPlan(b2World& world, std::vector <vertexDescr
 
 
 void Configurator::trackTaskExecution(Task & t){
+	//if (t.endCriteria.hasEnd()){
+		//printf("task in %i has end\n", iteration);
 		if (t.motorStep>0){
 			t.motorStep--;
-			//angle traversed in deltat
 			printf("step =%i\n", t.motorStep);
 		}
 		if(t.motorStep==0){
 			t.change=1;
-			printf("change task cause it ends = %i\n", t.change);
 		}
-	printf("change =%i, step =%i\n", t.change, t.motorStep);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1168,19 +1071,18 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()>0){ //LEFT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		    result *=FRICTION_DAMPENING;
+            result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
+		    //result *=FRICTION_DAMPENING;
 			//result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
-            result = SAFE_ANGLE/(MOTOR_CALLBACK * a.getOmega());
-		    result *=FRICTION_DAMPENING;
+            result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
+		    //result *=FRICTION_DAMPENING;
 			//result=12;
 		}
 		else if (a.getLinearSpeed()>0){
-			result = simulationStep/(MOTOR_CALLBACK*a.getLinearSpeed())*FRICTION_DAMPENING;
+			result = (simulationStep)/(MOTOR_CALLBACK*a.getLinearSpeed());
 		}
-        printf("number of steps at creation = %i\n", abs(result));
 	    return abs(result);
     }
 
@@ -1190,23 +1092,26 @@ void Configurator::changeTask(bool b, Sequence & p, State n, int&ogStep){
 	// 	b=1;
 	// }
 	if (!b){
-		//printf("do not change\n");
 		return;
+	}
+	if (!p.empty()){
+		if (p.size()==1){
+			running=0;
+		}
+		p.erase(p.begin());
 	}
 	if (planning){
 		if (plan.empty()){
-			//currentTask = controlGoal;
 			return;
 		}
 		currentTask = Task(p[0].disturbance, p[0].direction);
 		currentTask.motorStep = p[0].step;
-		p.erase(p.begin());
+		//p.erase(p.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
 		if (n.disturbance.isValid()){
 			currentTask = Task(n.disturbance, DEFAULT); //reactive
-			//currentTask.motorStep = motorStep(currentTask.getAction());
 		}
 		else if(currentTask.direction!=DEFAULT){
 				currentTask = Task(n.disturbance, DEFAULT); //reactive
@@ -1215,8 +1120,8 @@ void Configurator::changeTask(bool b, Sequence & p, State n, int&ogStep){
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
 		}
 
-		currentTask.motorStep = motorStep(currentTask.getAction());
-		printf("changed to reactive\n");
+		currentTask.motorStep = motorStep(currentTask.getAction()); //reflex
+		printf("changed to reactive, %i steps\n", currentTask.motorStep);
 	}
 	//currentTask.motorStep = motorStep(currentTask.getAction());
 	ogStep = currentTask.motorStep;

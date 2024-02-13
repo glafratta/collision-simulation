@@ -12,9 +12,7 @@ std::pair<Point, Point> WorldBuilder::bounds(Direction d, b2Transform start, flo
         Point positionVector, radiusVector, maxFromStart, top, bottom; 
         std::vector <Point> bounds;
         radiusVector.polarInit(boxLength, start.q.GetAngle());
-        //printf("radius vector = x=%f, y=%f\n", radiusVector.x, radiusVector.y);
         maxFromStart = Point(start.p) + radiusVector;
-        //printf("max from start length = %f\n", maxFromStart.r);
         //FIND THE BOUNDS OF THE BOX
         b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
         b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
@@ -64,10 +62,8 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
         default:
         throw std::invalid_argument("not a valid shape\n");break;
     }
-	//b2PolygonShape fixture; //giving the point the shape of a box
 
 	bodies++;
-	// body->CreateFixture(fixtureDef.shape, 0.0f);
 }
 
 std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task *curr, CoordinateContainer * dCloud){
@@ -113,11 +109,6 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
 }
 
   std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, CoordinateContainer * dCloud){
-    //sprintf(bodyFile, "/tmp/bodies%04i.txt", iteration);
-    // if (iteration=0){
-    //     FILE *f = fopen(bodyFile, "w+");
-    //     fclose(f);
-    // }
     std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep;
     if(d==BACK){
@@ -127,9 +118,6 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     }
     std::pair <Point, Point> bt = bounds(d, start, boxLength, curr);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr, dCloud);
-    // if (NULL!=curr){
-    //     result.second = averagePoint(&&&.first, curr->disturbance);
-    // }
     std::vector <BodyFeatures> features =processData(salient.first);
     for (BodyFeatures f: features){
         makeBody(world, f);
@@ -170,16 +158,3 @@ b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     return result;
 }
     
-// std::vector <BodyFeatures> AlternateBuilder::processData(CoordinateContainer points){
-//     int count =0;
-//     std::vector <BodyFeatures> result;
-//     for (Point p: points){
-//         if (count%2==0){
-//             BodyFeatures feature;
-//             feature.pose.p = p.getb2Vec2(); 
-//             result.push_back(feature);  
-//         }
-//         count++;
-//     }
-//     return result;
-// }

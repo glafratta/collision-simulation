@@ -29,7 +29,6 @@ public:
         else{
             affordanceIndex = i;
         }
-        //bodyDef.type = b2_dynamicBody;
 		pose.Set(p, 0);
         valid =1;
     }    
@@ -41,7 +40,6 @@ public:
         else{
             affordanceIndex = i;
         }
-        //bodyDef.type = b2_dynamicBody;
 		pose.Set(p, a);
         valid =1;
         partOfObject=1;

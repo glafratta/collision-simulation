@@ -1,9 +1,5 @@
 #include "measurement.h"
 
-// float EndedResult::errorSquared(){
-//     return estimatedCost*estimatedCost;
-// }
-
 bool Measurement::operator<(Measurement & m2){
     bool r = false;
     if (isValid() & m2.isValid()){
@@ -71,7 +67,6 @@ float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
 
 float EndCriteria::getStandardError(EndCriteria ec){ //standard error
     float result =0;
-    //result = weights[0]*angle.getStandardError(ec.angle)+ weights[1]*distance.getStandardError(ec.distance); //max =4;
     result = getStandardError(ec.angle, ec.distance);
     return result;
 }
@@ -92,7 +87,6 @@ float EndCriteria::getStandardError(Angle a, Distance d, State n){
 float SignedVectorLength(b2Vec2 v){
 	float signedLength = v.Length();
 	if (v.x <0){
-        //printf("this task goes backwards: og length = %f\n", v.Length());
 		signedLength = -signedLength;
 	}
 	return signedLength;

@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
-const float LEFT_WHEEL_WEIGHT =.9;
+//const float LEFT_WHEEL_WEIGHT =.9;
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
     std::vector <BodyFeatures> result;

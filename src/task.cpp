@@ -4,9 +4,6 @@
 
 simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
-		// if (discrete & action.getOmega()==0){
-		// 	result = simResult(simResult::resultType::safeForNow); //indicator that it is discretized
-		// }
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
@@ -21,10 +18,10 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		robot.body->SetTransform(start.p, theta);
 		int stepb2d=0;
 		for (stepb2d; stepb2d < (HZ*remaining); stepb2d++) {//3 second
-			instVelocity.x = action.getRecSpeed()*cos(theta);
-			instVelocity.y = action.getRecSpeed()*sin(theta);
+			instVelocity.x = action.getLinearSpeed()*cos(theta);
+			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
-			robot.body->SetAngularVelocity(action.getRecOmega());
+			robot.body->SetAngularVelocity(action.getOmega());
 			robot.body->SetTransform(robot.body->GetPosition(), theta);
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
@@ -44,9 +41,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				stepb2d=0;
 				break;
 			}
-			// else if (getAffIndex()== int(InnateAffordances::AVOID)){
-			// 	result.step =step;
-			// }
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
 		//b2Vec2 distance; //= robot.body->GetPosition();
@@ -58,7 +52,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		//int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
-			//b=NULL;
 		}
 		if (debugOn){
 			fclose(robotPath);
@@ -69,12 +62,10 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 }
 
 
-//void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2VEc2 robVelocity, b2Vec2 robPos){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
 	b2Transform shift(b2Vec2(-robVelocity.p.x*timeElapsed, -robVelocity.p.y*timeElapsed), b2Rot(-robVelocity.q.GetAngle()*timeElapsed)); //calculates shift in the time step
 	b2Vec2 newPos(d.getPosition().x+shift.p.x,d.getPosition().y + shift.p.y);
 	d.setPosition(newPos);
-	// float angle = d.getAngle(robVelocity);
 	float angle = d.getAngle(pose);
 	if (d.isPartOfObject()){
 		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
@@ -83,34 +74,32 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 }
 
 void Task::trackDisturbance(Disturbance & d, Action a){
-	// //switch(dir){
-	float angleTurned =MOTOR_CALLBACK*a.getOmega()*(1/FRICTION_DAMPENING);
-	printf("initial angle =%f, angle turned = %f\n", d.pose.q.GetAngle(), angleTurned);
+	float angleTurned =MOTOR_CALLBACK*a.getOmega();
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
-	// printf("NEW angle =%f\n", d.pose.q.GetAngle());
-	// //float deltaLength = d.pose.p.Length()-s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// printf("omega = %f, linear speed %f, pose = %f", a.getOmega(), a.getLinearSpeed(), d.pose.q.GetAngle());
-	// //float angle = atan2(d.pose.p.y, d.pose.p.x);
-	// d.pose.p.x-= -sin(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// d.pose.p.y -= cos(angleTurned)* s*MOTOR_CALLBACK*a.getLinearSpeed();
-	// //}
-	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed()*(1/FRICTION_DAMPENING);
+	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed();
 	float initialL = d.pose.p.Length();
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
-Task::controlResult Task::controller(){
+void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;
-float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-bool ended = checkEnded().ended;
-if (action.getOmega()==0){
-	float timeStepError =action.getOmega()/0.2; 
+	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
+	//bool ended = checkEnded().ended;
+	float timeStepError =action.getRecOmega()/timeElapsed; 
+	float normAccErr = timeStepError/SAFE_ANGLE;
+	if (action.getOmega()!=0|| motorStep<1 || motorStep%10!=0){ //only check every 2 sec
+		return;
+	}
 	//accumulatedError += timeStepError; 
-	if (timeStepError>tolerance){
-		float normAccErr = timeStepError/M_PI_2;
-		action.L -= normAccErr*pGain;  
-		action.R += normAccErr *pGain; 
+	if (fabs(timeStepError)>tolerance){
+		printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
+		if (normAccErr<0){
+			action.L -= normAccErr*pGain;  //-
+		}
+		else if (normAccErr>0){
+			action.R -= normAccErr *pGain; //+
+		}
 		if (action.L>1.0){
 		action.L=1.0;
 		}
@@ -124,8 +113,7 @@ if (action.getOmega()==0){
 			action.R=-1;
 		}
 	}
-}
-	return CONTINUE;
+
 }
 
 Direction Task::H(Disturbance ob, Direction d, bool topDown){
@@ -155,7 +143,6 @@ Direction Task::H(Disturbance ob, Direction d, bool topDown){
                 }   
             }
 		}
-    //printf("angle to ob = %f\n", ob.getAngle());
 }
     return d;
 }
@@ -220,7 +207,6 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 		float angleR = start.q.GetAngle()-endCriteria.angle.get();
 		r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
 	}
-	//if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE || fabs(fabs(robotTransform.q.GetAngle())-fabs(start.q.GetAngle()))>=M_PI_2){ //if length reached or turn
 	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
@@ -237,17 +223,6 @@ EndedResult Task::checkEnded(State n){ //check error of node compared to the pre
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }
-
-// std::pair<bool, b2Vec2> Task::findNeighbourPoint(b2World &w, b2Vec2 v, float radius){
-// 	std::pair <bool, b2Vec2> result(false, b2Vec2());
-// 	for (b2Body * b= w.GetBodyList(); b !=NULL; b=b->GetNext()){
-// 		Point p(*b->GetPosition());
-// 		if (p.isInRadius(v, radius)){
-// 			return result=std::pair<bool, b2Vec2>(true, b->GetPosition());
-// 		}
-// 	}
-// 	return result;
-// }
 
 float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
 	float slope = (v2.y- v1.y)/(v2.x - v1.x);
