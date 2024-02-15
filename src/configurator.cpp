@@ -461,7 +461,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 EndedResult Configurator::estimateCost(Task t, State &state){
 	EndedResult er = controlGoal.checkEnded(state);
 	//n.heuristic = er.estimatedCost;
-	er.cost += t.checkEnded(state).estimatedCost;
+	er.cost += t.checkEnded(state.endPose).estimatedCost;
 	return er;
 }
 
