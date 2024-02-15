@@ -312,7 +312,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
-		EndedResult er = estimateCost(t, g[v]);
+		EndedResult er = controlGoal.checkEnded(g[v]);
 		applyTransitionMatrix(g[v], direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
