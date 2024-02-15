@@ -128,7 +128,7 @@ Task * getTask(int advance=0){ //returns Task being executed
 void applyController(bool, Task &);
 
 
-b2Vec2 estimateDisplacementFromWheels();
+//b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
@@ -188,7 +188,7 @@ std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertex
 
 //vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
-EndedResult estimateCost(Task, State&); //returns whether the controlGoal has ended and fills node with cost and error
+EndedResult estimateCost(State&, State, Direction); //returns whether the controlGoal has ended and fills node with cost and error
 
 EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 

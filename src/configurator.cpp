@@ -328,7 +328,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, 1);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w)); //find simulation result
-			er  = estimateCost(t, s);
+			er  = estimateCost(s, g[v0], t.direction);
 			applyTransitionMatrix(s, g[v0].options[0], er.ended);
 			//DistanceVector distance = matcher.getDistance(g[], s);//what state is this
 			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], s)){
@@ -458,9 +458,10 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 // }
 
 
-EndedResult Configurator::estimateCost(Task t, State &state){
+EndedResult Configurator::estimateCost(State &state, State src, Direction d){
 	EndedResult er = controlGoal.checkEnded(state);
 	//n.heuristic = er.estimatedCost;
+	Task t(state.disturbance, d, src.endPose);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
 	return er;
 }
