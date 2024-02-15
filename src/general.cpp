@@ -22,7 +22,7 @@ simResult State::getSimResult(){
 }
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
-	DistanceVector result;
+	DistanceVector result(6);
 	result[0]= s1.disturbance.pose.p.x - s2.disturbance.pose.p.x; //disturbance x
 	result[1]= s1.disturbance.pose.p.y - s2.disturbance.pose.p.y; //disturbance y
 	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
