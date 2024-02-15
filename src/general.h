@@ -50,6 +50,34 @@ struct State{
 //	float evaluationFunction(float weight=0.02);
 };
 
+
+
+// struct TaskSummary{
+// 	Disturbance disturbance; //disturbance initialisation
+// 	Direction direction = DEFAULT;
+// 	int step=0;
+
+// 	TaskSummary()=default;
+
+// 	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
+// 		// if (direction==Direction::DEFAULT){
+// 		// 	step*=STRAIGHT_FRICTION;
+// 		// }
+// 	}
+// };
+
+typedef b2Transform Transform;
+bool operator!=(Transform const &, Transform const &);
+bool operator==(Transform const &, Transform const &);
+void operator-=(Transform &, Transform const&);
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
+typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
+typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
+typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
+typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
+//typedef std::vector <TaskSummary> Sequence;
+
 struct StateMatcher{
         WeightVector weights[6]; //disturbance, position vector, angle
 		//assume mean difference 0
@@ -68,35 +96,12 @@ struct StateMatcher{
 
 		bool isPerfectMatch(DistanceVector); // is this the same state?
 
+		bool isPerfectMatch(State, State); // is this the same state?
+
+		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, vertexDescriptor);
+
 
 };
-
-struct TaskSummary{
-	Disturbance disturbance; //disturbance initialisation
-	Direction direction = DEFAULT;
-	int step=0;
-
-	TaskSummary()=default;
-
-	TaskSummary(Disturbance d, Direction dir, float s): disturbance(d), direction(dir), step(s){
-		// if (direction==Direction::DEFAULT){
-		// 	step*=STRAIGHT_FRICTION;
-		// }
-	}
-};
-
-typedef b2Transform Transform;
-bool operator!=(Transform const &, Transform const &);
-bool operator==(Transform const &, Transform const &);
-void operator-=(Transform &, Transform const&);
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
-typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
-typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
-typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
-typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
-typedef std::vector <TaskSummary> Sequence;
-
 
 struct Point{
 	private:

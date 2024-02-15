@@ -1,13 +1,8 @@
 //#include "Box2D/Box2D.h"
-<<<<<<< HEAD
-#include "configurator.h"
-#include "a1lidarrpi.h"
-#include "alphabot.h"
-=======
+
 #include "a1lidarrpi.h"
 #include "alphabot.h"
 #include "configurator.h"
->>>>>>> non_paper
 #include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,10 +15,6 @@
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
-<<<<<<< HEAD
-=======
-	buildType=1;
->>>>>>> non_paper
     for (Point p: points){
             BodyFeatures feature;
             feature.pose.p = p.getb2Vec2(); 
@@ -112,13 +103,9 @@ int ogStep=0;
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-<<<<<<< HEAD
-	if (c ==NULL){
-=======
 	if (c ==NULL || !c->running){
 		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
 		motors.setLeftWheelSpeed(0);
->>>>>>> non_paper
 		printf("null pointer to configurator in stepcallback\n");
 	}
 	if (c->getIteration() <=0){
@@ -134,7 +121,7 @@ void step( AlphaBot &motors){
 	//if (c->getTask()->change){
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
 	//}
-	c->changeTask(c->getTask()->change, c->planVertices, ogStep);
+	c->changeTask(c->getTask()->change,ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("step: R=%f\tL=%f, conf iteration = %i\n", c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->getIteration());

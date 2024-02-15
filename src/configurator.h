@@ -26,7 +26,7 @@ public:
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 	bool ready=0;
-	TaskSummary ts;
+	//TaskSummary ts;
 
 	void setReady(bool b);
 
@@ -57,7 +57,7 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 	//int treeSize = 0; //for debug
-	Sequence plan;
+	//Sequence plan;
 	std::vector <vertexDescriptor> planVertices;
 	StateMatcher matcher;
 	M_CODES numberOfM =THREE_M;
@@ -132,7 +132,7 @@ b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
-simResult evaluateNode(vertexDescriptor, CollisionGraph&, Task  , b2World &);
+simResult evaluateNode(vertexDescriptor, vertexDescriptor, CollisionGraph&, Task  , b2World &);
 
 //void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
@@ -156,23 +156,6 @@ std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Dire
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
-// template <typename V, typename G>
-// bool isFullLength(V v, const G & g, float length=0){
-//     if (boost::in_degree(v, g)==0 && length < BOX2DRANGE){
-//         return false;
-//     }
-//     else if (length >=BOX2DRANGE){
-//         return true;
-//     }
-//     else{
-//         edgeDescriptor inEdge= boost::in_edges(v, g).first.dereference();
-//         length += g[inEdge].distanceCovered;
-// 		g[v].predecessors++;
-//         return isFullLength(boost::source(inEdge, g), g, length);
-//     }
-
-// }
-
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(), bool topDown=0){
 	if (!obs.isValid()){
 		obs = controlGoal.disturbance;
@@ -195,23 +178,23 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 
 void adjustProbability(CollisionGraph&, edgeDescriptor);
 
-void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+//void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
-Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+//Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
 std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 
-Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+//Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
+//vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
 EndedResult estimateCost(Task, State&); //returns whether the controlGoal has ended and fills node with cost and error
 
 EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
-Sequence getPlan(CollisionGraph &, vertexDescriptor);
+//Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
-void printPlan(Sequence);
+//void printPlan(Sequence);
 
 void start(); //data interface class collecting position of bodies
 
@@ -227,11 +210,11 @@ void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, 
 
 bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
-bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
+//bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 
-bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
+//bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
 
-void backtrack(CollisionGraph&, vertexDescriptor&);
+//void backtrack(CollisionGraph&, vertexDescriptor&);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 
@@ -239,9 +222,9 @@ std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds
 
 std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
-void checkDisturbance(Point, bool&,Task * curr =NULL);
+//void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-CollisionGraph checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
+std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 
 //std::vector <vertexDescriptor> (vertexDescriptor);
 									
@@ -249,11 +232,11 @@ void trackTaskExecution(Task &);
 
 DeltaPose assignDeltaPose(Task::Action, float);
 
-void changeTask(bool, Sequence&, State, int&);
+//void changeTask(bool, Sequence&, State, int&);
 
-void changeTask(bool, std::vector <vertexDescriptor>&, int&);
+void changeTask(bool, int&);
 
-int motorStep(Task::Action, EndCriteria);
+//int motorStep(Task::Action, EndCriteria);
 
 int motorStep(Task::Action a);
 

@@ -49,7 +49,22 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec){
     return result;
 }
 
+bool StateMatcher::isPerfectMatch(State s1, State s2){
+	DistanceVector  distance = getDistance(s1, s2);
+    return isPerfectMatch(distance);
+}
 
+
+bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direction d, vertexDescriptor v){
+    bool result =false;
+	auto edges= boost::out_edges(src, g);
+	for (auto ei=edges.first; ei!=edges.second; ++ei){
+		if (g[*ei].direction==d & isPerfectMatch(g[v], g[ei.dereference().m_source])){
+			result=true;
+		}
+	}
+    return result;
+}
 
 bool operator!=(Transform const &t1, Transform const& t2){
 	return t1.p.x != t2.p.x || t1.p.y != t2.p.y || t1.q.GetAngle() != t2.q.GetAngle();
