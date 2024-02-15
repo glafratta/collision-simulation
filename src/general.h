@@ -98,7 +98,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(State, State); // is this the same state?
 
-		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, vertexDescriptor);
+		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
 
 
 };

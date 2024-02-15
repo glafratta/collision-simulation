@@ -132,7 +132,7 @@ b2Vec2 estimateDisplacementFromWheels();
 
 void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
-simResult evaluateNode(vertexDescriptor, vertexDescriptor, CollisionGraph&, Task  , b2World &);
+simResult simulate(State&, State, Task  , b2World &);
 
 //void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
@@ -204,11 +204,11 @@ void registerInterface(ConfiguratorInterface *);
 
 static void run(Configurator *);
 
-void transitionMatrix(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT
+void transitionMatrix(State&, Direction); //DEFAULT, LEFT, RIGHT
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-bool applyTransitionMatrix(CollisionGraph &, vertexDescriptor, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
+bool applyTransitionMatrix(State&, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
 
 //bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 

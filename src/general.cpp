@@ -55,11 +55,11 @@ bool StateMatcher::isPerfectMatch(State s1, State s2){
 }
 
 
-bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direction d, vertexDescriptor v){
+bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direction d, State s){
     bool result =false;
 	auto edges= boost::out_edges(src, g);
 	for (auto ei=edges.first; ei!=edges.second; ++ei){
-		if (g[*ei].direction==d & isPerfectMatch(g[v], g[ei.dereference().m_source])){
+		if (g[*ei].direction==d & isPerfectMatch(s, g[ei.dereference().m_source])){
 			result=true;
 		}
 	}

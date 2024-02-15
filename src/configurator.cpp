@@ -96,7 +96,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.change=1;
 	}
 	else if (!planning){
-		result = evaluateNode(v0,v0, collisionGraph, currentTask, world);
+		result = simulate(collisionGraph[v0],collisionGraph[v0],currentTask, world);
 		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
 	}
 	float duration=0;
@@ -224,11 +224,11 @@ void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //
 }
 
 
-simResult Configurator::evaluateNode(vertexDescriptor v, vertexDescriptor srcVertex, CollisionGraph&g, Task  s, b2World & w){
+simResult Configurator::simulate(State& state, State src, Task  t, b2World & w){
 	//PREPARE TO LOOK AT BACK EDGES
-	edgeDescriptor inEdge;
+	//edgeDescriptor inEdge;
 	//vertexDescriptor srcVertex=v; //default
-	bool notRoot = boost::in_degree(v, g)>0;
+	//bool notRoot = boost::in_degree(v, g)>0;
 	//bool isLeaf= v==v1;
 	//vertexDescriptor v1 = v; //by default if no vertices need to be added the function returns the startingVertex
 
@@ -236,26 +236,26 @@ simResult Configurator::evaluateNode(vertexDescriptor v, vertexDescriptor srcVer
 	simResult result;
 	float remaining = BOX2DRANGE/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
-	if (srcVertex!=v){
-		inEdge = boost::in_edges(v, g).first.dereference();
+	//if (srcVertex!=v){
+		//inEdge = boost::in_edges(v, g).first.dereference();
 		//srcVertex = boost::source(inEdge, g);
 		//find remaining distance to calculate
-		if(g[inEdge].direction == Direction::DEFAULT){
+		if(t.direction == Direction::DEFAULT){
 		//float remainder = (round(g[srcVertex].endPose.p.Length()*100)%round(simulationStep*100))/100;
-		remaining= (BOX2DRANGE-fabs(g[srcVertex].endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+		remaining= (BOX2DRANGE-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
 		}
-	}
-	result =s.willCollide(w, iteration, debugOn, remaining, simulationStep); //default start from 0
+	//}
+	result =t.willCollide(w, iteration, debugOn, remaining, simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
-	if (b2Vec2(result.endPose.p -g[srcVertex].endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
+	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
 	//if (result.distanceCovered <=.01){ //CYCLE PREVENTING HEURISTICS
-		g[v].nodesInSameSpot = g[srcVertex].nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
+		state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
 	}
 	else{
-		g[v].nodesInSameSpot =0; //reset if robot is moving
+		state.nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
 	//result.collision.setOrientation(result.endPose.q.GetAngle()); //90 deg turn
@@ -275,7 +275,7 @@ simResult Configurator::evaluateNode(vertexDescriptor v, vertexDescriptor srcVer
 // 		//evaluate
 // 		int ct = w.GetBodyCount();
 // 		if (!g[v].filled){
-// 			evaluateNode(v, g,s, w);
+// 			simulate(v, g,s, w);
 // 		}
 // 		EndedResult er = controlGoal.checkEnded(g[v].endPose);
 // 		// if (!hasStickingPoint(g, v, er)&&  betterThanLeaves(g, v, _leaves, er, dir) ){
@@ -306,14 +306,14 @@ simResult Configurator::evaluateNode(vertexDescriptor v, vertexDescriptor srcVer
 void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	float error;
-	bool deepen;
+	//bool deepen;
 	Direction direction = t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(v,0)};
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
-		EndedResult er = estimateCost(v, g, direction);
-		applyTransitionMatrix(g, v, direction, er.ended);
+		EndedResult er = estimateCost(t, g[v]);
+		applyTransitionMatrix(g[v], direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
@@ -327,13 +327,13 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			bool topDown=1;
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, 1);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
-			s.fill(evaluateNode(v1, v, g, t, w)); //find simulation result
-			er  = estimateCost(v1, g, t.direction);
-			applyTransitionMatrix(g, v1, g[v0].options[0], er.ended);
+			s.fill(simulate(s, g[v0], t, w)); //find simulation result
+			er  = estimateCost(t, s);
+			applyTransitionMatrix(s, g[v0].options[0], er.ended);
 			//DistanceVector distance = matcher.getDistance(g[], s);//what state is this
-			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], v1)){
+			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], s)){
 				addVertex(v0, v1,g, Disturbance());
-			g[v1]=s;
+				g[v1]=s;
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
@@ -458,10 +458,10 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 // }
 
 
-EndedResult Configurator::estimateCost(Task s, State &n){
-	EndedResult er = controlGoal.checkEnded(n);
+EndedResult Configurator::estimateCost(Task t, State &state){
+	EndedResult er = controlGoal.checkEnded(state);
 	//n.heuristic = er.estimatedCost;
-	er.cost += s.checkEnded(n).estimatedCost;
+	er.cost += t.checkEnded(state).estimatedCost;
 	return er;
 }
 
@@ -562,76 +562,69 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::transitionMatrix(CollisionGraph&g, vertexDescriptor vd, Direction d){
-	Task temp(controlGoal.disturbance, DEFAULT, g[vd].endPose); //reflex to disturbance
-	switch (numberOfM){
-		case (THREE_M):{
-				if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
-					if (d ==DEFAULT){
-						if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-							//in order, try the task which represents the reflex towards the goal
-							if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
-								g[vd].options.push_back(temp.direction);
-								g[vd].options.push_back(getOppositeDirection(temp.direction).second);
-							}
-							else{
-								g[vd].options = {LEFT, RIGHT};
-							}
-						}
-						}
+void Configurator::transitionMatrix(State& state, Direction d){
+	Task temp(controlGoal.disturbance, DEFAULT, state.endPose); //reflex to disturbance
+	//switch (numberOfM){
+	//	case (THREE_M):{
+	if (state.outcome != simResult::successful){ //accounts for simulation also being safe for now
+		if (d ==DEFAULT){
+			if (state.nodesInSameSpot<maxNodesOnSpot){
+				//in order, try the task which represents the reflex towards the goal
+				if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+					state.options.push_back(temp.direction);
+					state.options.push_back(getOppositeDirection(temp.direction).second);
 				}
-				else { //will only enter if successful
-					if (d== LEFT || d == RIGHT){
-						g[vd].options = {DEFAULT};
-					}
-					else if (d==DEFAULT){
-						if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
-							if (graphConstruction != E){
-								g[vd].options.push_back(temp.direction);
-								g[vd].options.push_back(getOppositeDirection(temp.direction).second);
-							}
-							g[vd].options.push_back(DEFAULT);
-						}
-						else{
-							if (graphConstruction != E){
-								g[vd].options = {DEFAULT, LEFT, RIGHT};
-							}
-							else{
-								g[vd].options ={DEFAULT};
-							}
-						}
-
-					}
-
-				}
-		}
-		break;
-		case (FOUR_M):{
-			if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
-				if (d ==DEFAULT){
-					if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-							g[vd].options= {LEFT, RIGHT, BACK};
-					}
+				else{
+					state.options = {LEFT, RIGHT};
 				}
 			}
-			else { //will only enter if successful
-				if (d== LEFT || d == RIGHT){
-					g[vd].options = {DEFAULT};
-				}
-				else if (d == BACK){
-						g[vd].options= {LEFT, RIGHT};
-				}
 			}
-		}
-		break;
-		default:
-		break;
 	}
+	else { //will only enter if successful
+		if (d== LEFT || d == RIGHT){
+			state.options = {DEFAULT};
+		}
+		else if (d==DEFAULT){
+			if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+					state.options.push_back(temp.direction);
+					state.options.push_back(getOppositeDirection(temp.direction).second);
+				state.options.push_back(DEFAULT);
+			}
+			else{
+					state.options = {DEFAULT, LEFT, RIGHT};
+			}
+
+		}
+
+	}
+	//	}
+	//	break;
+	// 	case (FOUR_M):{
+	// 		if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
+	// 			if (d ==DEFAULT){
+	// 				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
+	// 						g[vd].options= {LEFT, RIGHT, BACK};
+	// 				}
+	// 			}
+	// 		}
+	// 		else { //will only enter if successful
+	// 			if (d== LEFT || d == RIGHT){
+	// 				g[vd].options = {DEFAULT};
+	// 			}
+	// 			else if (d == BACK){
+	// 					g[vd].options= {LEFT, RIGHT};
+	// 			}
+	// 		}
+	// 	}
+	// 	break;
+	// 	default:
+	// 	break;
+	// }
 }
 
-bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd, Direction d, bool ended, std::vector <vertexDescriptor> leaves){
+bool Configurator::applyTransitionMatrix(State& state, Direction d, bool ended, std::vector <vertexDescriptor> leaves){
 	bool result =0;
-	if (!g[vd].options.empty()){
+	if (!state.options.empty()){
 		return result;
 	}
 	if (controlGoal.endCriteria.hasEnd()){
@@ -639,11 +632,11 @@ bool Configurator::applyTransitionMatrix(CollisionGraph & g, vertexDescriptor vd
 			return result;
 		}
 	}
-	else if(round(g[vd].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
+	else if(round(state.endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 			return result;
 		}
-	transitionMatrix(g, vd, d);
-	result = !g[vd].options.empty();
+	transitionMatrix(state, d);
+	result = !state.options.empty();
 	return result;
 }
 
