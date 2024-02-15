@@ -188,7 +188,7 @@ std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertex
 
 //vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
-EndedResult estimateCost(State&, State, Direction); //returns whether the controlGoal has ended and fills node with cost and error
+EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
 
 EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
