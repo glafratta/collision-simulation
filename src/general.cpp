@@ -66,6 +66,12 @@ bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direct
     return result;
 }
 
+void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
+	for (int i=0; i<weights->size();i++){
+		weights[i]+=mu*E[i]*dE[i];
+	}
+}
+
 bool operator!=(Transform const &t1, Transform const& t2){
 	return t1.p.x != t2.p.x || t1.p.y != t2.p.y || t1.q.GetAngle() != t2.q.GetAngle();
 }

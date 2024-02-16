@@ -321,16 +321,13 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			if(g[v0].options.size()==0){
 				break;
 			}
-			//added =addVertex(v0, v1, g, g[v0].disturbance); //add
 			State s;
-			//edgeDescriptor e = boost::in_edges(v1, g).first.dereference();
 			bool topDown=1;
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, 1);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
 			applyTransitionMatrix(s, g[v0].options[0], er.ended);
-			//DistanceVector distance = matcher.getDistance(g[], s);//what state is this
 			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], s)){
 				addVertex(v0, v1,g, Disturbance());
 				g[v1]=s;

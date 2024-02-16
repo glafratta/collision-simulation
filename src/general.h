@@ -22,7 +22,6 @@ enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 
 enum PLAN_BUILD{CONTINUOUS, STATIC};
 
-typedef std::vector <float> WeightVector;
 typedef std::vector <float> DistanceVector;
 
 struct Edge{
@@ -79,10 +78,11 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 //typedef std::vector <TaskSummary> Sequence;
 
 struct StateMatcher{
-        WeightVector weights[6]; //disturbance, position vector, angle
+        std::vector <float> weights[6]; //disturbance, position vector, angle
 		//assume mean difference 0
 		std::vector <float> SDvector={0.11, 0.11, 0, 0.11, 0.11, M_PI/6};//hard-coded standard deviations for matching
-        StateMatcher(){}
+		float mu=0.001;
+	    StateMatcher(){}
 
 		void initOnes(){
 			for (auto i=weights->begin(); i!= weights->end(); i++){
@@ -99,6 +99,8 @@ struct StateMatcher{
 		bool isPerfectMatch(State, State); // is this the same state?
 
 		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
+
+		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
 
 };
