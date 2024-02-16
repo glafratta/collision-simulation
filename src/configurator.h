@@ -46,10 +46,11 @@ public:
 	std::thread * t=NULL;
 	bool debugOn=0;
 	float simulationStep=BOX2DRANGE;
+	b2Transform ogGoal;
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
-	float totalTime=0;
+	//float totalTime=0;
 	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
@@ -60,19 +61,20 @@ public:
 	//Sequence plan;
 	std::vector <vertexDescriptor> planVertices;
 	StateMatcher matcher;
-	M_CODES numberOfM =THREE_M;
-	GRAPH_CONSTRUCTION graphConstruction = A_STAR;
+	//M_CODES numberOfM =THREE_M;
+	//GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
-	PLAN_BUILD planBuild = STATIC;
+	//PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
 
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
-	motorStep(currentTask.getAction());
+	//motorStep(currentTask.getAction());
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	totalTime =0.0f;
+	//totalTime =0.0f;
+	ogGoal=controlGoal.disturbance.pose;
 }
 
 void setBenchmarking(bool b){
@@ -130,7 +132,7 @@ void applyController(bool, Task &);
 
 //b2Vec2 estimateDisplacementFromWheels();
 
-void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
+//void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
 simResult simulate(State&, State, Task  , b2World &);
 
@@ -152,7 +154,7 @@ void explorer(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescript
 
 // void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
 
-std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
+//std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
@@ -191,6 +193,8 @@ std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertex
 EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
 
 EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
+
+void loopGoal();
 
 //Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
