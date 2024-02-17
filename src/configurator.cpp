@@ -124,23 +124,23 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	std::pair <bool, Direction> result(false, DEFAULT);
-	if (numberOfM == THREE_M){
+	// if (numberOfM == THREE_M){
 		switch (d){
 		case Direction::LEFT: result.first = true; result.second = RIGHT;break;
 		case Direction::RIGHT: result.first = true; result.second = LEFT;break;
 		default:
 		break;
-	}
-	}
-	else if (numberOfM == FOUR_M){
-		switch (d){
-		case Direction::LEFT: result.first = true; result.second = RIGHT;break;
-		case Direction::RIGHT: result.first = true; result.second = LEFT;break;
-		case Direction::DEFAULT: result.first = true; result.second = BACK;break;
-		case Direction::BACK: result.first = true; result.second = DEFAULT;break;
-		default:
-		break;
-	}
+	// }
+	// }
+	// else if (numberOfM == FOUR_M){
+	// 	switch (d){
+	// 	case Direction::LEFT: result.first = true; result.second = RIGHT;break;
+	// 	case Direction::RIGHT: result.first = true; result.second = LEFT;break;
+	// 	case Direction::DEFAULT: result.first = true; result.second = BACK;break;
+	// 	case Direction::BACK: result.first = true; result.second = DEFAULT;break;
+	// 	default:
+	// 	break;
+	// }
 	}
 	return result;
 }
