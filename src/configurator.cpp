@@ -141,7 +141,7 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	// 	default:
 	// 	break;
 	// }
-	}
+	//}
 	return result;
 }
 
