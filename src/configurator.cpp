@@ -81,7 +81,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
-	vertexDescriptor bestLeaf = v0;
+	vertexDescriptor bestLeaf = currentVertex;
 //	CollisionGraph planError = 	checkPlan(world, planVertices,collisionGraph);
 	if (planning & planVertices.empty()){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
@@ -141,7 +141,7 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	// 	default:
 	// 	break;
 	// }
-	//}
+	}
 	return result;
 }
 
