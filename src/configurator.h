@@ -67,6 +67,7 @@ public:
 	//PLAN_BUILD planBuild = STATIC;
 	CollisionGraph collisionGraph;
 	WorldBuilder worldBuilder;
+	vertexDescriptor currentVertex;
 
 Configurator()=default;
 
@@ -75,6 +76,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	//totalTime =0.0f;
 	ogGoal=controlGoal.disturbance.pose;
+	currentVertex = boost::add_vertex(collisionGraph);
 }
 
 void setBenchmarking(bool b){

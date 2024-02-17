@@ -76,7 +76,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	simResult result;
 	//collisionGraph.clear();
 	//creating decision tree Disturbance
-	vertexDescriptor v0 = boost::add_vertex(collisionGraph);
+	//vertexDescriptor v0 = boost::add_vertex(collisionGraph);
 	std::vector <vertexDescriptor> leaves;
 	Direction dir;
 
@@ -86,17 +86,17 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning & planVertices.empty()){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
 		//printf("executing = %i", executing);
-		collisionGraph[v0].filled =1;
-		collisionGraph[v0].disturbance = controlGoal.disturbance;
-		collisionGraph[v0].outcome = simResult::successful;
-		explorer(v0, collisionGraph, currentTask, world, bestLeaf);
+		collisionGraph[currentVertex].filled =1;
+		collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
+		collisionGraph[currentVertex].outcome = simResult::successful;
+		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
 		//plan = getCleanSequence(collisionGraph, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
 		currentTask.change=1;
 	}
 	else if (!planning){
-		result = simulate(collisionGraph[v0],collisionGraph[v0],currentTask, world);
-		currentTask.change = collisionGraph[v0].outcome==simResult::crashed;
+		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world);
+		currentTask.change = collisionGraph[currentVertex].outcome==simResult::crashed;
 	}
 	float duration=0;
 	if (benchmark){
@@ -909,16 +909,22 @@ void Configurator::changeTask(bool b, int &ogStep){
 		//printf("do not change\n");
 		return;
 	}
+	if (!planVertices.empty()){
+		if (planVertices.size()==1){
+			running=0;
+		}
+		planVertices.erase(planVertices.begin());
+	}
 	if (planning){
 		if (planVertices.empty()){
 			//currentTask = controlGoal;
 			return;
 		}
-		vertexDescriptor v= planVertices[0];
-		edgeDescriptor e = boost::in_edges(v, collisionGraph).first.dereference();
+		currentVertex= planVertices[0];
+		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
 		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction);
-		currentTask.motorStep = collisionGraph[v].step;
-		planVertices.erase(planVertices.begin());
+		currentTask.motorStep = collisionGraph[currentVertex].step;
+		//planVertices.erase(planVertices.begin());
 		printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
