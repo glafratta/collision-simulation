@@ -82,8 +82,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
-//	CollisionGraph planError = 	checkPlan(world, planVertices,collisionGraph);
-	if (planning & planVertices.empty()){ //|| !planError.m_vertices.empty())
+	std::vector<vertexDescriptor> planError = checkPlan(world, planVertices,collisionGraph);
+	if (planning & (planVertices.empty() ||!planError.empty() ||iteration==1)){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
 		//printf("executing = %i", executing);
 		collisionGraph[currentVertex].filled =1;
@@ -752,9 +752,8 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	if (p.empty()){
 		return graphError;
 	}
-	updateGraph(g);
 	Task t= currentTask;
-	int stepsTraversed= t.motorStep- g[0].step;
+	int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
 	float remainingAngle = t.endCriteria.angle.get()-stepsTraversed*t.action.getOmega();
 	t.setEndCriteria(Angle(remainingAngle));
 	float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();

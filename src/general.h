@@ -78,14 +78,14 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 //typedef std::vector <TaskSummary> Sequence;
 
 struct StateMatcher{
-        std::vector <float> weights[6]; //disturbance, position vector, angle
+        std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		std::vector <float> SDvector={0.11, 0.11, 0, 0.11, 0.11, M_PI/6};//hard-coded standard deviations for matching
 		float mu=0.001;
 	    StateMatcher(){}
 
 		void initOnes(){
-			for (auto i=weights->begin(); i!= weights->end(); i++){
+			for (auto i=weights.begin(); i!= weights.end(); i++){
 				*i=1.0;
 			}
 		}

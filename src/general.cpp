@@ -67,7 +67,8 @@ bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direct
 }
 
 void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
-	for (int i=0; i<weights->size();i++){
+	for (int i=0; i<weights.size();i++){
+		//float weight= weights[i];
 		weights[i]+=mu*E[i]*dE[i];
 	}
 }
