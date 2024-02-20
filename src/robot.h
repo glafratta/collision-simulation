@@ -13,7 +13,7 @@
 #define ROBOT_BOX_OFFSET_X -0.05
 #define ROBOT_BOX_OFFSET_Y 0
 #define ROBOT_BOX_OFFSET_ANGLE 0
-#define BETWEEN_WHEELS .15
+const float BETWEEN_WHEELS=0.15;
 const float MAX_SPEED=.196; //1.56
 #define MAX_OMEGA 2 //2 radians
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
@@ -23,7 +23,7 @@ const float BOX2DRANGE =1.0;
 #define MAX_ANGLE_ERROR M_PI
 const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
 const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
-const float TURN_FRICTION =.8; //.75
+const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.00;
 const int maxNodesOnSpot =4;
 
