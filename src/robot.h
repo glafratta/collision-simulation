@@ -16,7 +16,7 @@
 //#define ROBOT_BOX_OFFSET_X 0
 #define ROBOT_BOX_OFFSET_Y 0
 #define ROBOT_BOX_OFFSET_ANGLE 0
-#define BETWEEN_WHEELS .15
+const float BETWEEN_WHEELS=0.15;
 const float MAX_SPEED=.196; //1.56
 #define MAX_OMEGA 2 //2 radians
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
