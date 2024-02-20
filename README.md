@@ -1,4 +1,4 @@
-# HICK: Homeostatic Input control with Core Knowledge
+# CloCk: Closed-loop control with Core Knowledge
 The purpose of this library is to showcase a framework for multi-step ahead plannig using pure input control. The navigation problem is broken down into several unique closed-loop input controllers, called Tasks. Each tasks produces a unique control behaviour (go straight, turn left/right 90 degrees) in response to a disturbance object. A supervising module, called the Configurator, can simulate sequences of Tasks  in game engine [Box2D](https://github.com/erincatto/box2d), extracts plans in the discrete and continuous domain, and queue them for execution.
 
 ## Hardware
