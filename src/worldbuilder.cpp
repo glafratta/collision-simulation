@@ -123,13 +123,13 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         makeBody(world, f);
     }
 	FILE *f;
-	if (debug){
-		f = fopen(bodyFile, "a+");
-		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
-			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-		}
-		fclose(f);
-	}
+	// if (debug){
+	// 	f = fopen(bodyFile, "a+");
+	// 	for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
+	// 		fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+	// 	}
+	// 	fclose(f);
+	// }
     result.first = salient.second;
     return result;
 }

@@ -129,7 +129,7 @@ Task * getTask(int advance=0){ //returns Task being executed
 }
 
 
-void applyController(bool, Task &);
+//void applyController(bool, Task &);
 
 
 //b2Vec2 estimateDisplacementFromWheels();
@@ -145,6 +145,8 @@ void propagateD(vertexDescriptor, CollisionGraph&);
 void updatePlan(); //search disturbances and update their expectation
 
 void updateGraph(CollisionGraph&);
+
+std::pair<int, float> customStepDistance(edgeDescriptor, CollisionGraph&, int); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 

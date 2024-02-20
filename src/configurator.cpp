@@ -761,7 +761,6 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 //	std::vector <vertexDescriptor> matches;
 	do {
 		CoordinateContainer dCloud;
-//		t = Task(ts.disturbance, ts.direction, start);
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
 		s.fill(t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
@@ -788,6 +787,13 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	return graphError;
 }
 
+std::pair <int, float> Configurator::customStepDistance(edgeDescriptor e, CollisionGraph &g, int i){
+	std::pair <int, float> result(0, simulationStep);
+	Direction d=g[e].direction;
+	if (e.m_source!=e.m_target & g[e].direction==d){
+		result.first++;
+	}
+}
 
 
 // std::pair<bool, vertexDescriptor> Configurator::findBestMatch(State s){
