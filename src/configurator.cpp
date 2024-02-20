@@ -89,6 +89,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		collisionGraph[currentVertex].filled =1;
 		collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
 		collisionGraph[currentVertex].outcome = simResult::successful;
+		currentTask.direction=STOP;
 		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
 		//plan = getCleanSequence(collisionGraph, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
@@ -391,10 +392,10 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 
 std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDescriptor leaf, vertexDescriptor root){
 	std::vector <vertexDescriptor> vertices;
-	if (leaf <root){
+	if (leaf ==root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
 	}
-	while (leaf !=root){
+	while(leaf !=root){
 		if (boost::in_degree(leaf, g)<1){
 			break;
 		}
@@ -408,6 +409,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 		leaf = src; //go back
 		}
 	}
+	vertices.insert(vertices.begin(), root);
 	return vertices;
 }
 
@@ -548,7 +550,7 @@ void Configurator::transitionMatrix(State& state, Direction d){
 	//switch (numberOfM){
 	//	case (THREE_M):{
 	if (state.outcome != simResult::successful){ //accounts for simulation also being safe for now
-		if (d ==DEFAULT){
+		if (d ==DEFAULT ||d==STOP){
 			if (state.nodesInSameSpot<maxNodesOnSpot){
 				//in order, try the task which represents the reflex towards the goal
 				if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
@@ -753,22 +755,29 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		return graphError;
 	}
 	Task t= currentTask;
-	int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
-	float remainingAngle = t.endCriteria.angle.get()-stepsTraversed*t.action.getOmega();
-	t.setEndCriteria(Angle(remainingAngle));
-	float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
+	// int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
+	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed*t.action.getOmega();
+	// t.setEndCriteria(Angle(remainingAngle));
+	//float stepDistance = g[p[0]].endPose.p.Length();
+	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
+	float stepDistance=simulationStep;
 	int it=0;
+	edgeDescriptor e=boost::out_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
 		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
+		b2Transform endPose=skip(e,g,it, &t, stepDistance);
 		s.fill(t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+		if (s.endPose.p.Length()>endPose.p.Length()){
+			s.endPose=endPose;
+			s.outcome=simResult::successful;
+		}
 		start = s.endPose;
-		edgeDescriptor e = boost::in_edges(p[it], g).first.dereference();
 		//for node in graph: find distance, find if match: if match put in vector, pick best match, if not add new node
-		vertexDescriptor vd = p[it];
-		DistanceVector distance = matcher.getDistance(g[vd], s);
+		//vertexDescriptor vd = p[it];
+		DistanceVector distance = matcher.getDistance(g[e.m_source], s);
 		if (!matcher.isPerfectMatch(distance)){
 			vertexDescriptor v;
 			addVertex(e.m_source, v,g, Disturbance(), 1);
@@ -787,11 +796,24 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	return graphError;
 }
 
-std::pair <int, float> Configurator::customStepDistance(edgeDescriptor e, CollisionGraph &g, int i){
-	std::pair <int, float> result(0, simulationStep);
-	Direction d=g[e].direction;
-	if (e.m_source!=e.m_target & g[e].direction==d){
-		result.first++;
+void Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task* t, float& step){
+	b2Transform end =g[e.m_source].endPose;
+	int stepsTraversed= t->motorStep- collisionGraph[p[0]].step;
+	float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
+	if (g[e.m_source].disturbance.isValid()){
+		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
+	}
+	else{
+		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
+
+	}
+	while (e.m_source!=e.m_target & g[e].direction==t->direction){
+		i++;
+		if (t->endCriteria.angle.isValid()){
+			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
+				t->setEndCriteria(Angle(remainingAngle));
+		}
+		e = boost::out_edges(e.m_target, g).first.dereference();
 	}
 }
 

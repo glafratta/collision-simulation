@@ -4,6 +4,10 @@
 
 simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
+		result.endPose = start;
+		if (direction==STOP){
+			return result;
+		}
 		Robot robot(&_world);
 		Listener listener;
 		_world.SetContactListener(&listener);	
