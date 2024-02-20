@@ -30,7 +30,7 @@ The indoor robot is equipped with
 
 ## Build
 ```
-cd HICS
+cd CloCK
 cmake .
 sudo make install
 ```
