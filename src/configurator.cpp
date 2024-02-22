@@ -60,12 +60,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 
 	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
-	bool wasAvoiding = currentTask.disturbance.isValid();
-	bool isSameTask = 1;
+	// bool wasAvoiding = currentTask.disturbance.isValid();
+	// bool isSameTask = 1;
 	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
+	worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
 	if (controlGoal.change){
 		currentTask=Task(Disturbance(), STOP);
 		running=0;
@@ -73,16 +73,17 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	}
 
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
-	isSameTask = wasAvoiding == currentTask.disturbance.isValid();
+	//isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	simResult result;
 	collisionGraph.clear();
 	//creating decision tree Disturbance
 	vertexDescriptor v0 = boost::add_vertex(collisionGraph);
-	std::vector <vertexDescriptor> leaves;
-	Direction dir;
+	//std::vector <vertexDescriptor> leaves;
+	//Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = v0;
+	int ogStep=collisionGraph[v0].step;
 	if (planning & (plan.empty())){ 
 		currentTask.change=1;
 		collisionGraph[v0].filled =1;
@@ -107,11 +108,13 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	}
 	worldBuilder.resetBodies();
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
-
-	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
-	if (isSameTask){
-		currentTask.controller(timeElapsed);
+	if (!plan.empty()){
+		ogStep = plan[0].step;
 	}
+	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
+	//if (isSameTask){
+		currentTask.controller(timeElapsed, ogStep-currentTask.motorStep);
+	//}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
 	return 1;

@@ -202,7 +202,7 @@ void trackDisturbance(Disturbance &, Action);
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
 
-void controller(float timeElapsed=0.2);
+void controller(float, int);
 
 std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
                                                                                     //finding a line passing through those points

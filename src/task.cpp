@@ -80,11 +80,11 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
-void Task::controller(float timeElapsed){
+void Task::controller(float timeElapsed, int s){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 	float timeStepError =action.getRecOmega()/timeElapsed; 
 	float normAccErr = timeStepError/SAFE_ANGLE;
-	if (action.getOmega()!=0|| motorStep<1 || motorStep%10!=0){ //only check every 2 sec
+	if (action.getOmega()!=0|| s<1 || s%10!=0){ //only check every 2 sec
 		return;
 	}
 	if (fabs(timeStepError)>tolerance){
