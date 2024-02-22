@@ -82,7 +82,7 @@ void Task::trackDisturbance(Disturbance & d, Action a){
 
 void Task::controller(float timeElapsed, int s){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-	float timeStepError =action.getRecOmega()/timeElapsed; 
+	float timeStepError =action.getRecOmega()*timeElapsed; 
 	float normAccErr = timeStepError/SAFE_ANGLE;
 	if (action.getOmega()!=0|| s<1 || s%10!=0){ //only check every 2 sec
 		return;

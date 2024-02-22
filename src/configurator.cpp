@@ -113,7 +113,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	}
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
 	//if (isSameTask){
-		currentTask.controller(timeElapsed, ogStep-currentTask.motorStep);
+		//currentTask.controller(timeElapsed, ogStep-currentTask.motorStep);
 	//}
 
 	//graph should be saved and can check, if plan actually executed successfully, the probability to transition to that state increases. Read on belief update
