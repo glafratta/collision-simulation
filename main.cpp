@@ -93,14 +93,15 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
+	c->trackTaskExecution(*(c->getTask()));	
 	if (c->plan.empty()){
 		motors.setRightWheelSpeed(0); //temporary fix because motors on despacito are the wrong way around
  	   motors.setLeftWheelSpeed(0);		
 	}
-	c->trackTaskExecution(*(c->getTask()));	
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
 		c->controlGoal.change =1;
+		return;
 	}
 	c->getTask()->trackDisturbance(c->getTask()->disturbance, c->getTask()->getAction());
 	c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction());
