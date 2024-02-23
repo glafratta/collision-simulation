@@ -7,8 +7,8 @@
 #include <vector>
 #include <thread>
 #include <filesystem>
-#include <cmath>
-#include <unistd.h>
+//#include <cmath>
+//#include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
 //#include "task.h"
@@ -118,7 +118,7 @@ int getIteration(){
 
 DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
-void controller();
+//void controller();
 
 void addIteration(){
 	iteration++;

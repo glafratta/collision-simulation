@@ -1,10 +1,11 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 //box2d robot body and kinematic model
-#include "box2d/box2d.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
+#include "box2d/box2d.h"
 #define SAFE_ANGLE M_PI_2
 #define SAFE_DISTANCE sqrt(ROBOT_HALFLENGTH*ROBOT_HALFLENGTH+ROBOT_HALFWIDTH*ROBOT_HALFWIDTH) //DEFAULT backtracking distance
 #define MAX_TURN M_PI
