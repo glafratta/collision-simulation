@@ -748,7 +748,52 @@ void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
 	}
 }
 
-
+std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, CollisionGraph &g, b2Transform start){
+	std::vector <vertexDescriptor> graphError;
+	if (p.empty()){
+		return graphError;
+	}
+	Task t= currentTask;
+	// int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
+	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed*t.action.getOmega();
+	// t.setEndCriteria(Angle(remainingAngle));
+	//float stepDistance = g[p[0]].endPose.p.Length();
+	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
+	float stepDistance=simulationStep;
+	int it=0;
+	edgeDescriptor e=boost::out_edges(p[0], g).first.dereference();
+//	std::vector <vertexDescriptor> matches;
+	do {
+		CoordinateContainer dCloud;
+		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
+		State s;
+		b2Transform endPose=skip(e,g,it, &t, stepDistance);
+		s.fill(t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+		if (s.endPose.p.Length()>endPose.p.Length()){
+			s.endPose=endPose;
+			s.outcome=simResult::successful;
+		}
+		start = s.endPose;
+		//for node in graph: find distance, find if match: if match put in vector, pick best match, if not add new node
+		//vertexDescriptor vd = p[it];
+		DistanceVector distance = matcher.getDistance(g[e.m_source], s);
+		if (!matcher.isPerfectMatch(distance)){
+			vertexDescriptor v;
+			addVertex(e.m_source, v,g, Disturbance(), 1);
+			g[v]=s;
+		}
+		if (s.outcome == simResult::crashed){ //has to replan
+			for (int i=it; i<p.size();i++){
+				graphError.push_back(p[i]);
+			}
+			break;
+		}
+		stepDistance = simulationStep;
+		t= Task(g[e.m_source].disturbance, g[e].direction, start);
+		it++;
+	}while (it<p.size());
+	return graphError;
+}
 
 
 b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task* t, float& step){
