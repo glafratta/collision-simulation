@@ -40,7 +40,7 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
         case b2Shape::e_polygon: {
             b2PolygonShape fixture; 
             fixtureDef.shape = &fixture;             
-            fixture.SetAsBox(features.halfLength, features.halfWidth); 
+           // fixture.SetAsBox(features.halfLength, features.halfWidth); 
 	        body->CreateFixture(fixtureDef.shape, 0.0f);
             break;
         }
