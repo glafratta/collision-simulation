@@ -9,6 +9,8 @@ find_package(Threads)
 
 find_package(OpenCV REQUIRED)
 
+find_package(box2d REQUIRED)
+
 ##find_package(Boost)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
