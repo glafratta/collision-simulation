@@ -10,21 +10,21 @@ find_package(OpenCV REQUIRED)
 
 find_package(box2d REQUIRED)
 
-add_library(HICS ${SRC} ${HEAD})
+add_library(CloCK ${SRC} ${HEAD})
 
-set_target_properties(HICS PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
+set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
 PUBLIC_HEADER "${HEAD}")
 
 #if(box2d_FOUND)
-	target_link_libraries(HICS box2d ${OpenCV_LIBS} pthread)
+	target_link_libraries(CloCK box2d ${OpenCV_LIBS} pthread)
 	message("box2d installed")
 #else()
 #	set(BOX2D_BIN_DIR ${"../box2d/build/bin"})
 #	target_link_libraries(HICS ${BOX2D_BIN_DIR}/libbox2d.a ${OpenCV_LIBS} pthread)
 #	message("fetching static library from ${BOX2D_BIN_DIR}")
 #endif()
-install(TARGETS HICS 
-	EXPORT HICS-targets 
+install(TARGETS CloCK 
+	EXPORT CloCK-targets 
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
