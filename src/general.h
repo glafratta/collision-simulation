@@ -45,7 +45,10 @@ struct State{
 	
 	void fill(simResult);
 
+	State(){}
+		
 	simResult getSimResult();
+
 //	float evaluationFunction(float weight=0.02);
 };
 

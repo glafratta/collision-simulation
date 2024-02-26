@@ -123,7 +123,7 @@ void Task::controller(float timeElapsed){
 Direction Task::H(Disturbance ob, Direction d, bool topDown){
 	if (ob.isValid()){
         if (ob.getAffIndex()==int(InnateAffordances::AVOID)){ //REACTIVE BEHAVIOUR
-            if (d == Direction::DEFAULT){ //REACTIVE BEHAVIOUR
+            if (d == Direction::DEFAULT & !topDown){ //REACTIVE BEHAVIOUR
                 if (ob.getAngle(start)<0){//angle formed with robot at last safe pose
                     d= Direction::LEFT; //go left
                 }

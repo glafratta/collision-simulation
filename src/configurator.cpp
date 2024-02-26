@@ -567,7 +567,7 @@ void Configurator::transitionMatrix(State& state, Direction d){
 		if (d== LEFT || d == RIGHT){
 			state.options = {DEFAULT};
 		}
-		else if (d==DEFAULT){
+		else {
 			if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
 					state.options.push_back(temp.direction);
 					state.options.push_back(getOppositeDirection(temp.direction).second);
@@ -761,14 +761,15 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
 	float stepDistance=simulationStep;
 	int it=0;
-	edgeDescriptor e=boost::out_edges(p[0], g).first.dereference();
+	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
 		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
 		b2Transform endPose=skip(e,g,it, &t, stepDistance);
-		s.fill(t.willCollide(world, iteration, 0, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+		//s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+		s.fill(simulate(s, g[e.m_source], t, world));
 		if (s.endPose.p.Length()>endPose.p.Length()){
 			s.endPose=endPose;
 			s.outcome=simResult::successful;
@@ -954,7 +955,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		}
 		currentVertex= planVertices[0];
 		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
-		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction);
+		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(), true);
 		currentTask.motorStep = collisionGraph[currentVertex].step;
 		//planVertices.erase(planVertices.begin());
 		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
