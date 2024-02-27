@@ -754,6 +754,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		return graphError;
 	}
 	Task t= currentTask;
+	t.check=1;
 	// int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
 	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed:checkEnd*t.action.getOmega();
 	// t.setEndCriteria(Angle(remainingAngle));
@@ -791,6 +792,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		}
 		stepDistance = simulationStep;
 		t= Task(g[e.m_source].disturbance, g[e].direction, start);
+		t.check=1;
 		it++;
 	}while (it<p.size());
 	return graphError;
