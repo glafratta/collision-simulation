@@ -755,7 +755,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	}
 	Task t= currentTask;
 	// int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
-	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed*t.action.getOmega();
+	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed:checkEnd*t.action.getOmega();
 	// t.setEndCriteria(Angle(remainingAngle));
 	//float stepDistance = g[p[0]].endPose.p.Length();
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
@@ -768,8 +768,8 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
 		b2Transform endPose=skip(e,g,it, &t, stepDistance);
-		//s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
-		s.fill(simulate(s, g[e.m_source], t, world));
+		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+		//s.fill(simulate(s, g[e.m_source], t, world));
 		if (s.endPose.p.Length()>endPose.p.Length()){
 			s.endPose=endPose;
 			s.outcome=simResult::successful;
@@ -809,12 +809,23 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 	}
 	while (e.m_source!=e.m_target & g[e].direction==t->direction){
 		i++;
-		if (t->endCriteria.angle.isValid()){
+		//if (t->endCriteria.angle.isValid()){
+		if (t->getAction().getOmega()!=0){
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
-				t->setEndCriteria(Angle(remainingAngle));
+			t->setEndCriteria(Angle(remainingAngle));
 		}
 		if (boost::out_degree(e.m_target,g)>0){
-			e = boost::out_edges(e.m_target, g).first.dereference();
+			auto es = boost::out_edges(e.m_target, g);
+			int matches =0;
+			for (auto ei = es.first; ei!=es.second; ++ei){
+				if ((*ei).m_target == planVertices[i]){
+					e= (*ei);
+					matches++;
+				}
+			}
+			if (matches==0){
+				break;
+			}
 		}
 		else{
 			break;
@@ -955,7 +966,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		}
 		currentVertex= planVertices[0];
 		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
-		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(), true);
+		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = collisionGraph[currentVertex].step;
 		//planVertices.erase(planVertices.begin());
 		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
