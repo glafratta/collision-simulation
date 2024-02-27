@@ -791,7 +791,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			break;
 		}
 		stepDistance = simulationStep;
-		t= Task(g[e.m_source].disturbance, g[e].direction, start);
+		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
 		t.check=1;
 		it++;
 	}while (it<p.size());
