@@ -761,7 +761,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	//float stepDistance = g[p[0]].endPose.p.Length();
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
 	float stepDistance=simulationStep;
-	int it=0;
+	int it=-1;
 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
@@ -778,7 +778,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		start = s.endPose;
 		//for node in graph: find distance, find if match: if match put in vector, pick best match, if not add new node
 		//vertexDescriptor vd = p[it];
-		DistanceVector distance = matcher.getDistance(g[e.m_source], s);
+		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
 		if (!matcher.isPerfectMatch(distance)){
 			vertexDescriptor v;
 			addVertex(e.m_source, v,g, Disturbance(), 1);
