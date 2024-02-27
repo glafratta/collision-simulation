@@ -18,7 +18,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		}
 		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
-		b2Vec2 pointInObject;
+		//b2Vec2 pointInObject;
 		robot.body->SetTransform(start.p, theta);
 		int stepb2d=0;
 		for (stepb2d; stepb2d < (HZ*remaining); stepb2d++) {//3 second
@@ -34,12 +34,15 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
-			theta += action.getRecOmega()/HZ; //= omega *t
+			theta += action.getOmega()/HZ; //= omega *t
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				Disturbance collision = Disturbance(1, listener.collisions[index]);
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
+				if (check){
+					break;
+				}
 				robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
 				collision.setOrientation(robot.body->GetTransform().q.GetAngle());
 				stepb2d=0;

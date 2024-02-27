@@ -19,6 +19,7 @@ public:
     Direction direction= DEFAULT;
     bool discrete=0;
     int motorStep=0;
+    bool check=0;
 protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
