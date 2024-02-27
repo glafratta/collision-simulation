@@ -820,7 +820,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 			auto es = boost::out_edges(e.m_target, g);
 			int matches =0;
 			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i]){
+				if ((*ei).m_target == planVertices[i+1]){
 					e= (*ei);
 					matches++;
 				}
