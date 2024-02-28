@@ -761,7 +761,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	//float stepDistance = g[p[0]].endPose.p.Length();
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
 	float stepDistance=simulationStep;
-	int it=0;
+	int it=-1;//because we start from vertex 0
 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
@@ -791,7 +791,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			break;
 		}
 		stepDistance = simulationStep;
-		it++;
+		//it++;
 		//e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
 		t.check=1;
@@ -801,8 +801,15 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 
 
 b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Task* t, float& step){
-	int stepsTraversed= t->motorStep- collisionGraph[planVertices[i]].step;
-	float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
+	int stepsTraversed= 0;
+	if(e.m_target==planVertices[0]){
+		t->motorStep- collisionGraph[planVertices[i]].step;
+		if (t->getAction().getOmega()!=0){
+			float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
+			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
+			t->setEndCriteria(Angle(remainingAngle));
+		}
+	}
 	if (g[e.m_source].disturbance.isValid()){
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
 	}
@@ -810,15 +817,11 @@ b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Tas
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
 
 	}
-	int it=0;
-	do{
+	//int it=0;
+	while (g[e].direction==t->direction & i+1<planVertices.size()){
 		//if (t->endCriteria.angle.isValid()){
-		i+=it;
-		it++;
-		if (t->getAction().getOmega()!=0){
-			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
-			t->setEndCriteria(Angle(remainingAngle));
-		}
+		i++;
+
 		if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
 			for (auto ei = es.first; ei!=es.second; ++ei){
@@ -827,15 +830,11 @@ b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Tas
 					break;
 				}
 			}
-			//break;
-			//if (matches==0){
-			//	break;
-		//	}
 		}
 		else{
 			break;
 		}
-		}while (g[e].direction==t->direction);
+		}
 
 	return g[planVertices[i]].endPose;
 }
