@@ -790,7 +790,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			}
 			break;
 		}
-		stepDistance = simulationStep;
+		stepDistance = BOX2DRANGE;
 		//it++;
 		//e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
@@ -813,10 +813,10 @@ b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Tas
 	if (g[e.m_source].disturbance.isValid()){
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
 	}
-	else{
-		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
+	// else{
+	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
 
-	}
+	// }
 	//int it=0;
 	while (g[e].direction==t->direction & i+1<planVertices.size()){
 		//if (t->endCriteria.angle.isValid()){
