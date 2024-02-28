@@ -810,7 +810,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
 
 	}
-	while (g[e2].direction==t->direction){
+	while (g[e].direction==t->direction){
 		//if (t->endCriteria.angle.isValid()){
 		if (t->getAction().getOmega()!=0){
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
