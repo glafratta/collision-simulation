@@ -761,14 +761,14 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	//float stepDistance = g[p[0]].endPose.p.Length();
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
 	float stepDistance=simulationStep;
-	int it=-1;
+	int it=0;
 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
 		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
-		b2Transform endPose=skip(e,g,(it+1), &t, stepDistance);
+		b2Transform endPose=skip(e,g,it, &t, stepDistance);
 		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
 		//s.fill(simulate(s, g[e.m_source], t, world));
 		if (s.endPose.p.Length()>endPose.p.Length()){
@@ -801,7 +801,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 
 
 b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task* t, float& step){
-	int stepsTraversed= t->motorStep- collisionGraph[planVertices[0]].step;
+	int stepsTraversed= t->motorStep- collisionGraph[planVertices[i]].step;
 	float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
 	if (g[e.m_source].disturbance.isValid()){
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
@@ -810,8 +810,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
 
 	}
-	while (e.m_source!=e.m_target & g[e].direction==t->direction){
-		// i++;
+	while (g[e2].direction==t->direction){
 		//if (t->endCriteria.angle.isValid()){
 		if (t->getAction().getOmega()!=0){
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
@@ -820,7 +819,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
 			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i]){
+				if ((*ei).m_target == planVertices[i+1]){
 					e= (*ei);
 					break;
 				}
@@ -832,6 +831,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		else{
 			break;
 		}
+		i++;
 	}
 	return g[planVertices[i]].endPose;
 }
