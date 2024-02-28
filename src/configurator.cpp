@@ -768,7 +768,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
-		b2Transform endPose=skip(e,g,it, &t, stepDistance);
+		b2Transform endPose=skip(e,g,(it+1), &t, stepDistance);
 		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
 		//s.fill(simulate(s, g[e.m_source], t, world));
 		if (s.endPose.p.Length()>endPose.p.Length()){
@@ -811,7 +811,7 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 
 	}
 	while (e.m_source!=e.m_target & g[e].direction==t->direction){
-		i++;
+		// i++;
 		//if (t->endCriteria.angle.isValid()){
 		if (t->getAction().getOmega()!=0){
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
@@ -819,16 +819,15 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		}
 		if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
-			int matches =0;
 			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i+1]){
+				if ((*ei).m_target == planVertices[i]){
 					e= (*ei);
-					matches++;
+					break;
 				}
 			}
-			if (matches==0){
-				break;
-			}
+			//if (matches==0){
+			//	break;
+		//	}
 		}
 		else{
 			break;
