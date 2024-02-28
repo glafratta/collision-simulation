@@ -791,10 +791,10 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			break;
 		}
 		stepDistance = simulationStep;
+		e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
 		t.check=1;
 		it++;
-		e=boost::in_edges(p[it], g).first.dereference();
 	}while (it<p.size());
 	return graphError;
 }
