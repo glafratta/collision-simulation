@@ -144,7 +144,7 @@ void propagateD(vertexDescriptor, CollisionGraph&);
 
 void updateGraph(CollisionGraph&);
 
-b2Transform skip(edgeDescriptor, CollisionGraph&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
+b2Transform skip(edgeDescriptor&, CollisionGraph&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 

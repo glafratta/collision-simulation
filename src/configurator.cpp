@@ -800,7 +800,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 }
 
 
-b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task* t, float& step){
+b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Task* t, float& step){
 	int stepsTraversed= t->motorStep- collisionGraph[planVertices[i]].step;
 	float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
 	if (g[e.m_source].disturbance.isValid()){
@@ -810,8 +810,10 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
 
 	}
-	while (g[e].direction==t->direction){
+	int it=-1;
+	do{
 		//if (t->endCriteria.angle.isValid()){
+		it++;
 		if (t->getAction().getOmega()!=0){
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
 			t->setEndCriteria(Angle(remainingAngle));
@@ -819,11 +821,12 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
 			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i+1]){
+				if ((*ei).m_target == planVertices[i+it]){
 					e= (*ei);
 					break;
 				}
 			}
+			break;
 			//if (matches==0){
 			//	break;
 		//	}
@@ -831,8 +834,9 @@ b2Transform Configurator::skip(edgeDescriptor e, CollisionGraph &g, int& i, Task
 		else{
 			break;
 		}
-		i++;
-	}
+		}while (g[e].direction==t->direction);
+	i+=it;
+
 	return g[planVertices[i]].endPose;
 }
 
