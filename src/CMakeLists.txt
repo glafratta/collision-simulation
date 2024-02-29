@@ -1,6 +1,6 @@
 include(GNUInstallDirs)
 
-set(SRC configurator.cpp task.cpp general.cpp measurement.cpp worldbuilder.cpp statematcher.cpp)
+set(SRC configurator.cpp task.cpp general.cpp measurement.cpp worldbuilder.cpp)
 
 set(HEAD disturbance.h configurator.h robot.h task.h general.h affordance.h settings.h measurement.h worldbuilder.h )
 
