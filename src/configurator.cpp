@@ -82,7 +82,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
-	std::vector<vertexDescriptor> planError = checkPlan(world, planVertices,collisionGraph);
+	std::vector<vertexDescriptor> planError;// checkPlan(world, planVertices,collisionGraph);
 	if (planning & (planVertices.empty() ||!planError.empty() ||iteration==1)){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
 		//printf("executing = %i", executing);
