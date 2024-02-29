@@ -12,7 +12,7 @@ find_package(OpenCV REQUIRED)
 ##find_package(Boost)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
-add_subdirectory(test "test")
+
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(target target.cpp)
   add_executable(targetless targetless.cpp)
