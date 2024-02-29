@@ -760,11 +760,11 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	// t.setEndCriteria(Angle(remainingAngle));
 	//float stepDistance = g[p[0]].endPose.p.Length();
 	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
-	float stepDistance=simulationStep;
 	int it=-1;//because we start from vertex 0
 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 //	std::vector <vertexDescriptor> matches;
 	do {
+		float stepDistance=BOX2DRANGE;
 		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
 		State s;
@@ -789,8 +789,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 				graphError.push_back(p[i]);
 			}
 			break;
-		}
-		stepDistance = simulationStep;
+		};
 		//it++;
 		//e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
@@ -821,7 +820,6 @@ b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Tas
 	while (g[e].direction==t->direction & i+1<planVertices.size()){
 		//if (t->endCriteria.angle.isValid()){
 		i++;
-
 		if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
 			for (auto ei = es.first; ei!=es.second; ++ei){
