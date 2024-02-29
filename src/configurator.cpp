@@ -790,7 +790,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			}
 			break;
 		}
-		stepDistance = BOX2DRANGE;
+		stepDistance = simulationStep;
 		//it++;
 		//e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
