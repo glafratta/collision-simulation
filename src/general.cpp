@@ -31,7 +31,6 @@ void State::set(State tmp){
 	outcome = tmp.outcome;
 	step = std::floor(tmp.step/(HZ*MOTOR_CALLBACK)+0.5);
 	//nObs++;
-	filled=true;
 }
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
