@@ -744,7 +744,7 @@ void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
 	int totObs=0;
 	std::vector <edgeDescriptor> sameTask;
 	//find total observations
-	for (auto ei= es.first; ei!=es.second; ++ei){
+	for (auto ei= es.first; ei!=es.second; ei++){
 		if (g[(*ei)].direction==g[e].direction){
 			totObs+=g[(*ei).m_target].nObs;
 			sameTask.push_back(*ei);
@@ -752,6 +752,9 @@ void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
 		}
 	}
 	//adjust
+	if (sameTask.size()==1){
+		return;
+	}
 	for (edgeDescriptor ed: sameTask){
 		g[ed].probability=g[ed.m_target].nObs/totObs;
 	}
