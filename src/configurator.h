@@ -180,7 +180,7 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	return vertexAdded;
 }
 
-void adjustProbability(CollisionGraph&, edgeDescriptor);
+void adjustProbability(CollisionGraph &, edgeDescriptor&);
 
 //void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
 

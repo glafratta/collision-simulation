@@ -49,6 +49,8 @@ struct State{
 		
 	simResult getSimResult();
 
+	void set(State);
+
 //	float evaluationFunction(float weight=0.02);
 };
 
@@ -103,7 +105,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
 
-		void match(State, State&); //use this to set equal states
+		//void match(State, State&); //use this to set equal states
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 

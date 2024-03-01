@@ -314,7 +314,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			applyTransitionMatrix(s, g[v0].options[0], er.ended);
 			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], s)){
 				addVertex(v0, v1,g, Disturbance());
-				g[v1]=s;
+				g[v1].set(s);
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
@@ -737,9 +737,9 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 // 	}
 // }
 
-void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
+void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 	//g[e.m_source].nObs++;
-	//g[e.m_target].nObs++;
+	g[e.m_target].nObs++;
 	auto es= out_edges(e.m_source, g);
 	int totObs=0;
 	std::vector <edgeDescriptor> sameTask;

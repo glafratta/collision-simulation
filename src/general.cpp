@@ -8,7 +8,7 @@ void State::fill(simResult result){
 	endPose = result.endPose;
 	outcome = result.resultCode;
 	step = std::floor(result.step/(HZ*MOTOR_CALLBACK)+0.5);
-	nObs++;
+	//nObs++;
 	filled=true;
 }
 
@@ -20,6 +20,18 @@ simResult State::getSimResult(){
 	result.valid = filled;
 	result.resultCode=outcome;
 	return result;
+}
+
+void State::set(State tmp){
+	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID){
+		totDs++;
+	}
+	disturbance = tmp.disturbance;
+	endPose = tmp.endPose;
+	outcome = tmp.outcome;
+	step = std::floor(tmp.step/(HZ*MOTOR_CALLBACK)+0.5);
+	//nObs++;
+	filled=true;
 }
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
@@ -70,11 +82,11 @@ bool StateMatcher::isPerfectMatch(CollisionGraph g, vertexDescriptor src, Direct
     return result;
 }
 
-void StateMatcher::match(State tmp, State& state){
-	int nObs = state.nObs;
-	state=tmp;
-	state.nObs= nObs+1;
-}
+// void StateMatcher::match(State tmp, State& state){
+// 	int nObs = state.nObs;
+// 	state=tmp;
+// 	state.nObs= nObs+1;
+// }
 
 void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
 	for (int i=0; i<weights.size();i++){
