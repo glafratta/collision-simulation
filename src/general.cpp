@@ -30,6 +30,7 @@ void State::set(State tmp){
 	endPose = tmp.endPose;
 	outcome = tmp.outcome;
 	step = std::floor(tmp.step/(HZ*MOTOR_CALLBACK)+0.5);
+	options = tmp.options;
 	//nObs++;
 }
 
