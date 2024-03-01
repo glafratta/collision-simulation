@@ -795,8 +795,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			vertexDescriptor v;
 			addVertex(planVertices[it-1], v,g, Disturbance(), 1);
 			//matcher.match(s, g[v]);
-			g[v]=s;
-			g[v].nObs++;
+			g[v].set(s);
 		}
 		else{
 			g[planVertices[it]].nObs++;
