@@ -87,6 +87,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.change=1;
 		//printf("executing = %i", executing);
 		collisionGraph[currentVertex].filled =1;
+		collisionGraph[currentVertex].nObs++;
 		collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
 		collisionGraph[currentVertex].outcome = simResult::successful;
 		currentTask.direction=STOP;
@@ -737,13 +738,22 @@ std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
 // }
 
 void Configurator::adjustProbability(CollisionGraph&g, edgeDescriptor e){
-	g[e.m_source].nObs++;
-	g[e.m_target].nObs++;
+	//g[e.m_source].nObs++;
+	//g[e.m_target].nObs++;
 	auto es= out_edges(e.m_source, g);
+	int totObs=0;
+	std::vector <edgeDescriptor> sameTask;
+	//find total observations
 	for (auto ei= es.first; ei!=es.second; ++ei){
 		if (g[(*ei)].direction==g[e].direction){
-			g[*ei].probability=g[e.m_target].nObs/g[e.m_target].nObs;
+			totObs+=g[(*ei).m_target].nObs;
+			sameTask.push_back(*ei);
+			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
 		}
+	}
+	//adjust
+	for (edgeDescriptor ed: sameTask){
+		g[ed].probability=g[ed.m_target].nObs/totObs;
 	}
 }
 
@@ -781,14 +791,19 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		if (!matcher.isPerfectMatch(distance)){
 			vertexDescriptor v;
 			addVertex(planVertices[it-1], v,g, Disturbance(), 1);
+			//matcher.match(s, g[v]);
 			g[v]=s;
+			g[v].nObs++;
+		}
+		else{
+			g[planVertices[it]].nObs++;
 		}
 		if (s.outcome == simResult::crashed){ //has to replan
 			for (int i=it; i<p.size();i++){
 				graphError.push_back(p[i]);
 			}
 			break;
-		};
+		}
 		//it++;
 		//e=boost::in_edges(p[it], g).first.dereference();
 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
