@@ -41,7 +41,7 @@ struct State{
 	// float cost=0; //self-error
 	// float heuristic=0; //error with respect to control goal
 	int step=0;
-	int nObs=1;
+	int nObs=0;
 	
 	void fill(simResult);
 

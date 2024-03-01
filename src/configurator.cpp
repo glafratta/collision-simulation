@@ -82,7 +82,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
-	std::vector<vertexDescriptor> planError;// checkPlan(world, planVertices,collisionGraph);
+	std::vector<vertexDescriptor> planError= checkPlan(world, planVertices,collisionGraph);
 	if (planning & (planVertices.empty() ||!planError.empty() ||iteration==1)){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
 		//printf("executing = %i", executing);
@@ -91,7 +91,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		collisionGraph[currentVertex].outcome = simResult::successful;
 		currentTask.direction=STOP;
 		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
-		//plan = getCleanSequence(collisionGraph, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
 		currentTask.change=1;
 	}
