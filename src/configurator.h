@@ -160,7 +160,7 @@ void explorer(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescript
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
-bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(), bool topDown=0){
+bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
 	if (!obs.isValid()){
 		obs = controlGoal.disturbance;
 	}
@@ -168,8 +168,13 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	if (g[src].options.size()>0 || topDown){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
-		g[e].direction =g[src].options[0];
-		g[src].options.erase(g[src].options.begin());
+		if (!topDown){
+			g[e].direction =g[src].options[0];
+			g[src].options.erase(g[src].options.begin());
+		}
+		else{
+			g[e].direction=d;
+		}
 		g[v1].totDs=g[src].totDs;
 		if (!g[v1].filled){
 			g[v1].disturbance = obs;

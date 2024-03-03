@@ -793,7 +793,7 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
 		if (!matcher.isPerfectMatch(distance)){
 			vertexDescriptor v;
-			addVertex(planVertices[it-1], v,g, Disturbance(), 1);
+			addVertex(planVertices[it-1], v,g, Disturbance(), g[e].direction, 1);
 			//matcher.match(s, g[v]);
 			g[v].set(s);
 		}
