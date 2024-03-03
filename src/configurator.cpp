@@ -767,14 +767,8 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 	}
 	Task t= currentTask;
 	t.check=1;
-	// int stepsTraversed= t.motorStep- collisionGraph[p[0]].step;
-	// float remainingAngle = t.endCriteria.angle.get()-stepsTraversed:checkEnd*t.action.getOmega();
-	// t.setEndCriteria(Angle(remainingAngle));
-	//float stepDistance = g[p[0]].endPose.p.Length();
-	//float stepDistance = simulationStep - stepsTraversed*t.action.getLinearSpeed();
-	int it=-1;//because we start from vertex 0
+	int it=-1;//this represents the source vertex in edge e
 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
-//	std::vector <vertexDescriptor> matches;
 	do {
 		float stepDistance=BOX2DRANGE;
 		CoordinateContainer dCloud;
@@ -782,19 +776,15 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 		State s;
 		b2Transform endPose=skip(e,g,it, &t, stepDistance);
 		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
-		//s.fill(simulate(s, g[e.m_source], t, world));
 		if (s.endPose.p.Length()>endPose.p.Length()){
 			s.endPose=endPose;
 			s.outcome=simResult::successful;
 		}
 		start = s.endPose;
-		//for node in graph: find distance, find if match: if match put in vector, pick best match, if not add new node
-		//vertexDescriptor vd = p[it];
 		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
 		if (!matcher.isPerfectMatch(distance)){
 			vertexDescriptor v;
 			addVertex(planVertices[it-1], v,g, Disturbance(), g[e].direction, 1);
-			//matcher.match(s, g[v]);
 			g[v].set(s);
 		}
 		else{
@@ -828,11 +818,6 @@ b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Tas
 	if (g[e.m_source].disturbance.isValid()){
 		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
 	}
-	// else{
-	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].endPose.p).Length();
-
-	// }
-	//int it=0;
 	while (g[e].direction==t->direction & i+1<planVertices.size()){
 		//if (t->endCriteria.angle.isValid()){
 		i++;
