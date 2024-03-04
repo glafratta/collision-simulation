@@ -299,16 +299,14 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 		EndedResult er = controlGoal.checkEnded(g[v]);
 		applyTransitionMatrix(g, v, direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
-			v0=v;
-			v1 =v0;
+			v0=v; //node being expanded
+			v1 =v0; //frontier
 			do {
-			// if(g[v0].options.size()==0){
-			// 	break;
-			// }
 			State s;
 			bool topDown=1;
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, topDown);
 			//skip:determine simulation step
+			float sD=simulationStep;
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
@@ -823,19 +821,35 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 }
 
 
-b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, int& i, Task* t, float& step){
+void Configurator::adjustStep(vertexDescriptor& src, CollisionGraph &g, int& i, Task* t, float& step){
+	if (boost::out_degree(src, g)==0){
+		return g[src].endPose;
+	}
 	int stepsTraversed= 0;
-	if(e.m_target==planVertices[0]){
-		t->motorStep- collisionGraph[planVertices[i]].step;
+	bool sameTask=0;
+	if(src==currentVertex & src!=0){
+		t->motorStep- g[currentVertex].step;
 		if (t->getAction().getOmega()!=0){
 			float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
 			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
 			t->setEndCriteria(Angle(remainingAngle));
 		}
 	}
-	if (g[e.m_source].disturbance.isValid()){
-		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
+	auto es = boost::out_edges(src, g);
+	for (auto ei = es.first; ei!=es.second; ++ei){
+		if (g[(*ei)].direction == t->direction){
+			sameTask=1;
+			break;
+		}
 	}
+	if (!sameTask){
+		return;
+	}
+	step=BOX2DRANGE; //set to range in order to discover other disturbances
+
+	// if (g[e.m_source].disturbance.isValid()){
+	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
+	// }
 	while (g[e].direction==t->direction & i+1<planVertices.size()){
 		//if (t->endCriteria.angle.isValid()){
 		i++;

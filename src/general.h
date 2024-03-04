@@ -20,13 +20,14 @@ enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 
 //enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
 
-enum PLAN_BUILD{CONTINUOUS, STATIC};
+//enum PLAN_BUILD{CONTINUOUS, STATIC};
 
 typedef std::vector <float> DistanceVector;
 
 struct Edge{
 	Direction direction;
-	float probability=1.0;};
+	float probability=1.0;
+};
 
 
 
