@@ -823,15 +823,16 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 
 void Configurator::adjustStep(vertexDescriptor& src, CollisionGraph &g, int& i, Task* t, float& step){
 	if (boost::out_degree(src, g)==0){
-		return g[src].endPose;
+		return;
 	}
 	int stepsTraversed= 0;
 	bool sameTask=0;
 	if(src==currentVertex & src!=0){
+		//edgeDescriptor e=
 		t->motorStep- g[currentVertex].step;
 		if (t->getAction().getOmega()!=0){
-			float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
-			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
+			float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
+			//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
 			t->setEndCriteria(Angle(remainingAngle));
 		}
 	}
