@@ -82,7 +82,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
-	std::vector<vertexDescriptor> planError= checkPlan(world, planVertices,collisionGraph);
+	//std::vector<vertexDescriptor> planError= checkPlan(world, planVertices,collisionGraph);
 	if (planning){ //|| !planError.m_vertices.empty())
 		currentTask.change=1;
 		//printf("executing = %i", executing);
@@ -297,33 +297,35 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v]);
-		applyTransitionMatrix(g[v], direction, er.ended);
+		applyTransitionMatrix(g, v, direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v;
 			v1 =v0;
 			do {
-			if(g[v0].options.size()==0){
-				break;
-			}
+			// if(g[v0].options.size()==0){
+			// 	break;
+			// }
 			State s;
 			bool topDown=1;
-			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, 1);
+			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, topDown);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
-			applyTransitionMatrix(s, g[v0].options[0], er.ended);
-			if (!matcher.isPerfectMatch(g, v0, g[v0].options[0], s)){
+			std::pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
+			if (!match.first){
 				addVertex(v0, v1,g, Disturbance());
 				g[v1].set(s);
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
+				v1=match.second;
 			}
+			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			v0=v1;
 			propagateD(v1, g);
-			}while(t.direction !=DEFAULT);
-			float phi = er.evaluationFunction();
-			addToPriorityQueue(v1, priorityQueue, phi);
+			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
+			//float phi = er.evaluationFunction();
+			addToPriorityQueue(v1, priorityQueue, evaluationFunction(er));
 		}
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
@@ -442,26 +444,33 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 
 EndedResult Configurator::estimateCost(State &state, b2Transform start, Direction d){
 	EndedResult er = controlGoal.checkEnded(state);
-	//n.heuristic = er.estimatedCost;
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
 	return er;
 }
 
-EndedResult Configurator::estimateCost(vertexDescriptor v,CollisionGraph& g, Direction d){
-	EndedResult er = controlGoal.checkEnded(g[v]);
-	//g[v].heuristic = er.estimatedCost;
-	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
-	edgeDescriptor e;
-	if(boost::in_degree(v,g)>0){
-		e = boost::in_edges(v, g). first.dereference();
-		start =g[e.m_source].endPose;
-		d = g[e].direction;
-	}
-	Task s(g[v].disturbance, d, start);
-	er.cost += s.checkEnded(g[v].endPose).estimatedCost;
-	return er;
+float Configurator::evaluationFunction(EndedResult er){
+	return abs(er.estimatedCost)+abs(er.cost);
 }
+
+float Configurator::evaluationFunction(EndedResult er){
+	return abs(er.estimatedCost)+abs(er.cost);
+}
+
+// EndedResult Configurator::estimateCost(vertexDescriptor v,CollisionGraph& g, Direction d){
+// 	EndedResult er = controlGoal.checkEnded(g[v]);
+// 	//g[v].heuristic = er.estimatedCost;
+// 	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
+// 	edgeDescriptor e;
+// 	if(boost::in_degree(v,g)>0){
+// 		e = boost::in_edges(v, g). first.dereference();
+// 		start =g[e.m_source].endPose;
+// 		d = g[e].direction;
+// 	}
+// 	Task s(g[v].disturbance, d, start);
+// 	er.cost += s.checkEnded(g[v].endPose).estimatedCost;
+// 	return er;
+// }
 
 
 // Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
@@ -605,22 +614,30 @@ void Configurator::transitionMatrix(State& state, Direction d){
 	// }
 }
 
-bool Configurator::applyTransitionMatrix(State& state, Direction d, bool ended, std::vector <vertexDescriptor> leaves){
-	bool result =0;
-	if (!state.options.empty()){
-		return result;
+void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d, bool ended){
+	if (!g[v].options.empty()){
+		return;
 	}
 	if (controlGoal.endCriteria.hasEnd()){
 		if (ended){
-			return result;
+			return;
 		}
 	}
-	else if(round(state.endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
-			return result;
+	else if(round(g[v].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
+		return;
+	}
+	for (int i=0; i<planVertices.size(); i++){
+		if (v==planVertices[i] & i+1<planVertices.size()){
+			auto es = boost::out_edges(v, g);
+			for (auto ei=es.first; ei!=es.second; ei++){
+				if ((*ei).m_target== planVertices[i+1]){
+					g[v].options.push_back(g[*ei].direction);
+					return;
+				}
+			}
 		}
-	transitionMatrix(state, d);
-	result = !state.options.empty();
-	return result;
+	}
+	transitionMatrix(g[v], d);
 }
 
 

@@ -73,7 +73,7 @@ struct EndedResult{
 
     EndedResult() = default;
 
-    float evaluationFunction();
+    float evaluationFunction(std::vector <vertexDescriptor> plan={}, vertexDescriptor v=-1);
 
    // float errorSquared();
 };

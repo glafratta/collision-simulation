@@ -103,7 +103,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(State, State); // is this the same state?
 
-		bool isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
+		std::pair<bool, vertexDescriptor> isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
 
 		//void match(State, State&); //use this to set equal states
 		

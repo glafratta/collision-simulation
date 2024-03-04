@@ -201,7 +201,9 @@ EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the 
 
 EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
-void loopGoal();
+//void loopGoal();
+
+float evaluationFunction(EndedResult);
 
 //Sequence getPlan(CollisionGraph &, vertexDescriptor);
 
@@ -219,7 +221,7 @@ void transitionMatrix(State&, Direction); //DEFAULT, LEFT, RIGHT
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-bool applyTransitionMatrix(State&, Direction,bool, std::vector <vertexDescriptor> leaves = std::vector <vertexDescriptor>());
+edgeDescriptor applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction,bool);
 
 //bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 

@@ -96,6 +96,10 @@ bool EndCriteria::hasEnd(){
     return angle.isValid() || distance.isValid();
 }
 
-float EndedResult::evaluationFunction(){ //h(n) = error, cost is the n of D
-	return abs(estimatedCost) +abs(cost);
+float EndedResult::evaluationFunction(std::vector <vertexDescriptor> plan, vertexDescriptor v){ //h(n) = error, cost is the n of D
+	float planPriority=0.0;
+    if (!plan.empty() & v>=0){
+        planPriority=1.0;
+    } 
+    return abs(estimatedCost) +abs(cost)+planPriority;
 	}
