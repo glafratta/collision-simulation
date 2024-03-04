@@ -221,7 +221,7 @@ void transitionMatrix(State&, Direction); //DEFAULT, LEFT, RIGHT
 
 //void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-edgeDescriptor applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction,bool);
+void applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction,bool);
 
 //bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 

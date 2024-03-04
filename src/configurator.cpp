@@ -308,6 +308,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			State s;
 			bool topDown=1;
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, topDown);
+			//skip:determine simulation step
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
@@ -449,9 +450,9 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	return er;
 }
 
-float Configurator::evaluationFunction(EndedResult er){
-	return abs(er.estimatedCost)+abs(er.cost);
-}
+// float Configurator::evaluationFunction(EndedResult er){
+// 	return abs(er.estimatedCost)+abs(er.cost);
+// }
 
 float Configurator::evaluationFunction(EndedResult er){
 	return abs(er.estimatedCost)+abs(er.cost);
