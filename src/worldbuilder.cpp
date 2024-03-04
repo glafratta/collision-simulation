@@ -108,14 +108,14 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr, CoordinateContainer * dCloud){
+  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Task*curr,CoordinateContainer * dCloud){
     std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
-    float boxLength=simulationStep;
-    if(d==BACK){
-        float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
-        float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
-        start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
-    }
+    float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
+    // if(d==BACK){
+    //     float x = start.p.x - (SAFE_DISTANCE+ ROBOT_HALFLENGTH)* cos(start.q.GetAngle());
+    //     float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
+    //     start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
+    // }
     std::pair <Point, Point> bt = bounds(d, start, boxLength, curr);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr, dCloud);
     std::vector <BodyFeatures> features =processData(salient.first);
@@ -123,13 +123,13 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         makeBody(world, f);
     }
 	FILE *f;
-	if (debug){
-		f = fopen(bodyFile, "a+");
-		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
-			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
-		}
-		fclose(f);
-	}
+	// if (debug){
+	// 	f = fopen(bodyFile, "a+");
+	// 	for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
+	// 		fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+	// 	}
+	// 	fclose(f);
+	// }
     result.first = salient.second;
     return result;
 }
