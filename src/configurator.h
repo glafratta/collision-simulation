@@ -136,7 +136,7 @@ Task * getTask(int advance=0){ //returns Task being executed
 
 //void reactiveAvoidance(b2World &, simResult &, Task&); //adds two Tasks if crashed but always next up is picked
 
-simResult simulate(State&, State, Task  , b2World &);
+simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
 //void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
@@ -144,9 +144,19 @@ void propagateD(vertexDescriptor, CollisionGraph&);
 
 void updateGraph(CollisionGraph&);
 
-void adjustStep(vertexDescriptor&, CollisionGraph &, int&, Task*, float&)
+void adjustStep(vertexDescriptor, CollisionGraph &, Task*, float&);
 
-b2Transform skip(edgeDescriptor&, CollisionGraph&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
+std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, CollisionGraph&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
+
+//b2Transform skip(edgeDescriptor&, CollisionGraph&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
+
+std::vector <edgeDescriptor> outEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
+
+std::vector <edgeDescriptor> inEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
+
+std::pair <bool, vertexDescriptor> findExactMatch(State, CollisionGraph&);
+
+bool edgeExists(vertexDescriptor, vertexDescriptor, CollisionGraph&);
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 

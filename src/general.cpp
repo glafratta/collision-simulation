@@ -78,6 +78,7 @@ std::pair<bool, vertexDescriptor> StateMatcher::isPerfectMatch(CollisionGraph g,
 		if (g[*ei].direction==d & isPerfectMatch(s, g[ei.dereference().m_source])){
 			result.first=true;
 			result.second=(*ei).m_target;
+			break;
 		}
 	}
     return result;

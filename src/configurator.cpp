@@ -96,7 +96,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.change=1;
 	}
 	else if (!planning){
-		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world);
+		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world, simulationStep);
 		currentTask.change = collisionGraph[currentVertex].outcome==simResult::crashed;
 	}
 	float duration=0;
@@ -224,7 +224,7 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 // }
 
 
-simResult Configurator::simulate(State& state, State src, Task  t, b2World & w){
+simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
 		//EVALUATE NODE()
 	simResult result;
 	float remaining = BOX2DRANGE/controlGoal.action.getLinearSpeed();
@@ -235,7 +235,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w){
 		if (remaining<0.01){
 			remaining=0;
 		}
-	result =t.willCollide(w, iteration, debugOn, remaining, simulationStep); //default start from 0
+	result =t.willCollide(w, iteration, debugOn, remaining, _simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
 		state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
@@ -305,23 +305,29 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			State s;
 			bool topDown=1;
 			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, topDown);
-			//skip:determine simulation step
-			float sD=simulationStep;
+			float _simulationStep=simulationStep;
+			adjustStep(v0, g, &t, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
-			s.fill(simulate(s, g[v0], t, w)); //find simulation result
+			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
-			std::pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
+			//std::pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
+			std::pair<bool, vertexDescriptor> match=findExactMatch(s, g);			
 			if (!match.first){
 				addVertex(v0, v1,g, Disturbance());
 				g[v1].set(s);
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
-				v1=match.second;
+				v1=match.second; //frontier
+				if (!edgeExists(v0, v1, g)){
+					boost::add_edge(v0, v1, g);
+				}
+				//if there is no e
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			v0=v1;
 			propagateD(v1, g);
+			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			//float phi = er.evaluationFunction();
 			addToPriorityQueue(v1, priorityQueue, evaluationFunction(er));
@@ -343,10 +349,15 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 	else{
 		return;
 	}
+	std::vector <vertexDescriptor> deletion;
 	while (g[e].direction ==DEFAULT){
 			g[e.m_source].disturbance = g[e.m_target].disturbance;
-			g[e.m_source].outcome = simResult::safeForNow;
-		v=e.m_source;
+			g[e.m_source].outcome = simResult::safeForNow; //propagating back
+			if (findExactMatch(g[e.m_source], g).first){
+				deletion.push_back(e.m_source);
+			}
+			v=e.m_source;
+
 		if(boost::in_degree(v,g)>0){
 			bool assigned=0;
 			for (auto ei =boost::in_edges(v, g).first; ei!=boost::in_edges(v, g).second; ei++){
@@ -364,6 +375,19 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 			break;
 		}
 	}
+	for (vertexDescriptor del:deletion){
+		boost::remove_vertex(del, g);
+	}
+}
+
+bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, CollisionGraph& g){
+	auto es=boost::in_edges(target, g);
+	for (auto ei=es.first; ei!=es.second; ei++){
+		if ((*ei).m_source==src){
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -757,7 +781,7 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 	//g[e.m_source].nObs++;
 	g[e.m_target].nObs++;
 	auto es= out_edges(e.m_source, g);
-	int totObs=0;
+	float totObs=0;
 	std::vector <edgeDescriptor> sameTask;
 	//find total observations
 	for (auto ei= es.first; ei!=es.second; ei++){
@@ -776,101 +800,145 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 	}
 }
 
-std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, CollisionGraph &g, b2Transform start){
-	std::vector <vertexDescriptor> graphError;
-	if (p.empty()){
-		return graphError;
+// std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, CollisionGraph &g, b2Transform start){
+// 	std::vector <vertexDescriptor> graphError;
+// 	if (p.empty()){
+// 		return graphError;
+// 	}
+// 	Task t= currentTask;
+// 	t.check=1;
+// 	int it=-1;//this represents the source vertex in edge e
+// 	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
+// 	do {
+// 		float stepDistance=BOX2DRANGE;
+// 		CoordinateContainer dCloud;
+// 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
+// 		State s;
+// 		b2Transform endPose=skip(e,g,it, &t, stepDistance);
+// 		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
+// 		if (s.endPose.p.Length()>endPose.p.Length()){
+// 			s.endPose=endPose;
+// 			s.outcome=simResult::successful;
+// 		}
+// 		start = s.endPose;
+// 		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
+// 		if (!matcher.isPerfectMatch(distance)){
+// 			vertexDescriptor v;
+// 			addVertex(planVertices[it-1], v,g, Disturbance(), g[e].direction, 1);
+// 			g[v].set(s);
+// 		}
+// 		else{
+// 			g[planVertices[it]].nObs++;
+// 		}
+// 		if (s.outcome == simResult::crashed){ //has to replan
+// 			for (int i=it; i<p.size();i++){
+// 				graphError.push_back(p[i]);
+// 			}
+// 			break;
+// 		}
+// 		//it++;
+// 		//e=boost::in_edges(p[it], g).first.dereference();
+// 		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
+// 		t.check=1;
+// 	}while (it+2<p.size());
+// 	return graphError;
+// }
+
+std::vector <edgeDescriptor> outEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+	std::vector <edgeDescriptor> result;
+	auto es = boost::out_edges(v, g);
+	for (auto ei = es.first; ei!=es.second; ++ei){
+		if (g[(*ei)].direction == d){
+			result.push_back(*ei);
+		}
 	}
-	Task t= currentTask;
-	t.check=1;
-	int it=-1;//this represents the source vertex in edge e
-	edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
-	do {
-		float stepDistance=BOX2DRANGE;
-		CoordinateContainer dCloud;
-		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, &t, &dCloud);
-		State s;
-		b2Transform endPose=skip(e,g,it, &t, stepDistance);
-		s.fill(t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance)); //check if plan is successful, simulate
-		if (s.endPose.p.Length()>endPose.p.Length()){
-			s.endPose=endPose;
-			s.outcome=simResult::successful;
-		}
-		start = s.endPose;
-		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
-		if (!matcher.isPerfectMatch(distance)){
-			vertexDescriptor v;
-			addVertex(planVertices[it-1], v,g, Disturbance(), g[e].direction, 1);
-			g[v].set(s);
-		}
-		else{
-			g[planVertices[it]].nObs++;
-		}
-		if (s.outcome == simResult::crashed){ //has to replan
-			for (int i=it; i<p.size();i++){
-				graphError.push_back(p[i]);
-			}
-			break;
-		}
-		//it++;
-		//e=boost::in_edges(p[it], g).first.dereference();
-		t= Task(g[e.m_source].disturbance, g[e].direction, start, true);
-		t.check=1;
-	}while (it+2<p.size());
-	return graphError;
+	return result;
 }
 
+std::vector <edgeDescriptor> inEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+	std::vector <edgeDescriptor> result;
+	auto es = boost::in_edges(v, g);
+	for (auto ei = es.first; ei!=es.second; ++ei){
+		if (g[(*ei)].direction == d){
+			result.push_back(*ei);
+		}
+	}
+	return result;
+}
 
-void Configurator::adjustStep(vertexDescriptor& src, CollisionGraph &g, int& i, Task* t, float& step){
-	if (boost::out_degree(src, g)==0){
+void Configurator::adjustStep(vertexDescriptor src, CollisionGraph &g, Task* t, float& step){
+	if (boost::out_degree(src, g)==0 || boost::in_degree(src,g)==0){
 		return;
 	}
-	int stepsTraversed= 0;
-	bool sameTask=0;
-	if(src==currentVertex & src!=0){
-		//edgeDescriptor e=
-		t->motorStep- g[currentVertex].step;
+	if(src==currentVertex){
 		if (t->getAction().getOmega()!=0){
 			float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
 			//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
 			t->setEndCriteria(Angle(remainingAngle));
 		}
-	}
-	auto es = boost::out_edges(src, g);
-	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei)].direction == t->direction){
-			sameTask=1;
-			break;
-		}
-	}
-	if (!sameTask){
-		return;
-	}
-	step=BOX2DRANGE; //set to range in order to discover other disturbances
-
-	// if (g[e.m_source].disturbance.isValid()){
-	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
-	// }
-	while (g[e].direction==t->direction & i+1<planVertices.size()){
-		//if (t->endCriteria.angle.isValid()){
-		i++;
-		if (boost::out_degree(e.m_target,g)>0){
-			auto es = boost::out_edges(e.m_target, g);
-			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i+1]){
-					e= (*ei);
-					break;
-				}
-			}
-		}
 		else{
-			break;
+			step= t->motorStep*t->action.getLinearSpeed();
 		}
-		}
-
-	return g[planVertices[i]].endPose;
+	}
 }
 
+std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, CollisionGraph& g, Direction d){
+	 	std::vector <edgeDescriptor> result;
+		edgeDescriptor e; 
+		do{
+			std::vector <edgeDescriptor> directionEdges=inEdges(g, v, d);
+			if (directionEdges.empty()){
+				break;
+			}
+			auto eit=std::max_element(directionEdges.begin(), directionEdges.end()); //choosing the most recent edge
+			e = *eit;
+			result.push_back(e);
+			v=e.m_source;
+		}while (g[e].direction==d);
+	return result;
+} 
+
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, CollisionGraph& g){
+	std::pair <bool, vertexDescriptor> result(false, -1);
+	auto vs= boost::vertices(g);
+	for (auto vi=vs.first; vi!= vs.second; vi++){
+		if (matcher.isPerfectMatch(g[*vi], s)){
+			result.first=true;
+			result.second=*vi;
+			break;
+		}
+
+	}
+	return result;
+}
+
+
+// b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, Task* t, float& step){
+// 	//	step=BOX2DRANGE; //set to range in order to discover other disturbances
+
+// 	// if (g[e.m_source].disturbance.isValid()){
+// 	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
+// 	// }
+// 	while (g[e].direction==t->direction & i+1<planVertices.size()){
+// 		//if (t->endCriteria.angle.isValid()){
+// 		i++;
+// 		if (boost::out_degree(e.m_target,g)>0){
+// 			auto es = boost::out_edges(e.m_target, g);
+// 			for (auto ei = es.first; ei!=es.second; ++ei){
+// 				if ((*ei).m_target == planVertices[i+1]){
+// 					e= (*ei);
+// 					break;
+// 				}
+// 			}
+// 		}
+// 		else{
+// 			break;
+// 		}
+// 		}
+
+// 	return g[planVertices[i]].endPose;
+
+// }
 
 // std::pair<bool, vertexDescriptor> Configurator::findBestMatch(State s){
 // 	//std::vector <vertexDescriptor> matches;
