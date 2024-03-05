@@ -844,7 +844,7 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 // 	return graphError;
 // }
 
-std::vector <edgeDescriptor> outEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+std::vector <edgeDescriptor> Configurator::outEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::out_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
@@ -855,7 +855,7 @@ std::vector <edgeDescriptor> outEdges(CollisionGraph&g, vertexDescriptor v, Dire
 	return result;
 }
 
-std::vector <edgeDescriptor> inEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
