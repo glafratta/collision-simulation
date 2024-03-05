@@ -319,8 +319,9 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			else{
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
-				if (!edgeExists(v0, v1, g)){
-					boost::add_edge(v0, v1, g);
+				if (!edgeExists(v0, v1, g) & !(v0==v1)){
+					edgeDescriptor e= (boost::add_edge(v0, v1, g)).first;
+					g[e].direction==t.direction;
 				}
 				//if there is no e
 			}
