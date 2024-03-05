@@ -871,6 +871,7 @@ void Configurator::adjustStep(vertexDescriptor src, CollisionGraph &g, Task* t, 
 		return;
 	}
 	if(src==currentVertex){
+	int stepsTraversed= t->motorStep- collisionGraph[src].step;
 		if (t->getAction().getOmega()!=0){
 			float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
 			//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
