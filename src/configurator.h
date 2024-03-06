@@ -183,7 +183,8 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		if (!topDown){
-			g[e].direction =g[src].options[0];
+			// g[e].direction =g[src].options[0];
+			g[e].direction =d;
 			g[src].options.erase(g[src].options.begin());
 		}
 		else{
