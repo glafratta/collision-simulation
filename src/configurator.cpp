@@ -341,8 +341,9 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 
 
 std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
+	std::vector<edgeDescriptor> deletion;
 	if (g[v].outcome == simResult::successful ){
-		return;
+		return deletion;
 	}
 	edgeDescriptor e;
 	Disturbance dist = g[v].disturbance;
@@ -351,9 +352,8 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, Collisi
 			e= *(boost::in_edges(e.m_source, g).first);
 		}
 	else{
-		return;
+		return deletion;
 	}
-	std::vector<edgeDescriptor> deletion;
 	while (g[e].direction ==DEFAULT){
 			g[e.m_source].disturbance = dist;
 			g[e.m_source].outcome = simResult::safeForNow; //propagating back
@@ -379,6 +379,7 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, Collisi
 			break;
 		}
 	}
+	return deletion;
 }
 
 void Configurator::pruneTarget(std::vector<edgeDescriptor> edges, CollisionGraph&g){
