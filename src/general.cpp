@@ -57,9 +57,10 @@ float StateMatcher::sumVector(DistanceVector vec){
 bool StateMatcher::isPerfectMatch(DistanceVector vec){
     bool result =false;
 	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<SDvector[4];
+	bool angleMatch = vec[5]<SDvector[5];
 	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<SDvector[0];
 	bool affordanceMatch =vec[2]==SDvector[2];
-    if (positionMatch &&  disturbanceMatch&& affordanceMatch ){ //match position and disturbance
+    if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
         result=true;
     }
     return result;
