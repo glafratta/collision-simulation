@@ -327,7 +327,8 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			v0=v1;
-			propagateD(v1, g);
+			std::vector<edgeDescriptor> toPrune =propagateD(v1, g);
+			pruneTarget(toPrune, g);
 			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			//float phi = er.evaluationFunction();
@@ -339,23 +340,25 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
+std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 	if (g[v].outcome == simResult::successful ){
 		return;
 	}
 	edgeDescriptor e;
+	Disturbance dist = g[v].disturbance;
 	if(boost::in_degree(v,g)>0){
 			e= *(boost::in_edges(v, g).first);
+			e= *(boost::in_edges(e.m_source, g).first);
 		}
 	else{
 		return;
 	}
-	std::vector <vertexDescriptor> deletion;
+	std::vector<edgeDescriptor> deletion;
 	while (g[e].direction ==DEFAULT){
-			g[e.m_source].disturbance = g[e.m_target].disturbance;
+			g[e.m_source].disturbance = dist;
 			g[e.m_source].outcome = simResult::safeForNow; //propagating back
 			if (findExactMatch(g[e.m_source], g).first){
-				deletion.push_back(e.m_source);
+				deletion.push_back(e);
 			}
 			v=e.m_source;
 
@@ -376,8 +379,11 @@ void Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
 			break;
 		}
 	}
-	for (vertexDescriptor del:deletion){
-		boost::remove_vertex(del, g);
+}
+
+void Configurator::pruneTarget(std::vector<edgeDescriptor> edges, CollisionGraph&g){
+	for (edgeDescriptor e:edges){
+		boost::remove_vertex(e.m_target, g);
 	}
 }
 
