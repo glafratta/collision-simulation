@@ -313,7 +313,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			//std::pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
 			std::pair<bool, vertexDescriptor> match=findExactMatch(s, g);			
 			if (!match.first){
-				addVertex(v0, v1,g, Disturbance());
+				addVertex(v0, v1,g, Disturbance(),t.direction, topDown);
 				g[v1].set(s);
 			}
 			else{
