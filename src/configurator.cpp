@@ -349,7 +349,7 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, Collisi
 	}
 	while (g[e].direction ==DEFAULT){
 			g[e.m_target].disturbance = dist;
-			g[e.m_target].outcome = simResult::safeForNow; //propagating back
+			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
 			std::pair <bool, vertexDescriptor> match= findExactMatch(e.m_target, g);
 			if ( match.first){
 				deletion.push_back(e);
