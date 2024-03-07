@@ -76,14 +76,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning){ //|| !planError.m_vertices.empty())
 		if (currentVertex==0){
 			currentTask.change=1;
-			collisionGraph[currentVertex].filled =1;
-			currentTask.action.L=0;
-			currentTask.action.R=0;
-			currentTask.direction==STOP;
+			currentTask.H(controlGoal.disturbance, STOP, 1);
+			collisionGraph[currentVertex].fill(simResult());
 		}
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
-		//collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
 		//collisionGraph[currentVertex].outcome = simResult::successful;
 		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
