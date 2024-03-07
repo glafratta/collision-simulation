@@ -36,7 +36,7 @@ public:
 
     Action()=default;
 
-    void init(Direction direction){
+    void init(Direction& direction){
         switch (direction){
         case Direction::DEFAULT:
         L=0.5;
@@ -57,6 +57,7 @@ public:
         case Direction::STOP:
         L=0;
         R=0;
+        direction=Direction::DEFAULT;
         break;
         default:
         throw std::invalid_argument("not a valid direction for M");

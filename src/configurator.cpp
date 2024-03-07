@@ -74,6 +74,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
 	if (planning){ //|| !planError.m_vertices.empty())
+		vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
+		g[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
 		if (currentVertex==0){
 			currentTask.change=1;
 			currentTask.H(controlGoal.disturbance, STOP, 1);
@@ -82,9 +84,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
 		//collisionGraph[currentVertex].outcome = simResult::successful;
-		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
+		boost::add_edge(startVertex, currentVertex, collisionGraph);
+		explorer(startVertex, collisionGraph, currentTask, world, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
-		currentTask.change=1;
+		boost::remove_edge(startVertex, currentVertex, collisionGraph);
+		///currentTask.change=1;
 	}
 	else if (!planning){
 		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world, simulationStep);
@@ -280,18 +284,15 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 
 void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
-	float error;
-	//bool deepen;
-	Direction direction = t.direction;
-	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(v,0)};
+	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
+	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v]);
-		applyTransitionMatrix(g, v, direction, er.ended);
+		applyTransitionMatrix(g, v, t.direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v; //node being expanded
-			b2Transform start= g[v0].endPose;
 			v1 =v0; //frontier
 			do {
 			State s;
@@ -314,7 +315,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 				v1=match.second; //frontier
 				if (!edgeExists(v0, v1, g) & !(v0==v1)){
 					edgeDescriptor e= (boost::add_edge(v0, v1, g)).first;
-					g[e].direction==t.direction;
+					g[e].direction=t.direction;
 				}
 				//if there is no e
 			}
@@ -868,10 +869,11 @@ std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescr
 	return result;
 }
 
-void Configurator::adjustStep(vertexDescriptor src, CollisionGraph &g, Task* t, float& step){
-	if (boost::out_degree(src, g)==0 || boost::in_degree(src,g)==0){
+void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Task* t, float& step){
+	if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0){
 		return;
 	}
+	vertexDescriptor src= boost::in_edges(v, g).first.dereference().m_source;
 	if(src==currentVertex){
 	int stepsTraversed= t->motorStep- collisionGraph[src].step;
 		if (t->getAction().getOmega()!=0){
