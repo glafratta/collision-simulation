@@ -179,9 +179,9 @@ void explorer(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescript
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
-	if (!obs.isValid()){
-		obs = controlGoal.disturbance;
-	}
+	// if (!obs.isValid()){
+	// 	obs = controlGoal.disturbance;
+	// }
 	bool vertexAdded = false;
 	if (g[src].options.size()>0 || topDown){
 		v1 = boost::add_vertex(g);
