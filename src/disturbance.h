@@ -121,7 +121,7 @@ public:
 
 struct simResult{
     enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
-    resultType resultCode;
+    resultType resultCode= successful;
     Disturbance collision;
     bool valid = 0;
     //float distanceCovered =0;
