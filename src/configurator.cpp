@@ -79,6 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			collisionGraph[currentVertex].filled =1;
 			currentTask.action.L=0;
 			currentTask.action.R=0;
+			currentTask.direction==STOP;
 		}
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
