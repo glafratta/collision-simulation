@@ -308,7 +308,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
-			//std::pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
+			//std:pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
 			std::pair<bool, vertexDescriptor> match=findExactMatch(s, g);			
 			if (!match.first){
 				addVertex(v0, v1,g, Disturbance(),t.direction);
@@ -441,7 +441,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 		leaf = src; //go back
 		}
 	}
-	//vertices.insert(vertices.begin(), root);
+	vertices.insert(vertices.begin(), root);
 	return vertices;
 }
 
