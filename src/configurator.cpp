@@ -300,11 +300,13 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 		applyTransitionMatrix(g, v, direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v; //node being expanded
+			b2Transform start= g[v0].endPose;
 			v1 =v0; //frontier
 			do {
 			State s;
 			bool topDown=1;
-			t = Task(g[v0].disturbance, g[v0].options[0], g[v0].endPose, topDown);
+			changeStart(start, v0, g);
+			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStep(v0, g, &t, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
@@ -938,6 +940,17 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	}
 	return result;
 }
+
+void Configurator::changeStart(b2Transform& start, vertexDescriptor v, CollisionGraph& g){
+	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
+		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
+		start = g[e.m_source].endPose;
+	}
+	else{
+		start=g[v].endPose;
+	}
+}
+
 
 
 // b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, Task* t, float& step){

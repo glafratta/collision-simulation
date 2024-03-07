@@ -160,6 +160,8 @@ std::pair <bool, vertexDescriptor> findExactMatch(State, CollisionGraph&);
 
 std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, CollisionGraph&); //has a safety to prevent matching a vertex with self
 
+void changeStart(b2Transform&, vertexDescriptor, CollisionGraph&); //if task at vertex v fails, start is set to v's predecessor's end
+
 bool edgeExists(vertexDescriptor, vertexDescriptor, CollisionGraph&);
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
