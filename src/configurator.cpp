@@ -78,7 +78,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		collisionGraph[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
 		if (currentVertex==0){
 			currentTask.change=1;
-			currentTask.H(controlGoal.disturbance, STOP, 1);
+			currentTask.H(collisionGraph[currentVertex].disturbance, STOP, 1);
 			collisionGraph[currentVertex].fill(simResult());
 		}
 		if (startVertex !=currentVertex){
