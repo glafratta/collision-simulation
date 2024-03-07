@@ -73,7 +73,7 @@ struct EndedResult{
 
     EndedResult() = default;
 
-    float evaluationFunction(std::vector <vertexDescriptor> plan={}, vertexDescriptor v=-1);
+    float evaluationFunction(std::vector <vertexDescriptor> plan={}, vertexDescriptor v=CollisionGraph::null_vertex());
 
    // float errorSquared();
 };

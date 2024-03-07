@@ -98,7 +98,7 @@ bool EndCriteria::hasEnd(){
 
 float EndedResult::evaluationFunction(std::vector <vertexDescriptor> plan, vertexDescriptor v){ //h(n) = error, cost is the n of D
 	float planPriority=0.0;
-    if (!plan.empty() & v>=0){
+    if (!plan.empty() & u_long(v)>=0){
         planPriority=1.0;
     } 
     return abs(estimatedCost) +abs(cost)+planPriority;

@@ -908,7 +908,7 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 } 
 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, CollisionGraph& g){
-	std::pair <bool, vertexDescriptor> result(false, -1);
+	std::pair <bool, vertexDescriptor> result(false, CollisionGraph::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (matcher.isPerfectMatch(g[*vi], s)){
@@ -922,7 +922,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Collisi
 }
 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, CollisionGraph& g){
-	std::pair <bool, vertexDescriptor> result(false, -1);
+	std::pair <bool, vertexDescriptor> result(false, CollisionGraph::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
