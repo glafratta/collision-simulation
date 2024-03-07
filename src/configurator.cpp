@@ -75,7 +75,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	vertexDescriptor bestLeaf = currentVertex;
 	if (planning){ //|| !planError.m_vertices.empty())
 		vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
-		g[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
+		collisionGraph[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
 		if (currentVertex==0){
 			currentTask.change=1;
 			currentTask.H(controlGoal.disturbance, STOP, 1);
@@ -284,13 +284,14 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 
 void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
+	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v]);
-		applyTransitionMatrix(g, v, t.direction, er.ended);
+		applyTransitionMatrix(g, v, direction, er.ended);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v; //node being expanded
 			v1 =v0; //frontier
