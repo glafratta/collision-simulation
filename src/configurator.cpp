@@ -72,9 +72,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
-	vertexDescriptor bestLeaf = currentVertex;
 	if (planning){ //|| !planError.m_vertices.empty())
 		vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
+		vertexDescriptor bestLeaf = startVertex;
 		collisionGraph[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
 		if (currentVertex==0){
 			currentTask.change=1;
@@ -88,7 +88,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
 		//collisionGraph[currentVertex].outcome = simResult::successful;
-		explorer(startVertex, collisionGraph, currentTask, world, startVertex);
+		explorer(startVertex, collisionGraph, currentTask, world, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
 		boost::remove_edge(startVertex, currentVertex, collisionGraph);
 		///currentTask.change=1;
