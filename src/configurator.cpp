@@ -441,7 +441,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 		leaf = src; //go back
 		}
 	}
-	vertices.insert(vertices.begin(), root);
+	//vertices.insert(vertices.begin(), root);
 	return vertices;
 }
 
