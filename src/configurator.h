@@ -158,6 +158,8 @@ std::vector <edgeDescriptor> inEdges(CollisionGraph&, vertexDescriptor, Directio
 
 std::pair <bool, vertexDescriptor> findExactMatch(State, CollisionGraph&);
 
+std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, CollisionGraph&); //has a safety to prevent matching a vertex with self
+
 bool edgeExists(vertexDescriptor, vertexDescriptor, CollisionGraph&);
 
 //void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution

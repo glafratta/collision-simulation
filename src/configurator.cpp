@@ -355,10 +355,10 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, Collisi
 		return deletion;
 	}
 	while (g[e].direction ==DEFAULT){
-			g[e.m_source].disturbance = dist;
-			g[e.m_source].outcome = simResult::safeForNow; //propagating back
-			std::pair <bool, vertexDescriptor> match= findExactMatch(g[e.m_source], g);
-			if ( match.first &e.m_source!=match.second){
+			g[e.m_target].disturbance = dist;
+			g[e.m_target].outcome = simResult::safeForNow; //propagating back
+			std::pair <bool, vertexDescriptor> match= findExactMatch(e.m_target, g);
+			if ( match.first){
 				deletion.push_back(e);
 			}
 			v=e.m_source;
@@ -917,6 +917,23 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Collisi
 			result.second=*vi;
 			break;
 		}
+
+	}
+	return result;
+}
+
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, CollisionGraph& g){
+	std::pair <bool, vertexDescriptor> result(false, -1);
+	auto vs= boost::vertices(g);
+	for (auto vi=vs.first; vi!= vs.second; vi++){
+		if (*vi!=v){
+			if (matcher.isPerfectMatch(g[*vi], g[v])){
+			result.first=true;
+			result.second=*vi;
+			break;
+		}
+		}
+
 
 	}
 	return result;
