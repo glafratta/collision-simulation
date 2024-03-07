@@ -88,7 +88,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
 		//collisionGraph[currentVertex].outcome = simResult::successful;
-		explorer(startVertex, collisionGraph, currentTask, world, bestLeaf);
+		explorer(startVertex, collisionGraph, currentTask, world, startVertex);
 		planVertices= planner(collisionGraph, bestLeaf);
 		boost::remove_edge(startVertex, currentVertex, collisionGraph);
 		///currentTask.change=1;
