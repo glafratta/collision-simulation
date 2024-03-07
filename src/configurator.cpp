@@ -317,7 +317,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			else{
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
-				if (!edgeExists(v0, v1, g) & !(v0==v1)){
+				if (!(v0==v1)){
 					edgeDescriptor e= (boost::add_edge(v0, v1, g)).first;
 					g[e].direction=t.direction;
 				}
@@ -874,11 +874,12 @@ std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescr
 }
 
 void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Task* t, float& step){
-	if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0){
+	if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 		return;
 	}
-	vertexDescriptor src= boost::in_edges(v, g).first.dereference().m_source;
-	if(src==currentVertex){
+	edgeDescriptor e= boost::in_edges(v, g).first.dereference();
+	vertexDescriptor src= e.m_source;
+	if(src==u_long(0) & g[e].direction==currentTask.direction){
 	int stepsTraversed= t->motorStep- collisionGraph[src].step;
 		if (t->getAction().getOmega()!=0){
 			float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
