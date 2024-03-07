@@ -29,7 +29,7 @@ void State::set(State tmp){
 	disturbance = tmp.disturbance;
 	endPose = tmp.endPose;
 	outcome = tmp.outcome;
-	step = std::floor(tmp.step/(HZ*MOTOR_CALLBACK)+0.5);
+	step = tmp.step;
 	options = tmp.options;
 	//nObs++;
 }

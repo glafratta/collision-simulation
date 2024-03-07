@@ -59,11 +59,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
 	currentTask.action.setRecOmega(deltaPose.q.GetAngle());
 
-	//MAKE NOTE OF WHAT STATE WE'RE IN BEFORE RECHECKING FOR COLLISIONS
-	//bool wasAvoiding = currentTask.disturbance.isValid();
-	//bool isSameTask = 1;
-	//UPDATE ABSOLUTE POSITION (SLAM-ISH for checking accuracy of velocity measurements)
-
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
 	if (controlGoal.change){
@@ -74,23 +69,21 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	//isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	simResult result;
-	//collisionGraph.clear();
-	//creating decision tree Disturbance
-	//vertexDescriptor v0 = boost::add_vertex(collisionGraph);
-	std::vector <vertexDescriptor> leaves;
 	Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	vertexDescriptor bestLeaf = currentVertex;
-	//std::vector<vertexDescriptor> planError= checkPlan(world, planVertices,collisionGraph);
 	if (planning){ //|| !planError.m_vertices.empty())
-		currentTask.change=1;
+		if (currentVertex==0){
+			currentTask.change=1;
+			collisionGraph[currentVertex].filled =1;
+			currentTask.action.L=0;
+			currentTask.action.R=0;
+		}
 		//printf("executing = %i", executing);
-		collisionGraph[currentVertex].filled =1;
-		collisionGraph[currentVertex].nObs++;
-		collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
-		collisionGraph[currentVertex].outcome = simResult::successful;
-		currentTask.direction=STOP;
+		//collisionGraph[currentVertex].nObs++;
+		//collisionGraph[currentVertex].disturbance = controlGoal.disturbance;
+		//collisionGraph[currentVertex].outcome = simResult::successful;
 		explorer(currentVertex, collisionGraph, currentTask, world, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
 		currentTask.change=1;

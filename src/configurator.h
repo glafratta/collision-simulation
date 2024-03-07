@@ -77,6 +77,8 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	//totalTime =0.0f;
 	ogGoal=controlGoal.disturbance.pose;
 	currentVertex = boost::add_vertex(collisionGraph);
+	collisionGraph[currentVertex].filled=1;
+	collisionGraph[currentVertex].change=1;
 }
 
 void setBenchmarking(bool b){
