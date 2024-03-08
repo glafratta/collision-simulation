@@ -354,12 +354,14 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, vertexD
 	// }
 	//while (g[e].direction ==DEFAULT){
 	while (ep.second& g[ep.first].direction==DEFAULT){
+		if (ep.first.m_target!=v){
 			g[ep.first.m_target].disturbance = dist;
 			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
-			std::pair <bool, vertexDescriptor> match= findExactMatch(e.m_target, g);
+			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
 			if ( match.first){
 				deletion.push_back(ep.first);
 			}
+		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
 			if (!ep.second){
 				return deletion;
