@@ -324,7 +324,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 				//if there is no e
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			std::vector<vertexDescriptor> toPrune =propagateD(v1, v, g);
+			std::vector<vertexDescriptor> toPrune =propagateD(v1, v, g); //og v1 v0
 			v0=v1;
 			pruneTarget(toPrune, g);
 			//check if states need to be pruned retroactively
@@ -353,7 +353,10 @@ std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, verte
 	// 	return deletion;
 	// }
 	//while (g[e].direction ==DEFAULT){
-	while (ep.second& g[ep.first].direction==DEFAULT){
+	while (ep.second){
+		if(g[ep.first].direction!=DEFAULT){
+			break;
+		}
 		if (ep.first.m_target!=v){
 			g[ep.first.m_target].disturbance = dist;
 			src=ep.first.m_target;
