@@ -140,9 +140,9 @@ simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRA
 
 //void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
 
-std::vector<edgeDescriptor> propagateD(vertexDescriptor, vertexDescriptor, CollisionGraph&);
+std::vector<vertexDescriptor> propagateD(vertexDescriptor, vertexDescriptor, CollisionGraph&);
 
-void pruneTarget(std::vector<edgeDescriptor>, CollisionGraph&);
+void pruneTarget(std::vector<vertexDescriptor>, CollisionGraph&);
 
 void updateGraph(CollisionGraph&);
 
