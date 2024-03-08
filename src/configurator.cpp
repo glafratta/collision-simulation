@@ -338,46 +338,51 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, CollisionGraph&g){
+std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, vertexDescriptor src, CollisionGraph&g){
 	std::vector<edgeDescriptor> deletion;
 	if (g[v].outcome == simResult::successful ){
 		return deletion;
 	}
-	edgeDescriptor e;
+	std::pair <edgeDescriptor, bool> ep= boost::edge(src, v, g);
+	//edgeDescriptor e = ep.first;
 	Disturbance dist = g[v].disturbance;
-	if(boost::in_degree(v,g)>0){
-			e= *(boost::in_edges(v, g).first);
-			e= *(boost::in_edges(e.m_source, g).first);
-		}
-	else{
-		return deletion;
-	}
-	while (g[e].direction ==DEFAULT){
-			g[e.m_target].disturbance = dist;
+	// if(ep.second){
+	// 		e= *(boost::in_edges(e.m_source, g).first);
+	// 	}
+	// else{
+	// 	return deletion;
+	// }
+	//while (g[e].direction ==DEFAULT){
+	while (ep.second& g[ep.first].direction==DEFAULT){
+			g[ep.first.m_target].disturbance = dist;
 			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
 			std::pair <bool, vertexDescriptor> match= findExactMatch(e.m_target, g);
 			if ( match.first){
-				deletion.push_back(e);
+				deletion.push_back(ep.first);
 			}
-			v=e.m_source;
-
-		if(boost::in_degree(v,g)>0){
-			bool assigned=0;
-			for (auto ei =boost::in_edges(v, g).first; ei!=boost::in_edges(v, g).second; ei++){
-				if (g[*ei].direction == DEFAULT )
-				{
-					e= *ei;
-					assigned=1;
-				}
+			ep.second= boost::in_degree(ep.first.m_source, g)>0;
+			if (!ep.second){
+				return deletion;
 			}
-			if (!assigned){
-				break;
-			}
-		}
-		else{
-			break;
-		}
+			ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	}
+		// if(boost::in_degree(v,g)>0){
+		// 	bool assigned=0;
+		// 	for (auto ei =boost::in_edges(v, g).first; ei!=boost::in_edges(v, g).second; ei++){
+		// 		if (g[*ei].direction == DEFAULT )
+		// 		{
+		// 			e= *ei;
+		// 			assigned=1;
+		// 		}
+		// 	}
+		// 	if (!assigned){
+		// 		break;
+		// 	}
+		// }
+		// else{
+		// 	break;
+		// }
+	
 	return deletion;
 }
 
