@@ -326,7 +326,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1, v0, g); //og v1 v0
 			v0=v1;
-			pruneTarget(toPrune, g, v)
+			pruneTarget(toPrune, g, v);
 			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			//float phi = er.evaluationFunction();
@@ -403,9 +403,11 @@ bool Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 			g[pair.second].options= g[pair.first].options;
 			breaksignal=1;
 		}
+		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0];
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		boost::remove_vertex(pair.first, g);
+		adjustProbability(g, e);
 	}
 	return breaksignal;
 }
