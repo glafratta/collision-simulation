@@ -363,7 +363,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
 			if ( match.first){
-			 	deletion.push_back(std::pair<ep.first.m_target, match.second>);
+			 	deletion.push_back(std::pair<vertexDescriptor, vertexDescriptor>(ep.first.m_target, match.second));
 				// if(ep.first.m_target==src){
 				// 	src=match.second;
 				// }
