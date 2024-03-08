@@ -324,9 +324,9 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 				//if there is no e
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			std::vector<vertexDescriptor> toPrune =propagateD(v1, v, g); //og v1 v0
+			sstd::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1, v0, g); //og v1 v0
 			v0=v1;
-			pruneTarget(toPrune, g);
+			pruneTarget(toPrune, g, v);
 			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			//float phi = er.evaluationFunction();
@@ -338,8 +338,8 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, vertexDescriptor& src, CollisionGraph&g){
-	std::vector<vertexDescriptor> deletion;
+std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, vertexDescriptor src, CollisionGraph&g){
+	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v].outcome == simResult::successful ){
 		return deletion;
 	}
@@ -359,14 +359,14 @@ std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, verte
 		}
 		if (ep.first.m_target!=v){
 			g[ep.first.m_target].disturbance = dist;
-			src=ep.first.m_target;
+			//src=ep.first.m_target;
 			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
 			if ( match.first){
-			 	deletion.push_back(ep.first.m_target);
-				if(ep.first.m_target==src){
-					src=match.second;
-				}
+			 	deletion.push_back(std::pair<ep.first.m_target, match.second>);
+				// if(ep.first.m_target==src){
+				// 	src=match.second;
+				// }
 			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
@@ -395,12 +395,18 @@ std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, verte
 	return deletion;
 }
 
-void Configurator::pruneTarget(std::vector<vertexDescriptor> vertices, CollisionGraph&g){
-	for (vertexDescriptor v:vertices){
-		boost::clear_in_edges(v, g);
-		boost::clear_out_edges(v, g);
-		boost::remove_vertex(v, g);
+bool Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src){
+	bool breaksignal=0;
+	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
+		boost::clear_in_edges(pair.first, g);
+		boost::clear_out_edges(pair.first, g);
+		boost::remove_vertex(pair.first, g);
+		if (pair.first==v){
+			v=pair.second;
+			breaksignal=1;
+		}
 	}
+	return breaksignal;
 }
 
 bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, CollisionGraph& g){
