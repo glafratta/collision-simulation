@@ -391,6 +391,7 @@ std::vector<edgeDescriptor> Configurator::propagateD(vertexDescriptor v, vertexD
 void Configurator::pruneTarget(std::vector<edgeDescriptor> edges, CollisionGraph&g){
 	for (edgeDescriptor e:edges){
 		boost::remove_vertex(e.m_target, g);
+		boost::remove_edge(e, g);
 	}
 }
 
