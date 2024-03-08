@@ -92,7 +92,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		planVertices= planner(collisionGraph, bestLeaf);
 		//boost::remove_edge(startVertex, currentVertex, collisionGraph);
 		///currentTask.change=1;
-		boost::clear_out_edges(startVertex, g);
 	}
 	else if (!planning){
 		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world, simulationStep);
@@ -467,7 +466,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 		leaf = src; //go back
 		}
 	}
-	vertices.insert(vertices.begin(), root);
+	//vertices.insert(vertices.begin(), root);
 	return vertices;
 }
 
@@ -1130,6 +1129,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 	}
 	if (planning){
 		if (planVertices.empty()){
+			currentVertex=0;
 			//currentTask = controlGoal;
 			return;
 		}
@@ -1137,6 +1137,9 @@ void Configurator::changeTask(bool b, int &ogStep){
 		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
 		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = collisionGraph[currentVertex].step;
+		if (currentVertex!=0){
+			boost::clear_out_edges(0, collisionGraph);
+		}
 		//planVertices.erase(planVertices.begin());
 		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
