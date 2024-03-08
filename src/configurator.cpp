@@ -338,7 +338,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-std::vector<vertexDescriptor> Configurator::propagateD(vertexDescriptor v, vertexDescriptor src, CollisionGraph&g){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v, vertexDescriptor src, CollisionGraph&g){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v].outcome == simResult::successful ){
 		return deletion;
