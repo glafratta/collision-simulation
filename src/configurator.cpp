@@ -83,7 +83,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		if (startVertex !=currentVertex){
 			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, collisionGraph).first;
-			collisionGraph[e].direction=t.direction;
+			collisionGraph[e].direction=currentTask.direction;
 		}
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
