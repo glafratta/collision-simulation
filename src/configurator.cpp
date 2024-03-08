@@ -83,15 +83,16 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		if (startVertex !=currentVertex){
 			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, collisionGraph).first;
-			collisionGraph[e].direction=DEFAULT;
+			collisionGraph[e].direction=t.direction;
 		}
 		//printf("executing = %i", executing);
 		//collisionGraph[currentVertex].nObs++;
 		//collisionGraph[currentVertex].outcome = simResult::successful;
 		explorer(startVertex, collisionGraph, currentTask, world, bestLeaf);
 		planVertices= planner(collisionGraph, bestLeaf);
-		boost::remove_edge(startVertex, currentVertex, collisionGraph);
+		//boost::remove_edge(startVertex, currentVertex, collisionGraph);
 		///currentTask.change=1;
+		boost::clear_out_edges(startVertex, g);
 	}
 	else if (!planning){
 		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world, simulationStep);
