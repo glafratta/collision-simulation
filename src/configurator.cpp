@@ -824,9 +824,9 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 		}
 	}
 	//adjust
-	if (sameTask.size()==1){
-		return;
-	}
+	// if (sameTask.size()==1){
+	// 	return;
+	// }
 	for (edgeDescriptor ed: sameTask){
 		g[ed].probability=g[ed.m_target].nObs/totObs;
 	}
