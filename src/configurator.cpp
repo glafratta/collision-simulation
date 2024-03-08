@@ -401,8 +401,8 @@ bool Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		boost::remove_vertex(pair.first, g);
-		if (pair.first==v){
-			v=pair.second;
+		if (pair.first==src){
+			src=pair.second;
 			breaksignal=1;
 		}
 	}
