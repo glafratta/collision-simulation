@@ -146,7 +146,10 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 
 DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy
 		DeltaPose result;
-		float theta;
+		float theta=0;
+		if (iteration==1){
+			return result;
+		}
 	 	theta = currentTask.getAction().getOmega()* timeElapsed;
 		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
 		result.q.Set(currentTask.getAction().getOmega());
