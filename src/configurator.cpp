@@ -898,28 +898,42 @@ std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescr
 	return result;
 }
 
-void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Task* t, float& step){
+std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDescriptor> ev, CollisionGraph& g){
+	std::pair <edgeDescriptor, bool> result;
+	if (ev.empty()){
+		result.second=false;
+		return result;
+	}
+	result.first = ev[0];
+	result.second=true;
+	for (edgeDescriptor e :ev){
+		if (g[e].probability>g[result.first].probability){
+			result.first =e;
+		}
+	}
+	return result;
+}
+
+
+
+void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, float& step){
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
-	std::pair <edgeDescriptor, bool> ep= boost::edge(src, v, g);
-	if (!ep.second){
+	edgeDescriptor ep= boost::edge(v, currentVertex, g);
+	if(!ep.second){
 		return;
 	}
 	edgeDescriptor e= ep.first;
-	if(src!=u_long(0) || g[e.first].direction!=currentTask.direction){
-		return;
-	}
-	vertexDescriptor src= e.m_source;
-	int stepsTraversed= t->motorStep- collisionGraph[src].step;
-	if (t->getAction().getOmega()!=0){
-		float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
+	int stepsTraversed= currentTask.motorStep- collisionGraph[currentVertex].step;
+	if (currentTask.getAction().getOmega()!=0){
+		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
-		t->setEndCriteria(Angle(remainingAngle));
+		currentTask.setEndCriteria(Angle(remainingAngle));
 	}
-	if(t->getAction().getLinearSpeed()!=0){
-		step= t->motorStep*t->action.getLinearSpeed();
-	}
+	if(currentTask.getAction().getLinearSpeed()>0){
+		step-= (stepsTraversed*MOTOR_CALLBACK)*currentTask.action.getLinearSpeed();
+	}			// -estimated distance covered
 
 }
 

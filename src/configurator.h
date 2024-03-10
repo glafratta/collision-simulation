@@ -146,7 +146,7 @@ bool pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Col
 
 void updateGraph(CollisionGraph&);
 
-void adjustStep(vertexDescriptor, CollisionGraph &, Task*, float&);
+void adjustStep(vertexDescriptor, CollisionGraph &, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, CollisionGraph&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
@@ -155,6 +155,8 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, CollisionGraph&,
 std::vector <edgeDescriptor> outEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
 std::vector <edgeDescriptor> inEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
+
+std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, CollisionGraph&);
 
 std::pair <bool, vertexDescriptor> findExactMatch(State, CollisionGraph&);
 
