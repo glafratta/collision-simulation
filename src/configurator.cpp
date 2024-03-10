@@ -156,10 +156,14 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		std::vector <cv::Point2f> currentTmp, previousTmp;
 		//MAKE OPENCV VECTORS
 		for (Point p:_current){
-			currentTmp.push_back(cv::Point2f(p.x, p.y));
+			if (p.r<.5){
+				currentTmp.push_back(cv::Point2f(p.x, p.y));
+			}
 		}
 		for (Point p: _previous){
-			previousTmp.push_back(cv::Point2f(p.x, p.y));
+			if (p.r<.5){
+				previousTmp.push_back(cv::Point2f(p.x, p.y));
+			}
 		}
 
 		if(diff>0){
