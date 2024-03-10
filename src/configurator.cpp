@@ -920,7 +920,7 @@ void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, float& step
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
-	edgeDescriptor ep= boost::edge(v, currentVertex, g);
+	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 	if(!ep.second){
 		return;
 	}
