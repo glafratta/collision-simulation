@@ -899,22 +899,28 @@ std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescr
 }
 
 void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Task* t, float& step){
-	if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
+	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
+	// 	return;
+	// }
+	std::pair <edgeDescriptor, bool> ep= boost::edge(src, v, g);
+	if (!ep.second){
 		return;
 	}
-	edgeDescriptor e= boost::in_edges(v, g).first.dereference();
-	vertexDescriptor src= e.m_source;
-	if(src==u_long(0) & g[e].direction==currentTask.direction){
-	int stepsTraversed= t->motorStep- collisionGraph[src].step;
-		if (t->getAction().getOmega()!=0){
-			float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
-			//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
-			t->setEndCriteria(Angle(remainingAngle));
-		}
-		else{
-			step= t->motorStep*t->action.getLinearSpeed();
-		}
+	edgeDescriptor e= ep.first;
+	if(src!=u_long(0) || g[e.first].direction!=currentTask.direction){
+		return;
 	}
+	vertexDescriptor src= e.m_source;
+	int stepsTraversed= t->motorStep- collisionGraph[src].step;
+	if (t->getAction().getOmega()!=0){
+		float remainingAngle = t->endCriteria.angle.get()-abs(stepsTraversed*t->action.getOmega());
+		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
+		t->setEndCriteria(Angle(remainingAngle));
+	}
+	if(t->getAction().getLinearSpeed()!=0){
+		step= t->motorStep*t->action.getLinearSpeed();
+	}
+
 }
 
 std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, CollisionGraph& g, Direction d){
