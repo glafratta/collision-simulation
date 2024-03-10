@@ -1137,10 +1137,10 @@ void Configurator::changeTask(bool b, int &ogStep){
 		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
 		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = collisionGraph[currentVertex].step;
-		if (currentVertex!=0){
-			boost::clear_out_edges(0, collisionGraph);
-		}
-		//planVertices.erase(planVertices.begin());
+		// if (currentVertex!=0){
+		// 	boost::clear_out_edges(0, collisionGraph);
+		// }
+		// //planVertices.erase(planVertices.begin());
 		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
