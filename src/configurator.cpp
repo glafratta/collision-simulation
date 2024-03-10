@@ -1134,7 +1134,12 @@ void Configurator::changeTask(bool b, int &ogStep){
 			return;
 		}
 		currentVertex= planVertices[0];
-		edgeDescriptor e= boost::edge(currentVertex, 0, g);
+		std::pair<edgeDescriptor, bool> ep=boost::edge(0, currentVertex, collisionGraph);
+		if (!ep.second){
+			throw std::invalid_argument("no plan was formed");
+			return;
+		}
+		edgeDescriptor e= ep.first;
 		boost::clear_out_edges(0, collisionGraph);
 		planVertices.erase(planVertices.begin());
 		currentTask = Task(collisionGraph[e.m_source].disturbance, g[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
