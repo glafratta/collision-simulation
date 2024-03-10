@@ -151,7 +151,6 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
 		result.q.Set(currentTask.getAction().getOmega());
 
-		int diff = _current.size()-_previous.size(); //if +ve,current is bigger, if -ve, previous is bigger
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
 		std::vector <cv::Point2f> currentTmp, previousTmp;
 		//MAKE OPENCV VECTORS
@@ -165,6 +164,7 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
 				previousTmp.push_back(cv::Point2f(p.x, p.y));
 			}
 		}
+		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
 
 		if(diff>0){
 			if (previousTmp.empty()){
