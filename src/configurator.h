@@ -146,7 +146,7 @@ bool pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Col
 
 void updateGraph(CollisionGraph&);
 
-void adjustStep(vertexDescriptor, CollisionGraph &, float&);
+void adjustStep(vertexDescriptor, CollisionGraph &, Direction, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, CollisionGraph&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 

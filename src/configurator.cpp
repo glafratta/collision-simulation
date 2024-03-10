@@ -304,7 +304,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			changeStart(start, v0, g);
 			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
-			adjustStep(v0, g, _simulationStep);
+			adjustStep(v0, g, t.direction, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
@@ -916,7 +916,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 
-void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, float& step){
+void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Direction d, float& step){
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
@@ -925,6 +925,9 @@ void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, float& step
 		return;
 	}
 	edgeDescriptor e= ep.first;
+	if (g[e].direction!=d){
+		return;
+	}
 	int stepsTraversed= currentTask.motorStep- collisionGraph[currentVertex].step;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
@@ -1050,6 +1053,7 @@ void Configurator::trackTaskExecution(Task & t){
 		if(t.motorStep==0){
 			t.change=1;
 		}
+	updateGraph(collisionGraph);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
