@@ -1121,12 +1121,12 @@ void Configurator::changeTask(bool b, int &ogStep){
 		//printf("do not change\n");
 		return;
 	}
-	if (!planVertices.empty()){
-		if (planVertices.size()==1){
-			running=0;
-		}
-		planVertices.erase(planVertices.begin());
-	}
+	// if (!planVertices.empty()){
+	// 	// if (planVertices.size()==1){
+	// 	// 	running=0;
+	// 	// }
+	// 	planVertices.erase(planVertices.begin());
+	// }
 	if (planning){
 		if (planVertices.empty()){
 			currentVertex=0;
@@ -1134,6 +1134,8 @@ void Configurator::changeTask(bool b, int &ogStep){
 			return;
 		}
 		currentVertex= planVertices[0];
+		Direction d= g[boost::edge(currentVertex, 0, g)].direction;
+		planVertices.erase(planVertices.begin());
 		edgeDescriptor e = boost::in_edges(currentVertex, collisionGraph).first.dereference();
 		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = collisionGraph[currentVertex].step;
