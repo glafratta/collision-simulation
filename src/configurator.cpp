@@ -304,7 +304,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			changeStart(start, v0, g);
 			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
-			adjustStep(v0, g, &t, _simulationStep);
+			adjustStep(v0, g, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
