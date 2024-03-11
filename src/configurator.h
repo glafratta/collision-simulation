@@ -1,19 +1,13 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
-#include "opencv2/opencv.hpp"
-//#include "box2d/box2d.h"
-//#include "robot.h"
 #include <dirent.h>
 #include <vector>
 #include <thread>
 #include <filesystem>
-//#include <cmath>
-//#include <unistd.h>
 #include <ncurses.h>
 #include <fstream>
-//#include "task.h"
-//#include "general.h" //general functions + point class + typedefs + Primitive.h + boost includes
 #include "worldbuilder.h"
+#include "sensor.h"
 #include <algorithm>
 #include <sys/stat.h>
 

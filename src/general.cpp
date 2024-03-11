@@ -106,8 +106,30 @@ bool operator==(Transform const &t1, Transform const& t2){
 	return (t1.p.x == t2.p.x) && (t1.p.y == t2.p.y) && (t1.q.GetAngle() == t2.q.GetAngle());
 }
 
+
+// Point Point::operator+(const Point&p){
+// 	Point result;
+// 	result.x = x + p.x;
+// 	result.y = y+ p.y;
+// 	result.phi = phi +p.phi;
+// 	result.r = r+p.r;
+// 	return result;
+// }
+
+// Point Point::operator!=(Point &p){
+// 	if (*this == p){
+// 		return false;
+// 	}
+// 	else if (!(*this ==p)){
+// 		return true;
+// 	}
+// }
+
+
+
+
 bool operator<(P const & p1, P const &p2){
-	return std::tie(p1.phi, p1.r)< std::tie(p2.phi, p2.r);
+	return std::tie(angle(p1), length(p1))< std::tie(angle(p2), length(p2));
 }
 
 bool operator>(P const &p1, P const & p2){
@@ -115,9 +137,16 @@ bool operator>(P const &p1, P const & p2){
 
 }
 
-bool operator==(P const &p1, P const & p2){
-	return (p1.x == p2.x && p1.y == p2.y);
-}
+// bool operator==(P const &p1, P const & p2){
+// 	return (p1.x == p2.x && p1.y == p2.y);
+// }
+
+// P operator+(P const& p1, P const& p2 ){
+// 	P result;
+// 	result.x=p1.x+p2.x;
+// 	result.y=p1.y+p1.y;
+// 	return result.
+// }
 
 void operator-=(Transform & t1, Transform const&t2){
 	t1.p.x-=t2.p.x;

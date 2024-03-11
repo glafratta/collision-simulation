@@ -157,13 +157,13 @@ DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, Coordinat
         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
 		std::vector <cv::Point2f> currentTmp, previousTmp;
 		//MAKE OPENCV VECTORS
-		for (Point p:_current){
-			if (p.r<.25){
+		for (cv::Point2f p:_current){
+			if (length(p)<.25){
 				currentTmp.push_back(cv::Point2f(p.x, p.y));
 			}
 		}
-		for (Point p: _previous){
-			if (p.r<.25){
+		for (cv::Point2f p: _previous){
+			if (length(p)<.25){
 				previousTmp.push_back(cv::Point2f(p.x, p.y));
 			}
 		}
@@ -784,28 +784,28 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 // 	return result;
 // }
 
-std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
-	int count=0;
-	float sumY=0, sumX=0;
-	float avgY=0, avgX=0;
-	std::pair <bool, float>result(false, 0);
-	for (Point p:current){
-		if (p.isInRadius(v, radius)){
-			auto pIt =current.find(p);
-			CoordinateContainer::iterator pItNext = pIt++;
-			float deltaY =pItNext->y- pIt->y;
-			float deltaX = pItNext->x - pIt->x;
-				result.first=true; //is there a neighbouring point?
-				count++;
-				sumY+=deltaY;
-				sumX+=deltaX;
-				avgY = sumY/count;
-				avgX = sumX/count;
-		}
-	}
-	result.second=atan(avgY/avgX);
-	return result;
-}
+// std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
+// 	int count=0;
+// 	float sumY=0, sumX=0;
+// 	float avgY=0, avgX=0;
+// 	std::pair <bool, float>result(false, 0);
+// 	for (cv::Point2f p:current){
+// 		if (p.isInRadius(v, radius)){
+// 			auto pIt =current.find(p);
+// 			CoordinateContainer::iterator pItNext = pIt++;
+// 			float deltaY =pItNext->y- pIt->y;
+// 			float deltaX = pItNext->x - pIt->x;
+// 				result.first=true; //is there a neighbouring point?
+// 				count++;
+// 				sumY+=deltaY;
+// 				sumX+=deltaX;
+// 				avgY = sumY/count;
+// 				avgX = sumX/count;
+// 		}
+// 	}
+// 	result.second=atan(avgY/avgX);
+// 	return result;
+// }
 
 
 // void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){

@@ -9,6 +9,7 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include </usr/include/boost/container/map.hpp>
+#include "opencv2/opencv.hpp"
 #include <cmath>
 #include "disturbance.h"
 
@@ -113,102 +114,101 @@ struct StateMatcher{
 
 };
 
-struct Point{
-	private:
-	bool valid=0;
-	public:
-	float x=0;
-	float y=0;
-	float r=0;
-	float phi=0;
+// struct Point: cv::Point2f{
+// 	public:
+// 	float r=0;
+// 	float phi=0;
 
-	Point(){}
+// 	Point(){}
 
-	Point(float _x, float _y): x(_x), y(_y){
-		r= sqrt(x*x+y*y);
-		phi = atan2(y,x);;
-	}
+// 	Point(float _x, float _y): x(_x), y(_y){
+// 		r= sqrt(x*x+y*y);
+// 		phi = atan2(y,x);;
+// 	}
 
-	Point(b2Vec2 v): x(v.x), y(v.y){
-		r= sqrt(x*x+y*y);
-		phi = atan2(y,x);
-	}
+// 	Point(b2Vec2 v): x(v.x), y(v.y){
+// 		r= sqrt(x*x+y*y);
+// 		phi = atan2(y,x);
+// 	}
 
-	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){
-	}
+// 	Point(float _x, float _y, float _r, float _phi): x(_x), y(_y), r(_r), phi(_phi){
+// 	}
 
-	void operator=(const Point &p){
-		x = p.x;
-		y= p.y;
-		r= p.r;
-		phi = p.phi;
-	}
+// 	void operator=(const Point &p){
+// 		x = p.x;
+// 		y= p.y;
+// 		r= p.r;
+// 		phi = p.phi;
+// 	}
 
-	bool operator==(Point &p){
-		return (x == p.x && y == p.y);
-	}
+// 	bool operator==(Point &p){
+// 		return (x == p.x && y == p.y);
+// 	}
 
-	bool operator!=(Point &p){
-		if (*this == p){
-			return false;
-		}
-		else if (!(*this ==p)){
-			return true;
-		}
-	}
+// 	bool operator!=(Point &);
 
-	Point operator+(const Point &p){
-		Point result;
-		result.x = x + p.x;
-		result.y = y+ p.y;
-		result.phi = phi +p.phi;
-		result.r = r+p.r;
-		return result;
-	}
+// 	Point operator+(const Point);
 
+// 	// bool isInRadius(b2Vec2 center, float radius = 0.05){ //check if this point is within a certain radius from another given point (center)
+// 	// 	bool result = false;
+// 	// 	if (center.IsValid() & this->getb2Vec2().IsValid()){
+// 	// 		std::pair <float, float> xBounds(center.x+radius, center.x-radius);
+// 	// 		std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
+// 	// 		float xLow = std::min(xBounds.first, xBounds.second);
+// 	// 		float xHigh = std::max(xBounds.first, xBounds.second);
+// 	// 		float yLow = std::min(yBounds.first, yBounds.second);
+// 	// 		float yHigh = std::max(yBounds.first, yBounds.second);
+// 	// 		result = this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
+// 	// 	}
+// 	// 	return result;
+// 	// }
 
-	bool isInRadius(b2Vec2 center, float radius = 0.05){ //check if this point is within a certain radius from another given point (center)
-		bool result = false;
-		if (center.IsValid() & this->getb2Vec2().IsValid()){
-			std::pair <float, float> xBounds(center.x+radius, center.x-radius);
-			std::pair <float, float> yBounds(center.y+radius, center.y-radius);		
-			float xLow = std::min(xBounds.first, xBounds.second);
-			float xHigh = std::max(xBounds.first, xBounds.second);
-			float yLow = std::min(yBounds.first, yBounds.second);
-			float yHigh = std::max(yBounds.first, yBounds.second);
-			result = this->x <= xHigh && this->x >=xLow-radius && this->y <= yHigh && this->y >=yLow;
-		}
-		return result;
-	}
+// 	b2Vec2 getb2Vec2(){
+// 		return b2Vec2(x,y);
+// 	}
 
-	b2Vec2 getb2Vec2(){
-		return b2Vec2(x,y);
-	}
-
-	void polarInit(float radius, float angle){
-		r= radius;
-		phi = angle;
-		x = radius *cos(angle);
-		y = radius *sin(angle);
-	}
+// 	// void polarInit(float radius, float angle){
+// 	// 	r= radius;
+// 	// 	phi = angle;
+// 	// 	x = radius *cos(angle);
+// 	// 	y = radius *sin(angle);
+// 	// }
 
 
-};
+// };
 
 struct comparator{
-    bool operator() ( Point a, Point b ){ //
+    bool operator() ( cv::Point2f a, cv::Point2f b ){ //
         return a.y <=b.y;
 	}
 }; 
 
-typedef Point P;
+typedef cv::Point2f P;
 bool operator<(P const &, P const &);
 
 bool operator>(P const &, P const &);
 
-bool operator==(P const &, P const &);
+float length(cv::Point2f p){
+	return sqrt(pow(p.x,2)+ pow(p.y, 2));
+}
 
-typedef std::set<Point> CoordinateContainer;
+float angle(cv::Point2f p){
+	return atan2(p.y, p.x);
+}
+
+b2Vec2 getb2Vec2(cv::Point2f p){
+	return b2Vec2(p.x,p.y);
+
+}
+
+// bool operator==(P const &, P const &);
+
+// bool operator!=(P const&, P const&);
+
+
+
+
+typedef std::set<cv::Point2f> CoordinateContainer;
 
 typedef std::pair <bool, int> Quadrant; //a .2x.2 box used to check whether general area has been visited
 

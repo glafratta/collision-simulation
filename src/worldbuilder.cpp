@@ -9,7 +9,7 @@ std::pair<Point, Point> WorldBuilder::bounds(Direction d, b2Transform start, flo
         result.first =Point(start.p.x+boxLength, start.p.y+boxLength);
     }
     else{
-        Point positionVector, radiusVector, maxFromStart, top, bottom; 
+        cv::Point2f positionVector, radiusVector, maxFromStart, top, bottom; 
         std::vector <Point> bounds;
         radiusVector.polarInit(boxLength, start.q.GetAngle());
         maxFromStart = Point(start.p) + radiusVector;
@@ -77,7 +77,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         qTopH = bt.second.y - mHead*bt.second.x;
         qBottomP = bt.first.y -mPerp*bt.first.x;
         qTopP = bt.second.y - mPerp*bt.second.x;
-        for (Point p: current){
+        for (cv::Point2f p: current){
             ceilingY = mHead*p.x +qTopH;
 			floorY = mHead*p.x+qBottomH;
 			float frontY= mPerp*p.x+qBottomP;
@@ -96,7 +96,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         floorY = std::min(bt.second.y, bt.first.y); 
         frontX = std::min(bt.second.x, bt.first.x);
         backX = std::max(bt.second.x, bt.first.x);
-        for (Point p: current){
+        for (cv::Point2f p: current){
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
             }
@@ -134,10 +134,14 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-bool WorldBuilder::checkDisturbance(Point p, bool& obStillThere, Task * curr){
+bool WorldBuilder::checkDisturbance(cv::Point2f p, bool& obStillThere, Task * curr, float range){
     bool result=0;
 	if (NULL!=curr){ //
-		if (p.isInRadius(curr->disturbance.getPosition())){
+        if (!curr->disturbance.isValid()){
+            return result;
+        }
+        cv::Rect rect(curr->disturbance.pose.x-range, curr->disturbance.pose+range, range*2, range*2);
+		if (p.inside(rect)){
 			obStillThere =1;
             result =1;
 		}
@@ -147,7 +151,7 @@ bool WorldBuilder::checkDisturbance(Point p, bool& obStillThere, Task * curr){
 
 b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     b2Vec2 result(0,0), centroid(0,0);
-    for (Point p: c){
+    for (cv::Point2f p: c){
        centroid.x+=p.x;
        centroid.y +=p.y; 
     }
