@@ -936,9 +936,10 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Collisi
 	std::pair <bool, vertexDescriptor> result(false, CollisionGraph::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
-		if (matcher.isPerfectMatch(g[*vi], s)){
+		vertexDescriptor v=*vi;
+		if (matcher.isPerfectMatch(g[v], s)){
 			result.first=true;
-			result.second=*vi;
+			result.second=v;
 			break;
 		}
 

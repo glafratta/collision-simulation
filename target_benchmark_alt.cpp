@@ -13,7 +13,7 @@
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
-	buildType =2;
+	//buildType =2;
     std::vector <BodyFeatures> result;
     for (Point p: points){
         if (count%2==0){
