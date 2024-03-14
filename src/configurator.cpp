@@ -351,7 +351,8 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 			if ( match.first){
 			 	deletion.push_back(std::pair<vertexDescriptor, vertexDescriptor>(ep.first.m_target, match.second));
 				if (match.second==v){
-					v=ep.first.m_target;
+					deletion[-1].first=match.second;
+					deletion[-1].second=ep.first.m_target;
 				}
 			}
 		}
@@ -366,16 +367,17 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 
 void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq){
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
-		// if (pair.first==src){
-		// 	src=pair.second;
-		// 	g[pair.second].options= g[pair.first].options;
-		// }
-		edgeDescriptor e = inEdges(g, pair.first, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		boost::clear_in_edges(pair.second, g);
-		boost::clear_out_edges(pair.second, g);
-		boost::remove_vertex(pair.second, g);
+		if (pair.first==src){
+			src=pair.second;
+			g[pair.second].options= g[pair.first].options;
+		}
+		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
+		g[pair.second].set(g[pair.first]);
+		boost::clear_in_edges(pair.first, g);
+		boost::clear_out_edges(pair.first, g);
+		boost::remove_vertex(pair.first, g);
 		for (auto i=pq.begin(); i!=pq.end(); i++){ //REMOVE FROM PQ
-			if((*i).first==pair.second){
+			if((*i).first==pair.first){
 				pq.erase(i);
 			}
 		}

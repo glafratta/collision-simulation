@@ -23,7 +23,7 @@ simResult State::getSimResult(){
 }
 
 void State::set(State tmp){
-	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID){
+	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
 		totDs++;
 	}
 	disturbance = tmp.disturbance;
@@ -85,11 +85,6 @@ std::pair<bool, vertexDescriptor> StateMatcher::isPerfectMatch(CollisionGraph g,
     return result;
 }
 
-// void StateMatcher::match(State tmp, State& state){
-// 	int nObs = state.nObs;
-// 	state=tmp;
-// 	state.nObs= nObs+1;
-// }
 
 void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
 	for (int i=0; i<weights.size();i++){
