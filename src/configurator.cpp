@@ -366,10 +366,10 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 
 void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq){
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
-		if (pair.first==src){
-			src=pair.second;
-			g[pair.second].options= g[pair.first].options;
-		}
+		// if (pair.first==src){
+		// 	src=pair.second;
+		// 	g[pair.second].options= g[pair.first].options;
+		// }
 		edgeDescriptor e = inEdges(g, pair.first, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		boost::clear_in_edges(pair.second, g);
 		boost::clear_out_edges(pair.second, g);
