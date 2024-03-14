@@ -334,7 +334,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v, vertexDescriptor src, CollisionGraph&g){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor& v, vertexDescriptor src, CollisionGraph&g){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v].outcome == simResult::successful ){
 		return deletion;
@@ -350,6 +350,9 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
 			if ( match.first){
 			 	deletion.push_back(std::pair<vertexDescriptor, vertexDescriptor>(ep.first.m_target, match.second));
+				if (match.second==v){
+					v=ep.first.m_target;
+				}
 			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
