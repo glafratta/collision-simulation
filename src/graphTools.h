@@ -3,29 +3,17 @@
 #include <set>
 //#include "opencv2/opencv.hpp"
 #include "opencv2/core.hpp"
-//#include <opencv2/imgproc/imgproc.hpp> //estimateAffine
 #include "opencv2/calib3d.hpp" //LMEDS
 #include <vector>
-//#include <map>
-//#include <compare>
-//#include <unordered_set>
 #include <utility>                   // for std::pair
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-//#include </usr/include/boost/container/map.hpp>
-//#include <math.h>
 #include "disturbance.h"
 
 enum M_CODES {THREE_M=3, FOUR_M=4};
 
 enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
-
-//enum GRAPH_CONSTRUCTION {A_STAR};
-
-//enum AVOID_MODE {AWAY_FROM_POINT, AWAY_FROM_LINE};
-
-//enum PLAN_BUILD{CONTINUOUS, STATIC};
 
 typedef std::vector <float> DistanceVector;
 
@@ -69,7 +57,7 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
-		std::vector <float> SDvector={0.11, 0.11, 0, 0.11, 0.11, M_PI/6};//hard-coded standard deviations for matching
+		std::vector <float> SDvector={0.06, 0.06, 0, 0.06, 0.06, M_PI/6};//hard-coded standard deviations for matching
 		float mu=0.001;
 	    StateMatcher(){}
 

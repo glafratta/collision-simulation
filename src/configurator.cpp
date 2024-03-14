@@ -321,8 +321,8 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1, v0, g); //og v1 v0
-			v0=v1;
 			pruneTarget(toPrune, g, v);
+			v0=v1;
 			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			//float phi = er.evaluationFunction();
@@ -340,29 +340,16 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		return deletion;
 	}
 	std::pair <edgeDescriptor, bool> ep= boost::edge(src, v, g);
-	//edgeDescriptor e = ep.first;
 	Disturbance dist = g[v].disturbance;
-	// if(ep.second){
-	// 		e= *(boost::in_edges(e.m_source, g).first);
-	// 	}
-	// else{
-	// 	return deletion;
-	// }
-	//while (g[e].direction ==DEFAULT){
 	while (ep.second){
 		if(g[ep.first].direction!=DEFAULT){
 			break;
 		}
 		if (ep.first.m_target!=v){
 			g[ep.first.m_target].disturbance = dist;
-			//src=ep.first.m_target;
-			//g[e.m_target].outcome = simResult::safeForNow; //propagating back
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
 			if ( match.first){
 			 	deletion.push_back(std::pair<vertexDescriptor, vertexDescriptor>(ep.first.m_target, match.second));
-				// if(ep.first.m_target==src){
-				// 	src=match.second;
-				// }
 			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
@@ -370,42 +357,27 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 				return deletion;
 			}
 			ep.first= *(boost::in_edges(ep.first.m_source, g).first);
-	}
-		// if(boost::in_degree(v,g)>0){
-		// 	bool assigned=0;
-		// 	for (auto ei =boost::in_edges(v, g).first; ei!=boost::in_edges(v, g).second; ei++){
-		// 		if (g[*ei].direction == DEFAULT )
-		// 		{
-		// 			e= *ei;
-		// 			assigned=1;
-		// 		}
-		// 	}
-		// 	if (!assigned){
-		// 		break;
-		// 	}
-		// }
-		// else{
-		// 	break;
-		// }
-	
+	}	
 	return deletion;
 }
 
-bool Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src){
-	bool breaksignal=0;
+void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq){
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
 			g[pair.second].options= g[pair.first].options;
-			breaksignal=1;
 		}
-		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0];
+		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		boost::remove_vertex(pair.first, g);
+		for (auto i=pq.begin(); i!=pq.end(); i++){ //REMOVE FROM PQ
+			if((*i).first==pair.first){
+				pq.erase(i);
+			}
+		}
 		adjustProbability(g, e);
 	}
-	return breaksignal;
 }
 
 bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, CollisionGraph& g){

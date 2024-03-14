@@ -137,7 +137,7 @@ simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRA
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, CollisionGraph&);
 
-bool pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, CollisionGraph&, vertexDescriptor&); // deletes queued vertices, changes v if it will be afected by the deletion and returns a break signal
+void pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, CollisionGraph&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>); // deletes queued vertices, changes v if it will be afected by the deletion and returns a break signal
 
 void updateGraph(CollisionGraph&);
 
