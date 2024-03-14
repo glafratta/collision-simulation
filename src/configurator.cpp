@@ -308,7 +308,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			std::pair<bool, vertexDescriptor> match=findExactMatch(s, g);			
 			if (!match.first){
 				addVertex(v0, v1,g, Disturbance(),t.direction);
-				g[v1].set(s);
+				// g[v1].set(s);
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
@@ -319,6 +319,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 				}
 				//if there is no e
 			}
+			g[v1].set(s);
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1, v0, g); //og v1 v0
 			v0=v1;
@@ -369,7 +370,7 @@ void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
-			g[pair.second].options= g[pair.first].options;
+			//g[pair.second].options= g[pair.first].options;
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		g[pair.second].set(g[pair.first]);
