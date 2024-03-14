@@ -353,10 +353,10 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.resize(deletion.size()+1);
 				deletion.push_back(pair);
-				if (match.second==v){
-					deletion[-1].first=match.second;
-					deletion[-1].second=ep.first.m_target;
-				}
+				// if (match.second==v){
+				// 	deletion[-1].first=match.second;
+				// 	deletion[-1].second=ep.first.m_target;
+				// }
 			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
