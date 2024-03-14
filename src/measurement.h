@@ -1,6 +1,6 @@
 #ifndef MEASUREMENT_H
 #define MEASUREMENT_H
-#include "general.h" 
+#include "graphTools.h" 
 
 class Measurement{
 protected:

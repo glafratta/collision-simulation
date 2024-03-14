@@ -2,7 +2,6 @@
 #define ROBOT_H
 //box2d robot body and kinematic model
 #include "box2d/box2d.h"
-#include "opencv2/opencv.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

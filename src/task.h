@@ -1,8 +1,5 @@
 #ifndef TASK_H
 #define TASK_H
-#include <vector>
-#include <stdio.h>
-#include <math.h> 
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 

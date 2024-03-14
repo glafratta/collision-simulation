@@ -1,6 +1,9 @@
+#ifndef DISTURBANCE_H
+#define DISTURBANCE_H
 #include "settings.h"
 //#include "measurement.h"
 #include "robot.h"
+//#include "opencv2/opencv.hpp"
 #include <stdexcept>
 
 struct Disturbance{ //this generates error
@@ -140,3 +143,5 @@ struct simResult{
         valid =1;
     }
 };
+
+#endif

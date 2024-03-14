@@ -1,25 +1,25 @@
 #include "worldbuilder.h"
 
-std::pair<Point, Point> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength,Task* curr ){
+std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength,Task* curr ){
     float halfWindowWidth=0.1;
-    std::pair <Point, Point> result;
+    std::pair <Pointf, Pointf>result;
     if (d !=DEFAULT & d!=BACK){
         boxLength =ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X; //og 16 cm
-        result.first =Point(start.p.x-boxLength, start.p.y-boxLength);
-        result.first =Point(start.p.x+boxLength, start.p.y+boxLength);
+        result.first =Pointf(start.p.x-boxLength, start.p.y-boxLength);
+        result.first =Pointf(start.p.x+boxLength, start.p.y+boxLength);
     }
     else{
-        cv::Point2f positionVector, radiusVector, maxFromStart, top, bottom; 
-        std::vector <Point> bounds;
-        radiusVector.polarInit(boxLength, start.q.GetAngle());
-        maxFromStart = Point(start.p) + radiusVector;
+        Pointf positionVector, radiusVector, maxFromStart, top, bottom; 
+        std::vector <Pointf> bounds;
+        radiusVector = Polar2f(boxLength, start.q.GetAngle());
+        maxFromStart = Pointf(start.p.x, start.p.y) + radiusVector;
         //FIND THE BOUNDS OF THE BOX
         b2Vec2 unitPerpR(-sin(start.q.GetAngle()), cos(start.q.GetAngle()));
         b2Vec2 unitPerpL(sin(start.q.GetAngle()), -cos(start.q.GetAngle()));
-        bounds.push_back(Point(start.p)+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
-        bounds.push_back(Point(start.p)+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
-        bounds.push_back(maxFromStart+Point(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
-        bounds.push_back(maxFromStart+Point(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
+        bounds.push_back(Pointf(start.p.x, start.p.y)+Pointf(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth));
+        bounds.push_back(Pointf(start.p.x, start.p.y)+Pointf(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
+        bounds.push_back(maxFromStart+Pointf(unitPerpL.x *halfWindowWidth, unitPerpL.y*halfWindowWidth)); 
+        bounds.push_back(maxFromStart+Pointf(unitPerpR.x *halfWindowWidth, unitPerpR.y*halfWindowWidth));
         comparator compPoint;
         std::sort(bounds.begin(), bounds.end(), compPoint); //sort bottom to top
         result.first = bounds[0]; //bottom
@@ -66,7 +66,7 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	bodies++;
 }
 
-std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair <Point, Point> bt, Task *curr, CoordinateContainer * dCloud){
+std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair<Pointf, Pointf> bt, Task *curr, CoordinateContainer * dCloud){
     std::pair <CoordinateContainer, bool> result(CoordinateContainer(), 0);
     float qBottomH=0, qTopH=0, qBottomP=0, qTopP=0, mHead=0, mPerp=0, ceilingY=0, floorY=0, frontX=0, backX=0;
     if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
@@ -77,7 +77,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         qTopH = bt.second.y - mHead*bt.second.x;
         qBottomP = bt.first.y -mPerp*bt.first.x;
         qTopP = bt.second.y - mPerp*bt.second.x;
-        for (cv::Point2f p: current){
+        for (Pointf p: current){
             ceilingY = mHead*p.x +qTopH;
 			floorY = mHead*p.x+qBottomH;
 			float frontY= mPerp*p.x+qBottomP;
@@ -96,7 +96,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         floorY = std::min(bt.second.y, bt.first.y); 
         frontX = std::min(bt.second.x, bt.first.x);
         backX = std::max(bt.second.x, bt.first.x);
-        for (cv::Point2f p: current){
+        for (Pointf p: current){
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
             }
@@ -116,7 +116,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     //     float y = start.p.y - (SAFE_DISTANCE+ROBOT_HALFLENGTH)* sin(start.q.GetAngle());
     //     start = b2Transform(b2Vec2(x, y), b2Rot(start.q.GetAngle()));
     // }
-    std::pair <Point, Point> bt = bounds(d, start, boxLength, curr);
+    std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, curr);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt, curr, dCloud);
     std::vector <BodyFeatures> features =processData(salient.first);
     for (BodyFeatures f: features){
@@ -134,13 +134,13 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-bool WorldBuilder::checkDisturbance(cv::Point2f p, bool& obStillThere, Task * curr, float range){
+bool WorldBuilder::checkDisturbance(Pointf p, bool& obStillThere, Task * curr, float range){
     bool result=0;
 	if (NULL!=curr){ //
         if (!curr->disturbance.isValid()){
             return result;
         }
-        cv::Rect rect(curr->disturbance.pose.x-range, curr->disturbance.pose+range, range*2, range*2);
+        cv::Rect rect(curr->disturbance.pose.p.x-range, curr->disturbance.pose.p.y+range, range*2, range*2);
 		if (p.inside(rect)){
 			obStillThere =1;
             result =1;
@@ -151,7 +151,7 @@ bool WorldBuilder::checkDisturbance(cv::Point2f p, bool& obStillThere, Task * cu
 
 b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     b2Vec2 result(0,0), centroid(0,0);
-    for (cv::Point2f p: c){
+    for (Pointf p: c){
        centroid.x+=p.x;
        centroid.y +=p.y; 
     }

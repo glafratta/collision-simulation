@@ -1,15 +1,15 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 #include <dirent.h>
-#include <vector>
+//#include "opencv2/opencv.hpp"
 #include <thread>
 #include <filesystem>
 #include <ncurses.h>
 #include <fstream>
 #include "worldbuilder.h"
-#include "sensor.h"
 #include <algorithm>
 #include <sys/stat.h>
+//#include "sensor.h"
 
 typedef b2Transform DeltaPose;
 
@@ -51,6 +51,7 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
+	SensorTools sensorTools;
 	//int treeSize = 0; //for debug
 	//Sequence plan;
 	std::vector <vertexDescriptor> planVertices;

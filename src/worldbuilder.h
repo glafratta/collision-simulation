@@ -1,8 +1,11 @@
-#include "task.h"
-#include "box2d/box2d.h"
+#ifndef WORLDBUILDER_H
+#define WORLDBUILDER_H
+#include "sensor.h"
+//#include "box2d/box2d.h"
 
 // class BoxFeatures{
-//     private:
+//     private:#include "general.h"
+
 //     float halfWindowWidth =.1;
 //     public:
     
@@ -29,17 +32,17 @@ class WorldBuilder{
     char bodyFile[100];
     float simulationStep=BOX2DRANGE;
     int buildType=0;
-    std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <cv::Point2f, cv::Point2f>, Task*curr=NULL, CoordinateContainer * dCloud=NULL); //gets points from the raw data that are relevant to the task based on bounding boxes
+    std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Pointf, Pointf>, Task*curr=NULL, CoordinateContainer * dCloud=NULL); //gets points from the raw data that are relevant to the task based on bounding boxes
                                                                                                                                         //std::pair<points, obstaclestillthere>
     void makeBody(b2World&, BodyFeatures);
 
     std::vector <BodyFeatures> processData(CoordinateContainer);
 
-    bool checkDisturbance(cv::Point2f, bool&,Task * curr =NULL, float range=0.025);
+    bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
     std::pair<bool, b2Vec2> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction, Task*curr=NULL, CoordinateContainer * dCloud = NULL);
 
-    std::pair <cv::Point2f, cv::Point2f> bounds(Direction, b2Transform t, float boxLength, Task* curr=NULL); //returns bottom and top of bounding box
+    std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, Task* curr=NULL); //returns bottom and top of bounding box
 
     b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 
@@ -51,3 +54,4 @@ class WorldBuilder{
         bodies =0;
     }
 };
+#endif

@@ -16,10 +16,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("data empty!\n");
 		return 1;
 	}
-	CoordinateContainer previous =current;
-	current.clear();
-	current = CoordinateContainer(data);
-	currentBox2D.clear();
+	// CoordinateContainer previous =current;
+	// current.clear();
+	//current = CoordinateContainer(data);
+	//currentBox2D.clear();
 	currentBox2D = CoordinateContainer(data2fp);
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
@@ -42,22 +42,23 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		timeElapsed = .2;
 	}
 
-
 	//CREATE BOX2D ENVIRONMENT
 	b2Vec2 gravity = {0.0, 0.0};
 	b2World world= b2World(gravity);
 	char name[256];
 
 	//CALCULATE VELOCITY 
-	DeltaPose deltaPose;
+	b2Transform velocity;
 	 if (currentTask.action.getOmega()==0){
-	 	deltaPose= GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
+		float dataRange=0.25;
+	 	velocity= sensorTools.affineTransEstimate(std::vector <Pointf>(data.begin(), data.end()), currentTask.action, timeElapsed, dataRange);
+		//GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
 	 }
 	else{
-		deltaPose = assignDeltaPose(currentTask.getAction(), timeElapsed); //open loop
+		velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
 	}
-	currentTask.action.setRecSpeed(SignedVectorLength(deltaPose.p));
-	currentTask.action.setRecOmega(deltaPose.q.GetAngle());
+	currentTask.action.setRecSpeed(SignedVectorLength(velocity.p));
+	currentTask.action.setRecOmega(velocity.q.GetAngle());
 
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
@@ -123,96 +124,84 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	std::pair <bool, Direction> result(false, DEFAULT);
-	// if (numberOfM == THREE_M){
 		switch (d){
 		case Direction::LEFT: result.first = true; result.second = RIGHT;break;
 		case Direction::RIGHT: result.first = true; result.second = LEFT;break;
 		default:
 		break;
-	// }
-	// }
-	// else if (numberOfM == FOUR_M){
-	// 	switch (d){
-	// 	case Direction::LEFT: result.first = true; result.second = RIGHT;break;
-	// 	case Direction::RIGHT: result.first = true; result.second = LEFT;break;
-	// 	case Direction::DEFAULT: result.first = true; result.second = BACK;break;
-	// 	case Direction::BACK: result.first = true; result.second = DEFAULT;break;
-	// 	default:
-	// 	break;
-	// }
 	}
 	return result;
 }
 
-DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy
-		DeltaPose result;
-		float theta=0;
-		if (iteration==1){
-			return result;
-		}
-	 	theta = currentTask.getAction().getOmega()* timeElapsed;
-		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-		result.q.Set(currentTask.getAction().getOmega());
+// DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy
+// 		DeltaPose result;
+// 		float theta=0;
+// 		if (iteration==1){
+// 			return result;
+// 		}
+// 	 	theta = currentTask.getAction().getOmega()* timeElapsed;
+// 		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
+// 		result.q.Set(currentTask.getAction().getOmega());
 
-        //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
-		std::vector <cv::Point2f> currentTmp, previousTmp;
-		//MAKE OPENCV VECTORS
-		for (cv::Point2f p:_current){
-			if (length(p)<.25){
-				currentTmp.push_back(cv::Point2f(p.x, p.y));
-			}
-		}
-		for (cv::Point2f p: _previous){
-			if (length(p)<.25){
-				previousTmp.push_back(cv::Point2f(p.x, p.y));
-			}
-		}
-		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
+//         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
+// 		std::vector <cv::Point2f> currentTmp, previousTmp;
+// 		//MAKE OPENCV VECTORS
+// 		for (cv::Point2f p:_current){
+// 			if (length(p)<.25){
+// 				currentTmp.push_back(cv::Point2f(p.x, p.y));
+// 			}
+// 		}
+// 		for (cv::Point2f p: _previous){
+// 			if (length(p)<.25){
+// 				previousTmp.push_back(cv::Point2f(p.x, p.y));
+// 			}
+// 		}
+// 		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
 
-		if(diff>0){
-			if (previousTmp.empty()){
-				//previousTmp = currentTmp;
-				return result;
-				}
-			else{
-				for (int i=0; i<abs(diff); i++){
-					previousTmp.push_back(previousTmp[0]); //before it was [-1]
-				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
-					printf("can't get previous data\n");
-				}
+// 		if(diff>0){
+// 			if (previousTmp.empty()){
+// 				//previousTmp = currentTmp;
+// 				return result;
+// 				}
+// 			else{
+// 				for (int i=0; i<abs(diff); i++){
+// 					previousTmp.push_back(previousTmp[0]); //before it was [-1]
+// 				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
+// 					printf("can't get previous data\n");
+// 				}
 
-			}
-			}
-		}
-		else if (diff<0){
-			if (currentTmp.empty()){
-				printf("no data\n");
-					return result;
-				}
-			else{
-				for (int i=0; i<abs(diff); i++){
-					currentTmp.push_back(currentTmp[0]);
-				}
-			}
-		}
-	//use partial affine transformation to estimate displacement
-	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
-	if (!transformMatrix.empty()){
-		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
-		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-		result.q.Set(acos(transformMatrix.at<double>(0,0))/timeElapsed);
-		float posAngle = atan(result.p.y/result.p.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
-		if (result.p.y ==0 && result.p.x ==0){
-			posAngle =0;
-		}
-		if (result.p.Length()>MAX_SPEED){
-			result.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
-			result.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
-		}
+// 			}
+// 			}
+// 		}
+// 		else if (diff<0){
+// 			if (currentTmp.empty()){
+// 				printf("no data\n");
+// 					return result;
+// 				}
+// 			else{
+// 				for (int i=0; i<abs(diff); i++){
+// 					currentTmp.push_back(currentTmp[0]);
+// 				}
+// 			}
+// 		}
+// 	//use partial affine transformation to estimate displacement
+// 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
+// 	if (!transformMatrix.empty()){
+// 		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
+// 		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
+// 		result.q.Set(acos(transformMatrix.at<double>(0,0))/timeElapsed);
+// 		float posAngle = atan(result.p.y/result.p.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
+// 		if (result.p.y ==0 && result.p.x ==0){
+// 			posAngle =0;
+// 		}
+// 		if (result.p.Length()>MAX_SPEED){
+// 			result.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
+// 			result.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
+// 		}
 
-	}
-	return result;
-	}
+// 	}
+// 	return result;
+// 	}
 
 
 
