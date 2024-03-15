@@ -12,9 +12,9 @@ then
 	echo "temperature of $temp ok, building"
 	rm targetless targetless_benchmark targetless_benchmark_alt target_benchmark target_benchmark_alt reactive target target_reactive CMakeCache.txt Makefile
 	cmake .
-	cd src/
-	make
-	cd ..
+#	cd src/
+#	make
+#	cd ..
 	sudo make install
 else
 	echo "too hot! temp = $temp , not building"
