@@ -359,10 +359,12 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 				deletion.push_back(pair);
 				if (ep.first.m_target==v){
 					v=match.second;
-					g[v].set(g[ep.first.m_target]);
 				// 	deletion[-1].first=match.second;
 				// 	deletion[-1].second=ep.first.m_target;
-				}
+				}					
+				g[match.second].set(g[ep.first.m_target]);
+
+
 			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
@@ -381,7 +383,7 @@ void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 		// 	//g[pair.second].options= g[pair.first].options;
 		// }
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		g[pair.second].set(g[pair.first]);
+		//g[pair.second].set(g[pair.first]);
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		boost::remove_vertex(pair.first, g);
