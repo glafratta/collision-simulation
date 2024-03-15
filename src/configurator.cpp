@@ -359,6 +359,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 				deletion.push_back(pair);
 				if (ep.first.m_target==v){
 					v=match.second;
+					g[v].set(g[ep.first.m_target]);
 				// 	deletion[-1].first=match.second;
 				// 	deletion[-1].second=ep.first.m_target;
 				}
