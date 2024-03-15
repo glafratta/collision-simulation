@@ -384,7 +384,7 @@ void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 		g[pair.second].set(g[pair.first]);
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
-		//boost::remove_vertex(pair.first, g);
+		boost::remove_vertex(pair.first, g);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
 			if(pq[i].first==pair.first){
 				pq.erase(pq.begin()+i);
