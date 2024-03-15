@@ -49,7 +49,7 @@ bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
+typedef boost::adjacency_list<boost::setS, boost::setS, boost::bidirectionalS, State, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
@@ -57,7 +57,7 @@ typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
-		std::vector <float> SDvector={0.02, 0.02, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
+		std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
 		float mu=0.001;
 	    StateMatcher(){}
 
