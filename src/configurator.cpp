@@ -322,7 +322,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			}
 			g[v1].set(s);
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vs =(propagateD(v1, v0, g)); //og v1 v0
+			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vs =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			for (std::pair<vertexDescriptor, vertexDescriptor> pair:vs){
 				toPrune.push_back(pair);
