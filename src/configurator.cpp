@@ -382,8 +382,8 @@ void Configurator::pruneTarget(std::vector<std::pair<vertexDescriptor, vertexDes
 		// }
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		g[pair.second].set(g[pair.first]);
-		boost::clear_in_edges(pair.first, g);
-		boost::clear_out_edges(pair.first, g);
+		//boost::clear_in_edges(pair.first, g);
+		//boost::clear_out_edges(pair.first, g);
 		boost::remove_vertex(pair.first, g);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
 			if(pq[i].first==pair.first){
