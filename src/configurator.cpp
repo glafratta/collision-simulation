@@ -337,7 +337,6 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()!=0);
 	removeVertices(toRemove, g);
-	//pruneTarget(toPrune, g, v, priorityQueue);
 }
 
 
@@ -376,7 +375,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	return deletion;
 }
 
-std::vector <vertexDescriptor> Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph&g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq, std::vector<vertexDescriptor>& toRemove){
+void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
