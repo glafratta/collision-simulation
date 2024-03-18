@@ -28,7 +28,7 @@ void State::set(State tmp){
 	}
 	disturbance = tmp.disturbance;
 	endPose = tmp.endPose;
-	//outcome = tmp.outcome;
+	outcome = tmp.outcome;
 	step = tmp.step;
 	options = tmp.options;
 	//nObs++;
