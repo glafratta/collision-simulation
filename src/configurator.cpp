@@ -331,7 +331,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()!=0);
-	removeVertices(toRemove, g);
+	//removeVertices(toRemove, g);
 }
 
 
@@ -395,7 +395,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 void Configurator::removeVertices(std::vector<vertexDescriptor> vs, CollisionGraph&g){
 	while (!vs.empty()){
 		auto vi= (std::max_element(vs.begin(), vs.end()));
-		boost::remove_vertex(*vi,g);
+		//boost::remove_vertex(*vi,g);
 		vs.erase(vi);
 	}
 }
