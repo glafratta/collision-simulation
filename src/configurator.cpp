@@ -400,7 +400,7 @@ void Configurator::removeVertices(std::vector<vertexDescriptor> vs, CollisionGra
 	while (!vs.empty()){
 		auto vi= (std::max_element(vs.begin(), vs.end()));
 		boost::clear_vertex(*vi, g);
-		boost::remove_vertex(*vi,g);
+		//boost::remove_vertex(*vi,g);
 		vs.erase(vi);
 	}
 }
