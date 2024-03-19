@@ -51,7 +51,7 @@ bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
+typedef boost::adjacency_list<boost::setS, boost::listS, boost::bidirectionalS, State, Edge> CollisionGraph;
 typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
