@@ -9,6 +9,7 @@
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/filtered_graph.hpp>
 #include "disturbance.h"
 
 enum M_CODES {THREE_M=3, FOUR_M=4};
@@ -58,7 +59,6 @@ typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
-
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle

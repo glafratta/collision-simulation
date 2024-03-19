@@ -89,7 +89,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("executing = %i", executing);
 		//transitionSystem[currentVertex].nObs++;
 		//transitionSystem[currentVertex].outcome = simResult::successful;
-		explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
+		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
+		removeVertices(toRemove, transitionSystem);
 		planVertices= planner(transitionSystem, bestLeaf);
 		//boost::remove_edge(startVertex, currentVertex, transitionSystem);
 		///currentTask.change=1;
@@ -281,7 +282,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-void Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
+std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
@@ -332,6 +333,7 @@ void Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2W
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()!=0);
 	//removeVertices(toRemove, g);
+	return toRemove;
 }
 
 
