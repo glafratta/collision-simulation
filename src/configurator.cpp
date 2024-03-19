@@ -382,7 +382,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 			//g[pair.second].options= g[pair.first].options;
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		g[pair.second].set(g[pair.first]);
+		g[pair.second].update(g[pair.first]);
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		toRemove.push_back(pair.first);

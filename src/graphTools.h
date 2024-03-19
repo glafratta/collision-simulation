@@ -42,6 +42,8 @@ struct State{
 
 	void set(State);
 
+	void update(State);
+
 };
 
 typedef b2Transform Transform;

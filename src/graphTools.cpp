@@ -34,6 +34,16 @@ void State::set(State tmp){
 	//nObs++;
 }
 
+void State::update(State tmp){
+	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
+		totDs++;
+	}
+	disturbance = tmp.disturbance;
+	endPose = tmp.endPose;
+	step = tmp.step;
+	options = tmp.options;
+}
+
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);
 	result[0]= s1.disturbance.pose.p.x - s2.disturbance.pose.p.x; //disturbance x
