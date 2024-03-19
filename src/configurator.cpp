@@ -386,7 +386,6 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		boost::clear_in_edges(pair.first, g);
 		boost::clear_out_edges(pair.first, g);
 		toRemove.push_back(pair.first);
-		//boost::remove_vertex(pair.first, g);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
 			if(pq[i].first==pair.first){
 				pq.erase(pq.begin()+i);
@@ -399,6 +398,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 void Configurator::removeVertices(std::vector<vertexDescriptor> vs, CollisionGraph&g){
 	while (!vs.empty()){
 		auto vi= (std::max_element(vs.begin(), vs.end()));
+		boost::clear_vertex(*vi, g);
 		boost::remove_vertex(*vi,g);
 		vs.erase(vi);
 	}
