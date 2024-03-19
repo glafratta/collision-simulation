@@ -325,12 +325,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
-			// for (std::pair<vertexDescriptor, vertexDescriptor> pair:vs){
-			// 	toPrune.push_back(pair);
-			// }
-			//check if states need to be pruned retroactively
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
-			//float phi = er.evaluationFunction();
 			addToPriorityQueue(v1, priorityQueue, evaluationFunction(er));
 		}
 		bestNext=priorityQueue[0].first;
@@ -383,8 +378,9 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		g[pair.second].update(g[pair.first]);
-		boost::clear_in_edges(pair.first, g);
-		boost::clear_out_edges(pair.first, g);
+		//boost::clear_in_edges(pair.first, g);
+		//boost::clear_out_edges(pair.first, g);
+		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
 //		boost::clear_vertex(pair.first, g);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
@@ -399,8 +395,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 void Configurator::removeVertices(std::vector<vertexDescriptor> vs, CollisionGraph&g){
 	while (!vs.empty()){
 		auto vi= (std::max_element(vs.begin(), vs.end()));
-		boost::clear_vertex(*vi, g);
-		//boost::remove_vertex(*vi,g);
+		boost::remove_vertex(*vi,g);
 		vs.erase(vi);
 	}
 }
