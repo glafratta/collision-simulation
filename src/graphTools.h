@@ -46,16 +46,20 @@ struct State{
 
 };
 
+
+
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> CollisionGraph;
-typedef boost::graph_traits<CollisionGraph>::vertex_iterator vertexIterator; 
-typedef boost::graph_traits<CollisionGraph>::vertex_descriptor vertexDescriptor;
-typedef boost::graph_traits<CollisionGraph>::edge_descriptor edgeDescriptor;
-typedef boost::graph_traits<CollisionGraph>::edge_iterator edgeIterator;
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
+typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
+typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
+typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
+typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
+
+
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
@@ -77,7 +81,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(State, State); // is this the same state?
 
-		std::pair<bool, vertexDescriptor> isPerfectMatch(CollisionGraph, vertexDescriptor, Direction, State);
+		std::pair<bool, vertexDescriptor> isPerfectMatch(TransitionSystem, vertexDescriptor, Direction, State);
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 

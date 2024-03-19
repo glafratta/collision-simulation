@@ -60,7 +60,7 @@ public:
 	//GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
 	//PLAN_BUILD planBuild = STATIC;
-	CollisionGraph collisionGraph;
+	TransitionSystem transitionSystem;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
 
@@ -71,7 +71,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	//totalTime =0.0f;
 	ogGoal=controlGoal.disturbance.pose;
-	currentVertex = boost::add_vertex(collisionGraph);
+	currentVertex = boost::add_vertex(transitionSystem);
 }
 
 void setBenchmarking(bool b){
@@ -133,51 +133,51 @@ Task * getTask(int advance=0){ //returns Task being executed
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-//void buildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &);
+//void buildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &);
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, vertexDescriptor&, CollisionGraph&);
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, vertexDescriptor&, TransitionSystem&);
 
-void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, CollisionGraph&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
+void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void removeVertices(std::vector<vertexDescriptor>, CollisionGraph&);
+void removeVertices(std::vector<vertexDescriptor>, TransitionSystem&);
 
-void updateGraph(CollisionGraph&);
+void updateGraph(TransitionSystem&);
 
-void adjustStep(vertexDescriptor, CollisionGraph &, Direction, float&);
+void adjustStep(vertexDescriptor, TransitionSystem &, Direction, float&);
 
-std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, CollisionGraph&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
+std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
-//b2Transform skip(edgeDescriptor&, CollisionGraph&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
+//b2Transform skip(edgeDescriptor&, TransitionSystem&, int&, Task*, float&); //inputs: plan, graph, index in the plan of the current vertex being checked. Returns the next index and the step distance to simulate
 
-std::vector <edgeDescriptor> outEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
+std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
-std::vector <edgeDescriptor> inEdges(CollisionGraph&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
+std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
 
-std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, CollisionGraph&);
+std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <bool, vertexDescriptor> findExactMatch(State, CollisionGraph&);
+std::pair <bool, vertexDescriptor> findExactMatch(State, TransitionSystem&);
 
-std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, CollisionGraph&); //has a safety to prevent matching a vertex with self
+std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, TransitionSystem&); //has a safety to prevent matching a vertex with self
 
-void changeStart(b2Transform&, vertexDescriptor, CollisionGraph&); //if task at vertex v fails, start is set to v's predecessor's end
+void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task at vertex v fails, start is set to v's predecessor's end
 
-bool edgeExists(vertexDescriptor, vertexDescriptor, CollisionGraph&);
+bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
-//void backtrackingBuildTree(vertexDescriptor v, CollisionGraph&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
+//void backtrackingBuildTree(vertexDescriptor v, TransitionSystem&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
-//void DFIDBuildTree(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
+//void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-void explorer(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+void explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-// void AlgorithmE(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+// void AlgorithmE(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-// void onDemandAStar(vertexDescriptor, CollisionGraph&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
+// void onDemandAStar(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
 
-//std::vector <vertexDescriptor> splitNode(vertexDescriptor, CollisionGraph&, Direction, b2Transform);
+//std::vector <vertexDescriptor> splitNode(vertexDescriptor, TransitionSystem&, Direction, b2Transform);
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
-bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
+bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
 	// if (!obs.isValid()){
 	// 	obs = controlGoal.disturbance;
 	// }
@@ -203,27 +203,27 @@ bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, CollisionGraph &g, 
 	return vertexAdded;
 }
 
-void adjustProbability(CollisionGraph &, edgeDescriptor&);
+void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-//void removeIdleNodes(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+//void removeIdleNodes(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
-//Sequence getCleanSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+//Sequence getCleanSequence(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-std::vector <vertexDescriptor> planner(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0);
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
-//Sequence getUnprocessedSequence(CollisionGraph&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
+//Sequence getUnprocessedSequence(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0); //gets a sequence of summaries of successful tasks, excluding the root node
 
-//vertexDescriptor findBestLeaf(CollisionGraph &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
+//vertexDescriptor findBestLeaf(TransitionSystem &, std::vector <vertexDescriptor>, vertexDescriptor, EndCriteria * refEnd = NULL);
 
 EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
 
-EndedResult estimateCost(vertexDescriptor, CollisionGraph &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
+EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
 //void loopGoal();
 
 float evaluationFunction(EndedResult);
 
-//Sequence getPlan(CollisionGraph &, vertexDescriptor);
+//Sequence getPlan(TransitionSystem &, vertexDescriptor);
 
 //void printPlan(Sequence);
 
@@ -237,15 +237,15 @@ static void run(Configurator *);
 
 void transitionMatrix(State&, Direction); //DEFAULT, LEFT, RIGHT
 
-//void transitionMatrix4M(CollisionGraph&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
+//void transitionMatrix4M(TransitionSystem&, vertexDescriptor, Direction); //DEFAULT, LEFT, RIGHT, BACK
 
-void applyTransitionMatrix(CollisionGraph&, vertexDescriptor, Direction,bool);
+void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool);
 
-//bool betterThanLeaves(CollisionGraph&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
+//bool betterThanLeaves(TransitionSystem&, vertexDescriptor, std::vector <vertexDescriptor>, EndedResult &, Direction); //evaluation function
 
-//bool hasStickingPoint(CollisionGraph&, vertexDescriptor, EndedResult &);
+//bool hasStickingPoint(TransitionSystem&, vertexDescriptor, EndedResult &);
 
-//void backtrack(CollisionGraph&, vertexDescriptor&);
+//void backtrack(TransitionSystem&, vertexDescriptor&);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 
@@ -255,7 +255,7 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 																		//and straight lines
 //void checkDisturbance(Point, bool&,Task * curr =NULL);
 
-std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, CollisionGraph&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
+std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 
 //std::vector <vertexDescriptor> (vertexDescriptor);
 									

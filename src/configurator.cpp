@@ -76,27 +76,27 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning){ //|| !planError.m_vertices.empty())
 		vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
 		vertexDescriptor bestLeaf = startVertex;
-		collisionGraph[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
+		transitionSystem[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
 		if (currentVertex==0){
 			currentTask.change=1;
-			currentTask.H(collisionGraph[currentVertex].disturbance, STOP, 1);
-			collisionGraph[currentVertex].fill(simResult());
+			currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
+			transitionSystem[currentVertex].fill(simResult());
 		}
 		if (startVertex !=currentVertex){
-			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, collisionGraph).first;
-			collisionGraph[e].direction=currentTask.direction;
+			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, transitionSystem).first;
+			transitionSystem[e].direction=currentTask.direction;
 		}
 		//printf("executing = %i", executing);
-		//collisionGraph[currentVertex].nObs++;
-		//collisionGraph[currentVertex].outcome = simResult::successful;
-		explorer(startVertex, collisionGraph, currentTask, world, bestLeaf);
-		planVertices= planner(collisionGraph, bestLeaf);
-		//boost::remove_edge(startVertex, currentVertex, collisionGraph);
+		//transitionSystem[currentVertex].nObs++;
+		//transitionSystem[currentVertex].outcome = simResult::successful;
+		explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
+		planVertices= planner(transitionSystem, bestLeaf);
+		//boost::remove_edge(startVertex, currentVertex, transitionSystem);
 		///currentTask.change=1;
 	}
 	else if (!planning){
-		result = simulate(collisionGraph[currentVertex],collisionGraph[currentVertex],currentTask, world, simulationStep);
-		currentTask.change = collisionGraph[currentVertex].outcome==simResult::crashed;
+		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
+		currentTask.change = transitionSystem[currentVertex].outcome==simResult::crashed;
 	}
 	float duration=0;
 	if (benchmark){
@@ -105,7 +105,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	 	float duration=abs(float(d.count())/1000); //express in seconds
 		FILE * f = fopen(statFile, "a+");
 		printf("open stat\n");
-		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
+		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
 		fclose(f);
 		//return 0; //stops when finished and doesn't execute
 
@@ -242,7 +242,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	}
 
 
-// void Configurator::backtrackingBuildTree(vertexDescriptor v, CollisionGraph& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
+// void Configurator::backtrackingBuildTree(vertexDescriptor v, TransitionSystem& g, Task s, b2World & w, std::vector <vertexDescriptor> &_leaves){
 // 	//PRINT DEBUG
 // 	//END DEBUG FILE
 // 	vertexDescriptor v1=v; 
@@ -281,7 +281,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2World & w, vertexDescriptor & bestNext){
+void Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
@@ -335,7 +335,7 @@ void Configurator::explorer(vertexDescriptor v, CollisionGraph& g, Task t, b2Wor
 }
 
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0, vertexDescriptor&v,CollisionGraph&g){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0, vertexDescriptor&v,TransitionSystem&g){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v1].outcome == simResult::successful ){
 		return deletion;
@@ -370,19 +370,15 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	return deletion;
 }
 
-void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, CollisionGraph& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
+void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
-			//g[pair.second].options= g[pair.first].options;
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		g[pair.second].update(g[pair.first]);
-		//boost::clear_in_edges(pair.first, g);
-		//boost::clear_out_edges(pair.first, g);
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
-//		boost::clear_vertex(pair.first, g);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
 			if(pq[i].first==pair.first){
 				pq.erase(pq.begin()+i);
@@ -392,15 +388,15 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::removeVertices(std::vector<vertexDescriptor> vs, CollisionGraph&g){
+void Configurator::removeVertices(std::vector<vertexDescriptor> vs, TransitionSystem&g){
 	while (!vs.empty()){
 		auto vi= (std::max_element(vs.begin(), vs.end()));
-		//boost::remove_vertex(*vi,g);
+		boost::remove_vertex(*vi,g);
 		vs.erase(vi);
 	}
 }
 
-bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, CollisionGraph& g){
+bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, TransitionSystem& g){
 	auto es=boost::in_edges(target, g);
 	for (auto ei=es.first; ei!=es.second; ei++){
 		if ((*ei).m_source==src){
@@ -411,7 +407,7 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Col
 }
 
 
-// Sequence Configurator::getCleanSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+// Sequence Configurator::getCleanSequence(TransitionSystem&g, vertexDescriptor leaf, vertexDescriptor root){
 // 	Sequence p;
 // 	if (leaf <root){
 // 		throw std::invalid_argument("wrong order of vertices for iteration\n");
@@ -435,7 +431,7 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Col
 
 // }
 
-std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDescriptor leaf, vertexDescriptor root){
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor leaf, vertexDescriptor root){
 	std::vector <vertexDescriptor> vertices;
 	if (leaf ==root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
@@ -460,7 +456,7 @@ std::vector <vertexDescriptor> Configurator::planner(CollisionGraph& g, vertexDe
 
 
 
-// Sequence Configurator::getUnprocessedSequence(CollisionGraph&g, vertexDescriptor leaf, vertexDescriptor root){
+// Sequence Configurator::getUnprocessedSequence(TransitionSystem&g, vertexDescriptor leaf, vertexDescriptor root){
 // 	Sequence p;
 // 	if (leaf <root){
 // 		throw std::invalid_argument("wrong order of vertices for iteration\n");
@@ -500,7 +496,7 @@ float Configurator::evaluationFunction(EndedResult er){
 	return abs(er.estimatedCost)+abs(er.cost);
 }
 
-// EndedResult Configurator::estimateCost(vertexDescriptor v,CollisionGraph& g, Direction d){
+// EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
 // 	EndedResult er = controlGoal.checkEnded(g[v]);
 // 	//g[v].heuristic = er.estimatedCost;
 // 	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
@@ -516,7 +512,7 @@ float Configurator::evaluationFunction(EndedResult er){
 // }
 
 
-// Sequence Configurator::getPlan(CollisionGraph &g, vertexDescriptor best){
+// Sequence Configurator::getPlan(TransitionSystem &g, vertexDescriptor best){
 // 	Sequence p;
 // 	edgeDescriptor e;
 // 	while (boost::in_degree(best, g)){
@@ -657,7 +653,7 @@ void Configurator::transitionMatrix(State& state, Direction d){
 	// }
 }
 
-void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, Direction d, bool ended){
+void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v, Direction d, bool ended){
 	if (!g[v].options.empty()){
 		return;
 	}
@@ -685,7 +681,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, D
 
 
 
-// bool Configurator::betterThanLeaves(CollisionGraph &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
+// bool Configurator::betterThanLeaves(TransitionSystem &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
 // 	bool better =1;
 // 	er = controlGoal.checkEnded(g[v].endPose); //heuristic
 // 	g[v].heuristic = er.estimatedCost;
@@ -711,7 +707,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, D
 // 	return better;
 // }
 
-// bool Configurator::hasStickingPoint(CollisionGraph& g, vertexDescriptor v, EndedResult & er){
+// bool Configurator::hasStickingPoint(TransitionSystem& g, vertexDescriptor v, EndedResult & er){
 // 	bool has =0;
 // 	vertexDescriptor src =v;
 // 	Point dPosition(g[v].disturbance.getPosition());
@@ -729,7 +725,7 @@ void Configurator::applyTransitionMatrix(CollisionGraph&g, vertexDescriptor v, D
 // }
 
 
-// void Configurator::backtrack(CollisionGraph&g, vertexDescriptor &v){
+// void Configurator::backtrack(TransitionSystem&g, vertexDescriptor &v){
 // 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
 // 		if(boost::in_degree(v, g)>0){
 // 			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
@@ -797,7 +793,7 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 // 	}
 // }
 
-void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
+void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
 	//g[e.m_source].nObs++;
 	g[e.m_target].nObs++;
 	auto es= out_edges(e.m_source, g);
@@ -820,7 +816,7 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 	}
 }
 
-// std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, CollisionGraph &g, b2Transform start){
+// std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
 // 	std::vector <vertexDescriptor> graphError;
 // 	if (p.empty()){
 // 		return graphError;
@@ -864,7 +860,7 @@ void Configurator::adjustProbability(CollisionGraph &g, edgeDescriptor& e){
 // 	return graphError;
 // }
 
-std::vector <edgeDescriptor> Configurator::outEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+std::vector <edgeDescriptor> Configurator::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::out_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
@@ -875,7 +871,7 @@ std::vector <edgeDescriptor> Configurator::outEdges(CollisionGraph&g, vertexDesc
 	return result;
 }
 
-std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescriptor v, Direction d){
+std::vector <edgeDescriptor> Configurator::inEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
@@ -886,7 +882,7 @@ std::vector <edgeDescriptor> Configurator::inEdges(CollisionGraph&g, vertexDescr
 	return result;
 }
 
-std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDescriptor> ev, CollisionGraph& g){
+std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDescriptor> ev, TransitionSystem& g){
 	std::pair <edgeDescriptor, bool> result;
 	if (ev.empty()){
 		result.second=false;
@@ -904,7 +900,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 
-void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Direction d, float& step){
+void Configurator::adjustStep(vertexDescriptor v, TransitionSystem &g, Direction d, float& step){
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
@@ -916,7 +912,7 @@ void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Direction d
 	if (g[e].direction!=d){
 		return;
 	}
-	int stepsTraversed= collisionGraph[currentVertex].step-currentTask.motorStep;
+	int stepsTraversed= transitionSystem[currentVertex].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
@@ -928,7 +924,7 @@ void Configurator::adjustStep(vertexDescriptor v, CollisionGraph &g, Direction d
 
 }
 
-std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, CollisionGraph& g, Direction d){
+std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, TransitionSystem& g, Direction d){
 	 	std::vector <edgeDescriptor> result;
 		edgeDescriptor e; 
 		do{
@@ -944,8 +940,8 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	return result;
 } 
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, CollisionGraph& g){
-	std::pair <bool, vertexDescriptor> result(false, CollisionGraph::null_vertex());
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g){
+	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
@@ -959,8 +955,8 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Collisi
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, CollisionGraph& g){
-	std::pair <bool, vertexDescriptor> result(false, CollisionGraph::null_vertex());
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g){
+	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
@@ -976,7 +972,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	return result;
 }
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, CollisionGraph& g){
+void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
 		start = g[e.m_source].endPose;
@@ -988,7 +984,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Collision
 
 
 
-// b2Transform Configurator::skip(edgeDescriptor& e, CollisionGraph &g, Task* t, float& step){
+// b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, Task* t, float& step){
 // 	//	step=BOX2DRANGE; //set to range in order to discover other disturbances
 
 // 	// if (g[e.m_source].disturbance.isValid()){
@@ -1021,8 +1017,8 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Collision
 // 	//g[v].fill(sim);
 // 	std::pair<bool, vertexDescriptor> result(0, -1);
 // 	float bestDistance=10000;
-// 	for (vertexDescriptor stateV: collisionGraph.m_vertices){
-// 		DistanceVector dv = matcher.getDistance(collisionGraph[stateV], s);
+// 	for (vertexDescriptor stateV: transitionSystem.m_vertices){
+// 		DistanceVector dv = matcher.getDistance(transitionSystem[stateV], s);
 // 		if (matcher.isPerfectMatch(dv) & matcher.sumVector(dv)<bestDistance){
 // 			result.second= stateV;
 // 			result.first=true;
@@ -1042,7 +1038,7 @@ void Configurator::trackTaskExecution(Task & t){
 		if(t.motorStep==0){
 			t.change=1;
 		}
-	updateGraph(collisionGraph);
+	updateGraph(transitionSystem);
 }
 
 DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
@@ -1147,29 +1143,29 @@ void Configurator::changeTask(bool b, int &ogStep){
 			return;
 		}
 		currentVertex= planVertices[0];
-		std::pair<edgeDescriptor, bool> ep=boost::edge(0, currentVertex, collisionGraph);
+		std::pair<edgeDescriptor, bool> ep=boost::edge(0, currentVertex, transitionSystem);
 		if (!ep.second){
 			throw std::invalid_argument("no plan was formed");
 			return;
 		}
 		edgeDescriptor e= ep.first;
-		boost::clear_out_edges(0, collisionGraph);
+		boost::clear_out_edges(0, transitionSystem);
 		planVertices.erase(planVertices.begin());
-		currentTask = Task(collisionGraph[e.m_source].disturbance, collisionGraph[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
-		currentTask.motorStep = collisionGraph[currentVertex].step;
+		currentTask = Task(transitionSystem[e.m_source].disturbance, transitionSystem[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
+		currentTask.motorStep = transitionSystem[currentVertex].step;
 		// if (currentVertex!=0){
-		// 	boost::clear_out_edges(0, collisionGraph);
+		// 	boost::clear_out_edges(0, transitionSystem);
 		// }
 		// //planVertices.erase(planVertices.begin());
 		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
-		if (collisionGraph[0].disturbance.isValid()){
-			currentTask = Task(collisionGraph[0].disturbance, DEFAULT); //reactive
+		if (transitionSystem[0].disturbance.isValid()){
+			currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
 			//currentTask.motorStep = motorStep(currentTask.getAction());
 		}
 		else if(currentTask.direction!=DEFAULT){
-				currentTask = Task(collisionGraph[0].disturbance, DEFAULT); //reactive
+				currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
 		}
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
@@ -1183,7 +1179,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 	//printf("set step\n");
 }
 
-void Configurator::updateGraph(CollisionGraph&g){
+void Configurator::updateGraph(TransitionSystem&g){
 	b2Transform deltaPose(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK));
