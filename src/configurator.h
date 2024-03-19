@@ -60,6 +60,7 @@ public:
 	bool discretized =0;
 	//PLAN_BUILD planBuild = STATIC;
 	TransitionSystem transitionSystem;
+	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
 
