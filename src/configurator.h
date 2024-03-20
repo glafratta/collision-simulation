@@ -51,7 +51,7 @@ public:
 	std::vector <vertexDescriptor> planVertices;
 	bool discretized =0;
 	TransitionSystem transitionSystem;
-	Model model;
+	//Model model;
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
