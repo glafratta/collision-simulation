@@ -10,11 +10,13 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/filtered_graph.hpp>
+#include <boost/property_map/property_map.hpp> //property map
+#include <boost/variant/get.hpp> //get function
 #include "disturbance.h"
 
-enum M_CODES {THREE_M=3, FOUR_M=4};
+// enum M_CODES {THREE_M=3, FOUR_M=4};
 
-enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
+// enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 
 typedef std::vector <float> DistanceVector;
 
@@ -49,6 +51,7 @@ struct State{
 
 
 
+
 typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
@@ -59,6 +62,20 @@ typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
+
+//template <typename StateDeletedMap>
+struct Deleted{
+	Deleted(TransitionSystem * ts): g(ts){}
+	bool operator()(const vertexDescriptor& v)const{
+	 	return boost::in_degree(v, *g)>0 || boost::out_degree(v, *g)>0;
+	}
+private:
+TransitionSystem * g;
+};
+
+
+// typedef boost::property_map<TransitionSystem, State>::type StateDeletedMap;
+typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> Model;
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle

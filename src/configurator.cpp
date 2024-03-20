@@ -86,14 +86,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, transitionSystem).first;
 			transitionSystem[e].direction=currentTask.direction;
 		}
-		//printf("executing = %i", executing);
-		//transitionSystem[currentVertex].nObs++;
-		//transitionSystem[currentVertex].outcome = simResult::successful;
 		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
-		removeVertices(toRemove, transitionSystem);
+		Deleted deleted(&transitionSystem);
+		Model m(transitionSystem, boost::keep_all(), deleted);
+		//model = Model(transitionSystem, boost::keep_all(), Deleted<StateDeletedMap>());
 		planVertices= planner(transitionSystem, bestLeaf);
-		//boost::remove_edge(startVertex, currentVertex, transitionSystem);
-		///currentTask.change=1;
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);

@@ -1,7 +1,6 @@
 #ifndef CONFIGURATOR_H
 #define CONFIGURATOR_H
 #include <dirent.h>
-//#include "opencv2/opencv.hpp"
 #include <thread>
 #include <filesystem>
 #include <ncurses.h>
@@ -9,7 +8,6 @@
 #include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
-//#include "sensor.h"
 
 typedef b2Transform DeltaPose;
 
@@ -20,7 +18,6 @@ public:
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 	bool ready=0;
-	//TaskSummary ts;
 
 	void setReady(bool b);
 
@@ -44,7 +41,6 @@ public:
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
-	//float totalTime=0;
 	CoordinateContainer current, currentBox2D;
 	bool planning =1;
 	char statFile[100];
@@ -52,14 +48,10 @@ public:
 	bool timerOff=0;
 	int bodies=0;
 	SensorTools sensorTools;
-	//int treeSize = 0; //for debug
-	//Sequence plan;
 	std::vector <vertexDescriptor> planVertices;
-	//M_CODES numberOfM =THREE_M;
-	//GRAPH_CONSTRUCTION graphConstruction = A_STAR;
 	bool discretized =0;
-	//PLAN_BUILD planBuild = STATIC;
 	TransitionSystem transitionSystem;
+	Model model;
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
@@ -67,9 +59,7 @@ public:
 Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
-	//motorStep(currentTask.getAction());
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	//totalTime =0.0f;
 	ogGoal=controlGoal.disturbance.pose;
 	currentVertex = boost::add_vertex(transitionSystem);
 }
@@ -111,7 +101,7 @@ int getIteration(){
 	return iteration;
 }
 
-DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
+//DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
 
 void addIteration(){
 	iteration++;
@@ -155,24 +145,14 @@ bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
 
-// void AlgorithmE(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
-
-// void onDemandAStar(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor&); //proper A star implementation with discretixed space
-
-//std::vector <vertexDescriptor> splitNode(vertexDescriptor, TransitionSystem&, Direction, b2Transform);
-
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
 bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
-	// if (!obs.isValid()){
-	// 	obs = controlGoal.disturbance;
-	// }
 	bool vertexAdded = false;
 	if (g[src].options.size()>0 || topDown){
 		v1 = boost::add_vertex(g);
 		edgeDescriptor e = add_edge(src, v1, g).first;
 		if (!topDown){
-			// g[e].direction =g[src].options[0];
 			g[e].direction =d;
 			g[src].options.erase(g[src].options.begin());
 		}

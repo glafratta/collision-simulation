@@ -20,22 +20,12 @@ const float MAX_SPEED=.196; //1.56
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
 const float BOX2DRANGE =1.0;
 #define LIDAR_RANGE 1.1
-//#define REACTION_TIME 1.0
 #define HZ 60.0
 #define MAX_ANGLE_ERROR M_PI
 const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
-//const float DISCRETE_RANGE =ROBOT_HALFLENGTH*2; //22 cm, as in Ulrich (2000)
-//#define DISCRETE_SIMDURATION DISCRETE_RANGE*2/MAX_SPEED
 const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
 const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.00;
-
-
-//const int maxNodesOnSpot = 2*MAX_TURN/(M_PI_2-atan(ROBOT_HALFWIDTH/ROBOT_HALFLENGTH));
-										//this is the angle that the robot would have to turn
-										//to be at a safe distance from an obstacle in the worst
-										//case scenario, provided that the position of the obstacle
-										//refers to the centre of mass of the robot
 const int maxNodesOnSpot =4;
 
 class Robot {
