@@ -89,8 +89,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
 		Deleted ndeleted(&transitionSystem);
 		Model m(transitionSystem, boost::keep_all(), ndeleted);
-		std::ostream mod();
-		boost::print_graph(m, mod);
+		//std::ostream mod();
+		boost::print_graph(m);
+		boost::print_graph(transitionSystem);
+		//TransitionSystem tmp;
+		boost::copy_graph(m, transitionSystem);
 		//model = Model(transitionSystem, boost::keep_all(), Deleted<StateDeletedMap>());
 		planVertices= planner(transitionSystem, bestLeaf);
 	}

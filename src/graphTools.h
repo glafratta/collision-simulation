@@ -11,8 +11,10 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/graph_utility.hpp>
-//#include <boost/property_map/property_map.hpp> //property map
-#include <boost/variant/get.hpp> //get function
+#include <boost/property_map/property_map.hpp> //property map
+//#include <boost/variant/get.hpp> //get function
+#include <boost/graph/copy.hpp>
+#include <utility>
 #include "disturbance.h"
 
 // enum M_CODES {THREE_M=3, FOUR_M=4};
@@ -66,6 +68,7 @@ typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
 
 //template <typename StateDeletedMap>
 struct Deleted{
+	Deleted(){}
 	Deleted(TransitionSystem * ts): g(ts){}
 	
 	bool operator()(const vertexDescriptor& v)const{
