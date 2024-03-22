@@ -12,7 +12,7 @@
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/graph_utility.hpp>
 //#include <boost/property_map/property_map.hpp> //property map
-//#include <boost/variant/get.hpp> //get function
+#include <boost/variant/get.hpp> //get function
 #include "disturbance.h"
 
 // enum M_CODES {THREE_M=3, FOUR_M=4};
