@@ -87,8 +87,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			transitionSystem[e].direction=currentTask.direction;
 		}
 		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
-		Deleted deleted(&transitionSystem);
-		Model m(transitionSystem, boost::keep_all(), deleted);
+		Deleted ndeleted(&transitionSystem);
+		Model m(transitionSystem, boost::keep_all(), ndeleted);
+		
 		//model = Model(transitionSystem, boost::keep_all(), Deleted<StateDeletedMap>());
 		planVertices= planner(transitionSystem, bestLeaf);
 	}
