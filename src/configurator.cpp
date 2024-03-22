@@ -92,10 +92,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//std::ostream mod();
 		boost::print_graph(m);
 		boost::print_graph(transitionSystem);
-		TransitionSystem tmp;
-		boost::copy_graph(m, tmp);
-		transitionSystem.swap(tmp);
-		tmp.clear();
+		//TransitionSystem tmp;
+		transitionSystem.clear();
+		boost::copy_graph(m, transitionSystem);
+		//transitionSystem.swap(tmp);
+		//tmp.clear();
 		//model = Model(transitionSystem, boost::keep_all(), Deleted<StateDeletedMap>());
 		planVertices= planner(transitionSystem, bestLeaf);
 	}
