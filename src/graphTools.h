@@ -57,25 +57,32 @@ bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
-typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
-typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
-typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
-typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
-
-//template <typename StateDeletedMap>
-struct Deleted{
-	Deleted(TransitionSystem * ts): g(ts){}
-	bool operator()(const vertexDescriptor& v)const{
-	 	return boost::in_degree(v, *g)>0 || boost::out_degree(v, *g)>0;
-	}
-private:
-TransitionSystem * g;
+struct TransitionSystem{
+	std::vector<State> states;
+	std::vector<Edge> edges;
 };
 
+//typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
+// typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
+// typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
+// typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
+// typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
 
-// typedef boost::property_map<TransitionSystem, State>::type StateDeletedMap;
-typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> Model;
+
+
+// //template <typename StateDeletedMap>
+// struct Deleted{
+// 	Deleted(TransitionSystem * ts): g(ts){}
+// 	bool operator()(const vertexDescriptor& v)const{
+// 	 	return boost::in_degree(v, *g)>0 || boost::out_degree(v, *g)>0;
+// 	}
+// private:
+// TransitionSystem * g;
+// };
+
+
+// // typedef boost::property_map<TransitionSystem, State>::type StateDeletedMap;
+// typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> Model;
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
