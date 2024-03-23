@@ -988,34 +988,6 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 }
 
 
-
-// b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, Task* t, float& step){
-// 	//	step=BOX2DRANGE; //set to range in order to discover other disturbances
-
-// 	// if (g[e.m_source].disturbance.isValid()){
-// 	// 	step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose.p).Length();
-// 	// }
-// 	while (g[e].direction==t->direction & i+1<planVertices.size()){
-// 		//if (t->endCriteria.angle.isValid()){
-// 		i++;
-// 		if (boost::out_degree(e.m_target,g)>0){
-// 			auto es = boost::out_edges(e.m_target, g);
-// 			for (auto ei = es.first; ei!=es.second; ++ei){
-// 				if ((*ei).m_target == planVertices[i+1]){
-// 					e= (*ei);
-// 					break;
-// 				}
-// 			}
-// 		}
-// 		else{
-// 			break;
-// 		}
-// 		}
-
-// 	return g[planVertices[i]].endPose;
-
-// }
-
 // std::pair<bool, vertexDescriptor> Configurator::findBestMatch(State s){
 // 	//std::vector <vertexDescriptor> matches;
 // 	//vertexDescriptor v = boost::add_vertex(g);
@@ -1034,15 +1006,13 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 
 void Configurator::trackTaskExecution(Task & t){
-	//if (t.endCriteria.hasEnd()){
-		//printf("task in %i has end\n", iteration);
-		if (t.motorStep>0){
-			t.motorStep--;
-			printf("step =%i\n", t.motorStep);
-		}
-		if(t.motorStep==0){
-			t.change=1;
-		}
+	if (t.motorStep>0){
+		t.motorStep--;
+		printf("step =%i\n", t.motorStep);
+	}
+	if(t.motorStep==0){
+		t.change=1;
+	}
 	updateGraph(transitionSystem);
 }
 
@@ -1054,30 +1024,14 @@ DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
 	return result;
 }
 
-// int Configurator::motorStep(Task::Action a, EndCriteria ec){
-// 	int result=0, angleResult=0, distanceResult=0;
-// 	if (ec.angle.isValid()){
-// 		angleResult = ec.angle.get()/(MOTOR_CALLBACK * a.getOmega());
-// 	}
-// 	if (ec.distance.isValid()){
-// 		distanceResult = ec.distance.get()/(MOTOR_CALLBACK * a.getLinearSpeed());
-// 	}
-// 	result =std::max(angleResult, distanceResult);
-// 	printf("task has %i steps\n", result);
-// 	return result;
-// }
 
 int Configurator::motorStep(Task::Action a){
 	int result=0;
         if (a.getOmega()>0){ //LEFT
             result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
-		    //result *=FRICTION_DAMPENING;
-			//result =12;
         }
 		else if (a.getOmega()<0){ //RIGHT
             result = (SAFE_ANGLE)/(MOTOR_CALLBACK * a.getOmega());
-		    //result *=FRICTION_DAMPENING;
-			//result=12;
 		}
 		else if (a.getLinearSpeed()>0){
 			result = (simulationStep)/(MOTOR_CALLBACK*a.getLinearSpeed());
@@ -1085,66 +1039,13 @@ int Configurator::motorStep(Task::Action a){
 	    return abs(result);
     }
 
-
-// void Configurator::changeTask(bool b, Sequence & p, State n, int&ogStep){
-// 	// if (currentTask.motorStep==0){
-// 	// 	b=1;
-// 	// }
-// 	if (!b){
-// 		return;
-// 	}
-// 	if (!p.empty()){
-// 		if (p.size()==1){
-// 			running=0;
-// 		}
-// 		p.erase(p.begin());
-// 	}
-// 	if (planning){
-// 		if (plan.empty()){
-// 			return;
-// 		}
-// 		currentTask = Task(p[0].disturbance, p[0].direction);
-// 		currentTask.motorStep = p[0].step;
-// 		//p.erase(p.begin());
-// 		printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
-// 	}
-// 	else{
-// 		if (n.disturbance.isValid()){
-// 			currentTask = Task(n.disturbance, DEFAULT); //reactive
-// 		}
-// 		else if(currentTask.direction!=DEFAULT){
-// 				currentTask = Task(n.disturbance, DEFAULT); //reactive
-// 		}
-// 		else{
-// 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
-// 		}
-
-// 		currentTask.motorStep = motorStep(currentTask.getAction()); //reflex
-// 		printf("changed to reactive, %i steps\n", currentTask.motorStep);
-// 	}
-// 	//currentTask.motorStep = motorStep(currentTask.getAction());
-// 	ogStep = currentTask.motorStep;
-// 	//printf("set step\n");
-// }
-
 void Configurator::changeTask(bool b, int &ogStep){
-	// if (currentTask.motorStep==0){
-	// 	b=1;
-	// }
 	if (!b){
-		//printf("do not change\n");
 		return;
 	}
-	// if (!planVertices.empty()){
-	// 	// if (planVertices.size()==1){
-	// 	// 	running=0;
-	// 	// }
-	// 	planVertices.erase(planVertices.begin());
-	// }
 	if (planning){
 		if (planVertices.empty()){
 			currentVertex=0;
-			//currentTask = controlGoal;
 			return;
 		}
 		currentVertex= planVertices[0];
@@ -1158,16 +1059,10 @@ void Configurator::changeTask(bool b, int &ogStep){
 		planVertices.erase(planVertices.begin());
 		currentTask = Task(transitionSystem[e.m_source].disturbance, transitionSystem[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentVertex].step;
-		// if (currentVertex!=0){
-		// 	boost::clear_out_edges(0, transitionSystem);
-		// }
-		// //planVertices.erase(planVertices.begin());
-		//printf("canged to next in plan, new task has %i steps\n", currentTask.motorStep);
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){
 			currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
-			//currentTask.motorStep = motorStep(currentTask.getAction());
 		}
 		else if(currentTask.direction!=DEFAULT){
 				currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
@@ -1179,9 +1074,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		currentTask.motorStep = motorStep(currentTask.getAction());
 		printf("changed to reactive\n");
 	}
-	//currentTask.motorStep = motorStep(currentTask.getAction());
 	ogStep = currentTask.motorStep;
-	//printf("set step\n");
 }
 
 void Configurator::updateGraph(TransitionSystem&g){

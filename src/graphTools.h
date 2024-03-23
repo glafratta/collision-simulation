@@ -46,9 +46,10 @@ struct State{
 		
 	simResult getSimResult();
 
+	void update(State);
+
 	void set(State);
 
-	void update(State);
 
 };
 
@@ -87,7 +88,15 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> Model;
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
-		std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
+		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
+		
+		struct Error{
+			const float endPosition=0.03;
+			const float angle= M_PI/6;
+			const float dPosition= 0.1;
+			const float affordance =0;
+		}error;
+
 		float mu=0.001;
 	    StateMatcher(){}
 

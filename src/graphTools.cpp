@@ -22,18 +22,6 @@ simResult State::getSimResult(){
 	return result;
 }
 
-void State::set(State tmp){
-	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
-		totDs++;
-	}
-	disturbance = tmp.disturbance;
-	endPose = tmp.endPose;
-	outcome = tmp.outcome;
-	step = tmp.step;
-	options = tmp.options;
-	//nObs++;
-}
-
 void State::update(State tmp){
 	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
 		totDs++;
@@ -42,6 +30,11 @@ void State::update(State tmp){
 	endPose = tmp.endPose;
 	step = tmp.step;
 	options = tmp.options;
+}
+
+void State::set(State tmp){
+	update(tmp);
+	outcome = tmp.outcome;
 }
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
@@ -66,10 +59,10 @@ float StateMatcher::sumVector(DistanceVector vec){
 
 bool StateMatcher::isPerfectMatch(DistanceVector vec){
     bool result =false;
-	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<SDvector[4];
-	bool angleMatch = fabs(vec[5])<SDvector[5];
-	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<SDvector[0];
-	bool affordanceMatch =vec[2]==SDvector[2];
+	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<error.endPosition;
+	bool angleMatch = fabs(vec[5])<error.angle;
+	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<error.dPosition;
+	bool affordanceMatch = vec[2]==error.affordance;
     if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
         result=true;
     }
