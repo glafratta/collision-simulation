@@ -7,7 +7,7 @@ void State::fill(simResult result){
 	disturbance = result.collision;
 	endPose = result.endPose;
 	outcome = result.resultCode;
-	step = getStep(result.step);
+	step = simToMotorStep(result.step);
 	//nObs++;
 	filled=true;
 }
@@ -37,10 +37,6 @@ void State::update(State tmp, bool changeStep){
 void State::set(State tmp, bool changeStep){
 	update(tmp, changeStep);
 	outcome = tmp.outcome;
-}
-
-int State::getStep(int simStep){
-	return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
 }
 
 

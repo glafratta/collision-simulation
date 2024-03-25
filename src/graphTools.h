@@ -50,7 +50,7 @@ struct State{
 
 	void set(State, bool);
 
-	int getStep(int);
+	int simToMotorStep(int);
 
 
 };
