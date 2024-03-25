@@ -305,7 +305,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 			changeStart(start, v0, g);
 			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
-			adjustStep(v0, g, t.direction, _simulationStep);
+			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
 			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
 			er  = estimateCost(s, g[v0].endPose, t.direction);
@@ -905,7 +905,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 
-void Configurator::adjustStep(vertexDescriptor v, TransitionSystem &g, Direction d, float& step){
+void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Direction d, float& step){
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }

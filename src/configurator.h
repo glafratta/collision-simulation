@@ -121,7 +121,7 @@ void removeVertices(std::vector<vertexDescriptor>, TransitionSystem&);
 
 void updateGraph(TransitionSystem&);
 
-void adjustStep(vertexDescriptor, TransitionSystem &, Direction, float&);
+void adjustStepDistance(vertexDescriptor, TransitionSystem &, Direction, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
