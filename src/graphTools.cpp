@@ -7,7 +7,7 @@ void State::fill(simResult result){
 	disturbance = result.collision;
 	endPose = result.endPose;
 	outcome = result.resultCode;
-	step = std::floor(result.step/(HZ*MOTOR_CALLBACK)+0.5);
+	step = getStep(result.step);
 	//nObs++;
 	filled=true;
 }
@@ -22,20 +22,27 @@ simResult State::getSimResult(){
 	return result;
 }
 
-void State::update(State tmp){
+void State::update(State tmp, bool changeStep){
 	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
 		totDs++;
 	}
 	disturbance = tmp.disturbance;
 	endPose = tmp.endPose;
-	step = tmp.step;
 	options = tmp.options;
+	if (changeStep){
+		step = tmp.step;
+	}
 }
 
-void State::set(State tmp){
-	update(tmp);
+void State::set(State tmp, bool changeStep){
+	update(tmp, changeStep);
 	outcome = tmp.outcome;
 }
+
+int State::getStep(int simStep){
+	return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
+}
+
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);

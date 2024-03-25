@@ -46,9 +46,11 @@ struct State{
 		
 	simResult getSimResult();
 
-	void update(State);
+	void update(State, bool);
 
-	void set(State);
+	void set(State, bool);
+
+	int getStep(int);
 
 
 };

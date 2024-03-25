@@ -324,7 +324,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				}
 				//if there is no e
 			}
-			g[v1].set(s);
+			g[v1].set(s, v1!=currentVertex);
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
@@ -381,7 +381,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 			src=pair.second;
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		g[pair.second].update(g[pair.first]);
+		g[pair.second].update(g[pair.first], pair.second!=currentVertex);
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
