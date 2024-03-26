@@ -384,7 +384,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		edgeDescriptor e2 = inEdges(g, pair.first, DEFAULT)[0];
-		gt::update(e, std::pair <State, Edge>(g[pair.first], e2),g, pair.second==currentVertex);
+		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex);
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
