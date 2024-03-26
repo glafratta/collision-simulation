@@ -1096,7 +1096,9 @@ void Configurator::updateGraph(TransitionSystem&g){
 						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK));
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){
-		g[*vIt].endPose-=deltaPose;
-		g[*vIt].disturbance.pose-=deltaPose;
+		if (*vIt!=movingVertex){
+			g[*vIt].endPose-=deltaPose;
+			g[*vIt].disturbance.pose-=deltaPose;
+		}
 	}
 }
