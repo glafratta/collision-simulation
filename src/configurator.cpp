@@ -1022,8 +1022,8 @@ void Configurator::trackTaskExecution(Task & t){
 	updateGraph(transitionSystem);
 }
 
-DeltaPose Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
-	DeltaPose result;
+b2Transform Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
+	b2Transform result;
 	float theta = a.getOmega()* timeElapsed;
 	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
 	result.q.Set(a.getOmega());

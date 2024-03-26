@@ -208,7 +208,7 @@ std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor
 									
 void trackTaskExecution(Task &);
 
-DeltaPose assignDeltaPose(Task::Action, float);
+b2Transform assignDeltaPose(Task::Action, float);
 
 void changeTask(bool, int&);
 
