@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <sys/stat.h>
 
-typedef b2Transform DeltaPose;
+//typedef b2Transform DeltaPose;
 
 class ConfiguratorInterface{
 public:
@@ -31,6 +31,7 @@ protected:
 	char fileNameBuffer[50];
 	Task currentTask;
 	bool benchmark=0;
+	vertexDescriptor movingVertex;
 public:
 	ConfiguratorInterface * ci;
 	bool running =0;
@@ -61,7 +62,11 @@ Configurator()=default;
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	ogGoal=controlGoal.disturbance.pose;
+	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex = boost::add_vertex(transitionSystem);
+	// edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	// transitionSystem[e].direction=DEFAULT;
+	// transitionSystem[e].step=0;
 }
 
 void setBenchmarking(bool b){

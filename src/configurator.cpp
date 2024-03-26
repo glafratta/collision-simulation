@@ -74,18 +74,20 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
-		vertexDescriptor bestLeaf = startVertex;
-		transitionSystem[startVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
-		if (currentVertex==0){
-			currentTask.change=1;
-			currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
-			transitionSystem[currentVertex] = gt::fill(simResult()).first;
-		}
-		if (startVertex !=currentVertex){
-			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, transitionSystem).first;
+		//vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
+		vertexDescriptor bestLeaf = movingVertex;
+		transitionSystem[movingVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
+		// if (currentVertex==0){
+		// 	currentTask.change=1;
+		// 	currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
+		// 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
+		// }
+		//if (startVertex !=currentVertex){
+			//provisional edge
+			edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 			transitionSystem[e].direction=currentTask.direction;
-		}
+			transitionSystem[e].step=currentTask.motorStep;
+	//	}
 		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
@@ -921,7 +923,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 		return;
 	}
 //	int stepsTraversed= transitionSystem[currentVertex].step-currentTask.motorStep;
-	int stepsTraversed= transitionSystem[ep.first].step-currentTask.motorStep;
+	int stepsTraversed= g[ep.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
