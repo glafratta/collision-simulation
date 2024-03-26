@@ -26,6 +26,9 @@ typedef std::vector <float> DistanceVector;
 struct Edge{
 	Direction direction;
 	float probability=1.0;
+	int step=0;
+
+	Edge(){}
 };
 
 
@@ -37,25 +40,14 @@ struct State{
 	int nodesInSameSpot =0;
 	int totDs=0; //error signal
 	bool filled =0;
-	int step=0;
+	//int step=0;
 	int nObs=0;
 	
-	void fill(simResult);
-
 	State(){}
 		
-	simResult getSimResult();
-
-	void update(State, bool);
-
-	void set(State, bool);
-
-	int simToMotorStep(int);
-
+	//simResult getSimResult();
 
 };
-
-
 
 
 typedef b2Transform Transform;
@@ -69,7 +61,6 @@ typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescripto
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
 
-//template <typename StateDeletedMap>
 struct Deleted{
 	Deleted(){}
 	Deleted(TransitionSystem * ts): g(ts){}
@@ -84,8 +75,22 @@ TransitionSystem * g;
 };
 
 
-// typedef boost::property_map<TransitionSystem, State>::type StateDeletedMap;
-typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> Model;
+namespace gt{
+
+	std::pair<State, Edge> fill(simResult);
+
+
+	int simToMotorStep(int simStep){
+		return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
+	}
+
+	float update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool); //returns disturbance rror based on expected vs observed D
+
+	float set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool);
+}
+
+
+typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> FilteredTS;
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle

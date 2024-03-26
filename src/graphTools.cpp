@@ -1,42 +1,49 @@
 #include "graphTools.h"
 
-void State::fill(simResult result){
-	if (result.collision.isValid()){
-		totDs++;
+	std::pair<State, Edge> gt::fill(simResult sr){
+	std::pair <State, Edge> result;
+	if (sr.collision.isValid()){
+		result.first.totDs++;
 	}
-	disturbance = result.collision;
-	endPose = result.endPose;
-	outcome = result.resultCode;
-	step = simToMotorStep(result.step);
+	result.first.disturbance = sr.collision;
+	result.first.endPose = sr.endPose;
+	result.first.outcome = sr.resultCode;
+	result.second.step = gt::simToMotorStep(sr.step);
 	//nObs++;
-	filled=true;
+	result.first.filled=true;
 }
 
-simResult State::getSimResult(){
-	simResult result;
-	result.collision= disturbance;
-	result.endPose=endPose;
-	result.step= step;
-	result.valid = filled;
-	result.resultCode=outcome;
+// simResult State::getSimResult(){
+// 	simResult result;
+// 	result.collision= disturbance;
+// 	result.endPose=endPose;
+// 	//result.step= step;
+// 	result.valid = filled;
+// 	result.resultCode=outcome;
+// 	return result;
+// }
+
+float gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current){
+	float result=0;
+	if (sk.first.disturbance.isValid()& sk.first.disturbance.getAffIndex()==AVOID & !g[e.m_target].disturbance.isValid()){
+		g[e.m_target].totDs++;
+	}
+	if (!current){
+		g[e].step = sk.second.step;
+	}
+	else{
+		result=g[e.m_target].disturbance.pose.p.x-sk.first.disturbance.pose.p.x;
+	}
+	g[e.m_target].disturbance = sk.first.disturbance;
+	g[e.m_target].endPose = sk.first.endPose;
+	g[e.m_target].options = sk.first.options;
 	return result;
 }
 
-void State::update(State tmp, bool changeStep){
-	if (tmp.disturbance.isValid()& tmp.disturbance.getAffIndex()==AVOID & !disturbance.isValid()){
-		totDs++;
-	}
-	disturbance = tmp.disturbance;
-	endPose = tmp.endPose;
-	options = tmp.options;
-	if (changeStep){
-		step = tmp.step;
-	}
-}
-
-void State::set(State tmp, bool changeStep){
-	update(tmp, changeStep);
-	outcome = tmp.outcome;
+float gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current){
+	float result=update(e, sk, g, current);
+	g[e.m_target].outcome = sk.first.outcome;
+	return result;
 }
 
 

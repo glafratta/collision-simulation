@@ -7,16 +7,14 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 class Task{
 public:
     friend class Configurator;
-    float accumulatedError=0;
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
     float pGain=0.1;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
-    bool discrete=0;
     int motorStep=0;
-    bool check=0;
+    int stepError=0;
 protected:
     b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:

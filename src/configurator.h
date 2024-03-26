@@ -147,26 +147,27 @@ std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
-bool addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs = Disturbance(),Direction d=DEFAULT, bool topDown=0){
-	bool vertexAdded = false;
+std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
+	std::pair<edgeDescriptor, bool> result;
+	result.second=false;
 	if (g[src].options.size()>0 || topDown){
 		v1 = boost::add_vertex(g);
-		edgeDescriptor e = add_edge(src, v1, g).first;
+		result = add_edge(src, v1, g);
+		g[result.first] =edge;
 		if (!topDown){
-			g[e].direction =d;
+//			g[e].direction =d;
 			g[src].options.erase(g[src].options.begin());
 		}
-		else{
-			g[e].direction=d;
-		}
+		// else{
+		// 	g[e].direction=d;
+		// }
 		g[v1].totDs=g[src].totDs;
 		if (!g[v1].filled){
 			g[v1].disturbance = obs;
 		}
-		vertexAdded=true;
-		adjustProbability(g, e); //for now predictions and observations carry the same weight
+		adjustProbability(g, result.first); //for now predictions and observations carry the same weight
 	}
-	return vertexAdded;
+	return result;
 }
 
 void adjustProbability(TransitionSystem &, edgeDescriptor&);

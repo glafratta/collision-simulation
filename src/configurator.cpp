@@ -80,7 +80,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		if (currentVertex==0){
 			currentTask.change=1;
 			currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
-			transitionSystem[currentVertex].fill(simResult());
+			transitionSystem[currentVertex] = gt::fill(simResult()).first;
 		}
 		if (startVertex !=currentVertex){
 			edgeDescriptor e = boost::add_edge(startVertex, currentVertex, transitionSystem).first;
@@ -88,12 +88,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
 		Deleted ndeleted(&transitionSystem);
-		Model m(transitionSystem, boost::keep_all(), ndeleted);
+		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
 		//std::ostream mod();
 	//	boost::print_graph(m);
-	//	boost::print_graph(transitionSystem);
+		boost::print_graph(transitionSystem);
 		TransitionSystem tmp;
-		boost::copy_graph(m, tmp);
+		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		planVertices= planner(transitionSystem, bestLeaf, currentVertex);
@@ -300,31 +300,33 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 			v0=v; //node being expanded
 			v1 =v0; //frontier
 			do {
-			State s;
+			std::pair <State, Edge> sk;
 			bool topDown=1;
 			changeStart(start, v0, g);
 			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
-			s.fill(simulate(s, g[v0], t, w, _simulationStep)); //find simulation result
-			er  = estimateCost(s, g[v0].endPose, t.direction);
-			//std:pair<bool, vertexDescriptor> match=matcher.isPerfectMatch(g, v0, t.direction, s);
-			std::pair<bool, vertexDescriptor> match=findExactMatch(s, g);			
+			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
+			sk.second.direction=t.direction;
+			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
+			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g);			
+			std::pair <edgeDescriptor, bool> edgeAdded(edgeDescriptor(), false);
 			if (!match.first){
-				addVertex(v0, v1,g, Disturbance(),t.direction);
-				// g[v1].set(s);
+				edgeAdded= addVertex(v0, v1,g, Disturbance(),sk.second);
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
 				if (!(v0==v1)){
-					edgeDescriptor e= (boost::add_edge(v0, v1, g)).first;
-					g[e].direction=t.direction;
+					edgeAdded= (boost::add_edge(v0, v1, g));
+					g[edgeAdded.first]=sk.second;//t.direction;
+
 				}
-				//if there is no e
 			}
-			g[v1].set(s, v1!=currentVertex);
+			if(edgeAdded.second){
+				gt::set(edgeAdded.first, sk, g, v1==currentVertex);
+			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
@@ -381,7 +383,8 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 			src=pair.second;
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		g[pair.second].update(g[pair.first], pair.second!=currentVertex);
+		edgeDescriptor e2 = inEdges(g, pair.first, DEFAULT)[0];
+		gt::update(e, std::pair <State, Edge>(g[pair.first], e2),g, pair.second==currentVertex);
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
@@ -449,7 +452,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
 			vertexDescriptor src = boost::source(e,g);
 			// if (g[leaf].endPose != g[src].endPose){ //if the node was successful
-			if (g[leaf].step>0){
+			if (g[e].step>0){
 				vertices.insert(vertices.begin(), leaf);
 			}
 		leaf = src; //go back
@@ -917,7 +920,8 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	if (g[e].direction!=d){
 		return;
 	}
-	int stepsTraversed= transitionSystem[currentVertex].step-currentTask.motorStep;
+//	int stepsTraversed= transitionSystem[currentVertex].step-currentTask.motorStep;
+	int stepsTraversed= transitionSystem[ep.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
@@ -1058,7 +1062,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		boost::clear_out_edges(0, transitionSystem);
 		planVertices.erase(planVertices.begin());
 		currentTask = Task(transitionSystem[e.m_source].disturbance, transitionSystem[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
-		currentTask.motorStep = transitionSystem[currentVertex].step;
+		currentTask.motorStep = transitionSystem[e].step;
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){
