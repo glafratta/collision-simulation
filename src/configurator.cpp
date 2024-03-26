@@ -93,6 +93,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			std::vector <vertexDescriptor> toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
 		else{
+			bestLeaf=currentVertex;
 			std::vector <vertexDescriptor> toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
 		Deleted ndeleted(&transitionSystem);
