@@ -311,21 +311,21 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
 			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g);			
-			std::pair <edgeDescriptor, bool> edgeAdded(edgeDescriptor(), false);
+			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 			if (!match.first){
-				edgeAdded= addVertex(v0, v1,g, Disturbance(),sk.second);
+				edge= addVertex(v0, v1,g, Disturbance(),sk.second); //new edge, valid
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
 				if (!(v0==v1)){
-					edgeAdded= (boost::add_edge(v0, v1, g));
-					g[edgeAdded.first]=sk.second;//t.direction;
-
+					edge= (boost::add_edge(v0, v1, g)); //assumes edge added
+					edge.second=true; //just means that the edge is valid
+					g[edge.first]=sk.second;//t.direction;
 				}
 			}
-			if(edgeAdded.second){
-				gt::set(edgeAdded.first, sk, g, v1==currentVertex);
+			if(edge.second){
+				gt::set(edge.first, sk, g, v1==currentVertex);
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
@@ -336,7 +336,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		}
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
-	}while(g[bestNext].options.size()!=0);
+	}while(g[bestNext].options.size()>0);
 	//removeVertices(toRemove, g);
 	return toRemove;
 }
