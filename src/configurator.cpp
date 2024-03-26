@@ -85,7 +85,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// }
 		//if (startVertex !=currentVertex){
 			//provisional edge
-			edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			if (iteration>1){
+				edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			}
+			else{
+				edgeDescriptor e = boost::add_edge(currentVertex, currentVertex, transitionSystem).first;
+			}
 			transitionSystem[e].direction=currentTask.direction;
 			transitionSystem[e].step=currentTask.motorStep;
 	//	}
