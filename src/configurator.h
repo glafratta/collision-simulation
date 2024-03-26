@@ -64,6 +64,8 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	ogGoal=controlGoal.disturbance.pose;
 	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex = boost::add_vertex(transitionSystem);
+	transitionSystem[movingVertex] = gt::fill(simResult()).first;
+	transitionSystem[currentVertex] = gt::fill(simResult()).first;
 	// edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	// transitionSystem[e].direction=DEFAULT;
 	// transitionSystem[e].step=0;

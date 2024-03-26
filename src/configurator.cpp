@@ -76,11 +76,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning){ //|| !planError.m_vertices.empty())
 		//vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
 		vertexDescriptor bestLeaf = movingVertex;
-		transitionSystem[movingVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
+		//transitionSystem[movingVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
+		
 		// if (currentVertex==0){
 		// 	currentTask.change=1;
 		// 	currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
-		// 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
+//		 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
 		// }
 		//if (startVertex !=currentVertex){
 			//provisional edge
@@ -88,7 +89,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			transitionSystem[e].direction=currentTask.direction;
 			transitionSystem[e].step=currentTask.motorStep;
 	//	}
-		std::vector <vertexDescriptor> toRemove=explorer(startVertex, transitionSystem, currentTask, world, bestLeaf);
+		std::vector <vertexDescriptor> toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
 		//std::ostream mod();
