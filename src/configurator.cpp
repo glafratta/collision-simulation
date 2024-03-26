@@ -105,7 +105,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
-		planVertices= planner(transitionSystem, bestLeaf, currentVertex);
+		planVertices= back_planner(transitionSystem, bestLeaf, currentVertex);
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
@@ -448,7 +448,7 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 // }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor leaf, vertexDescriptor root){
+std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, vertexDescriptor leaf, vertexDescriptor root){
 	std::vector <vertexDescriptor> vertices;
 	if (leaf ==root){
 		throw std::invalid_argument("wrong order of vertices for iteration\n");
