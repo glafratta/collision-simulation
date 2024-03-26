@@ -1,6 +1,6 @@
 #include "graphTools.h"
 
-	std::pair<State, Edge> gt::fill(simResult sr){
+std::pair<State, Edge> gt::fill(simResult sr){
 	std::pair <State, Edge> result;
 	if (sr.collision.isValid()){
 		result.first.totDs++;
@@ -11,6 +11,7 @@
 	result.second.step = gt::simToMotorStep(sr.step);
 	//nObs++;
 	result.first.filled=true;
+	return result;
 }
 
 int gt::simToMotorStep(int simStep){
