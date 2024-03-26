@@ -13,6 +13,10 @@
 	result.first.filled=true;
 }
 
+int gt::simToMotorStep(int simStep){
+	return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
+}
+
 // simResult State::getSimResult(){
 // 	simResult result;
 // 	result.collision= disturbance;

@@ -80,9 +80,7 @@ namespace gt{
 	std::pair<State, Edge> fill(simResult);
 
 
-	int simToMotorStep(int simStep){
-		return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
-	}
+	int simToMotorStep(int);
 
 	float update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool); //returns disturbance rror based on expected vs observed D
 
