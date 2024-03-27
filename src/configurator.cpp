@@ -375,7 +375,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	return deletion;
 }
 
-void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>> pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
+void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>>& pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
