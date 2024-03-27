@@ -78,9 +78,9 @@ namespace gt{
 
 	int simToMotorStep(int);
 
-	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::map<State*, float>&); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&); //returns disturbance rror based on expected vs observed D
 
-	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::map<State*, float>&);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&);
 }
 
 

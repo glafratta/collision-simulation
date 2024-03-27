@@ -28,7 +28,7 @@ int gt::simToMotorStep(int simStep){
 // 	return result;
 // }
 
-void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::map<State*, float>& errorMap){
+void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
 	float result=0;
 	if (!current){
 		g[e].step = sk.second.step;
@@ -47,7 +47,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	g[e.m_target].options = sk.first.options;
 }
 
-void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::map<State*, float>& errorMap){
+void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
 	update(e, sk, g, current, errorMap);
 	g[e.m_target].outcome = sk.first.outcome;
 }

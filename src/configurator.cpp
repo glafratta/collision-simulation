@@ -78,7 +78,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[e].direction=currentTask.direction;
 		transitionSystem[e].step=currentTask.motorStep;
-		std::map <State*, float> heuristicMap;
+		std::unordered_map <State*, float> heuristicMap;
 		std::vector <vertexDescriptor> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
