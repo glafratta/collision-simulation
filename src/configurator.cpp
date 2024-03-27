@@ -79,13 +79,15 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem[e].direction=currentTask.direction;
 		transitionSystem[e].step=currentTask.motorStep;
 		std::map <State*, float> heuristicMap;
+		std::vector <vertexDescriptor> toRemove;
 		if (iteration >1){
-			std::vector <vertexDescriptor> toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
+			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
 		else{
 			bestLeaf=currentVertex;
-			std::vector <vertexDescriptor> toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf);
+			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
+		clearFromMap(toRemove, transitionSystem, errorMap);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
 		boost::print_graph(transitionSystem);
@@ -334,7 +336,6 @@ std::vector <vertexDescriptor>Configurator::explorer(vertexDescriptor v, Transit
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
-	//removeVertices(toRemove, g);
 	return toRemove;
 }
 
@@ -393,11 +394,12 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::removeVertices(std::vector<vertexDescriptor> vs, TransitionSystem&g){
-	while (!vs.empty()){
-		auto vi= (std::max_element(vs.begin(), vs.end()));
-		boost::remove_vertex(*vi,g);
-		vs.erase(vi);
+void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::map<State*, float>map){
+	for (vertexDescriptor v: vs){
+		auto it =map.find(&g[v]);
+		if (it!=map.end()){
+			map.erase(it);
+		}
 	}
 }
 
@@ -1007,10 +1009,19 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 
 void Configurator::trackTaskExecution(Task & t){
-	if (t.motorStep>0){
+	auto it=errorMap.find(&transitionSystem[currentVertex]);
+	if (it==errorMap.end()){
+		throw std::invalid_argument("currentVertex does not have an error record\n");
+	}
+	if (t.motorStep>0 & fabs(it->second)<TRACKING_ERROR_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
 	}
+	else if (it->second>=TRACKING_ERROR_TOLERANCE){
+		t.motorStep+=std::floor(it->second/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
+	}
+	
+
 	if(t.motorStep==0){
 		t.change=1;
 	}

@@ -125,7 +125,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDesc
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void removeVertices(std::vector<vertexDescriptor>, TransitionSystem&);
+void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::map<State*, float>);
 
 void updateGraph(TransitionSystem&);
 

@@ -33,13 +33,13 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!current){
 		g[e].step = sk.second.step;
 	}
-	else{
+	else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
 		result=g[e.m_target].disturbance.pose.p.x-sk.first.disturbance.pose.p.x;
 		//if (auto it =errorMap.find(&g[e.m_target]); it !=errorMap.end()){
 		//	it->second= result;
 		//}
 		//else{
-			errorMap.insert_or_assign(&g[e.m_target], result);
+		errorMap.insert_or_assign(&g[e.m_target], result);
 	//	}
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
