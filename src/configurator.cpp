@@ -78,7 +78,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		std::unordered_map <Edge*, float> heuristicMap;
+		std::unordered_map <State*, float> heuristicMap;
 		std::vector <vertexDescriptor> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
@@ -94,8 +94,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
-		//transitionSystem.swap(tmp);
-		boost::copy_graph(tmp, transitionSystem);
+		transitionSystem.swap(tmp);
 		planVertices= back_planner(transitionSystem, bestLeaf, currentVertex);
 	}
 	else if (!planning){
@@ -395,7 +394,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<Edge*, float>map){
+void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<State*, float>map){
 	auto es=boost::edges(g);
 	for (auto ei=es.first; ei!=es.second; ei++){
 		for (vertexDescriptor v:vs){
@@ -1015,8 +1014,8 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 void Configurator::trackTaskExecution(Task & t){
 	float error=0;
-	std::unordered_map<Edge*, float>::iterator it;
-	if (it=errorMap.find(transitionSystem[currentEdge].ID); it!=errorMap.end()){
+	std::unordered_map<State*, float>::iterator it;
+	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
 		error=it->second;
 		it->second=0;
 	}
@@ -1064,7 +1063,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 	}
 	if (planning){
 		if (planVertices.empty()){
-			currentVertex=0;
+			currentVertex=movingVertex;
 			return;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::edge(currentVertex, planVertices[0], transitionSystem);
