@@ -1008,26 +1008,18 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 
 void Configurator::trackTaskExecution(Task & t){
-	//std::unordered_map<State*, float>::iterator it=errorMap.find(&(transitionSystem[currentVertex]));
-
 	float error=0;
 	std::unordered_map<State*, float>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-		//throw std::invalid_argument("currentVertex does not have an error record\n");
-			 		error=it->second;
+		error=it->second;
 	}
-	// for (it=errorMap.begin(); it!=errorMap.end();it++){
-	// 	if (it->first==transitionSystem[currentVertex].ID){
-	// 		error=it->second;
-	// 		break;
-	// 	}
-	// }
 	if (t.motorStep>0 & fabs(error)<TRACKING_ERROR_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
 	}
-	else if (error>=TRACKING_ERROR_TOLERANCE){
-		t.motorStep+=std::floor(error/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
+	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
+		int correction=-std::floor(error/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
+		t.motorStep+=correction; //reflex
 	}
 	if(t.motorStep==0){
 		t.change=1;
