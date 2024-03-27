@@ -1016,7 +1016,7 @@ void Configurator::trackTaskExecution(Task & t){
 	float error=0;
 	std::unordered_map<State*, float>::iterator it;
 	for (it=errorMap.begin(); it!=errorMap.end();it++){
-		if (it->first==&transitionSystem[currentVertex]){
+		if (it->first==transitionSystem[currentVertex].ID){
 			error=it->second;
 			break;
 		}
