@@ -25,11 +25,12 @@
 typedef std::vector <float> DistanceVector;
 
 struct Edge{
-	Direction direction;
+	Direction direction=DEFAULT;
 	float probability=1.0;
 	int step=0;
+	Edge*ID=this;
 
-	Edge(){}
+	Edge()=default;
 };
 
 
@@ -41,9 +42,8 @@ struct State{
 	int nodesInSameSpot =0;
 	bool filled =0;
 	int nObs=0;
-	State* ID=this;
 	
-	State(){}
+	State()=default;
 
 };
 
@@ -79,9 +79,9 @@ namespace gt{
 
 	int simToMotorStep(int);
 
-	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<Edge*, float>&); //returns disturbance rror based on expected vs observed D
 
-	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<Edge*, float>&);
 }
 
 

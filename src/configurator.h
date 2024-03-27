@@ -56,7 +56,8 @@ public:
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
-	std::unordered_map <State*, float> errorMap;
+	edgeDescriptor currentEdge, movingEdge;
+	std::unordered_map <Edge*, float> errorMap;
 
 Configurator()=default;
 
@@ -67,7 +68,8 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	currentVertex = boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
-	errorMap.emplace((transitionSystem[currentVertex].ID), 0);
+	currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	//errorMap.emplace((transitionSystem[currentVertex].ID), 0);
 	// edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	// transitionSystem[e].direction=DEFAULT;
 	// transitionSystem[e].step=0;
@@ -126,7 +128,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDesc
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::unordered_map<State*, float>);
+void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::unordered_map<Edge*, float>);
 
 void updateGraph(TransitionSystem&);
 

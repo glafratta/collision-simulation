@@ -74,10 +74,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
 		vertexDescriptor bestLeaf = movingVertex;
-		edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-		transitionSystem[e].direction=currentTask.direction;
-		transitionSystem[e].step=currentTask.motorStep;
-		std::unordered_map <State*, float> heuristicMap;
+		edgeDescriptor movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		errorMap.emplace(transitionSystem[currentEdge].ID , 0);
+		transitionSystem[movingEdge].direction=currentTask.direction;
+		transitionSystem[movingEdge].step=currentTask.motorStep;
+		std::unordered_map <Edge*, float> heuristicMap;
 		std::vector <vertexDescriptor> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
@@ -93,7 +94,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
-		transitionSystem.swap(tmp);
+		//transitionSystem.swap(tmp);
+		boost::copy_graph(tmp, transitionSystem);
 		planVertices= back_planner(transitionSystem, bestLeaf, currentVertex);
 	}
 	else if (!planning){
@@ -393,11 +395,15 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<State*, float>map){
-	for (vertexDescriptor v: vs){
-		auto it =map.find(&g[v]);
-		if (it!=map.end()){
-			map.erase(it);
+void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<Edge*, float>map){
+	auto es=boost::edges(g);
+	for (auto ei=es.first; ei!=es.second; ei++){
+		for (vertexDescriptor v:vs){
+			if (auto it=errorMap.find(g[*ei].ID);(*ei).m_target==v & it!=errorMap.end()){
+				errorMap.erase(it);
+				break;
+			}
+
 		}
 	}
 }
@@ -1009,8 +1015,8 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 void Configurator::trackTaskExecution(Task & t){
 	float error=0;
-	std::unordered_map<State*, float>::iterator it;
-	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
+	std::unordered_map<Edge*, float>::iterator it;
+	if (it=errorMap.find(transitionSystem[currentEdge].ID); it!=errorMap.end()){
 		error=it->second;
 		it->second=0;
 	}
@@ -1021,6 +1027,7 @@ void Configurator::trackTaskExecution(Task & t){
 	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
 		int correction=-std::floor(error/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
 		t.motorStep+=correction; //reflex
+		transitionSystem[currentEdge].step+=correction;
 	}
 	if(t.motorStep==0){
 		t.change=1;
@@ -1066,11 +1073,12 @@ void Configurator::changeTask(bool b, int &ogStep){
 			return;
 		}
 		currentVertex= planVertices[0];
-		edgeDescriptor e= ep.first;
+		//edgeDescriptor e= ep.first;
+		currentEdge=ep.first;
 		boost::clear_out_edges(0, transitionSystem);
 		planVertices.erase(planVertices.begin());
-		currentTask = Task(transitionSystem[e.m_source].disturbance, transitionSystem[e].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
-		currentTask.motorStep = transitionSystem[e].step;
+		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
+		currentTask.motorStep = transitionSystem[currentEdge].step;
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){
