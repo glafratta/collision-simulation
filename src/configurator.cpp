@@ -1010,9 +1010,9 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 void Configurator::trackTaskExecution(Task & t){
 	auto it=errorMap.find(&(transitionSystem[currentVertex]));
-	if (it==errorMap.end()){
-		throw std::invalid_argument("currentVertex does not have an error record\n");
-	}
+	// if (errorMap.contains(&(transitionSystem[currentVertex]))){
+	// 	throw std::invalid_argument("currentVertex does not have an error record\n");
+	// }
 	if (t.motorStep>0 & fabs(it->second)<TRACKING_ERROR_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
