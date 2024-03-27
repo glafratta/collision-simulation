@@ -398,7 +398,7 @@ void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSyst
 	//auto es=boost::edges(g);
 	//for (auto ei=es.first; ei!=es.second; ei++){
 		for (vertexDescriptor v:vs){
-			if (auto it=errorMap.find(g[v].ID);it->first==g[v].ID & it!=errorMap.end()){
+			if (auto it=errorMap.find(g[v].ID); it!=errorMap.end()){
 				errorMap.erase(it);
 				break;
 			}
