@@ -1,5 +1,7 @@
 include(GNUInstallDirs)
 
+set (CMAKE_CXX_STANDARD 17)
+
 set(SRC configurator.cpp task.cpp graphTools.cpp measurement.cpp worldbuilder.cpp sensor.cpp)
 
 set(HEAD disturbance.h configurator.h robot.h task.h graphTools.h affordance.h settings.h measurement.h worldbuilder.h sensor.h)

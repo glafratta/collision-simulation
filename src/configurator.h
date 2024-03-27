@@ -28,7 +28,7 @@ class Configurator{
 protected:
 	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	char fileNameBuffer[50];
+	//char fileNameBuffer[50];
 	Task currentTask;
 	bool benchmark=0;
 	vertexDescriptor movingVertex;
@@ -42,7 +42,7 @@ public:
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
-	CoordinateContainer current, currentBox2D;
+	CoordinateContainer currentBox2D;
 	bool planning =1;
 	char statFile[100];
 	char bodyFile[100];
@@ -56,6 +56,7 @@ public:
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
+	std::map <State*, float> errorMap;
 
 Configurator()=default;
 
@@ -162,13 +163,8 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		result = add_edge(src, v1, g);
 		g[result.first] =edge;
 		if (!topDown){
-//			g[e].direction =d;
 			g[src].options.erase(g[src].options.begin());
 		}
-		// else{
-		// 	g[e].direction=d;
-		// }
-		g[v1].totDs=g[src].totDs;
 		if (!g[v1].filled){
 			g[v1].disturbance = obs;
 		}

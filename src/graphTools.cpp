@@ -28,29 +28,29 @@ int gt::simToMotorStep(int simStep){
 // 	return result;
 // }
 
-float gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current){
+void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::map<State*, float>& errorMap){
 	float result=0;
-	if (sk.first.disturbance.isValid()& sk.first.disturbance.getAffIndex()==AVOID & !g[e.m_target].disturbance.isValid()){
-		g[e.m_target].totDs++;
-	}
 	if (!current){
 		g[e].step = sk.second.step;
 	}
 	else{
 		result=g[e.m_target].disturbance.pose.p.x-sk.first.disturbance.pose.p.x;
+		//if (auto it =errorMap.find(&g[e.m_target]); it !=errorMap.end()){
+		//	it->second= result;
+		//}
+		//else{
+			errorMap.insert_or_assign(&g[e.m_target], result);
+	//	}
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
 	g[e.m_target].endPose = sk.first.endPose;
 	g[e.m_target].options = sk.first.options;
-	return result;
 }
 
-float gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current){
-	float result=update(e, sk, g, current);
+void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::map<State*, float>& errorMap){
+	update(e, sk, g, current, errorMap);
 	g[e.m_target].outcome = sk.first.outcome;
-	return result;
 }
-
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);

@@ -74,22 +74,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		//vertexDescriptor startVertex=0; //used to see what would happen if task execution woudl stop now
 		vertexDescriptor bestLeaf = movingVertex;
-		//transitionSystem[movingVertex].endPose=b2Transform(b2Vec2(0,0), b2Rot(0));
-		
-		// if (currentVertex==0){
-		// 	currentTask.change=1;
-		// 	currentTask.H(transitionSystem[currentVertex].disturbance, STOP, 1);
-//		 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
-		// }
-		//if (startVertex !=currentVertex){
-			//provisional edge
-			edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			transitionSystem[e].direction=currentTask.direction;
-			transitionSystem[e].step=currentTask.motorStep;
-	//	}
-		if (iteration >1){
+		edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		transitionSystem[e].direction=currentTask.direction;
+		transitionSystem[e].step=currentTask.motorStep;
+		std::map <State*, float> heuristicMap;
+		if (iteration>1){
 			std::vector <vertexDescriptor> toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
 		else{
@@ -98,8 +88,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
-		//std::ostream mod();
-	//	boost::print_graph(m);
 		boost::print_graph(transitionSystem);
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
@@ -294,7 +282,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
+std::map<State*, float>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};

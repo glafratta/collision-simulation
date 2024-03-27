@@ -11,6 +11,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/graph_utility.hpp>
+#include <map>
 #include <boost/property_map/property_map.hpp> //property map
 //#include <boost/variant/get.hpp> //get function
 #include <boost/graph/copy.hpp>
@@ -38,14 +39,10 @@ struct State{
 	simResult::resultType outcome;
 	std::vector <Direction> options;
 	int nodesInSameSpot =0;
-	int totDs=0; //error signal
 	bool filled =0;
-	//int step=0;
 	int nObs=0;
 	
 	State(){}
-		
-	//simResult getSimResult();
 
 };
 
@@ -79,12 +76,11 @@ namespace gt{
 
 	std::pair<State, Edge> fill(simResult);
 
-
 	int simToMotorStep(int);
 
-	float update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::map<State*, float>&); //returns disturbance rror based on expected vs observed D
 
-	float set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::map<State*, float>&);
 }
 
 
