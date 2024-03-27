@@ -66,7 +66,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		Disturbance loopD(PURSUE, -(ogGoal.p));
 		controlGoal=Task(loopD,DEFAULT);
 	}
-
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	//isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	simResult result;
@@ -1010,17 +1009,19 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 void Configurator::trackTaskExecution(Task & t){
 	//std::unordered_map<State*, float>::iterator it=errorMap.find(&(transitionSystem[currentVertex]));
-	// if (errorMap.contains(&(transitionSystem[currentVertex]))){
-	// 	throw std::invalid_argument("currentVertex does not have an error record\n");
-	// }
+
 	float error=0;
 	std::unordered_map<State*, float>::iterator it;
-	for (it=errorMap.begin(); it!=errorMap.end();it++){
-		if (it->first==transitionSystem[currentVertex].ID){
-			error=it->second;
-			break;
-		}
+	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
+		//throw std::invalid_argument("currentVertex does not have an error record\n");
+			 		error=it->second;
 	}
+	// for (it=errorMap.begin(); it!=errorMap.end();it++){
+	// 	if (it->first==transitionSystem[currentVertex].ID){
+	// 		error=it->second;
+	// 		break;
+	// 	}
+	// }
 	if (t.motorStep>0 & fabs(error)<TRACKING_ERROR_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
