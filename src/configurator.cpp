@@ -79,7 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem[e].direction=currentTask.direction;
 		transitionSystem[e].step=currentTask.motorStep;
 		std::map <State*, float> heuristicMap;
-		if (iteration>1){
+		if (iteration >1){
 			std::vector <vertexDescriptor> toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
 		}
 		else{
@@ -282,7 +282,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-std::map<State*, float>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
+std::vector <vertexDescriptor>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
@@ -322,7 +322,7 @@ std::map<State*, float>Configurator::explorer(vertexDescriptor v, TransitionSyst
 				}
 			}
 			if(edge.second){
-				gt::set(edge.first, sk, g, v1==currentVertex);
+				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
@@ -381,7 +381,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		}
 		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		edgeDescriptor e2 = inEdges(g, pair.first, DEFAULT)[0];
-		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex);
+		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair.first);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ

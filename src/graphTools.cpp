@@ -2,9 +2,9 @@
 
 std::pair<State, Edge> gt::fill(simResult sr){
 	std::pair <State, Edge> result;
-	if (sr.collision.isValid()){
-		result.first.totDs++;
-	}
+	// if (sr.collision.isValid()){
+	// 	result.first.totDs++;
+	// }
 	result.first.disturbance = sr.collision;
 	result.first.endPose = sr.endPose;
 	result.first.outcome = sr.resultCode;
