@@ -1026,7 +1026,12 @@ void Configurator::trackTaskExecution(Task & t){
 	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
 		int correction=-std::floor(error/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
 		t.motorStep+=correction; //reflex
-		transitionSystem[currentEdge].step+=correction;
+		auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
+		if (eb.second){
+			transitionSystem[eb.first].step+=correction;
+		}
+		//transitionSystem[currentEdge].step+=correction;
+		
 	}
 	if(t.motorStep==0){
 		t.change=1;
