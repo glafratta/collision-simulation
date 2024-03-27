@@ -39,7 +39,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		//	it->second= result;
 		//}
 		//else{
-		errorMap.insert_or_assign(&g[e.m_target], result);
+		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	//	}
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;

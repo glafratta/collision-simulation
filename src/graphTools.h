@@ -41,6 +41,7 @@ struct State{
 	int nodesInSameSpot =0;
 	bool filled =0;
 	int nObs=0;
+	const State* ID=this;
 	
 	State(){}
 
