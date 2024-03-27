@@ -69,7 +69,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
 	currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	//errorMap.emplace((transitionSystem[currentVertex].ID), 0);
+	errorMap.emplace((transitionSystem[currentVertex].ID), 0);
 	// edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	// transitionSystem[e].direction=DEFAULT;
 	// transitionSystem[e].step=0;

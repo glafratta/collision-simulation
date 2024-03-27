@@ -75,7 +75,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	if (planning){ //|| !planError.m_vertices.empty())
 		vertexDescriptor bestLeaf = movingVertex;
 		edgeDescriptor movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-		errorMap.emplace(transitionSystem[currentEdge].ID , 0);
+		//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::unordered_map <State*, float> heuristicMap;
@@ -395,16 +395,16 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 }
 
 void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<State*, float>map){
-	auto es=boost::edges(g);
-	for (auto ei=es.first; ei!=es.second; ei++){
+	//auto es=boost::edges(g);
+	//for (auto ei=es.first; ei!=es.second; ei++){
 		for (vertexDescriptor v:vs){
-			if (auto it=errorMap.find(g[*ei].ID);(*ei).m_target==v & it!=errorMap.end()){
+			if (auto it=errorMap.find(g[v].ID);it->first==g[v].ID & it!=errorMap.end()){
 				errorMap.erase(it);
 				break;
 			}
 
 		}
-	}
+	//}
 }
 
 bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, TransitionSystem& g){
