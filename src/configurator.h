@@ -56,7 +56,7 @@ public:
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
-	std::map <State*, float> errorMap;
+	std::unordered_map <State*, float> errorMap;
 
 Configurator()=default;
 
@@ -126,7 +126,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDesc
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::map<State*, float>);
+void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::unordered_map<State*, float>);
 
 void updateGraph(TransitionSystem&);
 

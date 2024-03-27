@@ -394,7 +394,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::map<State*, float>map){
+void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<State*, float>map){
 	for (vertexDescriptor v: vs){
 		auto it =map.find(&g[v]);
 		if (it!=map.end()){
