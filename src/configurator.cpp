@@ -1012,6 +1012,7 @@ void Configurator::trackTaskExecution(Task & t){
 	std::unordered_map<State*, float>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
 		error=it->second;
+		it->second=0;
 	}
 	if (t.motorStep>0 & fabs(error)<TRACKING_ERROR_TOLERANCE){
 		t.motorStep--;
