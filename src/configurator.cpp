@@ -1136,5 +1136,7 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 			g[*vIt].disturbance.pose-=deltaPose;
 		}
 	}
-	controlGoal.disturbance.pose-=deltaPose;
+	if(controlGoal.disturbance.isValid()){
+		controlGoal.disturbance.pose-=deltaPose;
+	}
 }

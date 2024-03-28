@@ -130,7 +130,7 @@ void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tran
 
 void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::unordered_map<State*, float>);
 
-void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float error){
+void trackDisturbance(b2Transform &, Task::Action, float);
 
 void updateGraph(TransitionSystem&, float error);
 
