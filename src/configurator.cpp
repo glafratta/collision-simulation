@@ -1012,7 +1012,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 // }
 
 
-void Configurator::trackTaskExecution(Task & t){
+float Configurator::trackTaskExecution(Task & t){
 	float error=0;
 	std::unordered_map<State*, float>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
@@ -1030,13 +1030,12 @@ void Configurator::trackTaskExecution(Task & t){
 		if (eb.second){
 			transitionSystem[eb.first].step+=correction;
 		}
-		//transitionSystem[currentEdge].step+=correction;
-		
 	}
 	if(t.motorStep==0){
 		t.change=1;
 	}
 	updateGraph(transitionSystem);
+	return error;
 }
 
 b2Transform Configurator::assignDeltaPose(Task::Action a, float timeElapsed){

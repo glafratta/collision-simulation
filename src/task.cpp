@@ -77,13 +77,21 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 	d.setAngle(angle); //with respect to robot's velocity
 }
 
-void Task::trackDisturbance(Disturbance & d, Action a){
+void Task::trackDisturbance(Disturbance & d, Action a, float error){
+	
 	float angleTurned =MOTOR_CALLBACK*a.getOmega();
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
-	float distanceTraversed = MOTOR_CALLBACK*a.getLinearSpeed();
+	float distanceTraversed = 0;
 	float initialL = d.pose.p.Length();
+	if(error<TRACKING_ERROR_TOLERANCE){
+		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
+	}
+	else{
+		distanceTraversed=-error;
+	}
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
+
 }
 
 void Task::controller(float timeElapsed){

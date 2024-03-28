@@ -221,7 +221,7 @@ b2Vec2 getRecordedVelocity(){
 
 void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transform(b2Vec2(0,0), b2Rot(0)));
 
-void trackDisturbance(Disturbance &, Action);
+void trackDisturbance(Disturbance &, Action, float error);
 
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);

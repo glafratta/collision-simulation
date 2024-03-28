@@ -207,7 +207,7 @@ std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds 
 
 std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 									
-void trackTaskExecution(Task &);
+float trackTaskExecution(Task &);
 
 b2Transform assignDeltaPose(Task::Action, float);
 
