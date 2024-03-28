@@ -1118,7 +1118,7 @@ void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float er
 void Configurator::updateGraph(TransitionSystem&g, float error){
 	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
-	if (fabs(error)>TRACKING_ERROR_TOLERANCE){
+	if (fabs(error)<TRACKING_ERROR_TOLERANCE){
 		deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 						rot);
