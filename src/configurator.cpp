@@ -78,14 +78,14 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		std::unordered_map <State*, float> heuristicMap;
+		std::unordered_map <vertexDescriptor, float> heuristicMap;
 		std::vector <vertexDescriptor> toRemove;
 		if (iteration >1){
-			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf);
+			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
 		}
 		else{
 			bestLeaf=currentVertex;
-			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf);
+			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		Deleted ndeleted(&transitionSystem);
