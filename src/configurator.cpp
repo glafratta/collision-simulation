@@ -1034,7 +1034,7 @@ float Configurator::trackTaskExecution(Task & t){
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	updateGraph(transitionSystem, it->second);
+	updateGraph(transitionSystem, error);
 	return error;
 }
 
