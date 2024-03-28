@@ -1034,7 +1034,7 @@ float Configurator::trackTaskExecution(Task & t){
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	updateGraph(transitionSystem, error);
+	updateGraph(transitionSystem, it->second);
 	return error;
 }
 
@@ -1124,7 +1124,7 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 						rot);
 	}
 	else{
-		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error*(samplingRate/MOTOR_CALLBACK),
+		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 						rot);
 	
