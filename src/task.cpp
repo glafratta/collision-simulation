@@ -47,13 +47,8 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			}
 		}
 		result.collision.setAngle(robot.body->GetTransform());	
-		//b2Vec2 distance; //= robot.body->GetPosition();
-		//distance.x = robot.body->GetPosition().x - start.p.x;
-		//distance.y = robot.body->GetPosition().y - start.p.y;
-		//result.distanceCovered = distance.Length() ;
 		result.endPose = robot.body->GetTransform();
 		result.step=stepb2d;
-		//int roboCount=0;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
 			_world.DestroyBody(b);
 		}
@@ -77,21 +72,20 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 	d.setAngle(angle); //with respect to robot's velocity
 }
 
-void Task::trackDisturbance(Disturbance & d, Action a, float error){
-	float angleTurned =MOTOR_CALLBACK*a.getOmega();
-	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
-	float distanceTraversed = 0;
-	float initialL = d.pose.p.Length();
-	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
-		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
-	}
-	else{
-		distanceTraversed=error;
-	}
-	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
-	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
-
-}
+// void Configurator::trackDisturbance(b2Transform & pose, Action a, float error){
+// 	float angleTurned =MOTOR_CALLBACK*a.getOmega();
+// 	pose.q.Set(pose.q.GetAngle()-angleTurned);	
+// 	float distanceTraversed = 0;
+// 	float initialL = pose.p.Length();
+// 	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
+// 		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
+// 	}
+// 	else{
+// 		distanceTraversed=error;
+// 	}
+// 	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
+// 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
+// }
 
 void Task::controller(float timeElapsed){
 //float recordedAngle = action.getOmega()/0.2;

@@ -90,11 +90,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
-		boost::print_graph(transitionSystem);
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
+		boost::print_graph(transitionSystem);
 		planVertices= back_planner(transitionSystem, bestLeaf, currentVertex);
 	}
 	else if (!planning){
@@ -1034,7 +1034,7 @@ float Configurator::trackTaskExecution(Task & t){
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	updateGraph(transitionSystem);
+	updateGraph(transitionSystem, error);
 	return error;
 }
 
@@ -1100,10 +1100,35 @@ void Configurator::changeTask(bool b, int &ogStep){
 	ogStep = currentTask.motorStep;
 }
 
-void Configurator::updateGraph(TransitionSystem&g){
-	b2Transform deltaPose(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float error){
+	float angleTurned =MOTOR_CALLBACK*a.getOmega();
+	pose.q.Set(pose.q.GetAngle()-angleTurned);	
+	float distanceTraversed = 0;
+	float initialL = pose.p.Length();
+	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
+		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
+	}
+	else{
+		distanceTraversed=error;
+	}
+	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
+	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
+}
+
+void Configurator::updateGraph(TransitionSystem&g, float error){
+	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
+	b2Transform deltaPose;
+	if (fabs(error)>TRACKING_ERROR_TOLERANCE){
+		deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-						b2Rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK));
+						rot);
+	}
+	else{
+		deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
+						rot);
+	
+	}
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){
 		if (*vIt!=movingVertex){
@@ -1111,4 +1136,5 @@ void Configurator::updateGraph(TransitionSystem&g){
 			g[*vIt].disturbance.pose-=deltaPose;
 		}
 	}
+	controlGoal.disturbance.pose-=deltaPose;
 }
