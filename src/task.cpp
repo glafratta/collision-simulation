@@ -78,12 +78,11 @@ void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robV
 }
 
 void Task::trackDisturbance(Disturbance & d, Action a, float error){
-	
 	float angleTurned =MOTOR_CALLBACK*a.getOmega();
 	d.pose.q.Set(d.pose.q.GetAngle()-angleTurned);	
 	float distanceTraversed = 0;
 	float initialL = d.pose.p.Length();
-	if(error<TRACKING_ERROR_TOLERANCE){
+	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
 		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
 	}
 	else{
