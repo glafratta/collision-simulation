@@ -86,7 +86,7 @@ void Task::trackDisturbance(Disturbance & d, Action a, float error){
 		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
 	}
 	else{
-		distanceTraversed=-error;
+		distanceTraversed=error;
 	}
 	d.pose.p.x=cos(d.pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	d.pose.p.y = sin(d.pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
