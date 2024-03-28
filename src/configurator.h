@@ -154,7 +154,7 @@ bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 //void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //evaluates only after DEFAULT, internal one step lookahead
+std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &, std::map<vertexDescriptor, float>&); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
