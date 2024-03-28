@@ -1124,7 +1124,7 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 						rot);
 	}
 	else{
-		deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error*(samplingRate/MOTOR_CALLBACK),
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 						rot);
 	
