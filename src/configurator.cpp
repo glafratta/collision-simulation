@@ -1130,7 +1130,7 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 			g[*vIt].disturbance.pose-=deltaPose;
 		}
 	}
-	if (fabs(error)<TRACKING_ERROR_TOLERANCE){
+	if (fabs(error)>TRACKING_ERROR_TOLERANCE){
 		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
 						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 						rot);
