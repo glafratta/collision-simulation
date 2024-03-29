@@ -1118,23 +1118,23 @@ void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float er
 void Configurator::updateGraph(TransitionSystem&g, float error){
 	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
-	if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-		deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
-						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-						rot);
-	}
-	else{
-		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
-						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-						rot);
-	
-	}
+	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
+	deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
+					rot);
+	//}
 	auto vPair =boost::vertices(g);
-	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){
+	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 			g[*vIt].endPose-=deltaPose;
 			g[*vIt].disturbance.pose-=deltaPose;
 		}
+	}
+	if (fabs(error)<TRACKING_ERROR_TOLERANCE){
+		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
+						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
+						rot);
+	
 	}
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.pose-=deltaPose;
