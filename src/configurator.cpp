@@ -88,7 +88,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
-		clearFromMap(toRemove, transitionSystem, heuristicMap);
+		//clearFromMap(toRemove, transitionSystem, heuristicMap);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
 		TransitionSystem tmp;
@@ -328,7 +328,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			heuristicMap.emplace(v1, evaluationFunction);
+			heuristicMap.emplace(v1, evaluationFunction(er));
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
