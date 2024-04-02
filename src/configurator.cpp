@@ -923,11 +923,11 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	if(!ep.second){
 		return;
 	}
-	//edgeDescriptor e= ep.first;
+	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
 	// if (g[currentEdge].direction!=d){
 	// 	return;
 	// }
-	int stepsTraversed= g[currentEdge].step-currentTask.motorStep;
+	int stepsTraversed= g[eb.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
