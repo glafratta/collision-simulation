@@ -89,8 +89,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		//clearFromMap(toRemove, transitionSystem, heuristicMap);
-		Deleted ndeleted(&transitionSystem);
-		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
+		Connected connected(&transitionSystem);
+		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
@@ -355,18 +355,10 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		}
 		if (ep.first.m_target!=v1){
 			g[ep.first.m_target].disturbance = dist;
-			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g);
+			std::pair <bool, vertexDescriptor> match= exactPolicyMatch(ep.first.m_target, g);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-				//deletion.resize(deletion.size()+1);
-				deletion.push_back(pair);
-				// if (ep.first.m_target==v){
-				// 	v=match.second;
-				// // 	deletion[-1].first=match.second;
-				// // 	deletion[-1].second=ep.first.m_target;
-				// }					
-				// g[match.second].set(g[ep.first.m_target]);
-			}
+				deletion.push_back(pair);			}
 		}
 			ep.second= boost::in_degree(ep.first.m_source, g)>0;
 			if (!ep.second){
@@ -970,12 +962,27 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	return result;
 }
 
+std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(State s, TransitionSystem& g, Direction d){
+	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
+	auto vs= boost::vertices(g);
+	for (auto vi=vs.first; vi!= vs.second; vi++){
+		vertexDescriptor v=*vi;
+		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & inEdges(g, v, d).empty()){
+			result.first=true;
+			result.second=v;
+			break;
+		}
+
+	}
+	return result;
+}
+
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])){
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex){
 			result.first=true;
 			result.second=*vi;
 			break;

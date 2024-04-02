@@ -60,9 +60,9 @@ typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescripto
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
 
-struct Deleted{
-	Deleted(){}
-	Deleted(TransitionSystem * ts): g(ts){}
+struct Connected{
+	Connected(){}
+	Connected(TransitionSystem * ts): g(ts){}
 	
 	bool operator()(const vertexDescriptor& v)const{
 	 	bool in= boost::in_degree(v, *g)>0;
@@ -86,7 +86,7 @@ namespace gt{
 }
 
 
-typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Deleted> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> FilteredTS;
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle
@@ -117,7 +117,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(State, State); // is this the same state?
 
-		std::pair<bool, vertexDescriptor> isPerfectMatch(TransitionSystem, vertexDescriptor, Direction, State);
+		std::pair<bool, vertexDescriptor> isPerfectMatch(TransitionSystem, vertexDescriptor, Direction, State); //find match amoung vertex out edges
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
