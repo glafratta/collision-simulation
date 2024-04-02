@@ -977,12 +977,12 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 // 	return result;
 // }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g{
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, v, d).empty()){
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex){
 			result.first=true;
 			result.second=*vi;
 			break;
@@ -994,12 +994,12 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g){
+std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex){
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, v, d).empty()){
 			result.first=true;
 			result.second=*vi;
 			break;
