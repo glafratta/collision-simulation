@@ -919,7 +919,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
-	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
+	std::pair<edgeDescriptor, bool> ep= boost::edge(currentEdge.m_source, currentVertex, g);
 	if(!ep.second){
 		return;
 	}
