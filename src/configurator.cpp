@@ -977,7 +977,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 // 	return result;
 // }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g{
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
