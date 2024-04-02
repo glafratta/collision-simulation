@@ -1123,7 +1123,8 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-	deltaPose=b2Transform(b2Vec2(getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK,
+	float xdistance=getTask()->getAction().getLinearVelocity().x+error;
+	deltaPose=b2Transform(b2Vec2(xdistance*MOTOR_CALLBACK,
 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 					rot);
 	//}
@@ -1134,12 +1135,12 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 			g[*vIt].disturbance.pose-=deltaPose;
 		}
 	}
-	if (fabs(error)>TRACKING_ERROR_TOLERANCE){
-		deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
-						getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-						rot);
+	// if (fabs(error)>TRACKING_ERROR_TOLERANCE){
+	// 	deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
+	// 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
+	// 					rot);
 	
-	}
+	// }
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.pose-=deltaPose;
 	}
