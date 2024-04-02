@@ -919,16 +919,15 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
 	// 	return;
 	// }
-	std::pair<edgeDescriptor, bool> ep= boost::edge(currentEdge.m_source, currentVertex, g);
+	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 	if(!ep.second){
 		return;
 	}
-	edgeDescriptor e= ep.first;
-	if (g[e].direction!=d){
-		return;
-	}
-//	int stepsTraversed= transitionSystem[currentVertex].step-currentTask.motorStep;
-	int stepsTraversed= g[ep.first].step-currentTask.motorStep;
+	//edgeDescriptor e= ep.first;
+	// if (g[currentEdge].direction!=d){
+	// 	return;
+	// }
+	int stepsTraversed= g[currentEdge].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
 		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
