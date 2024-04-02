@@ -148,7 +148,7 @@ std::pair <bool, vertexDescriptor> findExactMatch(State, TransitionSystem&);
 
 std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, TransitionSystem&); //has a safety to prevent matching a vertex with self
 
-std::pair <bool, vertexDescriptor> exactPolicyMatch(State, TransitionSystem&, Direction); //matches state and action (policy)
+std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task at vertex v fails, start is set to v's predecessor's end
 

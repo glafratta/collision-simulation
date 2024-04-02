@@ -355,7 +355,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		}
 		if (ep.first.m_target!=v1){
 			g[ep.first.m_target].disturbance = dist;
-			std::pair <bool, vertexDescriptor> match= exactPolicyMatch(ep.first.m_target, g);
+			std::pair <bool, vertexDescriptor> match= exactPolicyMatch(ep.first.m_target, g, g[ep.first].direction);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.push_back(pair);			}
@@ -962,22 +962,39 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(State s, TransitionSystem& g, Direction d){
+// std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(State s, TransitionSystem& g, Direction d){
+// 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
+// 	auto vs= boost::vertices(g);
+// 	for (auto vi=vs.first; vi!= vs.second; vi++){
+// 		vertexDescriptor v=*vi;
+// 		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & inEdges(g, v, d).empty()){
+// 			result.first=true;
+// 			result.second=v;
+// 			break;
+// 		}
+
+// 	}
+// 	return result;
+// }
+
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
-		vertexDescriptor v=*vi;
-		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & inEdges(g, v, d).empty()){
+		if (*vi!=v){
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, v, d).empty()){
 			result.first=true;
-			result.second=v;
+			result.second=*vi;
 			break;
 		}
+		}
+
 
 	}
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g){
+std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
