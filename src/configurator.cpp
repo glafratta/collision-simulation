@@ -79,7 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::map <vertexDescriptor, float> heuristicMap;
-		std::vector <vertexDescriptor> toRemove;
+		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
 		}
@@ -88,6 +88,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
+		clearFromMap(toRemove, transitionSystem, heuristicMap);
 		Deleted ndeleted(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), ndeleted);
 		TransitionSystem tmp;
@@ -284,12 +285,12 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-std::vector <vertexDescriptor>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext, std::map<vertexDescriptor, float>& heuristicMap){
+std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext, std::map<vertexDescriptor, float>& heuristicMap){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
-	std::vector <vertexDescriptor> toRemove;
+	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
@@ -327,6 +328,7 @@ std::vector <vertexDescriptor>Configurator::explorer(vertexDescriptor v, Transit
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
+			heuristicMap.emplace(v1, evaluationFunction);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
@@ -375,7 +377,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	return deletion;
 }
 
-void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>>& pq, std::vector<vertexDescriptor>& toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
+void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, std::vector <std::pair<vertexDescriptor, float>>& pq, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 	for (std::pair<vertexDescriptor, vertexDescriptor> pair:vertices){
 		if (pair.first==src){
 			src=pair.second;
@@ -384,7 +386,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		edgeDescriptor e2 = inEdges(g, pair.first, DEFAULT)[0];
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
 		boost::clear_vertex(pair.first, g);
-		toRemove.push_back(pair.first);
+		toRemove.push_back(pair);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ
 			if(pq[i].first==pair.first){
 				pq.erase(pq.begin()+i);
@@ -394,12 +396,14 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::clearFromMap(std::vector<vertexDescriptor> vs, TransitionSystem&g, std::unordered_map<State*, float>map){
+void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> matches , TransitionSystem&g, std::unordered_map<State*, float>map){
 	//auto es=boost::edges(g);
 	//for (auto ei=es.first; ei!=es.second; ei++){
-		for (vertexDescriptor v:vs){
-			if (auto it=errorMap.find(g[v].ID); it!=errorMap.end()){
-				errorMap.erase(it);
+		for (std::pair<vertexDescriptor, vertexDescriptor> pair:matches){
+			if (auto it=map.find(g[pair.first].ID); it!=map.end()){
+				float value = map.at(transitionSystem[pair.first].ID);
+				map.insert_or_assign(transitionSystem[pair.second].ID, value);
+				map.erase(it);
 				break;
 			}
 

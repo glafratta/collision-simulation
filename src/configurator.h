@@ -126,9 +126,9 @@ simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRA
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, vertexDescriptor&, TransitionSystem&);
 
-void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>&, std::vector<vertexDescriptor>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
+void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void clearFromMap(std::vector<vertexDescriptor>, TransitionSystem&, std::unordered_map<State*, float>);
+void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, float>);
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
@@ -156,7 +156,7 @@ bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 //void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &, std::map<vertexDescriptor, float>&); //evaluates only after DEFAULT, internal one step lookahead
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &, std::map<vertexDescriptor, float>&); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
