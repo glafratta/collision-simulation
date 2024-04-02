@@ -960,7 +960,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
-		if (matcher.isPerfectMatch(g[v], s)){
+		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex){
 			result.first=true;
 			result.second=v;
 			break;
