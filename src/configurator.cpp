@@ -442,19 +442,19 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::map<vertexDescriptor, float> hm){
 	std::vector <vertexDescriptor> plan;
 	vertexDescriptor src=currentVertex;
-	float phi= hm.at(src);
 	std::vector <vertexDescriptor> frontier;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
+		float phi=2; //very large phi, will get overwritten
 		for (vertexDescriptor v:frontier){
 			if (auto it=hm.find(v); it!=hm.end()){
 				if (float phiTmp=hm.at(v); phiTmp<phi){
 					phi=phiTmp;
 					src=v;
-					plan.push_back(src);
 				}
 			}
 		}
+		plan.push_back(src);
 	}while(!frontier.empty());
 	return plan;
 }
@@ -988,7 +988,6 @@ std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v
 			}
 		}
 	return result;
-
 }
 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g){
