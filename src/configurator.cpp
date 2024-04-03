@@ -442,7 +442,7 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::map<vertexDescriptor, float> hm){
 	std::vector <vertexDescriptor> plan;
 	float phi= hm.at(movingVertex);
-	vertexDescriptor src=movingVertex;
+	vertexDescriptor src=currentVertex;
 	std::vector <vertexDescriptor> frontier;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
