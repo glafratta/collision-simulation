@@ -73,6 +73,33 @@ private:
 TransitionSystem * g;
 };
 
+struct Memorable{
+	Memorable(){}
+	Memorable(TransitionSystem* ts):g(ts){}
+
+	bool operator()(const vertexDescriptor& v){//const
+		bool result=true;
+		// if ((*g)[e].probability<FORGET_THRESHOLD){
+		// 	result=false;
+		// 	forget.insert(e);
+		// }
+		// auto es=boost::in_edges(e.m_source, *g);
+		// for (auto ei=es.first; ei!=es.second; ei++){
+		// 	for (edgeDescriptor ed:forget){
+		// 		if (*ei==ed){
+		// 			result=false;
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		return result;
+	}
+
+	private: 
+	TransitionSystem *g;
+	std::set <edgeDescriptor> forget;
+};
+
 
 namespace gt{
 

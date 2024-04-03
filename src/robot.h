@@ -28,6 +28,7 @@ const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.00;
 const int maxNodesOnSpot =4;
 const float TRACKING_ERROR_TOLERANCE = MAX_SPEED*0.5*MOTOR_CALLBACK;
+const float FORGET_THRESHOLD=0.05;
 
 class Robot {
 private: 

@@ -79,6 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::map <vertexDescriptor, float> heuristicMap;
+		heuristicMap.emplace(movingVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
@@ -96,7 +97,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		boost::print_graph(transitionSystem);
-		planVertices= back_planner(transitionSystem, bestLeaf, currentVertex);
+		planVertices= planner(transitionSystem, bestLeaf, currentVertex);
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
@@ -437,6 +438,27 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 // 	return p;
 
 // }
+
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::map<vertexDescriptor, float> hm){
+	std::vector <vertexDescriptor> plan;
+	float phi= hm.at(movingVertex);
+	vertexDescriptor src=movingVertex;
+	while(1){
+		std::vector <vertexDescriptor> frontier=frontierVertices(src, g, DEFAULT);
+		for (vertexDescriptor v:frontier){
+			if (auto it=hm.find(v); it!=hm.end()){
+				if (float phiTmp=hm.at(v); phiTmp<phi){
+					phi=phiTmp;
+					src=v;
+					plan.push_back(src);
+				}
+			}
+		}
+	}
+	return plan;
+}
+
+
 
 std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, vertexDescriptor leaf, vertexDescriptor root){
 	std::vector <vertexDescriptor> vertices;
@@ -947,6 +969,27 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	return result;
 } 
 
+std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
+		std::vector <vertexDescriptor> result;
+		edgeDescriptor e; 
+		std::vector <vertexDescriptor>frontier={v};
+		while (!frontier.empty()){
+			v= frontier[0];
+			frontier.erase(frontier.begin());
+			auto es=boost::out_edges(v, g);
+			for (auto ei=es.first; ei!=es.second; ei++){
+				if (g[*ei].direction==d){
+					result.push_back((*ei).m_target);
+				}
+				else{
+					frontier.push_back((*ei).m_target);
+				}
+			}
+		}
+	return result;
+
+}
+
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
@@ -999,7 +1042,7 @@ std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescript
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, v, d).empty()){
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, *vi, d).empty()){
 			result.first=true;
 			result.second=*vi;
 			break;

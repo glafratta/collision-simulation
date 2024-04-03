@@ -138,6 +138,8 @@ void adjustStepDistance(vertexDescriptor, TransitionSystem &, Direction, float&)
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
+std::vector <vertexDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction ); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+
 std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
 std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
@@ -181,6 +183,8 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 }
 
 void adjustProbability(TransitionSystem &, edgeDescriptor&);
+
+std::vector <vertexDescriptor> planner(TransitionSystem&, std::map<vertexDescriptor, float>);
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
