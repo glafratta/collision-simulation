@@ -79,7 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::map <vertexDescriptor, float> heuristicMap;
-		heuristicMap.emplace(movingVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
+		heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
@@ -441,8 +441,8 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::map<vertexDescriptor, float> hm){
 	std::vector <vertexDescriptor> plan;
-	float phi= hm.at(movingVertex);
 	vertexDescriptor src=currentVertex;
+	float phi= hm.at(src);
 	std::vector <vertexDescriptor> frontier;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
