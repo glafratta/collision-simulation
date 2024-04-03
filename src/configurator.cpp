@@ -971,22 +971,23 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 } 
 
 std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
-		std::vector <vertexDescriptor> result;
-		edgeDescriptor e; 
-		std::vector <vertexDescriptor>frontier={v};
-		while (!frontier.empty()){
-			v= frontier[0];
+	std::vector <vertexDescriptor> result;
+	edgeDescriptor e; 
+	std::vector <vertexDescriptor>frontier;
+	do{
+		if (!frontier.empty()){
 			frontier.erase(frontier.begin());
-			auto es=boost::out_edges(v, g);
-			for (auto ei=es.first; ei!=es.second; ei++){
-				if (g[*ei].direction==d){
-					result.push_back((*ei).m_target);
-				}
-				else{
-					frontier.push_back((*ei).m_target);
-				}
+		}
+		auto es=boost::out_edges(v, g);
+		for (auto ei=es.first; ei!=es.second; ei++){
+			if (g[*ei].direction==d){
+				result.push_back((*ei).m_target);
+			}
+			else{
+				frontier.push_back((*ei).m_target);
 			}
 		}
+	}while (!frontier.empty());
 	return result;
 }
 
