@@ -980,10 +980,6 @@ std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v
 	edgeDescriptor e; 
 	std::vector <vertexDescriptor>frontier;
 	do{
-		if (!frontier.empty()){
-			v=frontier[0];
-			frontier.erase(frontier.begin());
-		}
 		auto es=boost::out_edges(v, g);
 		for (auto ei=es.first; ei!=es.second; ei++){
 			if (g[*ei].direction==d){
@@ -993,7 +989,14 @@ std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v
 				frontier.push_back((*ei).m_target);
 			}
 		}
-	}while (!frontier.empty());
+		if (!frontier.empty()){
+			v=frontier[0];
+			frontier.erase(frontier.begin());
+		}
+		else{
+			break;
+		}
+	}while (true);
 	return result;
 }
 
