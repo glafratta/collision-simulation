@@ -976,6 +976,7 @@ std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v
 	std::vector <vertexDescriptor>frontier;
 	do{
 		if (!frontier.empty()){
+			v=frontier[0];
 			frontier.erase(frontier.begin());
 		}
 		auto es=boost::out_edges(v, g);
