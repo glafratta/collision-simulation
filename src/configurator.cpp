@@ -454,8 +454,13 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::m
 				}
 			}
 		}
-		plan.push_back(src);
-	}while(!frontier.empty());
+		if (!frontier.empty()){
+			plan.push_back(src);
+		}
+		else{
+			break;
+		}
+	}while(true);
 	return plan;
 }
 
