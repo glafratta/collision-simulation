@@ -443,8 +443,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::m
 	std::vector <vertexDescriptor> plan;
 	float phi= hm.at(movingVertex);
 	vertexDescriptor src=movingVertex;
-	while(1){
-		std::vector <vertexDescriptor> frontier=frontierVertices(src, g, DEFAULT);
+	std::vector <vertexDescriptor> frontier;
+	do{
+		frontier=frontierVertices(src, g, DEFAULT);
 		for (vertexDescriptor v:frontier){
 			if (auto it=hm.find(v); it!=hm.end()){
 				if (float phiTmp=hm.at(v); phiTmp<phi){
@@ -454,7 +455,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::m
 				}
 			}
 		}
-	}
+	}while(!frontier.empty());
 	return plan;
 }
 
