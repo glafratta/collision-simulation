@@ -97,7 +97,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		boost::print_graph(transitionSystem);
-		planVertices= planner(transitionSystem, bestLeaf, currentVertex);
+		planVertices= planner(transitionSystem,heuristicMap);
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
