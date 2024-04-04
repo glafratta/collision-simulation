@@ -1206,8 +1206,8 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-	float xdistance=getTask()->getAction().getLinearVelocity().x+error;
-	deltaPose=b2Transform(b2Vec2(xdistance*MOTOR_CALLBACK,
+	float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error;
+	deltaPose=b2Transform(b2Vec2(xdistance,
 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 					rot);
 	//}
