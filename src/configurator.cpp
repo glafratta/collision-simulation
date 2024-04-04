@@ -87,6 +87,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		else{
 			//bestLeaf=currentVertex;
+			currentTask.action.setVelocities(0,0);
 			toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);

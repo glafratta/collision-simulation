@@ -59,13 +59,16 @@ public:
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
-    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS)*TURN_FRICTION; //instant velocity, determines angle increment in willcollide
-    recordedOmega = omega;
-    linearSpeed = MAX_SPEED*(L+R)/2;
-    recordedSpeed=linearSpeed;
-    valid=1;
+    setVelocities(L, R);
     }
 
+void setVelocities(float l, float r){
+    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION; //instant velocity, determines angle increment in willcollide
+    recordedOmega = omega;
+    linearSpeed = MAX_SPEED*(l+r)/2;
+    recordedSpeed=linearSpeed;
+    valid=1;
+}
 
     b2Vec2 getLinearVelocity(){
         b2Vec2 velocity;
