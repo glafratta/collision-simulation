@@ -85,7 +85,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world);
 		}
 		else{
-			bestLeaf=currentVertex;
+			//bestLeaf=currentVertex;
 			toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
@@ -287,7 +287,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 
 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
-	vertexDescriptor v1, v0;
+	vertexDescriptor v1, v0, bestNext=v;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
