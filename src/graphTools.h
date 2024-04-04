@@ -51,6 +51,10 @@ struct State{
 	bool visited(){
 		return phi<=1.0;
 	}
+
+	void resetVisited(){
+		phi=10.0;
+	}
 };
 
 

@@ -81,6 +81,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//std::map <vertexDescriptor, float> heuristicMap;
 		//heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+		resetPhi(transitionSystem);
 		if (iteration >1){
 			toRemove=explorer(movingVertex, transitionSystem, currentTask, world);
 		}
@@ -125,6 +126,14 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	return 1;
 }
+
+void Configurator::resetPhi(TransitionSystem&g){
+	auto vs=boost::vertices(g);
+	for (auto vi=vs.first; vi!=vs.second; vi++){
+		g[*vi].resetVisited();
+	}
+}
+
 
 
 std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
