@@ -43,9 +43,14 @@ struct State{
 	bool filled =0;
 	int nObs=0;
 	State* ID=this;
+	float phi=10.0; //arbitrarily large phi
+
 	
 	State()=default;
 
+	bool visited(){
+		return phi<=1.0;
+	}
 };
 
 
@@ -71,6 +76,18 @@ struct Connected{
 	}
 private:
 TransitionSystem * g;
+};
+
+struct Visited{
+	Visited(){}
+	Visited(TransitionSystem*ts):g(ts){}
+
+	bool operator()(const vertexDescriptor&v )const{
+		return (*g)[v].phi<2.0;
+	}
+
+	private:
+	TransitionSystem*g;
 };
 
 struct Memorable{

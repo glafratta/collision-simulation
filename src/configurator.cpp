@@ -78,15 +78,15 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		std::map <vertexDescriptor, float> heuristicMap;
-		heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
+		//std::map <vertexDescriptor, float> heuristicMap;
+		//heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		if (iteration >1){
-			toRemove=explorer(movingVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
+			toRemove=explorer(movingVertex, transitionSystem, currentTask, world);
 		}
 		else{
 			bestLeaf=currentVertex;
-			toRemove=explorer(currentVertex, transitionSystem, currentTask, world, bestLeaf, heuristicMap);
+			toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
 		}
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		//clearFromMap(toRemove, transitionSystem, heuristicMap);
@@ -97,7 +97,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		boost::print_graph(transitionSystem);
-		planVertices= planner(transitionSystem,heuristicMap);
+		planVertices= planner(transitionSystem);
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
@@ -286,7 +286,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w, vertexDescriptor & bestNext, std::map<vertexDescriptor, float>& heuristicMap){
+std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	vertexDescriptor v1, v0;
 	Direction direction= t.direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
@@ -329,7 +329,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			heuristicMap.emplace(v1, evaluationFunction(er));
+			//heuristicMap.emplace(v1, evaluationFunction(er));
+			g[v1].phi=evaluationFunction(er);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
@@ -439,20 +440,24 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 // }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, std::map<vertexDescriptor, float> hm){
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 	std::vector <vertexDescriptor> plan;
-	vertexDescriptor src=currentVertex;
-	std::vector <vertexDescriptor> frontier;
+	vertexDescriptor src=currentVertex, connecting=TransitionSystem::null_vertex();
+	std::vector <edgeDescriptor> frontier;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
 		float phi=2; //very large phi, will get overwritten
-		for (vertexDescriptor v:frontier){
-			if (auto it=hm.find(v); it!=hm.end()){
-				if (float phiTmp=hm.at(v); phiTmp<phi){
-					phi=phiTmp;
-					src=v;
+		for (edgeDescriptor e:frontier){
+				if (g[e.m_target].phi<phi){
+					phi=g[e.m_target].phi;
+					if (e.m_source!=src){
+						connecting=e.m_source;
+					}
+					src=e.m_target;
 				}
-			}
+		}
+		if (connecting!=TransitionSystem::null_vertex()){
+			plan.push_back(connecting);
 		}
 		if (!frontier.empty()){
 			plan.push_back(src);
@@ -523,12 +528,9 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	return er;
 }
 
-// float Configurator::evaluationFunction(EndedResult er){
-// 	return abs(er.estimatedCost)+abs(er.cost);
-// }
 
 float Configurator::evaluationFunction(EndedResult er){
-	return abs(er.estimatedCost)+abs(er.cost);
+	return (abs(er.estimatedCost)+abs(er.cost))/2; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
@@ -975,23 +977,25 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	return result;
 } 
 
-std::vector <vertexDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
-	std::vector <vertexDescriptor> result;
+std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
+	std::vector <edgeDescriptor> result;
 	edgeDescriptor e; 
-	std::vector <vertexDescriptor>frontier;
+	std::vector <vertexDescriptor>connecting;
 	do{
 		auto es=boost::out_edges(v, g);
 		for (auto ei=es.first; ei!=es.second; ei++){
-			if (g[*ei].direction==d){
-				result.push_back((*ei).m_target);
-			}
-			else{
-				frontier.push_back((*ei).m_target);
+			if (g[(*ei).m_target].visited()){
+				if (g[*ei].direction==d){
+					result.push_back((*ei)); //assumes maximum depth of 2 vertices traversed
+				}
+				else{
+					connecting.push_back((*ei).m_target);
+				}
 			}
 		}
-		if (!frontier.empty()){
-			v=frontier[0];
-			frontier.erase(frontier.begin());
+		if (!connecting.empty()){
+			v=connecting[0];
+			connecting.erase(connecting.begin());
 		}
 		else{
 			break;

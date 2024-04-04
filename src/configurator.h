@@ -138,7 +138,7 @@ void adjustStepDistance(vertexDescriptor, TransitionSystem &, Direction, float&)
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
-std::vector <vertexDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction ); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction ); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
 std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
@@ -160,7 +160,7 @@ bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 //void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &, std::map<vertexDescriptor, float>&); //evaluates only after DEFAULT, internal one step lookahead
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 
@@ -184,7 +184,7 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 
 void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, std::map<vertexDescriptor, float>);
+std::vector <vertexDescriptor> planner(TransitionSystem&);
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
