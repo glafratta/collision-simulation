@@ -45,6 +45,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	g[e.m_target].disturbance = sk.first.disturbance;
 	g[e.m_target].endPose = sk.first.endPose;
 	g[e.m_target].options = sk.first.options;
+	g[e.m_target].phi=sk.first.phi;
 }
 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
