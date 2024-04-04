@@ -235,10 +235,14 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
 		//EVALUATE NODE()
 	simResult result;
-	float remaining = BOX2DRANGE/controlGoal.action.getLinearSpeed();
+	float distance=BOX2DRANGE;
+	if (controlGoal.disturbance.isValid()){
+		distance= controlGoal.disturbance.pose.p.Length();
+	}
+	float remaining =distance/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
 		if(t.direction == Direction::DEFAULT){
-		remaining= (BOX2DRANGE-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+		remaining= (distance-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
 			remaining=0;
