@@ -451,10 +451,11 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 	std::vector <vertexDescriptor> plan;
-	vertexDescriptor src=currentVertex, connecting=TransitionSystem::null_vertex();
+	vertexDescriptor src=currentVertex, connecting;
 	std::vector <edgeDescriptor> frontier;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
+		connecting=TransitionSystem::null_vertex();
 		float phi=2; //very large phi, will get overwritten
 		for (edgeDescriptor e:frontier){
 				if (g[e.m_target].phi<phi){
