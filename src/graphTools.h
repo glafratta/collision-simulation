@@ -82,17 +82,6 @@ private:
 TransitionSystem * g;
 };
 
-struct Visited{
-	Visited(){}
-	Visited(TransitionSystem*ts):g(ts){}
-
-	bool operator()(const vertexDescriptor&v )const{
-		return (*g)[v].phi<2.0;
-	}
-
-	private:
-	TransitionSystem*g;
-};
 
 struct Memorable{
 	Memorable(){}
