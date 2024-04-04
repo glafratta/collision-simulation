@@ -716,17 +716,6 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v,
 	else if(round(g[v].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	// for (int i=0; i<planVertices.size(); i++){
-	// 	if (v==planVertices[i] & i+1<planVertices.size()){
-	// 		auto es = boost::out_edges(v, g);
-	// 		for (auto ei=es.first; ei!=es.second; ei++){
-	// 			if ((*ei).m_target== planVertices[i+1]){
-	// 				g[v].options.push_back(g[*ei].direction);
-	// 				return;
-	// 			}
-	// 		}
-	// 	}
-	// }
 	transitionMatrix(g[v], d);
 }
 
