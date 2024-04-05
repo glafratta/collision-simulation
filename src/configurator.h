@@ -196,7 +196,7 @@ EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the 
 
 EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
-float evaluationFunction(EndedResult);
+float evaluationFunction(EndedResult, vertexDescriptor);
 
 void start(); //data interface class collecting position of bodies
 

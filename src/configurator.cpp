@@ -351,7 +351,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			//heuristicMap.emplace(v1, evaluationFunction(er));
-			g[v1].phi=evaluationFunction(er);
+			g[v1].phi=evaluationFunction(er, v1);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
@@ -551,8 +551,15 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 }
 
 
-float Configurator::evaluationFunction(EndedResult er){
-	return (abs(er.estimatedCost)+abs(er.cost))/2; //normalised to 1
+float Configurator::evaluationFunction(EndedResult er, vertexDescriptor v){
+	float planPriority=0.0;
+    for (vertexDescriptor p:planVertices){
+		if (p==v){
+       		planPriority=1.0;
+			break;
+		}
+    } 
+	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/3; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){

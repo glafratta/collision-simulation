@@ -73,7 +73,7 @@ struct EndedResult{
 
     EndedResult() = default;
 
-    float evaluationFunction(std::vector <vertexDescriptor> plan={}, vertexDescriptor v=TransitionSystem::null_vertex());
+//    float evaluationFunction(std::vector <vertexDescriptor> plan={}, vertexDescriptor v=TransitionSystem::null_vertex());
 
    // float errorSquared();
 };
