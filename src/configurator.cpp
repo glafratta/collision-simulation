@@ -356,7 +356,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
-			addToPriorityQueue(v1, priorityQueue, evaluationFunction(er));
+			addToPriorityQueue(v1, priorityQueue, g[v1].phi);
 		}
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
