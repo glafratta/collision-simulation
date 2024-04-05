@@ -122,6 +122,8 @@ Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
 }
 
+Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
+
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, vertexDescriptor&, TransitionSystem&);

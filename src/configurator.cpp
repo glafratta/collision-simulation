@@ -232,6 +232,13 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 // 	}
 // }
 
+Disturbance Configurator::getDisturbance(TransitionSystem&g, vertexDescriptor v){
+	if (!g[v].disturbance.isValid()){
+		return controlGoal.disturbance;
+	}
+	return g[v].disturbance;
+}
+
 
 simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
 		//EVALUATE NODE()
@@ -318,7 +325,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			std::pair <State, Edge> sk;
 			bool topDown=1;
 			changeStart(start, v0, g);
-			t = Task(g[v0].disturbance, g[v0].options[0], start, topDown);
+			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
