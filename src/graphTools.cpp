@@ -35,7 +35,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	}
 	else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
 		result=g[e.m_target].disturbance.pose.p.x-sk.first.disturbance.pose.p.x;
-		errorMap.insert_or_assign(g[e.m_target].ID, result);
+		//errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
 	g[e.m_target].endPose = sk.first.endPose;
