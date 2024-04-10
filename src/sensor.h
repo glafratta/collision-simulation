@@ -2,6 +2,8 @@
 #define SENSOR_H
 #include "task.h"
 
+class Configurator;
+
 class Pointf: public cv::Point2f{
 	public: 
 
@@ -64,9 +66,9 @@ template <typename T>
 std::set<T> vec2set(std::vector<T>);
 
 class SensorTools{
+	friend Configurator;
     std::vector <Pointf> previous;
     public:
-	friend Configurator;
     SensorTools(){};
 
     b2Transform affineTransEstimate(std::vector <Pointf>, Task::Action, float timeElapsed=0.2, float range=1.0);

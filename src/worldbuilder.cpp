@@ -180,4 +180,25 @@ b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     d.setPosition(centroid);
     return result;
 }
-    
+
+bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance dist){
+    bool result=false;
+    if (!dist.isValid()){
+        return result;
+    }
+    std::vector <Pointf> occluding; 
+    for (Pointf p:cc){
+        cv::Rect2f rect(dist.getPosition().x+dist.bf.halfWidth, dist.getPosition().y-dist.bf.halfWidth, dist.getPosition().x+dist.bf.halfWidth, dist.bf.halfLength*2);
+        if (p.inside(rect)){
+            occluding.push_back(p);
+        }
+    }
+    if (occluding.empty()){
+        return result;
+    }
+    CompareY compareY;
+    std::vector<Pointf>::iterator miny=std::min_element(occluding.begin(), occluding.end(), compareY);
+    std::vector<Pointf>::iterator maxy=std::max_element(occluding.begin(), occluding.end(), compareY);
+    //to finish
+    return result;
+}

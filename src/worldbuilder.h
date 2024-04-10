@@ -32,7 +32,7 @@ class WorldBuilder{
 
     std::pair<bool, b2Vec2> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
 
-    std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, Task* curr=NULL); //returns bottom and top of bounding box
+    std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength); //returns bottom and top of bounding box
 
     cv::Rect2f getRect(std::vector <Pointf>);//gets bounding box of points
 
@@ -46,6 +46,6 @@ class WorldBuilder{
         bodies =0;
     }
 
-    bool occluded(Disturbance);
+    bool occluded(CoordinateContainer, Disturbance);
 };
 #endif
