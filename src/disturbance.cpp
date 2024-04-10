@@ -1,9 +1,5 @@
 #include "disturbance.h"
 
-void BodyFeatures::setShape(float hl, float hw, b2Vec2 shift, float orientation,b2Shape::Type _shape){
-
-}
-
 
 void Disturbance::setAngle(b2Transform t){ //angle to robot
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
