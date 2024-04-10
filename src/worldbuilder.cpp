@@ -29,10 +29,14 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 cv::Rect2f WorldBuilder::getRect(std::vector <Pointf>nb){//gets bounding box of points
+    float h=0.002, w=0.002, x=0.001, y=-0.001;
+    cv::Rect2f result(x,y,w, h);
+    if (nb.empty()){
+        return result;
+    }
     CompareX compareX;
     CompareY compareY;
     //Pointf maxx, minx, miny, maxy;
-    float h=0.002, w=0.002;
 	std::vector<Pointf>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
 	std::vector<Pointf>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
 	std::vector<Pointf>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
@@ -41,8 +45,10 @@ cv::Rect2f WorldBuilder::getRect(std::vector <Pointf>nb){//gets bounding box of 
         h=fabs((*maxy).y-(*miny).y);
         w= fabs((*maxx).x-(*minx).x);
     }
-    float x= (*maxx).x, y=(*miny).y;
-    return cv::Rect2f(x, y, w, h);
+    x= (*maxx).x;
+    y=(*miny).y;
+    result=cv::Rect2f(x, y, w, h);
+    return result;
 }
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
