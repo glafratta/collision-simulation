@@ -1004,7 +1004,7 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 
 std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
 	std::vector <edgeDescriptor> result;
-	edgeDescriptor e; 
+	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
 	std::vector <vertexDescriptor>connecting;
 	do{
 		auto es=boost::out_edges(v, g);
@@ -1017,6 +1017,13 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 					connecting.push_back((*ei).m_target);
 				}
 			}
+		}
+		if(v==currentVertex & !result.empty() 
+			& es.first!=es.second & ep.second){
+			v=ep.first.m_source;
+		}
+		else{
+			break;
 		}
 		if (!connecting.empty()){
 			v=connecting[0];
