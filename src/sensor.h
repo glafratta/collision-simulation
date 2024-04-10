@@ -66,7 +66,7 @@ template <typename T>
 std::set<T> vec2set(std::vector<T>){
 	std::set <T> set;
     for (T t:vec){
-        set.emplace_back(t);
+        set.emplace(t);
     }
     return set;
 }
