@@ -245,7 +245,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	simResult result;
 	float distance=BOX2DRANGE;
 	if (controlGoal.disturbance.isValid()){
-		distance= controlGoal.disturbance.pose.p.Length();
+		distance= controlGoal.disturbance.getPosition().Length();
 	}
 	float remaining =distance/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
@@ -264,6 +264,12 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		state.nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
+	std::vector <Pointf> nb=neighbours(result.collision.getPosition(), 0.025);
+	cv::Rect2f rect =worldBuilder.getRect(nb);
+	std::pair<bool, float> orientation =findOrientation(nb);
+	result.collision.bf.halfLength=rect.width/2;
+	result.collision.bf.halfLength=rect.height/2;
+	result.collision.setOrientation(orientation.second);
 	return result;
 	}
 
@@ -328,7 +334,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
-			worldBuilder.buildWorld(w, currentBox2D, t.start, g[v0].options[0]); //was g[v].endPose
+			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
+			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
@@ -806,38 +813,40 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 }
 
 
-// std::pair <bool, b2Vec2> Configurator::findNeighbourPoint(b2Vec2 v, float radius){ //more accurate orientation
-// 	std::pair <bool, b2Vec2> result(false, b2Vec2());
-// 	for (Point p: current){
-// 		if (p.isInRadius(v, radius)){
-// 			return result=std::pair<bool, b2Vec2>(true, p.getb2Vec2());
-// 		}
-// 	}
-// 	return result;
-// }
+std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
+	std::vector <Pointf> result;
+	for (Pointf p: sensorTools.previous){
+		cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
+		if (p.inside(rect)){
+			result.push_back(p);
+		}
+	}
+	return result;
+}
 
-// std::pair <bool, float> Configurator::findOrientation(b2Vec2 v, float radius){
-// 	int count=0;
-// 	float sumY=0, sumX=0;
-// 	float avgY=0, avgX=0;
-// 	std::pair <bool, float>result(false, 0);
-// 	for (cv::Point2f p:current){
-// 		if (p.isInRadius(v, radius)){
-// 			auto pIt =current.find(p);
-// 			CoordinateContainer::iterator pItNext = pIt++;
-// 			float deltaY =pItNext->y- pIt->y;
-// 			float deltaX = pItNext->x - pIt->x;
-// 				result.first=true; //is there a neighbouring point?
-// 				count++;
-// 				sumY+=deltaY;
-// 				sumX+=deltaX;
-// 				avgY = sumY/count;
-// 				avgX = sumX/count;
-// 		}
-// 	}
-// 	result.second=atan(avgY/avgX);
-// 	return result;
-// }
+std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
+	int count=0;
+	float sumY=0, sumX=0;
+	float avgY=0, avgX=0;
+	std::pair <bool, float>result(false, 0);
+	for (Pointf p:vec){
+		//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
+		//if (p.inside(rect)){
+			auto pIt =vec2set(vec).find(p);
+			CoordinateContainer::iterator pItNext = pIt++;
+			float deltaY =pItNext->y- pIt->y;
+			float deltaX = pItNext->x - pIt->x;
+				result.first=true; //is there a neighbouring point?
+				count++;
+				sumY+=deltaY;
+				sumX+=deltaX;
+				avgY = sumY/count;
+				avgX = sumX/count;
+		//}
+	}
+	result.second=atan(avgY/avgX);
+	return result;
+}
 
 
 // void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
@@ -915,16 +924,7 @@ void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
 // 	return graphError;
 // }
 
-std::vector <edgeDescriptor> Configurator::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
-	std::vector <edgeDescriptor> result;
-	auto es = boost::out_edges(v, g);
-	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei)].direction == d){
-			result.push_back(*ei);
-		}
-	}
-	return result;
-}
+
 
 std::vector <edgeDescriptor> Configurator::inEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
 	std::vector <edgeDescriptor> result;
@@ -1230,7 +1230,7 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 			g[*vIt].endPose-=deltaPose;
-			g[*vIt].disturbance.pose-=deltaPose;
+			g[*vIt].disturbance.bf.pose-=deltaPose;
 		}
 	}
 	// if (fabs(error)>TRACKING_ERROR_TOLERANCE){
@@ -1240,6 +1240,6 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	
 	// }
 	if(controlGoal.disturbance.isValid()){
-		controlGoal.disturbance.pose-=deltaPose;
+		controlGoal.disturbance.bf.pose-=deltaPose;
 	}
 }

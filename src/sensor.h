@@ -37,28 +37,42 @@ bool operator >(const Pointf&,  const Pointf&);
 
 typedef std::set<Pointf> CoordinateContainer;
 
-struct comparator{
+struct CompareY{
     bool operator() ( cv::Point2f a, cv::Point2f b ){ //
         return a.y <=b.y;
 	}
 }; 
 
+struct CompareX{
+	bool operator()(cv::Point2f a, cv::Point2f b){
+		return a.x<=b.x;
+	}
+};
+
 
 
 b2Vec2 getb2Vec2(cv::Point2f );
+
+Pointf getPointf(b2Vec2);
 
 Pointf Polar2f(float, float);
 
 template <typename T>
 std::vector<T> set2vec(std::set<T>);
 
+template <typename T>
+std::set<T> vec2set(std::vector<T>);
+
 class SensorTools{
     std::vector <Pointf> previous;
     public:
+	friend Configurator;
     SensorTools(){};
 
     b2Transform affineTransEstimate(std::vector <Pointf>, Task::Action, float timeElapsed=0.2, float range=1.0);
 
 };
+
+
 
 #endif

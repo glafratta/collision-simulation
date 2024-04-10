@@ -120,6 +120,12 @@ namespace gt{
 	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&); //returns disturbance rror based on expected vs observed D
 
 	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&);
+
+	edgeDescriptor getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>);
+
+	std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
+
+	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction);
 }
 
 

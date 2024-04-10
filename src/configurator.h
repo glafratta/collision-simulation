@@ -63,7 +63,7 @@ Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
-	ogGoal=controlGoal.disturbance.pose;
+	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex = boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
@@ -142,8 +142,6 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem
 
 std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction ); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
-std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
-
 std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
@@ -212,9 +210,9 @@ void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 
-std::pair <bool, b2Vec2> findNeighbourPoint(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
+std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 
-std::pair <bool, float>  findOrientation(b2Vec2, float radius = 0.025); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
+std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
 
 std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan

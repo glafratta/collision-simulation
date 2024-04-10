@@ -34,7 +34,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		g[e].step = sk.second.step;
 	}
 	else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
-		result=g[e.m_target].disturbance.pose.p.x-sk.first.disturbance.pose.p.x;
+		result=g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x;
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
@@ -50,10 +50,44 @@ void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, 
 	g[e.m_target].outcome = sk.first.outcome;
 }
 
+std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
+	std::vector <edgeDescriptor> result;
+	auto es = boost::out_edges(v, g);
+	for (auto ei = es.first; ei!=es.second; ++ei){
+		if (g[(*ei)].direction == d){
+			result.push_back(*ei);
+		}
+	}
+	return result;
+}
+
+edgeDescriptor gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe){
+	edgeDescriptor mostLikely=oe[0];
+	for (edgeDescriptor e:oe){
+		if (g[e].probability>g[mostLikely].probability){
+			mostLikely=e;
+		}
+	}
+	return mostLikely;
+}
+
+
+Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, Direction d){
+	std::vector<edgeDescriptor> oe=outEdges(g, v, d);
+	Disturbance result=Disturbance();
+	if (oe.empty()){
+		return result;
+	}
+	edgeDescriptor mostLikely=getMostLikely(g, oe);
+	return g[mostLikely.m_target].disturbance;
+
+}
+
+
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);
-	result[0]= s1.disturbance.pose.p.x - s2.disturbance.pose.p.x; //disturbance x
-	result[1]= s1.disturbance.pose.p.y - s2.disturbance.pose.p.y; //disturbance y
+	result[0]= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
+	result[1]= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
 	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
 	result[3]= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	result[4]=s1.endPose.p.y-s2.endPose.p.y; //endpose y
