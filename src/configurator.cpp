@@ -569,7 +569,7 @@ float Configurator::evaluationFunction(EndedResult er, vertexDescriptor v){
 			break;
 		}
     } 
-	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/3; //normalised to 1
+	return (abs(er.estimatedCost)+abs(er.cost)-planPriority)/2; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
