@@ -27,7 +27,7 @@ const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
 const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.02;
 const int maxNodesOnSpot =4;
-const float TRACKING_ERROR_TOLERANCE = MAX_SPEED*0.5*MOTOR_CALLBACK;
+const float TRACKING_ERROR_TOLERANCE = MAX_SPEED*MOTOR_CALLBACK;
 const float FORGET_THRESHOLD=0.05;
 
 class Robot {
