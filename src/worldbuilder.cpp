@@ -181,14 +181,15 @@ b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     return result;
 }
 
-bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance dist){
+bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     bool result=false;
-    if (!dist.isValid()){
+    if (!expectedD.isValid()){
         return result;
     }
+    cv::Rect2f rect;
     std::vector <Pointf> occluding; 
     for (Pointf p:cc){
-        cv::Rect2f rect(dist.getPosition().x+dist.bf.halfWidth, dist.getPosition().y-dist.bf.halfWidth, dist.getPosition().x+dist.bf.halfWidth, dist.bf.halfLength*2);
+        rect=cv::Rect2f(expectedD.getPosition().x+expectedD.bf.halfWidth, expectedD.getPosition().y-dist.bf.halfWidth, dist.getPosition().x+dist.bf.halfWidth, dist.bf.halfLength*2);
         if (p.inside(rect)){
             occluding.push_back(p);
         }
@@ -199,6 +200,10 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance dist){
     CompareY compareY;
     std::vector<Pointf>::iterator miny=std::min_element(occluding.begin(), occluding.end(), compareY);
     std::vector<Pointf>::iterator maxy=std::max_element(occluding.begin(), occluding.end(), compareY);
+    float length = (*maxy).y-(*miny).y;
+    if (length>=rect.height*0.75 & occluding.size()>= rect.height*75){
+        result=true;
+    }
     //to finish
     return result;
 }

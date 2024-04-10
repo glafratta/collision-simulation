@@ -335,7 +335,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
-			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
@@ -832,7 +832,8 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 	for (Pointf p:vec){
 		//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
 		//if (p.inside(rect)){
-			auto pIt =vec2set(vec).find(p);
+			std::set <Pointf>set=vec2set(vec);
+			auto pIt =set.find(p);
 			CoordinateContainer::iterator pItNext = pIt++;
 			float deltaY =pItNext->y- pIt->y;
 			float deltaX = pItNext->x - pIt->x;
