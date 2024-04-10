@@ -33,14 +33,14 @@ std::vector<T> set2vec(std::set<T> s){
     return vec;
 }
 
-template <typename T>
-std::set<T> vec2set(std::vector<T> vec){
-    std::set <T> set;
-    for (T t:vec){
-        set.emplace_back(t);
-    }
-    return set;
-}
+// template <typename T>
+// std::set<T> vec2set(std::vector<T> vec){
+//     std::set <T> set;
+//     for (T t:vec){
+//         set.emplace_back(t);
+//     }
+//     return set;
+// }
 
 bool operator <(Pointf const & p1, Pointf const& p2){
 	float a1 = angle(p1);

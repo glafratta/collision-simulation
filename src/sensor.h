@@ -63,7 +63,13 @@ template <typename T>
 std::vector<T> set2vec(std::set<T>);
 
 template <typename T>
-std::set<T> vec2set(std::vector<T>);
+std::set<T> vec2set(std::vector<T>){
+	std::set <T> set;
+    for (T t:vec){
+        set.emplace_back(t);
+    }
+    return set;
+}
 
 class SensorTools{
 	friend Configurator;
