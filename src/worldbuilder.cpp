@@ -31,21 +31,17 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
 cv::Rect2f WorldBuilder::getRect(std::vector <Pointf>nb){//gets bounding box of points
     CompareX compareX;
     CompareY compareY;
-    Pointf maxx, minx, miny, maxy;
+    //Pointf maxx, minx, miny, maxy;
     float h=0.002, w=0.002;
-	std::vector<Pointf>::iterator maxx_it=std::max_element(nb.begin(), nb.end(), compareX);
-	std::vector<Pointf>::iterator miny_it=std::min_element(nb.begin(), nb.end(), compareY);
-	std::vector<Pointf>::iterator minx_it=std::min_element(nb.begin(), nb.end(), compareX);
-	std::vector<Pointf>::iterator maxy_it=std::max_element(nb.begin(), nb.end(), compareY);
-    maxx= *maxx_it;
-    minx=*minx_it;
-    miny=*miny_it;
-    maxy=*maxy_it;
+	std::vector<Pointf>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
+	std::vector<Pointf>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
+	std::vector<Pointf>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
+	std::vector<Pointf>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
     if (minx!=maxx & miny!=maxy){
-        h=fabs(maxy.y-miny.y);
-        w= fabs(maxx.x-minx.x);
+        h=fabs((*maxy).y-(*miny).y);
+        w= fabs((*maxx).x-(*minx).x);
     }
-    return cv::Rect2f(maxx.x, miny.y, w, h);
+    return cv::Rect2f((*maxx).x, (*miny).y, w, h);
 }
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
