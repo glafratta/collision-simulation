@@ -475,6 +475,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 	std::vector <vertexDescriptor> plan;
 	vertexDescriptor src=currentVertex, connecting;
 	std::vector <edgeDescriptor> frontier;
+	bool run=true;
 	do{
 		frontier=frontierVertices(src, g, DEFAULT);
 		connecting=TransitionSystem::null_vertex();
@@ -495,9 +496,10 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 			plan.push_back(src);
 		}
 		else{
+			run=false;
 			break;
 		}
-	}while(true);
+	}while(run);
 	return plan;
 }
 
@@ -562,14 +564,14 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 
 
 float Configurator::evaluationFunction(EndedResult er, vertexDescriptor v){
-	float planPriority=0.0;
+	float planPriority=1.0;
     for (vertexDescriptor p:planVertices){
 		if (p==v){
-       		planPriority=1.0;
+       		planPriority=0.0;
 			break;
 		}
     } 
-	return (abs(er.estimatedCost)+abs(er.cost)-planPriority)/2; //normalised to 1
+	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/3; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
