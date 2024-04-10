@@ -136,6 +136,8 @@ void trackDisturbance(b2Transform &, Task::Action, float);
 
 void updateGraph(TransitionSystem&, float error);
 
+void planPriority(TransitionSystem&, vertexDescriptor); 
+
 void adjustStepDistance(vertexDescriptor, TransitionSystem &, Direction, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
@@ -194,7 +196,7 @@ EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the 
 
 EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
-float evaluationFunction(EndedResult, vertexDescriptor);
+float evaluationFunction(EndedResult);
 
 void start(); //data interface class collecting position of bodies
 

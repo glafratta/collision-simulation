@@ -361,7 +361,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			//heuristicMap.emplace(v1, evaluationFunction(er));
-			g[v1].phi=evaluationFunction(er, v1);
+			g[v1].phi=evaluationFunction(er);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
@@ -481,6 +481,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 		connecting=TransitionSystem::null_vertex();
 		float phi=2; //very large phi, will get overwritten
 		for (edgeDescriptor e:frontier){
+			planPriority(g, e.m_target);
 				if (g[e.m_target].phi<phi){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
@@ -563,15 +564,15 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 }
 
 
-float Configurator::evaluationFunction(EndedResult er, vertexDescriptor v){
-	float planPriority=0.0;
-    for (vertexDescriptor p:planVertices){
-		if (p==v){
-       		planPriority=0.0;
-			break;
-		}
-    } 
-	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/2; //normalised to 1
+float Configurator::evaluationFunction(EndedResult er){
+	// float planPriority=0.0;
+    // for (vertexDescriptor p:planVertices){
+	// 	if (p==v){
+    //    		planPriority=0.0;
+	// 		break;
+	// 	}
+    // } 
+	return (abs(er.estimatedCost)+abs(er.cost))/2; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
@@ -1221,6 +1222,15 @@ void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float er
 	}
 	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
+}
+
+void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
+    for (vertexDescriptor p:planVertices){
+		if (p==v){
+       		g[v].phi-=.1;
+			break;
+		}
+    } 
 }
 
 void Configurator::updateGraph(TransitionSystem&g, float error){
