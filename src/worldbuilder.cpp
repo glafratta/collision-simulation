@@ -189,7 +189,10 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     cv::Rect2f rect;
     std::vector <Pointf> occluding; 
     for (Pointf p:cc){
-        rect=cv::Rect2f(expectedD.getPosition().x+expectedD.bf.halfWidth, expectedD.getPosition().y-dist.bf.halfWidth, dist.getPosition().x+dist.bf.halfWidth, dist.bf.halfLength*2);
+        rect=cv::Rect2f(expectedD.getPosition().x+expectedD.bf.halfWidth, 
+                        expectedD.getPosition().y-expectedD.bf.halfWidth, 
+                        expectedD.getPosition().x+expectedD.bf.halfWidth, 
+                        expectedD.bf.halfLength*2);
         if (p.inside(rect)){
             occluding.push_back(p);
         }
