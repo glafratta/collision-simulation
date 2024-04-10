@@ -41,7 +41,8 @@ cv::Rect2f WorldBuilder::getRect(std::vector <Pointf>nb){//gets bounding box of 
         h=fabs((*maxy).y-(*miny).y);
         w= fabs((*maxx).x-(*minx).x);
     }
-    return cv::Rect2f((*maxx).x, (*miny).y, w, h);
+    float x= (*maxx).x, y=(*miny).y;
+    return cv::Rect2f(x, y, w, h);
 }
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
