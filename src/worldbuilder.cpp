@@ -134,7 +134,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
     features =processData(salient.first);
-    if (occluded(disturbance)){
+    if (occluded(current, disturbance)){
         salient.first.emplace(getPointf(disturbance.getPosition()));
         features.push_back(disturbance.bf);
     }
