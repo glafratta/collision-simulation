@@ -1018,11 +1018,11 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 				}
 			}
 		}
-		if(v==currentVertex & !result.empty() 
+		if(v==currentVertex & result.empty() 
 			& es.first!=es.second & ep.second){
 			v=ep.first.m_source;
 		}
-		else{
+		else if (result.empty()){
 			break;
 		}
 		if (!connecting.empty()){
