@@ -564,14 +564,14 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 
 
 float Configurator::evaluationFunction(EndedResult er, vertexDescriptor v){
-	float planPriority=1.0;
+	float planPriority=0.1;
     for (vertexDescriptor p:planVertices){
 		if (p==v){
        		planPriority=0.0;
 			break;
 		}
     } 
-	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/3; //normalised to 1
+	return (abs(er.estimatedCost)+abs(er.cost)+planPriority)/2.1; //normalised to 1
 }
 
 // EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
