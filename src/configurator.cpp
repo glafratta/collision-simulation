@@ -264,6 +264,9 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		state.nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
+	if(!result.collision.isValid()){
+		return result;
+	}
 	std::vector <Pointf> nb=neighbours(result.collision.getPosition(), 0.025);
 	cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
