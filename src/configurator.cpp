@@ -73,7 +73,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		vertexDescriptor bestLeaf = movingVertex;
 		edgeDescriptor movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
@@ -81,17 +80,24 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//std::map <vertexDescriptor, float> heuristicMap;
 		//heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-		resetPhi(transitionSystem);
-		if (iteration >1){
-			toRemove=explorer(movingVertex, transitionSystem, currentTask, world);
+		vertexDescriptor src;
+		if (iteration>1){
+			src=movingVertex;
 		}
 		else{
-			//bestLeaf=currentVertex;
-			currentTask.action.setVelocities(0,0);
-			toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
+		 	currentTask.action.setVelocities(0,0);
+			src=currentVertex;
 		}
+		resetPhi(transitionSystem);
+		// if (iteration >1){
+		 	toRemove=explorer(src, transitionSystem, currentTask, world);
+		// }
+		// else{
+		// 	//bestLeaf=currentVertex;
+		// 	currentTask.action.setVelocities(0,0);
+		// 	toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
+		// }
 		clearFromMap(toRemove, transitionSystem, errorMap);
-		//clearFromMap(toRemove, transitionSystem, heuristicMap);
 		Connected connected(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
 		TransitionSystem tmp;
@@ -105,7 +111,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// TransitionSystem vtemp;
 		// boost::copy_graph(vts, vtemp);
 		// boost::print_graph(vtemp);
-		planVertices= planner(transitionSystem);
+		planVertices= planner(transitionSystem, src);
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
@@ -477,9 +483,9 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 // }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src){
 	std::vector <vertexDescriptor> plan;
-	vertexDescriptor src=movingVertex, connecting; //og: src=currentV
+	vertexDescriptor connecting; //og: src=currentV
 	std::vector <edgeDescriptor> frontier;
 	bool run=true;
 	do{
