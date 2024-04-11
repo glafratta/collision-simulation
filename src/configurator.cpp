@@ -507,7 +507,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		if (connecting!=TransitionSystem::null_vertex()){
 			plan.push_back(connecting);
 		}
-		if (!frontier.empty()){
+		if (!frontier.empty()& src!=currentVertex){
 			plan.push_back(src);
 		}
 		else{
