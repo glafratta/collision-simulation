@@ -1209,7 +1209,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 			currentVertex=movingVertex;
 			return;
 		}
-		if (currentVertex!=movingVertex){
+		if (currentVertex!=movingVertex & planVertices[0]!=currentVertex){
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
 			currentVertex= planVertices[0];
 		//edgeDescriptor e= ep.first;

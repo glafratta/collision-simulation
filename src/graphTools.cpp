@@ -90,11 +90,6 @@ edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem
 	}
 }
 
-void gt::reassignTarget(TransitionSystem& g, std::vector<edgeDescriptor> es, vertexDescriptor match){
-	for (edgeDescriptor e:es){
-		boost::add_edge(e.m_source, match, g);
-	}
-}
 
 
 
