@@ -1209,17 +1209,20 @@ void Configurator::changeTask(bool b, int &ogStep){
 		if (planVertices.empty()){
 			currentVertex=movingVertex;
 			return;
-		} 
-		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
+		}
+		if (currentVertex!=movingVertex){
+			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
+			currentVertex= planVertices[0];
+		//edgeDescriptor e= ep.first;
+			currentEdge=ep.first;
+		}
 		// if (!ep.second){
 		// 	// throw std::invalid_argument("no plan was formed");
 		// 	// return;
 		// 	currentEdge= boost::add_edge(currentVertex, pl)
 		// }
 		boost::clear_vertex(0, transitionSystem);
-		currentVertex= planVertices[0];
-		//edgeDescriptor e= ep.first;
-		currentEdge=ep.first;
+
 		planVertices.erase(planVertices.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
