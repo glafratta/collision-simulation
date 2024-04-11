@@ -1209,12 +1209,17 @@ void Configurator::changeTask(bool b, int &ogStep){
 			currentVertex=movingVertex;
 			return;
 		}
-		if (currentVertex!=movingVertex & planVertices[0]!=currentVertex){
+		if (currentVertex!=movingVertex){
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
 			currentVertex= planVertices[0];
 		//edgeDescriptor e= ep.first;
 			currentEdge=ep.first;
 		}
+		Direction direction=Direction::DEFAULT;
+		if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
+			direction= transitionSystem[edge.first].direction;
+		}
+		transitionSystem[currentEdge].direction=direction;
 		// if (!ep.second){
 		// 	// throw std::invalid_argument("no plan was formed");
 		// 	// return;
