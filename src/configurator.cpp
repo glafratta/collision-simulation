@@ -405,11 +405,11 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.push_back(pair);			}
 		}
-			ep.second= boost::in_degree(ep.first.m_source, g)>0;
-			if (!ep.second){
-				return deletion;
-			}
-			ep.first= *(boost::in_edges(ep.first.m_source, g).first);
+		ep.second= boost::in_degree(ep.first.m_source, g)>0;
+		if (!ep.second){
+			return deletion;
+		}
+		ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	}	
 	return deletion;
 }
@@ -1206,7 +1206,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		return;
 	}
 	if (planning){
-		if (planVertices.empty()){
+		if (planVertices.empty() & currentVertex!=movingVertex){
 			currentVertex=movingVertex;
 			return;
 		}
