@@ -1281,7 +1281,9 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 			g[*vIt].endPose-=deltaPose;
-			g[*vIt].disturbance.bf.pose-=deltaPose;
+			if (g[*vIt].disturbance.isValid()){
+				g[*vIt].disturbance.bf.pose-=deltaPose;
+			}
 		}
 	}
 	// if (fabs(error)>TRACKING_ERROR_TOLERANCE){
