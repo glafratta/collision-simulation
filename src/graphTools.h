@@ -83,13 +83,13 @@ TransitionSystem * g;
 };
 
 
-struct Memorable{
-	Memorable(){}
-	Memorable(TransitionSystem* ts):g(ts){}
+struct Forget{
+	Forget(){}
+	Forget(TransitionSystem* ts):g(ts){}
 
-	bool operator()(const vertexDescriptor& v){//const
+	bool operator()(const edgeDescriptor& e){//const
 		bool result=true;
-		// if ((*g)[e].probability<FORGET_THRESHOLD){
+		if ((*g)[e].probability<FORGET_THRESHOLD){
 		// 	result=false;
 		// 	forget.insert(e);
 		// }
@@ -101,7 +101,7 @@ struct Memorable{
 		// 			break;
 		// 		}
 		// 	}
-		// }
+		 }
 		return result;
 	}
 
