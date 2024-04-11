@@ -73,10 +73,16 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		edgeDescriptor movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-		//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
+		edgeDescriptor movingEdge;
+		if (currentVertex==movingVertex){
+			currentVertex=boost::add_vertex(transitionSystem);
+			currentTask.action.setVelocities(0,0);
+		}
+		movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
+
 		//std::map <vertexDescriptor, float> heuristicMap;
 		//heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
