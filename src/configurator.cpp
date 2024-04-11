@@ -354,7 +354,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
-			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g);			
+			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, t.direction);			
 			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 			if (!match.first){
 				edge= addVertex(v0, v1,g, Disturbance(),sk.second); //new edge, valid
@@ -400,7 +400,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		}
 		if (ep.first.m_target!=v1){
 			g[ep.first.m_target].disturbance = dist;
-			std::pair <bool, vertexDescriptor> match= exactPolicyMatch(ep.first.m_target, g, g[ep.first].direction);
+			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g, g[ep.first].direction);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.push_back(pair);			}
@@ -1052,12 +1052,16 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g){
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
-		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex){
+		bool Tmatch=true;
+		if (!dir==Direction::UNDEFINED){
+			Tmatch=!(inEdges(g, *vi, dir).empty());
+		}
+		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & Tmatch){
 			result.first=true;
 			result.second=v;
 			break;
@@ -1082,12 +1086,16 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 // 	return result;
 // }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g){
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex){
+			bool Tmatch=true;
+			if (!dir==Direction::UNDEFINED){
+				Tmatch=!(inEdges(g, *vi, dir).empty());
+			}
+			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex &Tmatch){
 			result.first=true;
 			result.second=*vi;
 			break;
@@ -1099,22 +1107,22 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
-	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
-	auto vs= boost::vertices(g);
-	for (auto vi=vs.first; vi!= vs.second; vi++){
-		if (*vi!=v){
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, *vi, d).empty()){
-			result.first=true;
-			result.second=*vi;
-			break;
-		}
-		}
+// std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
+// 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
+// 	auto vs= boost::vertices(g);
+// 	for (auto vi=vs.first; vi!= vs.second; vi++){
+// 		if (*vi!=v){
+// 			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, *vi, d).empty()){
+// 			result.first=true;
+// 			result.second=*vi;
+// 			break;
+// 		}
+// 		}
 
 
-	}
-	return result;
-}
+// 	}
+// 	return result;
+// }
 
 void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
