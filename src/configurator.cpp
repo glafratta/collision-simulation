@@ -499,9 +499,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					if (e.m_source!=src){
 						connecting=e.m_source;
 					}
-					if (e.m_source !=currentVertex){
+					//if (e.m_source !=currentVertex){
 						src=e.m_target;
-					}
+					//}
 				}
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
