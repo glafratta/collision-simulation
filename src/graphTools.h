@@ -110,6 +110,17 @@ struct Memorable{
 	std::set <edgeDescriptor> forget;
 };
 
+struct Visited{ //for debug
+	Visited(){}
+	Visited(TransitionSystem * ts):g(ts){}
+
+	bool operator()(const vertexDescriptor&v)const{
+		return (*g)[v].visited();
+	}
+	private:
+	TransitionSystem *g;
+};
+
 
 namespace gt{
 
@@ -130,6 +141,8 @@ namespace gt{
 
 
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
+
 
 struct StateMatcher{
         std::vector <float> weights; //disturbance, position vector, angle

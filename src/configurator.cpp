@@ -98,7 +98,13 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
+		Visited vis(&transitionSystem); //debug
+		VisitedTS vts(transitionSystem, boost::keep_all(), vis);
 		boost::print_graph(transitionSystem);
+		// printf("visited:\n");
+		// TransitionSystem vtemp;
+		// boost::copy_graph(vts, vtemp);
+		// boost::print_graph(vtemp);
 		planVertices= planner(transitionSystem);
 	}
 	else if (!planning){
@@ -473,7 +479,7 @@ bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, Tra
 
 std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 	std::vector <vertexDescriptor> plan;
-	vertexDescriptor src=currentVertex, connecting;
+	vertexDescriptor src=movingVertex, connecting; //og: src=currentV
 	std::vector <edgeDescriptor> frontier;
 	bool run=true;
 	do{
@@ -487,7 +493,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g){
 					if (e.m_source!=src){
 						connecting=e.m_source;
 					}
-					src=e.m_target;
+					if (e.m_source !=currentVertex){
+						src=e.m_target;
+					}
 				}
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
