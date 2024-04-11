@@ -82,6 +82,23 @@ Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, 
 	return g[mostLikely.m_target].disturbance;
 
 }
+edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem& g){
+	for (edgeDescriptor e:es){
+		if (g[e.m_source].visited() & g[e.m_target].visited()){
+			return e;
+		}
+	}
+}
+
+void gt::reassignTarget(TransitionSystem& g, std::vector<edgeDescriptor> es, vertexDescriptor match){
+	for (edgeDescriptor e:es){
+		boost::add_edge(e.m_source, match, g);
+	}
+}
+
+
+
+
 
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
@@ -156,5 +173,4 @@ void operator-=(Transform & t1, Transform const&t2){
 	t1.p.y-=t2.p.y;
 	t1.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
 }
-
 

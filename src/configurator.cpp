@@ -414,9 +414,13 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		if (pair.first==src){
 			src=pair.second;
 		}
-		edgeDescriptor e = inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
-		edgeDescriptor e2 = inEdges(g, pair.first, DEFAULT)[0];
+		edgeDescriptor e =inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
+		std::vector <edgeDescriptor> toReassign=inEdges(g, pair.first, DEFAULT);
+		edgeDescriptor e2 = gt::visitedEdge(toReassign, g);
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
+		for (edgeDescriptor e:toReassign){ //reassigning edges
+			boost::add_edge(e.m_source, pair.second, g);
+		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);
 		for (int i=0; i<pq.size(); i++){ //REMOVE FROM PQ

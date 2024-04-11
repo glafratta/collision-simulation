@@ -137,7 +137,10 @@ namespace gt{
 	std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
 	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction);
+
+	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);
 }
+
 
 
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> FilteredTS;
