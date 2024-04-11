@@ -95,14 +95,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			src=currentVertex;
 		}
 		resetPhi(transitionSystem);
-		// if (iteration >1){
-		 	toRemove=explorer(src, transitionSystem, currentTask, world);
-		// }
-		// else{
-		// 	//bestLeaf=currentVertex;
-		// 	currentTask.action.setVelocities(0,0);
-		// 	toRemove=explorer(currentVertex, transitionSystem, currentTask, world);
-		// }
+		toRemove=explorer(src, transitionSystem, currentTask, world);
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		Connected connected(&transitionSystem);
 		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
@@ -113,10 +106,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		Visited vis(&transitionSystem); //debug
 		VisitedTS vts(transitionSystem, boost::keep_all(), vis);
 		boost::print_graph(transitionSystem);
-		// printf("visited:\n");
-		// TransitionSystem vtemp;
-		// boost::copy_graph(vts, vtemp);
-		// boost::print_graph(vtemp);
 		planVertices= planner(transitionSystem, src);
 	}
 	else if (!planning){
