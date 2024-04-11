@@ -1058,7 +1058,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
-		if (!dir==Direction::UNDEFINED){
+		if (dir!=Direction::UNDEFINED){
 			Tmatch=!(inEdges(g, *vi, dir).empty());
 		}
 		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & Tmatch){
@@ -1092,7 +1092,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
 			bool Tmatch=true;
-			if (!dir==Direction::UNDEFINED){
+			if (dir!=Direction::UNDEFINED){
 				Tmatch=!(inEdges(g, *vi, dir).empty());
 			}
 			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex &Tmatch){
