@@ -83,14 +83,13 @@ TransitionSystem * g;
 };
 
 
-struct Forget{
-	Forget(){}
-	Forget(TransitionSystem* ts):g(ts){}
+struct Remember{
+	Remember(){}
+	Remember(TransitionSystem* ts):g(ts){}
 
 	bool operator()(const edgeDescriptor& e){//const
-		bool result=true;
 		if ((*g)[e].probability<FORGET_THRESHOLD){
-		// 	result=false;
+		 	return false;
 		// 	forget.insert(e);
 		// }
 		// auto es=boost::in_edges(e.m_source, *g);
@@ -102,12 +101,12 @@ struct Forget{
 		// 		}
 		// 	}
 		 }
-		return result;
+		return true;
 	}
 
 	private: 
 	TransitionSystem *g;
-	std::set <edgeDescriptor> forget;
+	//std::set <edgeDescriptor> forget;
 };
 
 struct Visited{ //for debug
