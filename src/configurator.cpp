@@ -1210,11 +1210,12 @@ void Configurator::changeTask(bool b, int &ogStep){
 			currentVertex=movingVertex;
 			return;
 		}
-		std::pair<edgeDescriptor, bool> ep=boost::edge(currentVertex, planVertices[0], transitionSystem);
-		if (!ep.second){
-			throw std::invalid_argument("no plan was formed");
-			return;
-		}
+		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
+		// if (!ep.second){
+		// 	// throw std::invalid_argument("no plan was formed");
+		// 	// return;
+		// 	currentEdge= boost::add_edge(currentVertex, pl)
+		// }
 		currentVertex= planVertices[0];
 		//edgeDescriptor e= ep.first;
 		currentEdge=ep.first;
