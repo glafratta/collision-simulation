@@ -156,7 +156,7 @@ struct StateMatcher{
 		struct Error{
 			const float endPosition=0.03;
 			const float angle= M_PI/6;
-			const float dPosition= 0.1;
+			const float dPosition= 0.05; //o.g. 0.1
 			const float affordance =0;
 		}error;
 
@@ -173,7 +173,7 @@ struct StateMatcher{
 
 		float sumVector(DistanceVector);
 
-		bool isPerfectMatch(DistanceVector); // is this the same state?
+		bool isPerfectMatch(DistanceVector, float endDistance=0); // is this the same state?
 
 		bool isPerfectMatch(State, State); // is this the same state?
 
@@ -181,6 +181,9 @@ struct StateMatcher{
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
+	private:
+
+	const float COEFFICIENT_INCREASE_THRESHOLD=0.1;
 };
 
 #endif

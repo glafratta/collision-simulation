@@ -105,7 +105,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.swap(tmp);
 		Visited vis(&transitionSystem); //debug
 		VisitedTS vts(transitionSystem, boost::keep_all(), vis);
-		boost::print_graph(transitionSystem);
+		//boost::print_graph(transitionSystem);
 		planVertices= planner(transitionSystem, src);
 	}
 	else if (!planning){

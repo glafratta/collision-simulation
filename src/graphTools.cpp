@@ -137,11 +137,16 @@ float StateMatcher::sumVector(DistanceVector vec){
 	return result;
 }
 
-bool StateMatcher::isPerfectMatch(DistanceVector vec){
+bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
+	float coefficient=1.0;
+	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/.9;
+		coefficient*=scale;
+	}
     bool result =false;
-	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<error.endPosition;
+	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<error.endPosition+coefficient;
 	bool angleMatch = fabs(vec[5])<error.angle;
-	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<error.dPosition;
+	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<error.dPosition+coefficient;
 	bool affordanceMatch = vec[2]==error.affordance;
     if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
         result=true;
@@ -151,7 +156,7 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec){
 
 bool StateMatcher::isPerfectMatch(State s1, State s2){
 	DistanceVector  distance = getDistance(s1, s2);
-    return isPerfectMatch(distance);
+    return isPerfectMatch(distance, s1.endPose.p.Length());
 }
 
 
