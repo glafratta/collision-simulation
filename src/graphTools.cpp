@@ -82,8 +82,11 @@ Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, 
 	if (oe.empty()){
 		return result;
 	}
-	edgeDescriptor mostLikely=getMostLikely(g, oe);
-	return g[mostLikely.m_target].disturbance;
+	std::pair<bool,edgeDescriptor> mostLikely=getMostLikely(g, oe);
+	if (mostLikely.first){
+		result=g[mostLikely.second.m_target].disturbance;
+	}
+	return result;
 
 }
 edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem& g){
