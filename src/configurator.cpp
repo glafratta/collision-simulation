@@ -366,6 +366,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			if(edge.second){
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 			}
+			gt::adjustProbability(g, edge);
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			//heuristicMap.emplace(v1, evaluationFunction(er));
 			g[v1].phi=evaluationFunction(er);
@@ -430,7 +431,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 				pq.erase(pq.begin()+i);
 			}
 		}
-		adjustProbability(g, e);
+		gt::adjustProbability(g, e);
 	}
 }
 
@@ -881,28 +882,28 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 // 	}
 // }
 
-void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
-	//g[e.m_source].nObs++;
-	//g[e.m_target].nObs++;
-	auto es= out_edges(e.m_source, g);
-	float totObs=0;
-	std::vector <edgeDescriptor> sameTask;
-	//find total observations
-	for (auto ei= es.first; ei!=es.second; ei++){
-		if (g[(*ei)].direction==g[e].direction){
-			totObs+=g[(*ei).m_target].nObs;
-			sameTask.push_back(*ei);
-			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
-		}
-	}
-	//adjust
-	// if (sameTask.size()==1){
-	// 	return;
-	// }
-	for (edgeDescriptor ed: sameTask){
-		g[ed].probability=g[ed.m_target].nObs/totObs;
-	}
-}
+// void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
+// 	//g[e.m_source].nObs++;
+// 	//g[e.m_target].nObs++;
+// 	auto es= out_edges(e.m_source, g);
+// 	float totObs=0;
+// 	std::vector <edgeDescriptor> sameTask;
+// 	//find total observations
+// 	for (auto ei= es.first; ei!=es.second; ei++){
+// 		if (g[(*ei)].direction==g[e].direction){
+// 			totObs+=g[(*ei).m_target].nObs;
+// 			sameTask.push_back(*ei);
+// 			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
+// 		}
+// 	}
+// 	//adjust
+// 	// if (sameTask.size()==1){
+// 	// 	return;
+// 	// }
+// 	for (edgeDescriptor ed: sameTask){
+// 		g[ed].probability=g[ed.m_target].nObs/totObs;
+// 	}
+// }
 
 // std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
 // 	std::vector <vertexDescriptor> graphError;

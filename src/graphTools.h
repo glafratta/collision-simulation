@@ -138,6 +138,8 @@ namespace gt{
 	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction);
 
 	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);
+
+	void adjustProbability(TransitionSystem&, edgeDescritpor);
 }
 
 

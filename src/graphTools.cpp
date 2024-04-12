@@ -44,6 +44,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
+	//adjustProbability(g, e);
 }
 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
@@ -88,6 +89,25 @@ edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem
 		if (g[e.m_source].visited() & g[e.m_target].visited()){
 			return e;
 		}
+	}
+}
+
+
+void gt::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
+	auto es= out_edges(e.m_source, g);
+	float totObs=0;
+	std::vector <edgeDescriptor> sameTask;
+	//find total observations
+	for (auto ei= es.first; ei!=es.second; ei++){
+		if (g[(*ei)].direction==g[e].direction){
+			totObs+=g[(*ei).m_target].nObs;
+			sameTask.push_back(*ei);
+			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
+		}
+	}
+	//adjust
+	for (edgeDescriptor ed: sameTask){
+		g[ed].probability=g[ed.m_target].nObs/totObs;
 	}
 }
 

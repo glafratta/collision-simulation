@@ -181,12 +181,12 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		if (!g[v1].filled){
 			g[v1].disturbance = obs;
 		}
-		adjustProbability(g, result.first); //for now predictions and observations carry the same weight
+		//adjustProbability(g, result.first); //for now predictions and observations carry the same weight
 	}
 	return result;
 }
 
-void adjustProbability(TransitionSystem &, edgeDescriptor&);
+//void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor);
 
