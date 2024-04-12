@@ -365,8 +365,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 			if(edge.second){
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
+				gt::adjustProbability(g, edge.first);
 			}
-			gt::adjustProbability(g, edge.first);
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			//heuristicMap.emplace(v1, evaluationFunction(er));
 			g[v1].phi=evaluationFunction(er);
