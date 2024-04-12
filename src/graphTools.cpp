@@ -139,9 +139,9 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 		coefficient*=scale;
 	}
     bool result =false;
-	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition+coefficient);
+	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);
 	bool angleMatch = fabs(vec[5])<error.angle;
-	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<(error.dPosition+coefficient);
+	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<(error.dPosition*coefficient);
 	bool affordanceMatch = vec[2]==error.affordance;
     if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
         result=true;
