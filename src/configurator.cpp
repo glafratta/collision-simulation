@@ -1057,18 +1057,23 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
+	//MoreLikely more_likely;
+	float prob=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
+		std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
 		if (dir!=Direction::UNDEFINED){
-			Tmatch=!(inEdges(g, *vi, dir).empty());
+			Tmatch=!ie.empty();
 		}
 		if (matcher.isPerfectMatch(s, g[v]) & v!=movingVertex & Tmatch){
-			result.first=true;
-			result.second=v;
-			break;
+			edgeDescriptor most_likely=gt::getMostLikely(g, ie);
+			if (g[most_likely].probability>prob){
+				result.first=true;
+				result.second=v;
+			}
+			//break;
 		}
-
 	}
 	return result;
 }

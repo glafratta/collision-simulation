@@ -82,24 +82,20 @@ private:
 TransitionSystem * g;
 };
 
+struct MoreLikely{
+	bool operator()(Edge e1, Edge e2){//const
+		return e1.probability >e2.probability;
+	}
+};
+
 
 struct Remember{
 	Remember(){}
 	Remember(TransitionSystem* ts):g(ts){}
 
 	bool operator()(const edgeDescriptor& e){//const
-		if ((*g)[e].probability<FORGET_THRESHOLD){
+		if ((*g)[e].probability<FORGET_THRESHOLD){ //filter signal
 		 	return false;
-		// 	forget.insert(e);
-		// }
-		// auto es=boost::in_edges(e.m_source, *g);
-		// for (auto ei=es.first; ei!=es.second; ei++){
-		// 	for (edgeDescriptor ed:forget){
-		// 		if (*ei==ed){
-		// 			result=false;
-		// 			break;
-		// 		}
-		// 	}
 		 }
 		return true;
 	}
