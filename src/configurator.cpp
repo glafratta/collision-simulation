@@ -417,10 +417,11 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		edgeDescriptor e =inEdges(g, pair.second, DEFAULT)[0]; //first vertex that satisfies that edge requirement
 		std::vector <edgeDescriptor> toReassign=inEdges(g, pair.first, DEFAULT);
 		edgeDescriptor e2 = gt::visitedEdge(toReassign, g);
+		toReassign.push_back(e);
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
 		for (edgeDescriptor r:toReassign){ //reassigning edges
 			std::pair <edgeDescriptor, bool> ep =boost::add_edge(r.m_source, pair.second, g);
-			adjustProbability(g, ep.first);
+			//adjustProbability(g, ep.first);
 		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);
@@ -882,7 +883,7 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 
 void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
 	//g[e.m_source].nObs++;
-	g[e.m_target].nObs++;
+	//g[e.m_target].nObs++;
 	auto es= out_edges(e.m_source, g);
 	float totObs=0;
 	std::vector <edgeDescriptor> sameTask;
