@@ -139,7 +139,7 @@ namespace gt{
 
 	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);
 
-	void adjustProbability(TransitionSystem&, edgeDescritpor);
+	void adjustProbability(TransitionSystem&, edgeDescriptor);
 }
 
 
