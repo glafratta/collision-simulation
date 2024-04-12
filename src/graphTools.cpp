@@ -93,7 +93,7 @@ edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem
 }
 
 
-void gt::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
+void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	auto es= out_edges(e.m_source, g);
 	float totObs=0;
 	std::vector <edgeDescriptor> sameTask;
