@@ -926,7 +926,7 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 // 			s.outcome=simResult::successful;
 // 		}
 // 		start = s.endPose;
-// 		DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
+// 		DistanceVector distance = matcher.getDistance(g[planVerti:ces[it]], s);
 // 		if (!matcher.isPerfectMatch(distance)){
 // 			vertexDescriptor v;
 // 			addVertex(planVertices[it-1], v,g, Disturbance(), g[e].direction, 1);
@@ -1063,7 +1063,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		if (dir!=Direction::UNDEFINED){
 			Tmatch=!(inEdges(g, *vi, dir).empty());
 		}
-		if (matcher.isPerfectMatch(g[v], s) & v!=movingVertex & Tmatch){
+		if (matcher.isPerfectMatch(s, g[v]) & v!=movingVertex & Tmatch){
 			result.first=true;
 			result.second=v;
 			break;
@@ -1097,7 +1097,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 			if (dir!=Direction::UNDEFINED){
 				Tmatch=!(inEdges(g, *vi, dir).empty());
 			}
-			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex &Tmatch){
+			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch){
 			result.first=true;
 			result.second=*vi;
 			break;

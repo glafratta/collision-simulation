@@ -112,11 +112,6 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 }
 
 
-
-
-
-
-
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);
 	result[0]= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
@@ -144,9 +139,9 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 		coefficient*=scale;
 	}
     bool result =false;
-	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<error.endPosition+coefficient;
+	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition+coefficient);
 	bool angleMatch = fabs(vec[5])<error.angle;
-	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<error.dPosition+coefficient;
+	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<(error.dPosition+coefficient);
 	bool affordanceMatch = vec[2]==error.affordance;
     if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
         result=true;
@@ -154,9 +149,9 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
     return result;
 }
 
-bool StateMatcher::isPerfectMatch(State s1, State s2){
-	DistanceVector  distance = getDistance(s1, s2);
-    return isPerfectMatch(distance, s1.endPose.p.Length());
+bool StateMatcher::isPerfectMatch(State s, State candidate){
+	DistanceVector  distance = getDistance(s, candidate);
+    return isPerfectMatch(distance, s.endPose.p.Length());
 }
 
 
