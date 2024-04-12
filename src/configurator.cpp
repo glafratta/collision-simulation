@@ -1096,16 +1096,20 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
+	float prob=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
+			std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
 			bool Tmatch=true;
 			if (dir!=Direction::UNDEFINED){
-				Tmatch=!(inEdges(g, *vi, dir).empty());
+				Tmatch=!ie.empty();
 			}
 			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch){
-			result.first=true;
-			result.second=*vi;
-			break;
+				edgeDescriptor most_likely=gt::getMostLikely(g, ie);
+				if (g[most_likely].probability>prob){
+					result.first=true;
+					result.second=v;
+				}
 		}
 		}
 
