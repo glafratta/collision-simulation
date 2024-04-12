@@ -1067,8 +1067,10 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 			Tmatch=!ie.empty();
 		}
 		if (matcher.isPerfectMatch(s, g[v]) & v!=movingVertex & Tmatch){
-			edgeDescriptor most_likely=gt::getMostLikely(g, ie);
-			if (g[most_likely].probability>prob){
+			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
+			if (!most_likely.first){
+			}
+			else if (g[most_likely.second].probability>prob){
 				result.first=true;
 				result.second=v;
 			}

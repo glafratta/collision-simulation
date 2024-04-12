@@ -63,11 +63,13 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 	return result;
 }
 
-edgeDescriptor gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe){
-	edgeDescriptor mostLikely=oe[0];
+std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe){
+	std::pair< bool, edgeDescriptor> mostLikely(false, edgeDescriptor());
+	float prob=0;
 	for (edgeDescriptor e:oe){
-		if (g[e].probability>g[mostLikely].probability){
-			mostLikely=e;
+		if (g[e].probability>prob){
+			mostLikely.second=e;
+			prob=g[e].probability;
 		}
 	}
 	return mostLikely;

@@ -127,7 +127,7 @@ namespace gt{
 
 	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, float>&);
 
-	edgeDescriptor getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>);
+	std::pair< bool, edgeDescriptor> getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>);
 
 	std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
