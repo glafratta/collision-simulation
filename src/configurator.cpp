@@ -1058,6 +1058,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	//MoreLikely more_likely;
+	//float nObs=0;
 	float prob=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
@@ -1071,8 +1072,11 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 			if (!most_likely.first){
 			}
 			else if (g[most_likely.second].probability>prob){
+			//if(g[v].nObs>nObs){	
 				result.first=true;
 				result.second=v;
+				prob=g[most_likely.second].probability;
+
 			}
 			//break;
 		}
