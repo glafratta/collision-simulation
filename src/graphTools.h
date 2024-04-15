@@ -179,7 +179,7 @@ struct StateMatcher{
 
 	private:
 
-	const float COEFFICIENT_INCREASE_THRESHOLD=0.1;
+	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;
 };
 
 #endif
