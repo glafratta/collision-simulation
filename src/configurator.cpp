@@ -1118,10 +1118,10 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 			//else if (g[most_likely.second].probability>prob){
 				if(g[v].nObs>nObs){
 				result.first=true;
-				result.second=v;
+				result.second=*vi;
 				//prob=g[most_likely.second].probability;
 				nObs=g[v].nObs;
-			//}
+			}
 		}
 		}
 	}
