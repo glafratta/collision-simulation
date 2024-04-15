@@ -640,6 +640,7 @@ void Configurator::printPlan(){
 			auto a=dirmap.find(transitionSystem[edge.first].direction);
 			printf("%s", (*a).second);
 		}
+		pre=edge.first.m_target;
 		}
 	printf("\n");
 }
