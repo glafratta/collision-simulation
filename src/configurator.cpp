@@ -1036,7 +1036,7 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 			& es.first!=es.second & ep.second){
 			v=ep.first.m_source;
 		}
-		else if (result.empty()){
+		else if (result.empty()&connecting.empty()){
 			break;
 		}
 		if (!connecting.empty()){
