@@ -168,6 +168,8 @@ std::pair <bool, Direction> getOppositeDirection(Direction);
 
 void resetPhi(TransitionSystem&g);
 
+void printPlan();
+
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
 	result.second=false;

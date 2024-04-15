@@ -107,6 +107,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		VisitedTS vts(transitionSystem, boost::keep_all(), vis);
 		//boost::print_graph(transitionSystem);
 		planVertices= planner(transitionSystem, src);
+		if (debugOn){
+			printPlan();
+		}
+
 	}
 	else if (!planning){
 		result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
@@ -345,7 +349,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
-			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
@@ -624,20 +628,12 @@ float Configurator::evaluationFunction(EndedResult er){
 // 	return p;
 // }
 
-// void Configurator::printPlan(Sequence p){
-// 	for (TaskSummary ts: p){
-// 		switch (ts.direction){
-// 			case DEFAULT: printf("DEFAULT: %i", ts.step);break;
-// 			case LEFT: printf("LEFT: %i", ts.step); break;
-// 			case RIGHT: printf("RIGHT: %i", ts.step); break;
-// 			case BACK: printf("BACK: %i", ts.step); break;
-// 			case STOP: printf("STOP");break;
-// 			default:break;
-// 		}
-// 		printf(", ");
-// 	}
-// 	printf("\n");
-// }
+void Configurator::printPlan(){
+	for (vertexDescriptor v: planVertices){
+		printf("%i, ", v);
+		}
+	printf("\n");
+}
 
 
 void Configurator::start(){
