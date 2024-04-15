@@ -1185,7 +1185,7 @@ float Configurator::trackTaskExecution(Task & t){
 		printf("step =%i\n", t.motorStep);
 	}
 	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
-		int correction=-std::floor(error/(t.action.getLinearSpeed()*MOTOR_CALLBACK)+0.5);
+		int correction=-std::floor(error/(t.action.getLinearSpeed()*samplingRate)+0.5);
 		t.motorStep+=correction; //reflex
 		auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
 		if (eb.second){
