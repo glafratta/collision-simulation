@@ -1116,8 +1116,6 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 			}
 		}
 		}
-
-
 	}
 	return result;
 }

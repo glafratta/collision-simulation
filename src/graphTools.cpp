@@ -72,6 +72,7 @@ std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vec
 			prob=g[e].probability;
 		}
 	}
+	mostLikely.first=!oe.empty();
 	return mostLikely;
 }
 
