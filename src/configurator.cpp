@@ -1064,9 +1064,9 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
-		if (dir!=Direction::UNDEFINED){
-			Tmatch=!ie.empty();
-		}
+		//if (dir!=Direction::UNDEFINED){
+			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
+		//}
 		if (matcher.isPerfectMatch(s, g[v]) & v!=movingVertex & Tmatch){
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			if (!most_likely.first){
@@ -1102,22 +1102,26 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor v, TransitionSystem& g, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
-	float prob=0;
+	//float prob=0;
+	int nObs=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
 			std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
 			bool Tmatch=true;
-			if (dir!=Direction::UNDEFINED){
-				Tmatch=!ie.empty();
-			}
+			//if (dir!=Direction::UNDEFINED){
+			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
+			//}
 			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch){
-			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
-			if (!most_likely.first){
-			}
-			else if (g[most_likely.second].probability>prob){
+			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
+			//if (!most_likely.first){
+			//}
+			//else if (g[most_likely.second].probability>prob){
+				if(g[v].nObs>nObs){
 				result.first=true;
 				result.second=v;
-			}
+				//prob=g[most_likely.second].probability;
+				nObs=g[v].nObs;
+			//}
 		}
 		}
 	}
