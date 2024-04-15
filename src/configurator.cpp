@@ -629,8 +629,17 @@ float Configurator::evaluationFunction(EndedResult er){
 // }
 
 void Configurator::printPlan(){
+	std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
+	vertexDescriptor pre=movingVertex;
 	for (vertexDescriptor v: planVertices){
-		printf("%i, ", v);
+		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
+		if (!edge.second){
+			throw std::exception();
+		}
+		else{
+			auto a=dirmap.find(transitionSystem[edge.first].direction);
+			printf("%s", (*a).second);
+		}
 		}
 	printf("\n");
 }
