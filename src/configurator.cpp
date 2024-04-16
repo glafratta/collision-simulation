@@ -516,9 +516,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		float phi=2; //very large phi, will get overwritten
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
-				if (g[e].step!=0){
-				}
-				else if (g[e.m_target].phi<phi){
+			if (g[e.m_target].phi<phi& g[e].step!=0){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
 						connecting=e.m_source;
@@ -532,7 +530,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			plan.push_back(connecting);
 		}
 		if (!frontier.empty()){
-			if (src!=currentVertex &){
+			if (src!=currentVertex){
 				plan.push_back(src);
 			}
 		}
@@ -1216,7 +1214,7 @@ float Configurator::trackTaskExecution(Task & t){
 	}
 	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
 		int correction=-std::floor(error/(t.action.getLinearSpeed()*timeElapsed)+0.5);
-		t.motorStep+=correction; //reflex
+		//t.motorStep+=correction; //reflex
 		auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
 		if (eb.second){
 			transitionSystem[eb.first].step+=correction;
