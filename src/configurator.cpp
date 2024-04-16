@@ -514,6 +514,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		frontier=frontierVertices(src, g, DEFAULT);
 		connecting=TransitionSystem::null_vertex();
 		float phi=2; //very large phi, will get overwritten
+		bool changed_src=false;
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
 			if (g[e.m_target].phi<phi){
@@ -523,13 +524,15 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					}
 					//if (e.m_source !=currentVertex){
 					src=e.m_target;
+					changed_src=true;
 					//}
 				}
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
 			plan.push_back(connecting);
 		}
-		if (!frontier.empty()& src!=plan[-1]){
+		//if (!frontier.empty()){
+		if (changed_src){
 			if (src!=currentVertex){
 				plan.push_back(src);
 			}
