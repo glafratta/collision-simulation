@@ -516,7 +516,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		float phi=2; //very large phi, will get overwritten
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
-			if (g[e.m_target].phi<phi& g[e].step!=0){
+			if (g[e.m_target].phi<phi){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
 						connecting=e.m_source;
@@ -529,7 +529,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		if (connecting!=TransitionSystem::null_vertex()){
 			plan.push_back(connecting);
 		}
-		if (!frontier.empty()){
+		if (!frontier.empty()& src!=plan[-1]){
 			if (src!=currentVertex){
 				plan.push_back(src);
 			}
@@ -1050,6 +1050,9 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
 	std::vector <vertexDescriptor>connecting;
 	do{
+		if ((controlGoal.disturbance.getPosition()-g[v].endPose.p).Length() < DISTANCE_ERROR_TOLERANCE){
+			break;
+		}
 		auto es=boost::out_edges(v, g);
 		for (auto ei=es.first; ei!=es.second; ei++){
 			if (g[(*ei).m_target].visited()){
