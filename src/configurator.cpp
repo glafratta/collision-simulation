@@ -117,10 +117,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		currentTask.change = transitionSystem[currentVertex].outcome==simResult::crashed;
 	}
 	float duration=0;
+	auto endTime =std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
+ 	float duration=abs(float(d.count())/1000); //express in seconds
+	printf("took %f seconds\n", duration);
 	if (benchmark){
-	 	auto endTime =std::chrono::high_resolution_clock::now();
-	 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
-	 	float duration=abs(float(d.count())/1000); //express in seconds
 		FILE * f = fopen(statFile, "a+");
 		printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
@@ -333,6 +334,14 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
+	if (debugOn){
+		auto vs=boost::vertices(g);
+		printf("previously in graph:");
+		for (auto vi=vs.first; vi!=vs.second; vi++){
+			printf(" v%i", (*vi));
+		}
+		printf("\n");
+	}
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
@@ -371,6 +380,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
 				gt::adjustProbability(g, edge.first);
 			}
+			// if (debugOn){
+			// 	printf("v= %i, start = (%f, %f, %f\n)", v1, start.p.x, start.p.y, start.q.GetAngle());
+			// }
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			//heuristicMap.emplace(v1, evaluationFunction(er));
 			g[v1].phi=evaluationFunction(er);
@@ -634,11 +646,11 @@ void Configurator::printPlan(){
 	for (vertexDescriptor v: planVertices){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
 		if (!edge.second){
-			throw std::exception();
+			//throw std::exception();
 		}
 		else{
 			auto a=dirmap.find(transitionSystem[edge.first].direction);
-			printf("%s", (*a).second);
+			printf("%i, %s, ", edge.first.m_target, (*a).second);
 		}
 		pre=edge.first.m_target;
 		}
@@ -1181,6 +1193,9 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 float Configurator::trackTaskExecution(Task & t){
 	float error=0;
+	if (planVertices.empty() & planning){
+		return error;
+	}
 	std::unordered_map<State*, float>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
 		error=it->second;
@@ -1191,7 +1206,7 @@ float Configurator::trackTaskExecution(Task & t){
 		printf("step =%i\n", t.motorStep);
 	}
 	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
-		int correction=-std::floor(error/(t.action.getLinearSpeed()*samplingRate)+0.5);
+		int correction=-std::floor(error/(t.action.getLinearSpeed()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
 		auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
 		if (eb.second){
@@ -1301,6 +1316,9 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
 }
 
 void Configurator::updateGraph(TransitionSystem&g, float error){
+	if (debugOn){
+		printf("updating graph\n");
+	}
 	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
