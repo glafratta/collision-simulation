@@ -112,6 +112,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		planVertices= planner(transitionSystem, src);
 		if (debugOn){
 			printPlan();
+			//boost::print_graph(transitionSystem);
 		}
 
 	}
@@ -515,13 +516,15 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		float phi=2; //very large phi, will get overwritten
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
-				if (g[e.m_target].phi<phi){
+				if (g[e].step!=0){
+				}
+				else if (g[e.m_target].phi<phi){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
 						connecting=e.m_source;
 					}
 					//if (e.m_source !=currentVertex){
-						src=e.m_target;
+					src=e.m_target;
 					//}
 				}
 		}
@@ -529,7 +532,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			plan.push_back(connecting);
 		}
 		if (!frontier.empty()){
-			if (src!=currentVertex){
+			if (src!=currentVertex &){
 				plan.push_back(src);
 			}
 		}
@@ -648,9 +651,11 @@ void Configurator::printPlan(){
 	vertexDescriptor pre=movingVertex;
 	for (vertexDescriptor v: planVertices){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
+		//auto a=dirmap.find(transitionSystem[edge.first].direction);
 		if (!edge.second){
 			//throw std::exception();
-			printf("no edge: %i, %s, ", edge.first.m_target, (*a).second);
+			//auto a=dirmap.find(transitionSystem[edge.first].direction);
+			printf("no edge: %i-> ", edge.first.m_source);
 		}
 		else{
 			auto a=dirmap.find(transitionSystem[edge.first].direction);
@@ -1254,6 +1259,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 	if (planning){
 		if (planVertices.empty()){
 			currentVertex=movingVertex;
+
 			return;
 		}
 		if (currentVertex!=movingVertex){
@@ -1272,7 +1278,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		// 	// return;
 		// 	currentEdge= boost::add_edge(currentVertex, pl)
 		// }
-		boost::clear_vertex(0, transitionSystem);
+		boost::clear_vertex(movingVertex, transitionSystem);
 
 		planVertices.erase(planVertices.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
