@@ -79,6 +79,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			currentTask.action.setVelocities(0,0);
 		}
 		movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		if (debugOn){
+			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
+		}
 			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
@@ -119,7 +122,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	float duration=0;
 	auto endTime =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
- 	float duration=abs(float(d.count())/1000); //express in seconds
+ 	duration=abs(float(d.count())/1000); //express in seconds
 	printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
@@ -647,6 +650,7 @@ void Configurator::printPlan(){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
 		if (!edge.second){
 			//throw std::exception();
+			printf("no edge: %i, %s, ", edge.first.m_target, (*a).second);
 		}
 		else{
 			auto a=dirmap.find(transitionSystem[edge.first].direction);
