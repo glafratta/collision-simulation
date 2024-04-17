@@ -147,7 +147,7 @@ std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direct
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <bool, vertexDescriptor> findExactMatch(State, TransitionSystem&, Direction dir=Direction::UNDEFINED); //matches to most likely
+std::pair <bool, vertexDescriptor> findExactMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED); //matches to most likely
 
 std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED); //has a safety to prevent matching a vertex with self
 

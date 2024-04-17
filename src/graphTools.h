@@ -174,7 +174,7 @@ struct StateMatcher{
 
 		bool isPerfectMatch(DistanceVector, float endDistance=0); // is this the same state?
 
-		bool isPerfectMatch(State, State); //first state: state to find a match for, second state: candidate match
+		bool isPerfectMatch(State, State, State* src=NULL); //first state: state to find a match for, second state: candidate match
 
 		std::pair<bool, vertexDescriptor> isPerfectMatch(TransitionSystem, vertexDescriptor, Direction, State); //find match amoung vertex out edges
 		

@@ -361,7 +361,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
-			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, t.direction);			
+			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, g[v0].ID, t.direction);			
 			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 			if (!match.first){
 				edge= addVertex(v0, v1,g, Disturbance(),sk.second); //new edge, valid
@@ -1087,7 +1087,7 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 	return result;
 }
 
-std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, Direction dir){
+std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, State * src, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	//MoreLikely more_likely;
@@ -1098,9 +1098,9 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
 		//if (dir!=Direction::UNDEFINED){
-			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
+		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
-		if (matcher.isPerfectMatch(s, g[v]) & v!=movingVertex & Tmatch){
+		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex & Tmatch){
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			if (!most_likely.first){
 			}

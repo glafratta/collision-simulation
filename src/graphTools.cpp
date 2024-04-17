@@ -156,9 +156,13 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
     return result;
 }
 
-bool StateMatcher::isPerfectMatch(State s, State candidate){
+bool StateMatcher::isPerfectMatch(State s, State candidate, State *src){
 	DistanceVector  distance = getDistance(s, candidate);
-    return isPerfectMatch(distance, s.endPose.p.Length())&s.label==candidate.label;
+	float stray=0;
+	if (src!=NULL){
+		stray=(s.endPose.p-src->endPose.p).Length();
+	}
+    return isPerfectMatch(distance, s.endPose.p.Length()) & stray<error.endPosition;
 }
 
 
