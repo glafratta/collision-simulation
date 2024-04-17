@@ -65,14 +65,13 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
+	transitionSystem[movingVertex].label=VERTEX_LABEL::MOVING;
 	currentVertex = boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
 	currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	errorMap.emplace((transitionSystem[currentVertex].ID), 0);
-	// edgeDescriptor e = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	// transitionSystem[e].direction=DEFAULT;
-	// transitionSystem[e].step=0;
+
 }
 
 void setBenchmarking(bool b){
@@ -170,6 +169,8 @@ void resetPhi(TransitionSystem&g);
 
 void printPlan();
 
+
+
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
 	result.second=false;
@@ -186,6 +187,12 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		//adjustProbability(g, result.first); //for now predictions and observations carry the same weight
 	}
 	return result;
+}
+
+void setStateLabel(State& s, vertexDescriptor v, Direction d){
+	if(d!=currentTask.direction & v==movingVertex){
+		s.label=VERTEX_LABEL::ESCAPE;
+	}
 }
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);

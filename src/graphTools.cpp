@@ -50,6 +50,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
 	update(e, sk, g, current, errorMap);
 	g[e.m_target].outcome = sk.first.outcome;
+	g[e.m_target].label=sk.first.label;
 }
 
 std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
@@ -157,7 +158,7 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 
 bool StateMatcher::isPerfectMatch(State s, State candidate){
 	DistanceVector  distance = getDistance(s, candidate);
-    return isPerfectMatch(distance, s.endPose.p.Length());
+    return isPerfectMatch(distance, s.endPose.p.Length())&s.label==candidate.label;
 }
 
 

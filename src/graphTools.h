@@ -21,6 +21,7 @@
 // enum M_CODES {THREE_M=3, FOUR_M=4};
 
 // enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
+enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE};
 
 typedef std::vector <float> DistanceVector;
 
@@ -44,6 +45,7 @@ struct State{
 	int nObs=0;
 	State* ID=this;
 	float phi=10.0; //arbitrarily large phi
+	VERTEX_LABEL label=VERTEX_LABEL::UNLABELED;
 
 	
 	State()=default;
@@ -55,6 +57,7 @@ struct State{
 	void resetVisited(){
 		phi=10.0;
 	}
+
 };
 
 

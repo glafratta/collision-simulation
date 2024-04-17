@@ -85,9 +85,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
 		transitionSystem[movingEdge].direction=currentTask.direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-
-		//std::map <vertexDescriptor, float> heuristicMap;
-		//heuristicMap.insert_or_assign(currentVertex, evaluationFunction(controlGoal.checkEnded(transitionSystem[movingVertex])));
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
 		if (iteration>1){
@@ -106,9 +103,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
-		Visited vis(&transitionSystem); //debug
-		VisitedTS vts(transitionSystem, boost::keep_all(), vis);
-		//boost::print_graph(transitionSystem);
 		planVertices= planner(transitionSystem, src);
 		if (debugOn){
 			printPlan();
@@ -338,14 +332,14 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
-	if (debugOn){
-		auto vs=boost::vertices(g);
-		printf("previously in graph:");
-		for (auto vi=vs.first; vi!=vs.second; vi++){
-			printf(" v%i", (*vi));
-		}
-		printf("\n");
-	}
+	// if (debugOn){
+	// 	auto vs=boost::vertices(g);
+	// 	printf("previously in graph:");
+	// 	for (auto vi=vs.first; vi!=vs.second; vi++){
+	// 		printf(" v%i", (*vi));
+	// 	}
+	// 	printf("\n");
+	// }
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
@@ -363,6 +357,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
+			setStateLabel(sk.first, v0, t.direction); //new
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
@@ -388,7 +383,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			// 	printf("v= %i, start = (%f, %f, %f\n)", v1, start.p.x, start.p.y, start.q.GetAngle());
 			// }
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
-			//heuristicMap.emplace(v1, evaluationFunction(er));
 			g[v1].phi=evaluationFunction(er);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
 			v0=v1;
@@ -526,15 +520,23 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					src=e.m_target;
 					changed_src=true;
 					//}
-				}
+			}
+			else if (g[e.m_target].label==ESCAPE){
+				boost::clear_vertex(e.m_target, g);
+			}
+			else if (g[e.m_source].label==ESCAPE){
+				boost::clear_vertex(e.m_source, g);
+			}
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
+			g[connecting].label=VERTEX_LABEL::UNLABELED;
 			plan.push_back(connecting);
 		}
 		//if (!frontier.empty()){
 		if (changed_src){
 			if (src!=currentVertex){
 				plan.push_back(src);
+				g[src].label==UNLABELED;
 			}
 		}
 		else{
@@ -1263,7 +1265,6 @@ void Configurator::changeTask(bool b, int &ogStep){
 	if (planning){
 		if (planVertices.empty()){
 			currentVertex=movingVertex;
-
 			return;
 		}
 		if (currentVertex!=movingVertex){
