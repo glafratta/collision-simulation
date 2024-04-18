@@ -194,9 +194,9 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 		if ( d!=DEFAULT){
 			s.label=VERTEX_LABEL::ESCAPE;
 		}	
-		else if (d==DEFAULT){ //not two defaults
+	}		
+	else if (transitionSystem[src].label==ESCAPE &d==DEFAULT){ //not two defaults
 		s.label=ESCAPE2;
-	}
 	}
 
 }
