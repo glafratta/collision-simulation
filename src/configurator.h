@@ -65,7 +65,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
-	transitionSystem[movingVertex].label=VERTEX_LABEL::MOVING;
+///	transitionSystem[movingVertex].label=VERTEX_LABEL::MOVING;
 	currentVertex = boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex] = gt::fill(simResult()).first;
 	transitionSystem[currentVertex] = gt::fill(simResult()).first;
@@ -190,13 +190,15 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 }
 
 void setStateLabel(State& s, State * src, Direction d){
-	if(d!=currentTask.direction & d!=DEFAULT & src->label==MOVING){
-		s.label=VERTEX_LABEL::ESCAPE;
-		return;
-	}
-	else if (d==DEFAULT){ //not two defaults
+	if(d!=currentTask.direction & src->ID==transitionSystem[movingVertex].ID){
+		if ( d!=DEFAULT){
+			s.label=VERTEX_LABEL::ESCAPE;
+		}	
+		else if (d==DEFAULT){ //not two defaults
 		s.label=ESCAPE2;
 	}
+	}
+
 }
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);

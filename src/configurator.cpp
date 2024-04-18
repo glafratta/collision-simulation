@@ -379,7 +379,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
 				if (!(v0==v1)){
-					edge= (boost::add_edge(v0, v1, g)); //assumes edge added
+					edge= (boost::edge(v0, v1, g)); //assumes edge added
 					edge.second=true; //just means that the edge is valid
 					g[edge.first]=sk.second;//t.direction;
 				}
@@ -545,7 +545,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		if (changed_src){
 			if (src!=currentVertex){
 				plan.push_back(src);
-				g[src].label==UNLABELED;
+				g[src].label=UNLABELED;
 			}
 		}
 		else{
