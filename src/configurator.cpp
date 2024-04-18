@@ -366,7 +366,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			State * source=NULL;
 			bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]);
 			if (v0==movingVertex & vm){
-				source= g[currentVertex].ID;
+				source= g[currentEdge.m_source].ID;
 			}
 			else{
 				source=g[v0].ID;
