@@ -159,7 +159,9 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 bool StateMatcher::isPerfectMatch(State s, State candidate, State *src){
 	DistanceVector  distance = getDistance(s, candidate);
 	float stray=0;
-	if (src!=NULL & s.label!=UNLABELED){
+	if (src!=NULL & s.label!=UNDEFINED){
+		float ds= (src->endPose.p -candidate.endPose.p).Length();
+		b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
 		stray=(s.endPose.p-src->endPose.p).Length();
 	}
     return isPerfectMatch(distance, s.endPose.p.Length()) & stray<error.endPosition;

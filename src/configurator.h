@@ -190,11 +190,11 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 }
 
 void setStateLabel(State& s, State * src, Direction d){
-	if(d!=currentTask.direction & src->label==MOVING){
+	if(d!=currentTask.direction & d!=DEFAULT & src->label==MOVING){
 		s.label=VERTEX_LABEL::ESCAPE;
 		return;
 	}
-	if (src->label==ESCAPE){ //not two defaults
+	else if (d==DEFAULT){ //not two defaults
 		s.label=ESCAPE2;
 	}
 }

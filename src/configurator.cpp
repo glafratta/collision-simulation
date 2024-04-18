@@ -357,11 +357,18 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
-			setStateLabel(sk.first, v0, t.direction); //new
+			setStateLabel(sk.first, g[v0].ID, t.direction); //new
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
-			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, g[v0].ID, t.direction);			
+			State * source=NULL;
+			if (v0==movingVertex & matcher.isPerfectMatch(g[v], g[currentEdge.m_source])){
+				source= g[currentVertex].ID;
+			}
+			else{
+				source=g[v0].ID;
+			}
+			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, source, t.direction);			
 			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 			if (!match.first){
 				edge= addVertex(v0, v1,g, Disturbance(),sk.second); //new edge, valid
@@ -1100,7 +1107,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		//if (dir!=Direction::UNDEFINED){
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
-		if (matcher.isPerfectMatch(s, g[v], src) & Tmatch){ //& v!=movingVertex 
+		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			if (!most_likely.first){
 			}
