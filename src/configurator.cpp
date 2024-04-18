@@ -79,6 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			currentTask.action.setVelocities(0,0);
 		}
 		movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		propagateD(currentVertex, movingVertex, movingVertex, transitionSystem);
 		if (debugOn){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
