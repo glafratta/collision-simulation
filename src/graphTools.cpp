@@ -164,7 +164,7 @@ bool StateMatcher::isPerfectMatch(State s, State candidate, State *src){
 		b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
 		stray=(s.endPose.p-src->endPose.p).Length();
 	}
-    return isPerfectMatch(distance, s.endPose.p.Length()) & stray<error.endPosition;
+    return isPerfectMatch(distance, s.endPose.p.Length()) & (stray<error.endPosition|| s.label==candidate.label);
 }
 
 
