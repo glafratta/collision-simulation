@@ -532,12 +532,12 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					changed_src=true;
 					//}
 			}
-			else if (g[e.m_target].label==ESCAPE){
-				boost::clear_vertex(e.m_target, g);
-			}
-			else if (g[e.m_source].label==ESCAPE){
-				boost::clear_vertex(e.m_source, g);
-			}
+			// else if (g[e.m_target].label==ESCAPE){
+			// 	boost::clear_vertex(e.m_target, g);
+			// }
+			// else if (g[e.m_source].label==ESCAPE){
+			// 	boost::clear_vertex(e.m_source, g);
+			// }
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
 			g[connecting].label=VERTEX_LABEL::UNLABELED;
