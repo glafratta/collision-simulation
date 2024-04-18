@@ -362,7 +362,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
 			State * source=NULL;
-			if (v0==movingVertex & matcher.isPerfectMatch(g[v], g[currentEdge.m_source])){
+			bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]);
+			if (v0==movingVertex & vm){
 				source= g[currentVertex].ID;
 			}
 			else{
