@@ -189,8 +189,8 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 	return result;
 }
 
-void setStateLabel(State& s, State * src, Direction d){
-	if(d!=currentTask.direction & src->ID==transitionSystem[movingVertex].ID){
+void setStateLabel(State& s, vertexDescriptor src, Direction d){
+	if(d!=currentTask.direction & src==movingVertex){
 		if ( d!=DEFAULT){
 			s.label=VERTEX_LABEL::ESCAPE;
 		}	

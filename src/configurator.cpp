@@ -359,7 +359,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
-			setStateLabel(sk.first, g[v0].ID, t.direction); //new
+			setStateLabel(sk.first, v0, t.direction); //new
 			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
