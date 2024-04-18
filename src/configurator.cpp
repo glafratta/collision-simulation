@@ -360,7 +360,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
 			setStateLabel(sk.first, v0, t.direction); //new
-			sk =gt::fill(simulate(sk.first, g[v0], t, w, _simulationStep)); //find simulation result
+			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
+			gt::fill(sim, &sk.first, &sk.second); //find simulation result
 			sk.second.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
 			State * source=NULL;
@@ -380,7 +381,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				g[v0].options.erase(g[v0].options.begin());
 				v1=match.second; //frontier
 				if (!(v0==v1)){
-					edge= (boost::edge(v0, v1, g)); //assumes edge added
+					edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
 					edge.second=true; //just means that the edge is valid
 					g[edge.first]=sk.second;//t.direction;
 				}

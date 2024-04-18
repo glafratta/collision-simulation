@@ -122,7 +122,7 @@ struct Visited{ //for debug
 
 namespace gt{
 
-	std::pair<State, Edge> fill(simResult);
+	void fill(simResult, State* s=NULL, Edge* e=NULL);
 
 	int simToMotorStep(int);
 
