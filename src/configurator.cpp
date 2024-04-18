@@ -1100,7 +1100,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		//if (dir!=Direction::UNDEFINED){
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
-		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex & Tmatch){
+		if (matcher.isPerfectMatch(s, g[v], src) & Tmatch){ //& v!=movingVertex 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			if (!most_likely.first){
 			}
