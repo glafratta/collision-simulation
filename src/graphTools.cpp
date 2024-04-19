@@ -10,7 +10,6 @@ void gt::fill(simResult sr, State* s, Edge* e){
 	if (NULL!=e){
 		e->step = gt::simToMotorStep(sr.step);
 	}
-	//nObs++;
 }
 
 int gt::simToMotorStep(int simStep){
