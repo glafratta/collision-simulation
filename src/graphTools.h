@@ -150,6 +150,8 @@ namespace gt{
 	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);
 
 	void adjustProbability(TransitionSystem&, edgeDescriptor);
+
+	std::pair <edgeDescriptor, bool> add_edge(vertexDescriptor, vertexDescriptor, TransitionSystem&); //wrapper around boost function, disallows edges to self
 }
 
 

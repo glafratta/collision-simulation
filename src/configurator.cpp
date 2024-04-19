@@ -108,8 +108,9 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		planVertices= planner(transitionSystem, src);
 		is_current_v icv(currentVertex);
 		boost::remove_out_edge_if(movingVertex, icv, transitionSystem);
-		if (debugOn & !timerOff){
+		if (debugOn & timerOff){
 			printPlan();
+			printf("graph size= %i\n", transitionSystem.m_vertices.size());
 		}
 
 	}
@@ -447,7 +448,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		edgeDescriptor e;
 		edgeDescriptor e2 = gt::visitedEdge(toReassign, g);
 		if (ie.empty()){
-			e =boost::add_edge(e2.m_source, pair.second, g).first;
+		//	e =boost::add_edge(e2.m_source, pair.second, g).first;
 		}
 		else{
 			e=ie[0];
@@ -455,7 +456,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		toReassign.push_back(e);
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
 		for (edgeDescriptor r:toReassign){ //reassigning edges
-			std::pair <edgeDescriptor, bool> ep =boost::add_edge(r.m_source, pair.second, g);
+			std::pair <edgeDescriptor, bool> ep =gt::add_edge(r.m_source, pair.second, g);
 		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);

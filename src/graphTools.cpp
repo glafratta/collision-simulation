@@ -118,6 +118,16 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	}
 }
 
+std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescriptor v, TransitionSystem& g){
+	std::pair <edgeDescriptor, bool> result(edgeDescriptor(), false);
+	if (u==v){
+		return result;
+	}
+	result =boost::add_edge(u, v, g);
+	return result;
+}
+
+
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);
