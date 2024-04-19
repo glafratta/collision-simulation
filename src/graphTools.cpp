@@ -36,7 +36,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
-	if(sk.first.label==UNLABELED){
+	if(sk.first.label==g[e.m_target].label){
 		g[e.m_target].endPose = sk.first.endPose;
 	}
 	g[e.m_target].options = sk.first.options;
