@@ -456,7 +456,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		toReassign.push_back(e);
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
 		for (edgeDescriptor r:toReassign){ //reassigning edges
-			std::pair <edgeDescriptor, bool> ep =gt::add_edge(r.m_source, pair.second, g);
+			gt::add_edge(r.m_source, pair.second, g);
 		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);
@@ -1163,7 +1163,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 			//if (dir!=Direction::UNDEFINED){
 			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 			//}
-			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch){
+			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>0){
 			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			//if (!most_likely.first){
 			//}
