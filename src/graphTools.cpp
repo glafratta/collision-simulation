@@ -48,7 +48,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
 	update(e, sk, g, current, errorMap);
 	g[e.m_target].outcome = sk.first.outcome;
-	g[e.m_target].label=sk.first.label;
+	//g[e.m_target].label=sk.first.label;
 }
 
 std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){

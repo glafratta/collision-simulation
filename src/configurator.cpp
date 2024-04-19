@@ -375,7 +375,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, source, t.direction);			
 			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 			if (!match.first){
-				edge= addVertex(v0, v1,g, Disturbance(),sk.second); //new edge, valid
+				edge= addVertex(v0, v1,g, Disturbance(),sk.second);
+				g[edge.first.m_target].label=sk.first.label; //new edge, valid
 			}
 			else{
 				g[v0].options.erase(g[v0].options.begin());
@@ -532,9 +533,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					changed_src=true;
 					//}
 			}
-			// else if (g[e.m_target].label==ESCAPE){
-			// 	boost::clear_vertex(e.m_target, g);
-			// }
+			else if (g[e.m_target].label!=UNLABELED){
+			 	boost::clear_vertex(e.m_target, g);
+			}
 			// else if (g[e.m_source].label==ESCAPE){
 			// 	boost::clear_vertex(e.m_source, g);
 			// }
