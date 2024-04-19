@@ -119,6 +119,17 @@ struct Visited{ //for debug
 	TransitionSystem *g;
 };
 
+struct is_current_v{
+	is_current_v(){}
+	//CurrentV(TransitionSystem * ts): g(ts){}
+	is_current_v(vertexDescriptor _cv): cv(_cv){}
+	bool operator()(edgeDescriptor e){
+		return e.m_source!=cv;
+	}	
+
+	private:
+	vertexDescriptor cv;
+};
 
 namespace gt{
 

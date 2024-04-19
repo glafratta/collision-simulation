@@ -106,9 +106,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		planVertices= planner(transitionSystem, src);
-		if (debugOn){
+		is_current_v icv(currentVertex);
+		boost::remove_out_edge_if(movingVertex, icv, transitionSystem);
+		if (debugOn & !timerOff){
 			printPlan();
-			//boost::print_graph(transitionSystem);
 		}
 
 	}
@@ -358,7 +359,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, t.direction, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
-			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
+			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
 			setStateLabel(sk.first, v0, t.direction); //new
 			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 			gt::fill(sim, &sk.first, &sk.second); //find simulation result
@@ -528,14 +529,13 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					if (e.m_source!=src){
 						connecting=e.m_source;
 					}
-					//if (e.m_source !=currentVertex){
 					src=e.m_target;
 					changed_src=true;
-					//}
 			}
-			else if (g[e.m_target].label!=UNLABELED){
-			 	boost::clear_vertex(e.m_target, g);
-			}
+//			else if (g[e.m_target].label!=UNLABELED){
+			// else if (e.m_source==movingVertex){
+			//  	boost::clear_vertex(e.m_target, g);
+			// }
 			else if (g[e.m_source].label!=UNLABELED){
 			 	boost::clear_vertex(e.m_source, g);
 			}
@@ -1112,7 +1112,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		//if (dir!=Direction::UNDEFINED){
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
-		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch){ 
+		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			if (!most_likely.first){
 			}
