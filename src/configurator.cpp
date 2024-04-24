@@ -263,7 +263,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	}
 	float remaining =distance/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
-		if(t.direction == Direction::DEFAULT){
+		if(t.direction == Direction::DEFAULT & fabs(src.endPose.q.GetAngle())<fabs(controlGoal.disturbance.q.GetAngle())+M_PI/6){
 		remaining= (distance-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
 		}
 		if (remaining<0.01){
