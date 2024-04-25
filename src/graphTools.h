@@ -46,6 +46,7 @@ struct State{
 	State* ID=this;
 	float phi=10.0; //arbitrarily large phi
 	VERTEX_LABEL label=VERTEX_LABEL::UNLABELED;
+	//Direction direction=DEFAULT;
 
 	
 	State()=default;
@@ -166,9 +167,9 @@ struct StateMatcher{
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
 		
 		struct Error{
-			const float endPosition=0.05;
+			const float endPosition=0.05;//0.05;
 			const float angle= M_PI/6;
-			const float dPosition= 0.065; //o.g. 0.1
+			const float dPosition= 0.06;//0.065; 
 			const float affordance =0;
 		}error;
 
