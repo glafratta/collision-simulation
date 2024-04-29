@@ -1047,7 +1047,12 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	int stepsTraversed= g[eb.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*MOTOR_CALLBACK*currentTask.action.getOmega());
-		currentTask.setEndCriteria(Angle(remainingAngle));
+		if (t->direction==getOppositeDirection(currentTask.direction).second){
+			remainingAngle=M_PI-remainingAngle;
+		}
+		else{
+			currentTask.setEndCriteria(Angle(remainingAngle));
+		}
 		t->setEndCriteria(Angle(remainingAngle));
 	}
 	if(currentTask.getAction().getLinearSpeed()>0){
