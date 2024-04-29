@@ -360,7 +360,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			changeStart(start, v0, g);
 			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
-			adjustStepDistance(v0, g, t.direction, _simulationStep);
+			adjustStepDistance(v0, g, &t, _simulationStep);
 			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
 			setStateLabel(sk.first, v0, t.direction); //new
@@ -1038,7 +1038,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 
-void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Direction d, float& step){
+void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 	if(!ep.second){
 		return;
@@ -1048,6 +1048,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*MOTOR_CALLBACK*currentTask.action.getOmega());
 		currentTask.setEndCriteria(Angle(remainingAngle));
+		t->setEndCriteria(Angle(remainingAngle));
 	}
 	if(currentTask.getAction().getLinearSpeed()>0){
 		step-= (stepsTraversed*MOTOR_CALLBACK)*currentTask.action.getLinearSpeed();
