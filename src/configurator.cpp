@@ -914,7 +914,7 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 		std::set <Pointf>set=vec2set(vec);
 		auto pIt =set.find(p);
 		CoordinateContainer::iterator pItNext = pIt++;
-		if (pItNext!=set.end()){
+		if (pIt!=set.end()){
 			float deltaY =pItNext->y- pIt->y;
 			float deltaX = pItNext->x - pIt->x;
 			result.first=true; //is there a neighbouring point?
