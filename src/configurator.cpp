@@ -891,8 +891,8 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 
 std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
 	std::vector <Pointf> result;
+	cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
 	for (Pointf p: sensorTools.previous){
-		cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
 		if (p.inside(rect)){
 			result.push_back(p);
 		}
