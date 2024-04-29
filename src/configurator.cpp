@@ -283,7 +283,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if(!result.collision.isValid()){
 		return result;
 	}
-	std::vector <Pointf> nb=neighbours(result.collision.getPosition(), 0.025);
+	std::vector <Pointf> nb=neighbours(result.collision.getPosition(), 0.05);
 	cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
 	result.collision.bf.halfLength=rect.width/2;
@@ -891,9 +891,11 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 
 std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
 	std::vector <Pointf> result;
-	cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
+	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius, radius);//tl, br, w, h
+	auto br=rect.br();
+	auto tl=rect.tl();
 	for (Pointf p: sensorTools.previous){
-		if (p.inside(rect)){
+		if (p.inside(rect) & p!=getPointf(pos)){
 			result.push_back(p);
 		}
 	}
