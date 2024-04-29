@@ -371,7 +371,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			setStateLabel(sk.first, v0, t.direction); //new
 			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 			gt::fill(sim, &sk.first, &sk.second); //find simulation result
-			//sk.second.direction=t.direction;
+			sk.first.direction=t.direction;
 			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
 			State * source=NULL;
 			bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]);
@@ -1038,21 +1038,14 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Direction d, float& step){
-	// if (boost::out_degree(v, g)==0 || boost::in_degree(v,g)==0 || planVertices.empty()){
-	// 	return;
-	// }
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 	if(!ep.second){
 		return;
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
-	// if (g[currentEdge].direction!=d){
-	// 	return;
-	// }
 	int stepsTraversed= g[eb.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
-		//remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
 		currentTask.setEndCriteria(Angle(remainingAngle));
 	}
 	if(currentTask.getAction().getLinearSpeed()>0){

@@ -170,7 +170,7 @@ struct StateMatcher{
 		struct Error{
 			const float endPosition=0.05;//0.05;
 			const float angle= M_PI/6;
-			const float dPosition= 0.07;//0.065; 
+			const float dPosition= 0.065;//0.065; 
 			const float affordance =0;
 		}error;
 
