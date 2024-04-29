@@ -1046,7 +1046,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, D
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
 	int stepsTraversed= g[eb.first].step-currentTask.motorStep;
 	if (currentTask.getAction().getOmega()!=0){
-		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*currentTask.action.getOmega());
+		float remainingAngle = currentTask.endCriteria.angle.get()-abs(stepsTraversed*MOTOR_CALLBACK*currentTask.action.getOmega());
 		currentTask.setEndCriteria(Angle(remainingAngle));
 	}
 	if(currentTask.getAction().getLinearSpeed()>0){
