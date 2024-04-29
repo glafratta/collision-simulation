@@ -907,10 +907,10 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 	float sumY=0, sumX=0;
 	float avgY=0, avgX=0;
 	std::pair <bool, float>result(false, 0);
+	vec.shrink_to_fit();
 	for (Pointf p:vec){
 	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
 	//if (p.inside(rect)){
-		count+=1;
 		std::set <Pointf>set=vec2set(vec);
 		auto pIt =set.find(p);
 		CoordinateContainer::iterator pItNext = pIt++;
@@ -918,7 +918,7 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 			float deltaY =pItNext->y- pIt->y;
 			float deltaX = pItNext->x - pIt->x;
 			result.first=true; //is there a neighbouring point?
-			
+			count+=1;
 			sumY+=deltaY;
 			sumX+=deltaX;
 		}
@@ -927,7 +927,7 @@ std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
 	}
 	avgY = sumY/count;
 	avgX = sumX/count;
-	result.second=atan2(avgY, avgX);
+	result.second=atan(avgY/avgX);
 	return result;
 }
 
