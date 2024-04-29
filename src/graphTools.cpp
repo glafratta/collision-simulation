@@ -155,8 +155,8 @@ float StateMatcher::sumVector(DistanceVector vec){
 bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 	float coefficient=1.0;
 	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		coefficient+=(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/(BOX2DRANGE-COEFFICIENT_INCREASE_THRESHOLD);
-		//coefficient*=scale;
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/.9;
+		coefficient*=scale;
 	}
     bool result =false;
 	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);
@@ -168,6 +168,7 @@ bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
     }
     return result;
 }
+
 bool StateMatcher::isPerfectMatch(State s, State candidate, State *src){
 	DistanceVector  distance = getDistance(s, candidate);
 	float stray=0;

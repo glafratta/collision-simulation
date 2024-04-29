@@ -95,8 +95,7 @@ void setBenchmarking(bool b){
 		d=ltm->tm_mday;
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
-		//sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-		sprintf(statFile, "%s/stats%.02f_.%.02f_relax.txt",dirName, matcher.error.endPosition, matcher.error.dPosition);		
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
 		//sprintf(statFile,"stat");
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");

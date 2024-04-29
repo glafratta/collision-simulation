@@ -85,8 +85,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
+<<<<<<< HEAD
 		//transitionSystem[movingEdge].direction=currentTask.direction;
 		//transitionSystem[movingEdge].direction=currentTask.direction; //because direction is in the state
+=======
+		transitionSystem[movingEdge].direction=currentTask.direction;
+>>>>>>> parent of a2a510d (confirmed parameters, added benchmark stats)
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
@@ -124,15 +128,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
  	duration=abs(float(d.count())/1000); //express in seconds
 	printf("took %f seconds\n", duration);
-	if (benchmark & iteration<40){
+	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
 		printf("open stat\n");
-		Visited visited(&transitionSystem);
-		VisitedTS vts(transitionSystem, boost::keep_all(), visited);
-		TransitionSystem tmp;
-		boost::copy_graph(vts, tmp);
-		//fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
-		fprintf(f,"%i\t%i\t%f\t%i\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration, tmp.m_vertices.size());
+		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
 		fclose(f);
 		//return 0; //stops when finished and doesn't execute
 
