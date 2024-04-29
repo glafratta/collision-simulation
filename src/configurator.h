@@ -178,6 +178,7 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		v1 = boost::add_vertex(g);
 		result = add_edge(src, v1, g);
 		g[result.first] =edge;
+		g[v1].direction=g[src].options[0];
 		if (!topDown){
 			g[src].options.erase(g[src].options.begin());
 		}

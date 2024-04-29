@@ -85,12 +85,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
-<<<<<<< HEAD
 		//transitionSystem[movingEdge].direction=currentTask.direction;
 		//transitionSystem[movingEdge].direction=currentTask.direction; //because direction is in the state
-=======
-		transitionSystem[movingEdge].direction=currentTask.direction;
->>>>>>> parent of a2a510d (confirmed parameters, added benchmark stats)
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
