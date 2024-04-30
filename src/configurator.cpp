@@ -1252,7 +1252,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.motorStep+=correction; //reflex
 	}
 	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
-		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*timeElapsed)+0.5);
+		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
 	}	if(t.motorStep==0){
 		t.change=1;
@@ -1380,7 +1380,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.bf.pose-=deltaPose;
 	}
-	if (currentTask.disturbance.isValid()){
-		currentTask.disturbance.bf.pose-=deltaPose;
-	}
+	// if (currentTask.disturbance.isValid()){
+	// 	currentTask.disturbance.bf.pose-=deltaPose;
+	// }
 }

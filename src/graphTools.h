@@ -143,11 +143,11 @@ struct ExecutionError{
 	}
 
 	float r(){
-		return _theta;
+		return _r;
 	}
 
 	float theta(){
-		return _r;
+		return _theta;
 	}
 
 	void setTheta(float f){
