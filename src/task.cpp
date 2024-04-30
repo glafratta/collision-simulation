@@ -61,16 +61,16 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 }
 
 
-void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
-	b2Transform shift(b2Vec2(-robVelocity.p.x*timeElapsed, -robVelocity.p.y*timeElapsed), b2Rot(-robVelocity.q.GetAngle()*timeElapsed)); //calculates shift in the time step
-	b2Vec2 newPos(d.getPosition().x+shift.p.x,d.getPosition().y + shift.p.y);
-	d.setPosition(newPos);
-	float angle = d.getAngle(pose);
-	if (d.isPartOfObject()){
-		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
-	}
-	d.setAngle(angle); //with respect to robot's velocity
-}
+// void Task::trackDisturbance(Disturbance & d, float timeElapsed, b2Transform robVelocity, b2Transform pose){ //isInternal refers to whether the tracking is with respect to the global coordinate frame (i.e. in willCollide) if =1, if isIntenal =0 it means that the Disturbance is tracked with the robot in the default position (0.0)
+// 	b2Transform shift(b2Vec2(-robVelocity.p.x*timeElapsed, -robVelocity.p.y*timeElapsed), b2Rot(-robVelocity.q.GetAngle()*timeElapsed)); //calculates shift in the time step
+// 	b2Vec2 newPos(d.getPosition().x+shift.p.x,d.getPosition().y + shift.p.y);
+// 	d.setPosition(newPos);
+// 	float angle = d.getAngle(pose);
+// 	if (d.isPartOfObject()){
+// 		d.setOrientation(d.getOrientation() + shift.q.GetAngle());
+// 	}
+// 	d.setAngle(angle); //with respect to robot's velocity
+// }
 
 // void Configurator::trackDisturbance(b2Transform & pose, Action a, float error){
 // 	float angleTurned =MOTOR_CALLBACK*a.getOmega();
