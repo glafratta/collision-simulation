@@ -55,7 +55,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	//adjustProbability(g, e);
 }
 
-void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
+void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap){
 	update(e, sk, g, current, errorMap);
 	g[e.m_target].outcome = sk.first.outcome;
 	//g[e.m_target].label=sk.first.label;

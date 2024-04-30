@@ -472,13 +472,13 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 	}
 }
 
-void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> matches , TransitionSystem&g, std::unordered_map<State*, float>map){
+void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> matches , TransitionSystem&g, std::unordered_map<State*, ExecutionError>map){
 	//auto es=boost::edges(g);
 	//for (auto ei=es.first; ei!=es.second; ei++){
 		for (std::pair<vertexDescriptor, vertexDescriptor> pair:matches){
 			if (auto it=map.find(g[pair.first].ID); it!=map.end()){
-				float value = map.at(transitionSystem[pair.first].ID);
-				map.insert_or_assign(transitionSystem[pair.second].ID, value);
+				ExecutionError exer = map.at(transitionSystem[pair.first].ID);
+				map.insert_or_assign(transitionSystem[pair.second].ID, exer);
 				map.erase(it);
 				break;
 			}
