@@ -1233,29 +1233,28 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 // }
 
 
-float Configurator::trackTaskExecution(Task & t){
-	float error=0;
+ExecutionError Configurator::trackTaskExecution(Task & t){
+	ExecutionError error;
 	if (planVertices.empty() & planning){
 		return error;
 	}
-	std::unordered_map<State*, float>::iterator it;
+	std::unordered_map<State*, ExecutionError>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
 		error=it->second;
-		it->second=0;
+		it->second=ExecutionError();
 	}
-	if (t.motorStep>0 & fabs(error)<TRACKING_ERROR_TOLERANCE){
+	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
 	}
-	else if (fabs(error)>=TRACKING_ERROR_TOLERANCE){
-		int correction=-std::floor(error/(t.action.getLinearSpeed()*timeElapsed)+0.5);
+	else if (fabs(error.r())>=TRACKING_ERROR_TOLERANCE){
+		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
-		// auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
-		// if (eb.second){
-		// 	transitionSystem[eb.first].step+=correction;
-		// }
 	}
-	if(t.motorStep==0){
+	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
+		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*timeElapsed)+0.5);
+		t.motorStep+=correction; //reflex
+	}	if(t.motorStep==0){
 		t.change=1;
 	}
 	updateGraph(transitionSystem, error);
@@ -1350,17 +1349,18 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-void Configurator::updateGraph(TransitionSystem&g, float error){
+void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	if (debugOn){
 		printf("updating graph\n");
 	}
-	b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
+	//b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	b2Transform deltaPose;
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-	float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error;
+	float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error.r();
+	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-					rot);
+					angularDisplacement); //og rot
 	//}
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
@@ -1379,5 +1379,8 @@ void Configurator::updateGraph(TransitionSystem&g, float error){
 	// }
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.bf.pose-=deltaPose;
+	}
+	if (currentTask.disturbance.isValid()){
+		currentTask.disturbance.bf.pose-=deltaPose;
 	}
 }

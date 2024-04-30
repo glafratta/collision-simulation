@@ -133,6 +133,35 @@ struct is_current_v{
 	vertexDescriptor cv;
 };
 
+struct ExecutionError{
+
+	ExecutionError(){}
+
+	ExecutionError(float fr, float ft){
+		_r=fr;
+		_theta=ft;
+	}
+
+	float r(){
+		return _theta;
+	}
+
+	float theta(){
+		return _r;
+	}
+
+	void setTheta(float f){
+		_theta=f;
+	}
+
+	void setR(float f){
+		_r=f;
+	}
+	private:
+	float _r=0;
+	float _theta=0;
+};
+
 namespace gt{
 
 	void fill(simResult, State* s=NULL, Edge* e=NULL);

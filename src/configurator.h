@@ -57,7 +57,7 @@ public:
 	WorldBuilder worldBuilder;
 	vertexDescriptor currentVertex;
 	edgeDescriptor movingEdge, currentEdge;
-	std::unordered_map <State*, float> errorMap;
+	std::unordered_map <State*, ExecutionError> errorMap;
 
 Configurator()=default;
 
@@ -133,7 +133,7 @@ void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tr
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
-void updateGraph(TransitionSystem&, float error);
+void updateGraph(TransitionSystem&, ExecutionError error);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
@@ -235,7 +235,7 @@ std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average
 
 std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 									
-float trackTaskExecution(Task &);
+ExecutionError trackTaskExecution(Task &);
 
 b2Transform assignDeltaPose(Task::Action, float);
 

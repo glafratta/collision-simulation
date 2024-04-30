@@ -26,17 +26,22 @@ int gt::simToMotorStep(int simStep){
 // 	return result;
 // }
 
-void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, float>& errorMap){
+void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap){
 	if (e==edgeDescriptor()){
 		return;
 	}
-	float result=0;
+	ExecutionError result;
 	if (!current){
 		g[e].step = sk.second.step;
 	}
 	else if (g[e.m_target].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
-		result=g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x;
+		result.setR(g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x);
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
+	}
+	else if ((g[e.m_target].direction==LEFT || g[e.m_target].direction==RIGHT )& g[e.m_target].disturbance.isValid()){
+		result.setTheta(g[e.m_target].disturbance.getOrientation()-sk.first.disturbance.getOrientation());
+		errorMap.insert_or_assign(g[e.m_target].ID, result);
+
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
 	if(sk.first.label==g[e.m_target].label){

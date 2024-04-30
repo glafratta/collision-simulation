@@ -28,7 +28,7 @@ struct Disturbance{ //this generates error
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     float angleToRobot=0;
-    bool partOfObject=0;
+    //bool partOfObject=0;
 public:
     bool valid= 0;
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
@@ -64,7 +64,7 @@ public:
         }
 		bf.pose.Set(p, a);
         valid =1;
-        partOfObject=1;
+        //partOfObject=1;
     }    
 
     void setAngle(float a){ //angle to robot
@@ -110,16 +110,16 @@ public:
 
     void setOrientation(float f){ //returns orientation (angle) of a point, in order 
         bf.pose.q.Set(f);
-        partOfObject =1;
+       // partOfObject =1;
     }
 
     float getOrientation(){
         return bf.pose.q.GetAngle();
     }
 
-    bool isPartOfObject(){
-        return partOfObject;
-    }
+    // bool isPartOfObject(){
+    //     return partOfObject;
+    // }
 
     b2Transform pose(){
         return bf.pose;
