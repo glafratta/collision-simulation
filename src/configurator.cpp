@@ -334,7 +334,8 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	vertexDescriptor v1, v0, bestNext=v;
-	Direction direction= t.direction;
+	//Direction direction= t.direction;
+	Direction direction=g[v].direction;
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
