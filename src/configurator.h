@@ -70,7 +70,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	errorMap.emplace((transitionSystem[currentVertex].ID), 0);
+	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
 
 }
 
