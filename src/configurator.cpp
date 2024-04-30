@@ -1062,6 +1062,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 
 }
 
+
 std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, TransitionSystem& g, Direction d){
 	 	std::vector <edgeDescriptor> result;
 		edgeDescriptor e; 
