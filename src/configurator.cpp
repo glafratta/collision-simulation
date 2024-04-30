@@ -1254,7 +1254,8 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
 		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
-	}	if(t.motorStep==0){
+	}	
+	if(t.motorStep==0){
 		t.change=1;
 	}
 	updateGraph(transitionSystem, error);
