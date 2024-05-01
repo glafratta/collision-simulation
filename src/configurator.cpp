@@ -105,6 +105,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		FILE * f = fopen(statFile, "a+");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), collisionGraph.m_vertices.size(), duration);
 		fclose(f);
+		printf("HZ=%f\n", HZ);
 	}
 	worldBuilder.resetBodies();
 	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
