@@ -26,8 +26,8 @@ const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
 const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.00;
 const int maxNodesOnSpot =4;
-const int POS_IT =3;
-const int VEL_IT =8;
+const int POS_IT =2;
+const int VEL_IT =6;
 
 class Robot {
 private: 
