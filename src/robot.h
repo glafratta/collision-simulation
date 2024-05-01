@@ -19,7 +19,7 @@ const float MAX_SPEED=.196; //1.56
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
 const float BOX2DRANGE =1.0;
 #define LIDAR_RANGE 1.1
-#define HZ 60.0
+#define HZ 50.0
 #define MAX_ANGLE_ERROR M_PI
 const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
 const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
