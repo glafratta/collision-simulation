@@ -19,15 +19,15 @@ const float MAX_SPEED=.196; //1.56
 #define ANGLE_ERROR_TOLERANCE 5 * M_PI/180
 const float BOX2DRANGE =1.0;
 #define LIDAR_RANGE 1.1
-const float HZ=40.0;
+const float HZ=30.0;
 #define MAX_ANGLE_ERROR M_PI
 const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
 const float MOTOR_CALLBACK =.1; //MOTOR CALL BACK EVERY .1 s
 const float TURN_FRICTION =.86; //.75
 const float DISTANCE_ERROR_TOLERANCE=.00;
 const int maxNodesOnSpot =4;
-#define POS_IT 3
-#define VEL_IT 8
+const int POS_IT =3;
+const int VEL_IT =8;
 
 class Robot {
 private: 
