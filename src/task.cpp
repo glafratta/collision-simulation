@@ -29,7 +29,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (checkEnded(robot.body->GetTransform()).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep){
 				break;
 			}
-			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
+			_world.Step(1.0f/HZ, POS_IT, VEL_IT); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getRecOmega()/HZ; //= omega *t
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
