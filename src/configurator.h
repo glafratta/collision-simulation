@@ -48,7 +48,8 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	SensorTools sensorTools;
+	//SensorProc * sensorProc=NULL;
+	PointCloudProc pcProc;
 	std::vector <vertexDescriptor> planVertices;
 	bool discretized =0;
 	TransitionSystem transitionSystem;
@@ -120,6 +121,8 @@ void addIteration(){
 Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
 }
+
+float taskLateralError(); // simples: can just return currentTask.action.getTransform()
 
 Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 
@@ -228,9 +231,9 @@ void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 
-std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
+// std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 
-std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
+// std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
 
 std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan

@@ -19,7 +19,7 @@ const float MAX_OMEGA =2; //2 radians
 const float ANGLE_ERROR_TOLERANCE =5 * M_PI/180;
 const float BOX2DRANGE =1.0;
 const float LIDAR_RANGE =1.1;
-const float HZ =60.0;
+const float HZ =10.0;
 const float MAX_ANGLE_ERROR= M_PI;
 const float SAFE_DISTANCE =sqrt(ROBOT_HALFLENGTH*ROBOT_HALFLENGTH+ROBOT_HALFWIDTH*ROBOT_HALFWIDTH); //DEFAULT backtracking distance
 const float MAX_DISTANCE_ERROR =2*BOX2DRANGE;
@@ -30,6 +30,8 @@ const int maxNodesOnSpot =4;
 const float TRACKING_ERROR_TOLERANCE = MAX_SPEED*MOTOR_CALLBACK*0.5; //OG *0.5
 const float TRACKING_ANGLE_TOLERANCE =MAX_OMEGA*0.5*MOTOR_CALLBACK;
 const float FORGET_THRESHOLD=0.05;
+const int POS_IT=2;
+const int VEL_IT=6;
 
 class Robot {
 private: 

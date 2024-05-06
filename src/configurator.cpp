@@ -16,10 +16,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("data empty!\n");
 		return 1;
 	}
-	// CoordinateContainer previous =current;
-	// current.clear();
-	//current = CoordinateContainer(data);
-	//currentBox2D.clear();
 	currentBox2D = CoordinateContainer(data2fp);
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
@@ -48,18 +44,18 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	char name[256];
 
 	//CALCULATE VELOCITY 
-	b2Transform velocity;
-	 if (currentTask.action.getOmega()==0){
-		float dataRange=0.25;
-	 	velocity= sensorTools.affineTransEstimate(std::vector <Pointf>(data.begin(), data.end()), currentTask.action, timeElapsed, dataRange);
-		//GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
-	 }
-	else{
-		velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
-	}
-	currentTask.action.setRecSpeed(SignedVectorLength(velocity.p));
-	currentTask.action.setRecOmega(velocity.q.GetAngle());
-
+	// b2Transform velocity;
+	//  if (currentTask.action.getOmega()==0){
+	// 	float dataRange=0.25;
+	//  	velocity= sensorProc->affineTransEstimate(std::vector <Pointf>(data.begin(), data.end()), currentTask.action, timeElapsed, dataRange);
+	// 	//GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
+	//  }
+	// else{
+	// 	velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
+	// }
+	// currentTask.action.setRecSpeed(SignedVectorLength(velocity.p));
+	// currentTask.action.setRecOmega(velocity.q.GetAngle());
+	float lateralError=taskLateralError();
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
 	if (controlGoal.change){
@@ -137,7 +133,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
 //	if (currentTask.motorStep<pl){
-	currentTask.controller(timeElapsed);
+	//currentTask.controller(lateralError, timeElapsed);
 //	}
 
 	return 1;
@@ -283,9 +279,9 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if(!result.collision.isValid()){
 		return result;
 	}
-	std::vector <Pointf> nb=neighbours(result.collision.getPosition(), 0.05);
+	std::vector <Pointf> nb=pcProc.neighbours(result.collision.getPosition(), 0.05);
 	cv::Rect2f rect =worldBuilder.getRect(nb);
-	std::pair<bool, float> orientation =findOrientation(nb);
+	std::pair<bool, float> orientation =pcProc.findOrientation(nb);
 	result.collision.bf.halfLength=rect.width/2;
 	result.collision.bf.halfLength=rect.height/2;
 	result.collision.setOrientation(orientation.second);
@@ -890,47 +886,47 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 }
 
 
-std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
-	std::vector <Pointf> result;
-	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
-	auto br=rect.br();
-	auto tl=rect.tl();
-	for (Pointf p: sensorTools.previous){
-		if (p.inside(rect) & p!=getPointf(pos)){
-			result.push_back(p);
-		}
-	}
-	return result;
-}
+// std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
+// 	std::vector <Pointf> result;
+// 	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
+// 	auto br=rect.br();
+// 	auto tl=rect.tl();
+// 	for (Pointf p: sensorTools.previous){
+// 		if (p.inside(rect) & p!=getPointf(pos)){
+// 			result.push_back(p);
+// 		}
+// 	}
+// 	return result;
+// }
 
-std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
-	int count=0;
-	float sumY=0, sumX=0;
-	float avgY=0, avgX=0;
-	std::pair <bool, float>result(false, 0);
-	vec.shrink_to_fit();
-	for (Pointf p:vec){
-	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
-	//if (p.inside(rect)){
-		std::set <Pointf>set=vec2set(vec);
-		auto pIt =set.find(p);
-		CoordinateContainer::iterator pItNext = pIt++;
-		if (pIt!=set.end()){
-			float deltaY =pItNext->y- pIt->y;
-			float deltaX = pItNext->x - pIt->x;
-			result.first=true; //is there a neighbouring point?
-			count+=1;
-			sumY+=deltaY;
-			sumX+=deltaX;
-		}
+// std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
+// 	int count=0;
+// 	float sumY=0, sumX=0;
+// 	float avgY=0, avgX=0;
+// 	std::pair <bool, float>result(false, 0);
+// 	vec.shrink_to_fit();
+// 	for (Pointf p:vec){
+// 	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
+// 	//if (p.inside(rect)){
+// 		std::set <Pointf>set=vec2set(vec);
+// 		auto pIt =set.find(p);
+// 		CoordinateContainer::iterator pItNext = pIt++;
+// 		if (pIt!=set.end()){
+// 			float deltaY =pItNext->y- pIt->y;
+// 			float deltaX = pItNext->x - pIt->x;
+// 			result.first=true; //is there a neighbouring point?
+// 			count+=1;
+// 			sumY+=deltaY;
+// 			sumX+=deltaX;
+// 		}
 
-	//}
-	}
-	avgY = sumY/count;
-	avgX = sumX/count;
-	result.second=atan(avgY/avgX);
-	return result;
-}
+// 	//}
+// 	}
+// 	avgY = sumY/count;
+// 	avgX = sumX/count;
+// 	result.second=atan(avgY/avgX);
+// 	return result;
+// }
 
 
 // void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
@@ -1240,6 +1236,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	if (planVertices.empty() & planning){
 		return error;
 	}
+	//PROLONGING DURATION OF TASK IF NEEDED
 	std::unordered_map<State*, ExecutionError>::iterator it;
 	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
 		error=it->second;
@@ -1256,10 +1253,12 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
 		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
-	}	
+	}		
 	if(t.motorStep==0){
 		t.change=1;
 	}
+	//FINDING IF ROBOT IS GOING STRAIGHT
+	error.setTheta(taskLateralError()); //will be rest at the next callback
 	updateGraph(transitionSystem, error);
 	return error;
 }

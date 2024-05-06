@@ -87,23 +87,21 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 // 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 // }
 
-void Task::controller(float timeElapsed){
-//float recordedAngle = action.getOmega()/0.2;
+void Task::Correct::operator()(float error, Action & action, float timeElapsed){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-	//bool ended = checkEnded().ended;
-	float timeStepError =action.getRecOmega()/timeElapsed; 
-	float normAccErr = timeStepError/SAFE_ANGLE;
-	if (action.getOmega()!=0|| motorStep<1 || motorStep%10!=0){ //only check every 2 sec
+	// float timeStepError =action.getRecOmega()/timeElapsed; 
+	// float normAccErr = timeStepError/SAFE_ANGLE;
+	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		return;
 	}
 	//accumulatedError += timeStepError; 
-	if (fabs(timeStepError)>tolerance){
-		printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		if (normAccErr<0){
-			action.L -= normAccErr*pGain;  //-
+	if (fabs(error)>tolerance){
+		//printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
+		if (error<0){
+			action.L -= error*pGain;  //-
 		}
-		else if (normAccErr>0){
-			action.R -= normAccErr *pGain; //+
+		else if (error>0){
+			action.R -= error *pGain; //+
 		}
 		if (action.L>1.0){
 		action.L=1.0;
@@ -229,8 +227,8 @@ EndedResult Task::checkEnded(State n){ //check error of node compared to the pre
 	return r;
 }
 
-float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
-	float slope = (v2.y- v1.y)/(v2.x - v1.x);
-	return atan(slope);
-}
+// float Task::findOrientation(b2Vec2 v1, b2Vec2 v2){
+// 	float slope = (v2.y- v1.y)/(v2.x - v1.x);
+// 	return atan(slope);
+// }
 

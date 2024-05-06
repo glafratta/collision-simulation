@@ -56,7 +56,7 @@ bool operator >(const Pointf& p1,  const Pointf& p2){
 
 
 
-b2Transform SensorTools::affineTransEstimate(std::vector <Pointf> current, Task::Action a,float timeElapsed, float range){
+b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Task::Action a,float timeElapsed, float range){
         b2Transform result;
         std::vector <Pointf> previousTmp = previous;
         previous=current;
@@ -97,5 +97,111 @@ b2Transform SensorTools::affineTransEstimate(std::vector <Pointf> current, Task:
 
 	}
 	return result;
+
+}
+
+std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
+	std::vector <Pointf> result;
+	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
+	auto br=rect.br();
+	auto tl=rect.tl();
+	for (Pointf p: previous){
+		if (p.inside(rect) & p!=getPointf(pos)){
+			result.push_back(p);
+		}
+	}
+	return result;
+}
+
+std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec){
+	int count=0;
+	float sumY=0, sumX=0;
+	float avgY=0, avgX=0;
+	std::pair <bool, float>result(false, 0);
+	vec.shrink_to_fit();
+	for (Pointf p:vec){
+	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
+	//if (p.inside(rect)){
+		std::set <Pointf>set=vec2set(vec);
+		auto pIt =set.find(p);
+		CoordinateContainer::iterator pItNext = pIt++;
+		if (pIt!=set.end()){
+			float deltaY =pItNext->y- pIt->y;
+			float deltaX = pItNext->x - pIt->x;
+			result.first=true; //is there a neighbouring point?
+			count+=1;
+			sumY+=deltaY;
+			sumX+=deltaX;
+		}
+
+	//}
+	}
+	avgY = sumY/count;
+	avgX = sumX/count;
+	result.second=atan(avgY/avgX);
+	return result;
+}
+
+
+cv::Mat ImgProc::cropLeft(cv::Mat mat){
+		float w=mat.size().width;
+		float h=mat.size().height;
+		cv::Mat result=mat(cv::Range(0, h), cv::Range(0, w/2));
+        return result;
+}
+
+cv::Mat ImgProc::cropRight(cv::Mat mat){
+		float w=mat.size().width;
+		float h=mat.size().height;
+		cv::Mat result=mat(cv::Range(0, h), cv::Range(w/2, w));
+        return result;
+}
+
+void ImgProc::opticFlow(const cv::Mat& frame){
+	    cv::Mat frame_grey;
+        std::vector <cv::Point2f> new_corners;
+        std::vector <uchar> status;
+        std::vector<float> err;
+        cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
+        //QImage::Format f= QImage::Format_Grayscale8;
+        if (it%60==0){ //resample corners every 2 seconds (30fps)
+            corners.clear();
+            cv::goodFeaturesToTrack(frame_grey, corners, gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
+            printf("GFT\n");
+        }
+        if (it>0 & !corners.empty()){
+            cv::calcOpticalFlowPyrLK(previousFrame_grey, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
+            printf("LK\n");
+        }
+        else{
+            status=std::vector<uchar>(corners.size(), 1);
+        }
+
+        std::vector <cv::Point2f> good_corners;
+        //if (it==1){
+        int i=0;
+        printf("pre-fill in status, new corners size =%i\n", new_corners.size());
+        for (i; i<corners.size();i++){
+            if (status[i]==1){
+                good_corners.push_back(corners[i]);
+            }
+			float RADIUS=5;
+            cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
+        }
+        if (!corners.empty()&!new_corners.empty()){
+            float dx=corners[0].x-new_corners[0].x;
+            float dy=corners[0].y-new_corners[0].y;
+            float r= sqrt(dx*dx+dy*dy);
+            printf("distance: x=%f, y=%f, r=%f\n", dx, dy, r);
+        }
+        printf("good corners = %i, corners %i\n", good_corners.size(),i);
+            
+            //cv::imwrite("sample.jpeg", frame);
+
+        //}
+        printf("updated %i\n", it);
+        previousFrame_grey=frame_grey.clone();
+        corners=good_corners;
+        it++;
 
 }

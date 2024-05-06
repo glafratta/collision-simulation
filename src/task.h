@@ -10,13 +10,13 @@ public:
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
-    float pGain=0.1;
+   // float pGain=0.1;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
 protected:
-    b2Vec2 RecordedVelocity ={0.0f, 0.0f};
+ //   b2Vec2 RecordedVelocity ={0.0f, 0.0f};
 public:
 struct Action{
 private:
@@ -126,6 +126,10 @@ void setVelocities(float l, float r){
         return recordedOmega;
     }
     //friend class Configurator;
+    void setRec(float _speed, float _omega){
+        recordedSpeed=_speed;
+        recordedOmega=_omega;
+    }
 };
 
 
@@ -190,36 +194,15 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     setEndCriteria();
 }
 
-// void init(){
-//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-//     direction = DEFAULT;
-//     action.init(direction);
-//    // printf("default init \n");
-//    // RecordedVelocity = action.getLinearVelocity();
-// }
-
-// void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool T){
-//     start = _start;
-//     disturbance = ob;
-//     direction = H(disturbance, d);  
-//     //action = Action(direction);
-//     action.init(direction);
-//    // RecordedVelocity = action.getLinearVelocity();
-//     setEndCriteria();
-//    // step = action.motorStep();
-//    // printf("step =%i\n", step);
-
-// }
-
-void setRecordedVelocity(b2Vec2 vel){
-    RecordedVelocity = vel;
+// void setRecordedVelocity(b2Vec2 vel){
+//     RecordedVelocity = vel;
     
-} //useful to get the speed.
+// } //useful to get the speed.
 
 
-b2Vec2 getRecordedVelocity(){
-    return RecordedVelocity;
-}
+// b2Vec2 getRecordedVelocity(){
+//     return RecordedVelocity;
+// }
 
 
 //void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transform(b2Vec2(0,0), b2Rot(0)));
@@ -231,12 +214,22 @@ simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, floa
 
 //enum controlResult{DONE =0, CONTINUE =1};
 
-void controller(float timeElapsed=0.2);
+struct Correct{
+    Correct(){}
 
-std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
+    void operator()(float, Action&, float timeElapsed=0.1);
+    private:
+    Task * task;
+    float pGain=0.1;
+
+}correct;
+
+//void controller(float, float timeElapsed=0.2);
+
+//std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
                                                                                     //finding a line passing through those points
 
-float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
+//float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
 
 };
 
