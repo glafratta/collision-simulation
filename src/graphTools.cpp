@@ -41,7 +41,6 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	else if ((g[e.m_target].direction==LEFT || g[e.m_target].direction==RIGHT )& g[e.m_target].disturbance.isValid()){
 		result.setTheta(g[e.m_target].disturbance.getOrientation()-sk.first.disturbance.getOrientation());
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
-
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;
 	if(sk.first.label==g[e.m_target].label){

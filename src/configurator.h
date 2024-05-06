@@ -18,15 +18,17 @@ public:
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
 	bool ready=0;
+	bool newData=0;
 
 	void setReady(bool b);
 
 	bool isReady();
+
 };
 
 class Configurator{
 protected:
-	double samplingRate = 1.0/ 5.0; //default
+//	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
 	//char fileNameBuffer[50];
 	Task currentTask;
@@ -122,7 +124,7 @@ Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
 }
 
-float taskLateralError(); // simples: can just return currentTask.action.getTransform()
+float taskLateralError(); // returns lateral displacement error (local y)
 
 Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 
@@ -158,7 +160,7 @@ std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, TransitionSy
 
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task at vertex v fails, start is set to v's predecessor's end
 
-bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
+//bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 //void backtrackingBuildTree(vertexDescriptor v, TransitionSystem&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 

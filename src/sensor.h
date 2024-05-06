@@ -77,6 +77,7 @@ std::set<T> vec2set(std::vector<T> vec){
 class PointCloudProc{
 	friend Configurator;
     std::vector <Pointf> previous;
+	const float NEIGHBOURHOOD=0.05;
     public:
     PointCloudProc(){};
 
@@ -85,6 +86,8 @@ class PointCloudProc{
 	std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 
 	std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
+
+	std::vector<Pointf> setDisturbanceOrientation(Disturbance&);
 
 };
 

@@ -10,6 +10,7 @@ bool ConfiguratorInterface::isReady(){
 	return ready;
 }
 
+
 bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
 	//PREPARE VECTORS TO RECEIVE DATA
 	if (data.empty()){
@@ -279,12 +280,10 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if(!result.collision.isValid()){
 		return result;
 	}
-	std::vector <Pointf> nb=pcProc.neighbours(result.collision.getPosition(), 0.05);
+	std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision);
 	cv::Rect2f rect =worldBuilder.getRect(nb);
-	std::pair<bool, float> orientation =pcProc.findOrientation(nb);
 	result.collision.bf.halfLength=rect.width/2;
 	result.collision.bf.halfLength=rect.height/2;
-	result.collision.setOrientation(orientation.second);
 	return result;
 	}
 
@@ -484,15 +483,15 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, TransitionSystem& g){
-	auto es=boost::in_edges(target, g);
-	for (auto ei=es.first; ei!=es.second; ei++){
-		if ((*ei).m_source==src){
-			return true;
-		}
-	}
-	return false;
-}
+// bool Configurator::edgeExists(vertexDescriptor src, vertexDescriptor target, TransitionSystem& g){
+// 	auto es=boost::in_edges(target, g);
+// 	for (auto ei=es.first; ei!=es.second; ei++){
+// 		if ((*ei).m_source==src){
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
 
 
 // Sequence Configurator::getCleanSequence(TransitionSystem&g, vertexDescriptor leaf, vertexDescriptor root){
@@ -1221,7 +1220,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 // 	std::pair<bool, vertexDescriptor> result(0, -1);
 // 	float bestDistance=10000;
 // 	for (vertexDescriptor stateV: transitionSystem.m_vertices){
-// 		DistanceVector dv = matcher.getDistance(transitionSystem[stateV], s);
+// 		DistanceVector dv = matcher.getDistance(:transitionSystem[stateV], s);
 // 		if (matcher.isPerfectMatch(dv) & matcher.sumVector(dv)<bestDistance){
 // 			result.second= stateV;
 // 			result.first=true;
@@ -1247,7 +1246,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		printf("step =%i\n", t.motorStep);
 	}
 	else if (fabs(error.r())>=TRACKING_ERROR_TOLERANCE){
-		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*timeElapsed)+0.5);
+		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*LIDAR_SAMPLING_RATE)+0.5);
 		t.motorStep+=correction; //reflex
 	}
 	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
