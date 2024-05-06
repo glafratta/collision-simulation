@@ -56,7 +56,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	// }
 	// currentTask.action.setRecSpeed(SignedVectorLength(velocity.p));
 	// currentTask.action.setRecOmega(velocity.q.GetAngle());
-	float lateralError=taskLateralError();
+	//float rotation_Error=taskRotationError();
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
 	if (controlGoal.change){
@@ -1253,12 +1253,15 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
 	}		
+
+	//FINDING IF ROBOT IS GOING STRAIGHT
+	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	//FINDING IF ROBOT IS GOING STRAIGHT
-	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
-	error.setTheta(taskLateralError()); //will be rest at the next callback
+	else{
+		error.setTheta(taskRotationError()); //will be rest at the next callback
+	}
 	return error;
 }
 

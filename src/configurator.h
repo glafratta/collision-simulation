@@ -17,6 +17,7 @@ public:
 	int iteration=0;
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
+	cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
 
@@ -52,6 +53,7 @@ public:
 	int bodies=0;
 	//SensorProc * sensorProc=NULL;
 	PointCloudProc pcProc;
+	ImgProc imgProc;
 	std::vector <vertexDescriptor> planVertices;
 	bool discretized =0;
 	TransitionSystem transitionSystem;
@@ -124,7 +126,7 @@ Task * getTask(int advance=0){ //returns Task being executed
 	return &currentTask;
 }
 
-float taskLateralError(); // returns lateral displacement error (local y)
+float taskRotationError(); // returns lateral displacement error (local y)
 
 Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 

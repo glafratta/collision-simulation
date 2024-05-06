@@ -169,8 +169,9 @@ cv::Mat ImgProc::cropRight(cv::Mat mat){
         return result;
 }
 
-void ImgProc::opticFlow(const cv::Mat& frame){
-	    cv::Mat frame_grey;
+b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corners, cv::Mat& previousFrame_grey){
+	    b2Vec2 optic_flow;
+		cv::Mat frame_grey;
         std::vector <cv::Point2f> new_corners;
         std::vector <uchar> status;
         std::vector<float> err;
@@ -195,25 +196,22 @@ void ImgProc::opticFlow(const cv::Mat& frame){
         printf("pre-fill in status, new corners size =%i\n", new_corners.size());
         for (i; i<corners.size();i++){
             if (status[i]==1){
-                good_corners.push_back(corners[i]);
+                good_corners.push_back(new_corners[i]); //og corners
             }
 			float RADIUS=5;
             cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
-        if (!corners.empty()&!new_corners.empty()){
-            float dx=corners[0].x-new_corners[0].x;
-            float dy=corners[0].y-new_corners[0].y;
-            float r= sqrt(dx*dx+dy*dy);
-            printf("distance: x=%f, y=%f, r=%f\n", dx, dy, r);
+        if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
+           	optic_flow.x=corners[0].x-new_corners[0].x;
+            optic_flow.y=corners[0].y-new_corners[0].y;
+			
         }
         printf("good corners = %i, corners %i\n", good_corners.size(),i);
-            
-            //cv::imwrite("sample.jpeg", frame);
 
-        //}
         printf("updated %i\n", it);
         previousFrame_grey=frame_grey.clone();
         corners=good_corners;
         it++;
+		return optic_flow;
 
 }
