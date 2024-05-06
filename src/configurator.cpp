@@ -1258,8 +1258,8 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.change=1;
 	}
 	//FINDING IF ROBOT IS GOING STRAIGHT
+	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
 	error.setTheta(taskLateralError()); //will be rest at the next callback
-	updateGraph(transitionSystem, error);
 	return error;
 }
 
