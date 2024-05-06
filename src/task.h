@@ -219,7 +219,6 @@ struct Correct{
 
     void operator()(float, Action&, float timeElapsed=0.1);
     private:
-    Task * task;
     float pGain=0.1;
 
 }correct;
