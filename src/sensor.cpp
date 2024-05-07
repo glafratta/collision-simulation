@@ -9,6 +9,18 @@ float angle(cv::Point2f const& p){
 	return atan2(p.y, p.x);
 }
 
+bool operator <(Pointf const & p1, Pointf const& p2){
+	float a1 = angle(p1);
+	float l1=length(p1);
+	float a2=angle(p2);
+	float l2=length(p2); 
+	return std::tie(a1, l1)< std::tie(a2, l2);
+}	
+
+bool operator >(const Pointf& p1,  const Pointf& p2){
+	return p2<p1;
+}
+
 b2Vec2 getb2Vec2(cv::Point2f p){
 	return b2Vec2(p.x,p.y);
 
@@ -18,11 +30,11 @@ Pointf getPointf(b2Vec2 v){
 	return Pointf(v.x, v.y);
 }
 
-template <typename T>
-cv::Point2f getPoint2f(T p){
-	cv::Point2f result(p.x, p.y);
-	return result;
-}
+// template <typename T>
+// cv::Point2f getPoint2f(T p){
+// 	cv::Point2f result(p.x, p.y);
+// 	return result;
+// }
 
 Pointf Polar2f(float radius, float angle){
 	float x = radius *cos(angle);
@@ -39,14 +51,14 @@ std::vector<T> set2vec(std::set<T> s){
     return vec;
 }
 
-template <typename T>
-std::vector<cv::Point2f> set2vec_cv(std::set<T> s){
-    std::vector <cv::Point2f> vec;
-    for (T t:s){
-        vec.emplace_back(getPoint2f(t));
-    }
-    return vec;
-}
+// template <typename T>
+// std::vector<cv::Point2f> set2vec_cv(std::set<T> s){
+//     std::vector <cv::Point2f> vec;
+//     for (T t:s){
+//         vec.emplace_back(getPoint2f(t));
+//     }
+//     return vec;
+// }
 
 // template <typename T>
 // std::set<T> vec2set(std::vector<T> vec){
@@ -57,17 +69,7 @@ std::vector<cv::Point2f> set2vec_cv(std::set<T> s){
 //     return set;
 // }
 
-bool operator <(Pointf const & p1, Pointf const& p2){
-	float a1 = angle(p1);
-	float l1=length(p1);
-	float a2=angle(p2);
-	float l2=length(p2); 
-	return std::tie(a1, l1)< std::tie(a2, l2);
-}	
 
-bool operator >(const Pointf& p1,  const Pointf& p2){
-	return p2<p1;
-}
 
 
 
@@ -160,8 +162,9 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	return result;
 }
 
-std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, std::vector <Pointf>* data){
-	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD, data);
+std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, CoordinateContainer* data){
+	std::vector <Pointf> vec= set2vec(*data);
+	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,&vec);
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
 	// result.collision.bf.halfLength=rect.width/2;

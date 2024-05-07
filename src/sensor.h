@@ -59,16 +59,16 @@ b2Vec2 getb2Vec2(cv::Point2f );
 
 Pointf getPointf(b2Vec2);
 
-template <typename T>
-cv::Point2f getPoint2f(T);
+// template <typename T>
+// cv::Point2f getPoint2f(T);
 
 Pointf Polar2f(float, float);
 
 template <typename T>
 std::vector<T> set2vec(std::set<T>);
 
-template <typename T>
-std::vector<cv::Point2f> set2vec_cv(std::set<T>);
+// template <typename T>
+// std::vector<cv::Point2f> set2vec_cv(std::set<T>);
 
 template <typename T>
 std::set<T> vec2set(std::vector<T> vec){
@@ -93,7 +93,7 @@ class PointCloudProc{
 
 	std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 
-	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, std::vector <Pointf>* data=NULL);
+	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer* data=NULL);
 
 };
 
