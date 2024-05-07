@@ -4,7 +4,9 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/tracking.hpp>
 
+class ConfiguratorInterface;
 class Configurator;
+
 
 class Pointf: public cv::Point2f{
 	public: 
@@ -84,6 +86,7 @@ std::set<T> vec2set(std::vector<T> vec){
 
 class PointCloudProc{
 	friend ConfiguratorInterface;
+	friend Configurator;
     std::vector <Pointf> previous;
 	const float NEIGHBOURHOOD=0.075;
     public:
@@ -97,6 +100,9 @@ class PointCloudProc{
 
 	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer* data=NULL);
 
+	void updatePrevious(CoordinateContainer c){
+		previous=set2vec(c);
+	}
 };
 
 class ImgProc{

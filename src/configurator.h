@@ -27,7 +27,7 @@ public:
 	bool isReady();
 
 	void updatePCProc(){
-		pcProc->previous=set2vec(data);
+		pcProc->updatePrevious(data);
 	}
 
 };

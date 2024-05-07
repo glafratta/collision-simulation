@@ -219,8 +219,13 @@ struct Correct{
     Correct(){}
 
     void operator()(float, Action&, float timeElapsed=0.1);
+
+    float getError(){
+        return error;
+    }
     private:
     float pGain=0.1;
+    float error=0;
 
 }correct;
 

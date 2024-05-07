@@ -87,21 +87,22 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 // 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 // }
 
-void Task::Correct::operator()(float error, Action & action, float timeElapsed){
+void Task::Correct::operator()(float _error, Action & action, float timeElapsed){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
+	error=_error;
 	// float timeStepError =action.getRecOmega()/timeElapsed; 
 	// float normAccErr = timeStepError/SAFE_ANGLE;
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		return;
 	}
 	//accumulatedError += timeStepError; 
-	if (fabs(error)>tolerance){
+	if (fabs(_error)>tolerance){
 		//printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		if (error<0){
-			action.L -= error*pGain;  //-
+		if (_error<0){
+			action.L -= _error*pGain;  //-
 		}
-		else if (error>0){
-			action.R -= error *pGain; //+
+		else if (_error>0){
+			action.R -= _error *pGain; //+
 		}
 		if (action.L>1.0){
 		action.L=1.0;
