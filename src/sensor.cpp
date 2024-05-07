@@ -18,6 +18,12 @@ Pointf getPointf(b2Vec2 v){
 	return Pointf(v.x, v.y);
 }
 
+template <typename T>
+cv::Point2f getPoint2f(T p){
+	cv::Point2f result(p.x, p.y);
+	return result;
+}
+
 Pointf Polar2f(float radius, float angle){
 	float x = radius *cos(angle);
 	float y = radius *sin(angle);
@@ -29,6 +35,15 @@ std::vector<T> set2vec(std::set<T> s){
     std::vector <T> vec;
     for (T t:s){
         vec.emplace_back(t);
+    }
+    return vec;
+}
+
+template <typename T>
+std::vector<cv::Point2f> set2vec_cv(std::set<T> s){
+    std::vector <cv::Point2f> vec;
+    for (T t:s){
+        vec.emplace_back(getPoint2f(t));
     }
     return vec;
 }
