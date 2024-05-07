@@ -1250,7 +1250,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*LIDAR_SAMPLING_RATE)+0.5);
 		t.motorStep+=correction; //reflex
 	}
-	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE){
+	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE & t.action.getOmega()!=0){
 		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
 		t.motorStep+=correction; //reflex
 	}		
@@ -1260,9 +1260,9 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	else{
-		error.setTheta(taskRotationError()); //will be rest at the next callback
-	}
+	// else{
+	// 	error.setTheta(taskRotationError()); //will be rest at the next callback
+	// }
 	return error;
 }
 

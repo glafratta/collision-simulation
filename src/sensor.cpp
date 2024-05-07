@@ -163,8 +163,13 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 }
 
 std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, CoordinateContainer* data){
-	std::vector <Pointf> vec= set2vec(*data);
-	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,&vec);
+	std::vector <Pointf> * vecPtr=NULL;
+	std::vector <Pointf> vec;
+	if (NULL!=data){
+		vec=set2vec(*data);
+		vecPtr= &vec;
+	}
+	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,vecPtr);
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
 	// result.collision.bf.halfLength=rect.width/2;
