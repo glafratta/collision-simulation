@@ -20,7 +20,7 @@ protected:
 public:
 struct Action{
 private:
-    float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
+    float linearSpeed=MAX_SPEED/2; //used to calculate instantaneous velocity using omega
     float recordedSpeed=linearSpeed;
     float omega=0; //initial angular velocity is 0
     float recordedOmega = omega;

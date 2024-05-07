@@ -140,33 +140,30 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 }
 
 std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec){
-	int count=0;
+	std::pair <bool, float>result(false, 0);
+	if (vec.size()<6){
+		return result;
+	}
+	int count=1;
 	float sumY=0, sumX=0;
 	float avgY=0, avgX=0;
-	std::pair <bool, float>result(false, 0);
 	vec.shrink_to_fit();
-	for (Pointf p:vec){
-	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
-	//if (p.inside(rect)){
-		std::set <Pointf>set=vec2set(vec);
-		auto pIt =set.find(p);
-		CoordinateContainer::iterator pItNext = pIt++;
-		if (pIt!=set.end()){
+	CompareY compareY;
+	std::sort(vec.begin(), vec.end(), compareY);
+	for (int i=0; i<vec.size()-1; i++){
+		std::vector<Pointf>::iterator pIt=(vec.begin()+i);
+		std::vector<Pointf>::iterator pItNext = pIt+1;
 			float deltaY =pItNext->y- pIt->y;
 			float deltaX = pItNext->x - pIt->x;
-			result.first=true; //is there a neighbouring point?
 			count+=1;
 			sumY+=deltaY;
 			sumX+=deltaX;
-		}
-
+	}
+	//if (count>0){
+	avgY = sumY/count;
+	avgX = sumX/count;
+	result.second=atan(avgY/avgX);
 	//}
-	}
-	if (count>0){
-		avgY = sumY/count;
-		avgX = sumX/count;
-		result.second=atan(avgY/avgX);
-	}
 	return result;
 }
 
@@ -179,8 +176,8 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 	}
 	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,vecPtr);
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
-	if (nb.size()>5){
-		std::pair<bool, float> orientation =findOrientation(nb);
+	std::pair<bool, float> orientation =findOrientation(nb);
+	if (orientation.first){
 		d.setOrientation(orientation.second);
 	}
 	return nb;
