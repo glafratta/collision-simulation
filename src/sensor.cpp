@@ -174,6 +174,9 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 		vec=set2vec(*data);
 		vecPtr= &vec;
 	}
+	else{
+		vecPtr = &previous;
+	}
 	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,vecPtr);
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
