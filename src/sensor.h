@@ -59,6 +59,9 @@ b2Vec2 getb2Vec2(cv::Point2f );
 
 Pointf getPointf(b2Vec2);
 
+template <typename T>
+cv::Point2f getPoint2f(T);
+
 Pointf Polar2f(float, float);
 
 template <typename T>
