@@ -77,7 +77,7 @@ b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Ta
         b2Transform result;
         std::vector <Pointf> previousTmp = previous;
         previous=current;
-		if (previousTmp.empty() || current.empty()){
+		if (previousTmp.empty() || current.empty() || previousTmp==current){
 			return result;
 		}
 	 	float theta = a.getOmega()* timeElapsed;
