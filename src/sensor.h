@@ -89,7 +89,7 @@ class PointCloudProc{
 
     b2Transform affineTransEstimate(std::vector <Pointf>, Task::Action, float timeElapsed=0.2, float range=1.0);
 
-	std::vector<Pointf> neighbours(b2Vec2,float radius =0.025, std::vector <Pointf> * data=NULL); //finds if there are bodies close to a point. Used for 
+	std::vector<Pointf> neighbours(b2Vec2,float radius, std::vector <Pointf> * data=NULL); //finds if there are bodies close to a point. Used for 
 
 	std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 

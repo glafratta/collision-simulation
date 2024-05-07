@@ -119,7 +119,7 @@ b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Ta
 
 std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::vector <Pointf> * data){ //more accurate orientation
 	std::vector <Pointf> result;
-	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
+	cv::Rect2f rect(pos.x-radius, pos.y+radius, radius*2, radius*2);//tl, br, w, h
 	auto br=rect.br();
 	auto tl=rect.tl();
 	if (NULL==data){
