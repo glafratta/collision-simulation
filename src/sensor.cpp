@@ -159,6 +159,7 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	avgY = sumY/count;
 	avgX = sumX/count;
 	result.second=atan(avgY/avgX);
+	
 	return result;
 }
 
