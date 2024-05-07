@@ -23,7 +23,7 @@ class Pointf: public cv::Point2f{
 			return result;
 	}
 
-	bool inside(Pointf, Pointf);
+	bool isin(Pointf, Pointf);
 
 };
 

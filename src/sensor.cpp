@@ -1,6 +1,6 @@
 #include "sensor.h"
 
-bool Pointf::inside(Pointf tl, Pointf br){
+bool Pointf::isin(Pointf tl, Pointf br){
 	bool result= x>tl.x & x<br.x & y>br.y& y<tl.y;
 	return result;
 }
@@ -133,7 +133,7 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 		data = &previous;
 	}
 	for (Pointf p: *data){
-		if (p.inside(tl, br) & p!=getPointf(pos)){
+		if (p.isin(tl, br) & p!=getPointf(pos)){
 			result.push_back(p);
 		}
 	}
