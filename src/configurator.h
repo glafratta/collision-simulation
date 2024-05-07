@@ -20,10 +20,15 @@ public:
 	cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
+	PointCloudProc * pcProc=NULL;
 
 	void setReady(bool b);
 
 	bool isReady();
+
+	void updatePCProc(){
+		pcProc->previous=set2vec(data);
+	}
 
 };
 
@@ -36,7 +41,7 @@ protected:
 	bool benchmark=0;
 	vertexDescriptor movingVertex;
 public:
-	ConfiguratorInterface * ci;
+	ConfiguratorInterface * ci=NULL;
 	bool running =0;
 	std::thread * t=NULL;
 	bool debugOn=0;

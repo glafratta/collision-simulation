@@ -83,7 +83,7 @@ std::set<T> vec2set(std::vector<T> vec){
 
 
 class PointCloudProc{
-	friend Configurator;
+	friend ConfiguratorInterface;
     std::vector <Pointf> previous;
 	const float NEIGHBOURHOOD=0.075;
     public:

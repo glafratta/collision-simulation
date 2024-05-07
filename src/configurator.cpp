@@ -713,6 +713,7 @@ void Configurator::stop(){
 
 void Configurator::registerInterface(ConfiguratorInterface * _ci){
 	ci = _ci;
+	ci->pcProc=&pcProc;
 	//ci->ts = TaskSummary(controlGoal.disturbance, controlGoal.direction, motorStep(controlGoal.action));
 }
 
@@ -732,6 +733,7 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			c->ci->ready=0;
 			c->Spawner(c->ci->data, c->ci->data2fp);
+			//c->pcProc.previous=set2vec(c->ci->data);
 			//c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
 	}

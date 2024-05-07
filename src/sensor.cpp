@@ -82,7 +82,6 @@ std::vector<T> set2vec(std::set<T> s){
 b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Task::Action a,float timeElapsed, float range){
         b2Transform result;
         std::vector <Pointf> previousTmp = previous;
-        previous=current;
 		if (previousTmp.empty() || current.empty() || previousTmp==current){
 			return result;
 		}
