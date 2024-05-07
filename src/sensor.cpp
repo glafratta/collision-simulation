@@ -179,7 +179,7 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 	}
 	std::vector <Pointf> nb=neighbours(d.getPosition(), NEIGHBOURHOOD,vecPtr);
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
-	if (!nb.size()>5){
+	if (nb.size()>5){
 		std::pair<bool, float> orientation =findOrientation(nb);
 		d.setOrientation(orientation.second);
 	}
