@@ -1,5 +1,11 @@
 #include "sensor.h"
 
+bool Pointf::inside(Pointf tl, Pointf br){
+	bool result= x>tl.x & x<br.x & y>br.y& y<tl.y;
+	return result;
+}
+
+
 float length(cv::Point2f const& p){
 	return sqrt(pow(p.x,2)+ pow(p.y, 2));
 }
@@ -119,14 +125,15 @@ b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Ta
 
 std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::vector <Pointf> * data){ //more accurate orientation
 	std::vector <Pointf> result;
-	cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
-	auto br=rect.br();
-	auto tl=rect.tl();
+	//cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
+	float x1=pos.x-radius, x2=pos.x+radius, y1=pos.y-radius, y2=pos.y+radius;
+	Pointf br(std::max(x1, x2), std::min(y1, y2));
+	Pointf tl(std::min(x1, x2), std::max(y1, y2));
 	if (NULL==data){
 		data = &previous;
 	}
 	for (Pointf p: *data){
-		if (p.inside(rect) & p!=getPointf(pos)){
+		if (p.inside(tl, br) & p!=getPointf(pos)){
 			result.push_back(p);
 		}
 	}
@@ -156,10 +163,11 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 
 	//}
 	}
-	avgY = sumY/count;
-	avgX = sumX/count;
-	result.second=atan(avgY/avgX);
-	
+	if (count>0){
+		avgY = sumY/count;
+		avgX = sumX/count;
+		result.second=atan(avgY/avgX);
+	}
 	return result;
 }
 

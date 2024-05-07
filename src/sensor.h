@@ -23,6 +23,8 @@ class Pointf: public cv::Point2f{
 			return result;
 	}
 
+	bool inside(Pointf, Pointf);
+
 };
 
 template<>
