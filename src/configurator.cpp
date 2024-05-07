@@ -45,6 +45,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	char name[256];
 
 	//CALCULATE VELOCITY 
+//	taskRotationError(); //to remove
 	// b2Transform velocity;
 	//  if (currentTask.action.getOmega()==0){
 	// 	float dataRange=0.25;
