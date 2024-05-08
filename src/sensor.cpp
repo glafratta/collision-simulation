@@ -123,7 +123,7 @@ b2Transform PointCloudProc::affineTransEstimate(std::vector <Pointf> current, Ta
 }
 
 std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::vector <Pointf> data){ //more accurate orientation
-	std::vector <Pointf> result;
+	std::vector <Pointf> result= std::vector<Pointf>();
 	//cv::Rect2f rect(pos.x-radius, pos.y-radius, radius*2, radius*2);//tl, br, w, h
 	float x1=pos.x-radius, x2=pos.x+radius, y1=pos.y-radius, y2=pos.y+radius;
 	Pointf br(std::max(x1, x2), std::min(y1, y2));
@@ -144,26 +144,26 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	if (vec.size()<6){
 		return result;
 	}
-	int count=1;
+	int count=0;
 	float sumY=0, sumX=0;
 	float avgY=0, avgX=0;
-	vec.shrink_to_fit();
 	CompareY compareY;
-	std::sort(vec.begin(), vec.end(), compareY);
-	for (int i=0; i<vec.size()-1; i++){
-		std::vector<Pointf>::iterator pIt=(vec.begin()+i);
-		std::vector<Pointf>::iterator pItNext = pIt+1;
-			float deltaY =pItNext->y- pIt->y;
-			float deltaX = pItNext->x - pIt->x;
-			count+=1;
-			sumY+=deltaY;
-			sumX+=deltaX;
+	std::vector <Pointf> vec_copy(vec);
+	std::sort(vec_copy.begin(), vec_copy.end(), compareY);
+	for (int i=0; i<vec_copy.size()-1; i++){
+		result.first=true;
+		Pointf p=vec_copy[i];
+		Pointf p_next = vec_copy[i+1];
+		float deltaY =p_next.y- p.y;
+		float deltaX = p_next.x - p.x;
+		count+=1;
+		sumY+=deltaY;
+		sumX+=deltaX;
 	}
 	//if (count>0){
 	avgY = sumY/count;
 	avgX = sumX/count;
 	result.second=atan(avgY/avgX);
-	//}
 	return result;
 }
 
