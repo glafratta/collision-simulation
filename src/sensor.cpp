@@ -186,6 +186,7 @@ std::pair <bool, float> PointCloudProc::findOrientationCV(std::vector<Pointf> ve
 	if (vec.size()<6){
 		return result;
 	}
+	result.first=true;
 	cv::Vec4f line; //vx, vy, x0, y0 -> (vx, vy) normalised collinear vector 
 							    // -> (x0, y0) a point on the line
 	cv::fitLine(vec, line, cv::DIST_L2, 0, 0.1, 0.1);
