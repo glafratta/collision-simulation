@@ -99,6 +99,8 @@ class PointCloudProc{
 
 	std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 
+	std::pair <bool, float> findOrientationCV(std::vector<Pointf>);
+	
 	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer data=CoordinateContainer());
 
 	void updatePrevious(CoordinateContainer c){

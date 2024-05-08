@@ -136,6 +136,10 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 			result.push_back(p);
 		}
 	}
+	// if (!result.empty()){
+	// 	CompareY compareY;
+	// 	std::sort(result.begin(), result.end(), compareY);
+	// }
 	return result;
 }
 
@@ -148,7 +152,7 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	float sumY=0, sumX=0;
 	float avgY=0, avgX=0;
 	CompareY compareY;
-	//std::vector <Pointf> vec_copy(vec);
+	std::vector <Pointf> vec_copy(vec);
 	//std::sort(vec.begin(), vec.end(), compareY);
 	//for (int i=0; i<vec.size()-1; i++){
 	Pointf p;
@@ -157,6 +161,7 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 		result.first=true;
 		pIt =std::min_element(vec.begin(), vec.end(), compareY);
 		p=*(pIt);
+		vec_copy.push_back(p);
 		vec.erase(pIt);
 		auto pItNext=std::min_element(vec.begin(), vec.end(), compareY);
 		Pointf p_next=*pItNext;
@@ -175,6 +180,19 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	return result;
 }
 
+
+std::pair <bool, float> PointCloudProc::findOrientationCV(std::vector<Pointf> vec){
+	std::pair <bool, float>result(false, 0);
+	if (vec.size()<6){
+		return result;
+	}
+	cv::Vec4f line; //vx, vy, x0, y0 -> (vx, vy) normalised collinear vector 
+							    // -> (x0, y0) a point on the line
+	cv::fitLine(vec, line, cv::DIST_L2, 0, 0.1, 0.1);
+	result.second=atan(line[1]/line[0]);
+	return result;
+}
+
 std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, CoordinateContainer data){
 	std::vector <Pointf> v;
 	if (!data.empty()){
@@ -186,7 +204,7 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 	}
 	std::vector <Pointf> nb=std::vector<Pointf>(neighbours(d.getPosition(), NEIGHBOURHOOD,v));
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
-	std::pair<bool, float> orientation =findOrientation(nb);
+	std::pair<bool, float> orientation =findOrientationCV(nb);
 	if (orientation.first){
 		d.setOrientation(orientation.second);
 	}
