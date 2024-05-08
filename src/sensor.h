@@ -46,7 +46,8 @@ bool operator >(const Pointf&,  const Pointf&);
 typedef std::set<Pointf> CoordinateContainer;
 
 struct CompareY{
-    bool operator() ( cv::Point2f a, cv::Point2f b ){ //
+	template <typename T>
+    bool operator() ( T a, T b ){ //
         return a.y <=b.y;
 	}
 }; 
