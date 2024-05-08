@@ -1,7 +1,7 @@
 #include "sensor.h"
 
 bool Pointf::isin(Pointf tl, Pointf br){
-	bool result= x>tl.x & x<br.x & y>br.y& y<tl.y;
+	bool result= this->x>tl.x & this->x<br.x & this->y>br.y& this->y<tl.y;
 	return result;
 }
 
@@ -141,7 +141,7 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 
 std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec){
 	std::pair <bool, float>result(false, 0);
-	if (vec.size()<3){
+	if (vec.size()<6){
 		return result;
 	}
 	int count=1;
