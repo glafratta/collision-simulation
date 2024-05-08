@@ -281,9 +281,10 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if(!result.collision.isValid()){
 		return result;
 	}
-	std::vector <Pointf> vec= set2vec(ci->data);
-	std::vector <Pointf> nb=pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);//=pcProc.setDisturbanceOrientation(result.collision, ci->data);
-	pcProc.findOrientation(nb);
+	// std::vector <Pointf> vec= set2vec(ci->data);
+	 std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
+	// pcProc.findOrientation(nb);
+	
 	cv::Rect2f rect =worldBuilder.getRect(nb);
 	result.collision.bf.halfLength=rect.width/2;
 	result.collision.bf.halfLength=rect.height/2;

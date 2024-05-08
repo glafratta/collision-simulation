@@ -149,14 +149,19 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 	float avgY=0, avgX=0;
 	CompareY compareY;
 	//std::vector <Pointf> vec_copy(vec);
-	std::sort(vec.begin(), vec.end(), compareY);
-	for (int i=0; i<vec.size()-1; i++){
-	// Pointf p;
-	// while(!vec.empty()){
+	//std::sort(vec.begin(), vec.end(), compareY);
+	//for (int i=0; i<vec.size()-1; i++){
+	Pointf p;
+	std::vector<Pointf>::iterator pIt=vec.end();
+	while(!vec.empty()){
 		result.first=true;
-		// p=*(std::min_element(vec.begin(), vec.end(), compareY));
-		Pointf p=vec[i];
-		Pointf p_next = vec[i+1];
+		pIt =std::min_element(vec.begin(), vec.end(), compareY);
+		p=*(pIt);
+		vec.erase(pIt);
+		auto pItNext=std::min_element(vec.begin(), vec.end(), compareY);
+		Pointf p_next=*pItNext;
+		// Pointf p=vec[i];
+		// Pointf p_next = vec[i+1];
 		float deltaY =p_next.y- p.y;
 		float deltaX = p_next.x - p.x;
 		count+=1;
