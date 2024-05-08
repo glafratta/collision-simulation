@@ -181,8 +181,8 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 }
 
 
-std::pair <bool, float> PointCloudProc::findOrientationCV(std::vector<Pointf> vec){
-	std::pair <bool, float>result(false, 0);
+std::pair <bool, cv::Vec4f> PointCloudProc::findOrientationCV(std::vector<Pointf> vec){
+	std::pair <bool, cv::Vec4f>result(false, 0);
 	if (vec.size()<6){
 		return result;
 	}
@@ -190,7 +190,8 @@ std::pair <bool, float> PointCloudProc::findOrientationCV(std::vector<Pointf> ve
 	cv::Vec4f line; //vx, vy, x0, y0 -> (vx, vy) normalised collinear vector 
 							    // -> (x0, y0) a point on the line
 	cv::fitLine(vec, line, cv::DIST_L2, 0, 0.1, 0.1);
-	result.second=atan(line[1]/line[0]);
+	result.second=line;
+	//result.second=atan(line[1]/ line[0]);
 	return result;
 }
 
@@ -205,9 +206,14 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 	}
 	std::vector <Pointf> nb=std::vector<Pointf>(neighbours(d.getPosition(), NEIGHBOURHOOD,v));
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
-	std::pair<bool, float> orientation =findOrientationCV(nb);
+	std::pair<bool, cv::Vec4f> orientation =findOrientationCV(nb);
+	float dtheta=0;
 	if (orientation.first){
-		d.setOrientation(orientation.second);
+		float dsin=orientation.second[1]- d.pose().q.s;
+		float dcos=orientation.second[0]- d.pose().q.c;
+		dtheta=atan(dsin/dcos);
+		float new_theta=d.getOrientation()+dtheta;
+		d.setOrientation(new_theta);
 	}
 	return nb;
 
