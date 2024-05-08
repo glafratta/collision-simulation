@@ -720,6 +720,9 @@ void Configurator::registerInterface(ConfiguratorInterface * _ci){
 void Configurator::run(Configurator * c){
 	//printf("run\n");
 	while (c->running){
+		if (c->ci->stop){
+			c->ci=NULL;
+		}
 		if (c->ci == NULL){
 			printf("null pointer to interface\n");
 			c->running=0;

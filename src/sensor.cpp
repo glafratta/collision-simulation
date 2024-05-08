@@ -141,7 +141,7 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 
 std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec){
 	std::pair <bool, float>result(false, 0);
-	if (vec.size()<6){
+	if (vec.size()<3){
 		return result;
 	}
 	int count=1;
@@ -176,7 +176,7 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 		//v=previous;
 		v=std::vector<Pointf>(previous);
 	}
-	std::vector <Pointf> nb= std::vector <Pointf>(neighbours(d.getPosition(), NEIGHBOURHOOD,v));
+	std::vector <Pointf> nb=std::vector<Pointf>(neighbours(d.getPosition(), NEIGHBOURHOOD,v));
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
 	std::pair<bool, float> orientation =findOrientation(nb);
 	if (orientation.first){

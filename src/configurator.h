@@ -21,6 +21,7 @@ public:
 	bool ready=0;
 	bool newData=0;
 	PointCloudProc * pcProc=NULL;
+	bool stop=0;
 
 	void setReady(bool b);
 
