@@ -27,11 +27,17 @@ class BodyFeatures{
 struct Disturbance{ //this generates error
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
-    float angleToRobot=0;
-    //bool partOfObject=0;
-public:
     bool valid= 0;
+    float angleToRobot=0;
+    bool rotation_valid=0;    
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
+
+    void setOrientation(float f){ //returns orientation (angle) of a point, in order 
+        rotation_valid=1;
+        bf.pose.q.Set(f);
+    }
+
+public:
     //b2Transform pose = {b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)};
     
    // bool safeForNow=1;
@@ -62,7 +68,7 @@ public:
         else{
             affordanceIndex = i;
         }
-		bf.pose.Set(p, a);
+		//bf.pose.Set(p, a);
         valid =1;
         //partOfObject=1;
     }    
@@ -108,13 +114,10 @@ public:
         valid =0;
     }
 
-    void setOrientation(float f){ //returns orientation (angle) of a point, in order 
-        bf.pose.q.Set(f);
-       // partOfObject =1;
-    }
 
-    float getOrientation(){
-        return bf.pose.q.GetAngle();
+    std::pair<bool, float> getOrientation(){
+    
+        return std::pair<bool, float>(rotation_valid, bf.pose.q.GetAngle());
     }
 
     // bool isPartOfObject(){
@@ -128,6 +131,34 @@ public:
     void setPose(b2Transform t){
         bf.pose=t;
     }
+
+    void setAsBox(float w, float l){
+        bf.halfLength=l;
+        bf.halfWidth=w;
+    }
+
+    BodyFeatures bodyFeatures(){
+        return bf;
+    }
+
+    void addToOrientation(float dtheta){
+        if (rotation_valid){
+            setOrientation(bf.pose.q.GetAngle()+dtheta);
+        }
+        else{
+            setOrientation(dtheta);
+        }
+    }
+
+    float halfLength(){
+        return bf.halfLength;
+    }
+
+    float halfWidth(){
+        return bf.halfWidth;
+    }
+
+
 
 }; //sub action f
 

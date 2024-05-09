@@ -286,8 +286,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	// pcProc.findOrientation(nb);
 	
 	cv::Rect2f rect =worldBuilder.getRect(nb);
-	result.collision.bf.halfLength=rect.width/2;
-	result.collision.bf.halfLength=rect.height/2;
+	result.collision.setAsBox(rect.width/2, rect.height/2);
 	return result;
 	}
 

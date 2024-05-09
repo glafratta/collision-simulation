@@ -212,8 +212,8 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 		float dsin=orientation.second[1]- d.pose().q.s;
 		float dcos=orientation.second[0]- d.pose().q.c;
 		dtheta=atan(dsin/dcos);
-		float new_theta=d.getOrientation()+dtheta;
-		d.setOrientation(new_theta);
+		//float new_theta=d.getOrientation()+dtheta;
+		d.addToOrientation(dtheta);
 	}
 	return nb;
 

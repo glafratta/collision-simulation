@@ -139,7 +139,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     features =processData(salient.first);
     if (occluded(current, disturbance)){
         salient.first.emplace(getPointf(disturbance.getPosition()));
-        features.push_back(disturbance.bf);
+        features.push_back(disturbance.bodyFeatures());
     }
     for (BodyFeatures f: features){
         makeBody(world, f);
@@ -192,10 +192,10 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     cv::Rect2f rect;
     std::vector <Pointf> occluding; 
     for (Pointf p:cc){
-        rect=cv::Rect2f(expectedD.getPosition().x+expectedD.bf.halfWidth, 
-                        expectedD.getPosition().y-expectedD.bf.halfWidth, 
-                        expectedD.getPosition().x+expectedD.bf.halfWidth, 
-                        expectedD.bf.halfLength*2);
+        rect=cv::Rect2f(expectedD.getPosition().x+expectedD.halfWidth(), 
+                        expectedD.getPosition().y-expectedD.halfWidth(), 
+                        expectedD.getPosition().x+expectedD.halfWidth(), 
+                        expectedD.halfLength()*2);
         if (p.inside(rect)){
             occluding.push_back(p);
         }

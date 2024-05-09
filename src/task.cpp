@@ -41,7 +41,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
 				//robot.body->SetTransform(start.p, start.q.GetAngle()); //if the simulation crashes reset position for 
-				collision.setOrientation(robot.body->GetTransform().q.GetAngle());
+				//collision.setOrientation(robot.body->GetTransform().q.GetAngle());
 				stepb2d=0;
 				break;
 			}
