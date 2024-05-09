@@ -1,5 +1,16 @@
 #include "graphTools.h"
 
+// void subtract(orientation o1, orientation o2){
+// 	if (!o1.first){
+// 		o1.second=0;
+// 	}
+// 	if (!o2.first){
+// 		o2.second=0;
+// 	}
+
+// }
+
+
 void gt::fill(simResult sr, State* s, Edge* e){
 	if (NULL!=s){
 		s->disturbance = sr.collision;
@@ -39,7 +50,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
 	else if ((g[e.m_target].direction==LEFT || g[e.m_target].direction==RIGHT )& g[e.m_target].disturbance.isValid()){
-		result.setTheta(g[e.m_target].disturbance.getOrientation()-sk.first.disturbance.getOrientation());
+		result.setTheta(g[e.m_target].disturbance.getOrientation().second-sk.first.disturbance.getOrientation().second);
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
 	g[e.m_target].disturbance = sk.first.disturbance;

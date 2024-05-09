@@ -1381,7 +1381,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 		if (*vIt!=movingVertex){
 			g[*vIt].endPose-=deltaPose;
 			if (g[*vIt].disturbance.isValid()){
-				g[*vIt].disturbance.bf.pose-=deltaPose;
+				g[*vIt].disturbance.subtractPose(deltaPose);
 			}
 		}
 	}
@@ -1392,7 +1392,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	
 	// }
 	if(controlGoal.disturbance.isValid()){
-		controlGoal.disturbance.bf.pose-=deltaPose;
+		controlGoal.disturbance.subtractPose(deltaPose);
 	}
 	// if (currentTask.disturbance.isValid()){
 	// 	currentTask.disturbance.bf.pose-=deltaPose;

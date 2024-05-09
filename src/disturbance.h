@@ -150,6 +150,12 @@ public:
         }
     }
 
+    void subtractPose(b2Transform dPose){
+        bf.pose.p.x-=dPose.p.x;
+        bf.pose.p.y-=dPose.p.y;
+        addToOrientation(-dPose.q.GetAngle());
+    }
+
     float halfLength(){
         return bf.halfLength;
     }
