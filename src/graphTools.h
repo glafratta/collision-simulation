@@ -68,6 +68,9 @@ bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 
+typedef std::pair<bool, float> orientation;
+orientation subtract(orientation, orientation);
+
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
 typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
