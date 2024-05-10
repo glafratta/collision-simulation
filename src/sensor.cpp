@@ -143,14 +143,14 @@ std::vector <Pointf> PointCloudProc::neighbours(b2Vec2 pos, float radius, std::v
 	return result;
 }
 
-std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec){
-	std::pair <bool, float>result(false, 0);
+std::pair <bool, b2Vec2> PointCloudProc::findOrientation(std::vector<Pointf> vec){
+	std::pair <bool, b2Vec2>result(false, b2Vec2());
 	if (vec.size()<6){
 		return result;
 	}
 	int count=0;
 	float sumY=0, sumX=0;
-	float avgY=0, avgX=0;
+	b2Vec2 avgVec;
 	CompareY compareY;
 	std::vector <Pointf> vec_copy(vec);
 	//std::sort(vec.begin(), vec.end(), compareY);
@@ -174,9 +174,10 @@ std::pair <bool, float> PointCloudProc::findOrientation(std::vector<Pointf> vec)
 		sumX+=deltaX;
 	}
 	//if (count>0){
-	avgY = sumY/count;
-	avgX = sumX/count;
-	result.second=atan(avgY/avgX);
+	avgVec.y = sumY/count;
+	avgVec.x = sumX/count;
+	avgVec.Normalize();
+	result.second=avgVec;
 	return result;
 }
 
@@ -206,14 +207,12 @@ std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, Co
 	}
 	std::vector <Pointf> nb=std::vector<Pointf>(neighbours(d.getPosition(), NEIGHBOURHOOD,v));
 	//cv::Rect2f rect =worldBuilder.getRect(nb);
-	std::pair<bool, cv::Vec4f> orientation =findOrientationCV(nb);
+	//std::pair<bool, cv::Vec4f> orientation =findOrientationCV(nb);
+	std::pair<bool, b2Vec2> orientation =findOrientation(nb);	
 	float dtheta=0;
 	if (orientation.first){
-		// float dsin=orientation.second[1]- d.pose().q.s;
-		// float dcos=orientation.second[0]- d.pose().q.c;
-		dtheta=atan(orientation.second[1]/orientation.second[0]);
-		//float new_theta=d.getOrientation()+dtheta;
-		d.addToOrientation(dtheta);
+//		d.setOrientation(orientation.second[1], orientation.second[0]);
+		d.setOrientation(orientation.second.y, orientation.second.x);
 	}
 	return nb;
 

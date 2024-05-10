@@ -28,7 +28,7 @@ struct Disturbance{ //this generates error
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
-    float angleToRobot=0;
+  //  float angleToRobot=0;
     bool rotation_valid=0;    
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
@@ -36,6 +36,15 @@ private:
         rotation_valid=1;
         bf.pose.q.Set(f);
     }
+
+    void addToOrientation(float dtheta){
+    if (rotation_valid){
+        setOrientation(bf.pose.q.GetAngle()+dtheta);
+    }
+    else{
+        setOrientation(dtheta);
+    }
+}
 
 public:
     //b2Transform pose = {b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)};
@@ -73,10 +82,10 @@ public:
         //partOfObject=1;
     }    
 
-    void setAngle(float a){ //angle to robot
-        angleToRobot =a; 
-    }
-    void setAngle(b2Transform);
+    // void setAngle(float a){ //angle to robot
+    //     angleToRobot =a; 
+    // }
+   // void setAngle(b2Transform);
 
 
     float getAngle(b2Transform);
@@ -85,9 +94,9 @@ public:
         return getAngle(b->GetTransform());
     }
 
-    float getAngle(){
-        return angleToRobot;
-    }
+    // float getAngle(){
+    //     return angleToRobot;
+    // }
 
     void setPosition(b2Vec2 pos){
         bf.pose.p.Set(pos.x, pos.y);
@@ -141,14 +150,6 @@ public:
         return bf;
     }
 
-    void addToOrientation(float dtheta){
-        if (rotation_valid){
-            setOrientation(bf.pose.q.GetAngle()+dtheta);
-        }
-        else{
-            setOrientation(dtheta);
-        }
-    }
 
     void subtractPose(b2Transform dPose){
         bf.pose.p.x-=dPose.p.x;
@@ -163,6 +164,9 @@ public:
     float halfWidth(){
         return bf.halfWidth;
     }
+
+    void setOrientation(float, float);
+
 
 
 

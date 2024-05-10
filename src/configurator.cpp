@@ -282,7 +282,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		return result;
 	}
 	// std::vector <Pointf> vec= set2vec(ci->data);
-	 std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
+	std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
 	// pcProc.findOrientation(nb);
 	
 	cv::Rect2f rect =worldBuilder.getRect(nb);
@@ -1260,7 +1260,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.motorStep+=correction; //reflex
 	}
 	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE & t.action.getOmega()!=0){
-		int correction=-std::floor(error.theta()/(t.action.getOmega()*timeElapsed)+0.5);
+		int correction=-std::floor(error.theta()/(t.action.getOmega()*MOTOR_CALLBACK)+0.5);
 		t.motorStep+=correction; //reflex
 	}		
 

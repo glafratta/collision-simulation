@@ -46,7 +46,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				break;
 			}
 		}
-		result.collision.setAngle(robot.body->GetTransform());	
+		//result.collision.setAngle(robot.body->GetTransform());	
 		result.endPose = robot.body->GetTransform();
 		result.step=stepb2d;
 		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){

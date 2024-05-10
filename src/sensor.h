@@ -97,7 +97,7 @@ class PointCloudProc{
 
 	std::vector<Pointf> neighbours(b2Vec2,float radius, std::vector <Pointf> data= std::vector <Pointf>()); //finds if there are bodies close to a point. Used for 
 
-	std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
+	std::pair <bool, b2Vec2>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 
 	std::pair <bool, cv::Vec4f> findOrientationCV(std::vector<Pointf>);
 	
