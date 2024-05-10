@@ -33,6 +33,7 @@ const float TRACKING_ANGLE_TOLERANCE =MAX_OMEGA*0.5*MOTOR_CALLBACK;
 const float FORGET_THRESHOLD=0.05;
 const int POS_IT=2;
 const int VEL_IT=6;
+const int FPS=30;
 
 class Robot {
 private: 

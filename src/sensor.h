@@ -111,6 +111,7 @@ class PointCloudProc{
 class ImgProc{
 	std::vector <cv::Point2f> previousCorners;
     public:
+	
     ImgProc(){}
 
     cv::Mat cropLeft(cv::Mat);
@@ -118,6 +119,10 @@ class ImgProc{
     cv::Mat cropRight(cv::Mat);
 
     b2Vec2 opticFlow(const cv::Mat&, std::vector <cv::Point2f>&, cv::Mat&);
+
+	std::vector <cv::Point2f> corners();
+
+	cv::Mat previous();
 
     private:
 	int it=0;

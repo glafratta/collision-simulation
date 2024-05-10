@@ -218,14 +218,25 @@ simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, floa
 struct Correct{
     Correct(){}
 
-    void operator()(float, Action&, float timeElapsed=0.1);
+    void operator()( Action&, float timeElapsed=0.1);
 
-    float getError(){
-        return error;
-    }
+    // float getError(){
+    //     return p;
+    // }
+    float update(float);
     private:
-    float pGain=0.1;
-    float error=0;
+
+
+    float p(){
+        float sum=0;
+        for (int j=0;j<p_buffer.size(); j++){
+            sum+=p_buffer[j];
+        }
+        return sum;
+    }
+    std::vector <float>p_buffer=std::vector <float>(3,0);
+    float kp=0.1, kd=1, ki=1;
+    float i=0, d=0;
 
 }correct;
 

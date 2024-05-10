@@ -17,7 +17,7 @@ public:
 	int iteration=0;
 	CoordinateContainer data;
 	CoordinateContainer data2fp;
-	cv::Mat visual_field;
+	//cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
 	PointCloudProc * pcProc=NULL;

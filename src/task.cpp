@@ -87,24 +87,22 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 // 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 // }
 
-void Task::Correct::operator()(float _error, Action & action, float timeElapsed){
+void Task::Correct::operator()(Action & action, float timeElapsed){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-	error=_error;
-	// float timeStepError =action.getRecOmega()/timeElapsed; 
-	// float normAccErr = timeStepError/SAFE_ANGLE;
+	float p1=p();
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		return;
 	}
 	//accumulatedError += timeStepError; 
-	if (fabs(_error)>tolerance){
+	if (fabs(p1)>tolerance){
 		//printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		if (_error<0){
-			action.L -= _error*pGain;  //-
+		if (p1<0){
+			action.L -= p1*kp;  //-
 		}
-		else if (_error>0){
-			action.R -= _error *pGain; //+
+		else if (p1>0){
+			action.R -= p1 *kp; //+
 		}
-		if (action.L>1.0){
+		if (p1>1.0){
 		action.L=1.0;
 		}
 		if (action.R>1.0){
@@ -119,6 +117,18 @@ void Task::Correct::operator()(float _error, Action & action, float timeElapsed)
 	}
 
 }
+
+float Task::Correct::update(float e){
+	float p0=p();
+	//p=_error;
+	p_buffer.erase(p_buffer.begin());
+	p_buffer.push_back(e);
+	float p1=p();
+	d=p1-p0;
+	i+=e;
+	return p1;
+}
+
 
 Direction Task::H(Disturbance ob, Direction d, bool topDown){
 	if (ob.isValid()){

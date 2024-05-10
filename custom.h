@@ -130,16 +130,18 @@ void step( AlphaBot &motors){
 };
 
 struct CameraCallback: Libcam2OpenCV::Callback {
-    CameraCallback(ConfiguratorInterface * _ci):ci(_ci){}
+    CameraCallback(Configurator * _c):c(_c){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
         if (NULL==ci){
             return;
         }
-        ci->visual_field=frame;
+        //c->ci->visual_field=frame;
+		b2Vec2 optic_flow=c->imgProc.opticFlow(frame, c->imgProc.corners(), c->imgProc.previous());
+		c->getTask()->correct.update(optic_flow.x); //for now just going straight
     }
     private:
-    ConfiguratorInterface * ci;
+    Configurator * c;
 };
 
 float Configurator::taskRotationError(){
@@ -154,7 +156,7 @@ float Configurator::taskRotationError(){
     //get optic flow
     b2Vec2 left_optic_flow= imgProc.opticFlow(left_vf, corners_left, previous_grey_left);
     b2Vec2 right_optic_flow= imgProc.opticFlow(right_vf, corners_right, previous_grey_right);
-
+	printf("L optic flow=%f, %f\t R optic flow= %f, %f\n", left_optic_flow.x, left_optic_flow.y, right_optic_flow.x, right_optic_flow.x);
     theta_left=atan(left_optic_flow.y/left_optic_flow.x);
     theta_right =atan(right_optic_flow.y/right_optic_flow.x);
     if ((theta_left<0 & theta_right>0)||(theta_left>0 & theta_right<0)){

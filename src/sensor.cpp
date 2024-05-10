@@ -280,3 +280,11 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
 		return optic_flow;
 
 }
+
+std::vector <cv::Point2f> ImgProc::corners(){
+	return corners_left;
+}
+
+cv::Mat ImgProc::previous(){
+	return previous_grey_left;
+}
