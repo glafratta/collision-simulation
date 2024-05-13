@@ -5,6 +5,7 @@
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int step=0;
     char a='0';
+    int n_l, n_r, n_s;
 public:
 Task t=Task(STOP);
 
@@ -25,25 +26,40 @@ void setA(char _a){
     if (a== 'l'){
         t=Task(LEFT);
         step=14;
+        n_l++;
     }
     else if (a=='r'){
         t=Task(RIGHT);
         step=14;
+        n_r++;
     }
-    else if (a='s'){
+    else if (a=='s'){
         t=Task(DEFAULT);
         step=22;
+        n_s++;
     }
     else{
         t=Task(STOP);
     }
 }
+
+int getCount(){
+    if (a=='s'){
+        return n_s;
+    }
+    else if (a=='l'){
+        return n_l;
+    }
+    else if (a='r'){
+        return n_r;
+    }
+    else if (a='0'){
+        return 0;
+    }
+}
 };
 
 struct CameraCallback: Libcam2OpenCV::Callback {
-    int l_count=0;
-    int r_count=0;
-    int s_count=0;
     CameraCallback(Callback * _cb):cb(_cb){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
@@ -51,7 +67,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         //if (cb->t.direction!=STOP){
             char dumpname[50];
-            sprintf(dump, "%s.txt", cb->a);
+            sprintf(dump, "%s_%i.txt", cb->a, cb->getCount());
             FILE * dump=fopen(dumpname, "a+");
             fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
             fclose(dump);
