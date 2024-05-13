@@ -186,6 +186,11 @@ Task(){
     printf("default constructro\n");
 }
 
+Task(Direction d){
+    direction=d;
+    action.init(direction);
+}
+
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
@@ -223,6 +228,8 @@ struct Correct{
     float getError(){
         return p();
     }
+
+
     float update(float);
     private:
 

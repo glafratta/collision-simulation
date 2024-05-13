@@ -6,12 +6,14 @@ set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)
-
+find_package(PkgConfig)
 find_package(OpenCV REQUIRED)
 
 ##find_package(Boost)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
+
+add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}"/test)
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   add_executable(target target.cpp)
