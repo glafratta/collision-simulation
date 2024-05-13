@@ -1,6 +1,9 @@
 find_package(OpenCV REQUIRED)
 
 find_package(box2d REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	#add_executable(noMotors noMotors.cpp)
 	#add_executable(testController testController.cpp)
