@@ -12,7 +12,7 @@ find_package(OpenCV REQUIRED)
 
 find_package(box2d REQUIRED)
 
-find_package(PkgConfig)
+#find_package(PkgConfig)
 
 add_library(CloCK ${SRC} ${HEAD})
 
@@ -20,7 +20,7 @@ set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE
 PUBLIC_HEADER "${HEAD}")
 
 if(Box2D_FOUND)
-	target_link_libraries(CloCK ${OpenCV_LIBS} box2d pthread PkgConfig::LIBCAMERA cam2opencv)
+	target_link_libraries(CloCK ${OpenCV_LIBS} box2d pthread)
 	message("box2d installed in")
 else()
 	#set(BOX2D_BIN_DIR ${"/usr/local/lib"})

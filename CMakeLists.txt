@@ -6,7 +6,7 @@ set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads)
-find_package(PkgConfig)
+#find_package(PkgConfig)
 find_package(OpenCV REQUIRED)
 
 ##find_package(Boost)
