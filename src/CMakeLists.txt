@@ -14,7 +14,7 @@ find_package(box2d REQUIRED)
 
 #find_package(PkgConfig)
 
-add_library(CloCK ${SRC} ${HEAD})
+add_library(CloCK STATIC ${SRC} ${HEAD})
 
 set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
 PUBLIC_HEADER "${HEAD}")
