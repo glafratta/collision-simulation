@@ -150,19 +150,20 @@ float Configurator::taskRotationError(){
     if (visual_field.empty()){
         return error;
     }
-    cv::Mat left_vf= imgProc.cropLeft(ci->visual_field);
-    //get Right
-    cv::Mat right_vf= imgProc.cropRight(ci->visual_field);
-    //get optic flow
-    b2Vec2 left_optic_flow= imgProc.opticFlow(left_vf, corners_left, previous_grey_left);
-    b2Vec2 right_optic_flow= imgProc.opticFlow(right_vf, corners_right, previous_grey_right);
-	printf("L optic flow=%f, %f\t R optic flow= %f, %f\n", left_optic_flow.x, left_optic_flow.y, right_optic_flow.x, right_optic_flow.x);
-    theta_left=atan(left_optic_flow.y/left_optic_flow.x);
-    theta_right =atan(right_optic_flow.y/right_optic_flow.x);
-    if ((theta_left<0 & theta_right>0)||(theta_left>0 & theta_right<0)){
-        printf("optic flows diverge\n");
-    }
-    //get difference between optic flows = error
-    error = theta_left-theta_right;
+    // cv::Mat left_vf= imgProc.cropLeft(ci->visual_field);
+    // //get Right
+    // cv::Mat right_vf= imgProc.cropRight(ci->visual_field);
+    // //get optic flow
+    // b2Vec2 left_optic_flow= imgProc.opticFlow(left_vf, corners_left, previous_grey_left);
+    // b2Vec2 right_optic_flow= imgProc.opticFlow(right_vf, corners_right, previous_grey_right);
+	// printf("L optic flow=%f, %f\t R optic flow= %f, %f\n", left_optic_flow.x, left_optic_flow.y, right_optic_flow.x, right_optic_flow.x);
+    // theta_left=atan(left_optic_flow.y/left_optic_flow.x);
+    // theta_right =atan(right_optic_flow.y/right_optic_flow.x);
+    // if ((theta_left<0 & theta_right>0)||(theta_left>0 & theta_right<0)){
+    //     printf("optic flows diverge\n");
+    // }
+    // //get difference between optic flows = error
+    // error = theta_left-theta_right;
+	//error=imgProc.opticFlow(ci->visual_field, imgProc.corners(), imgProc.previous()).x;
     return error;
 }

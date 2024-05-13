@@ -220,9 +220,9 @@ struct Correct{
 
     void operator()( Action&, float timeElapsed=0.1);
 
-    // float getError(){
-    //     return p;
-    // }
+    float getError(){
+        return p();
+    }
     float update(float);
     private:
 
