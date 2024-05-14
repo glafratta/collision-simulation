@@ -20,7 +20,7 @@ add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
-#  pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
+  pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
   include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/.. ${LIBCAMERA_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS})
   include(GNUInstallDirs)
   add_executable(target custom.h target.cpp)
