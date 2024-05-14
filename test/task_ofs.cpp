@@ -69,7 +69,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     CameraCallback(MotorCallback * _cb):cb(_cb){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-		std::vector <cv::Point2f> corners= imgProc.corners();
+		printf("has frame\n");
+        std::vector <cv::Point2f> corners= imgProc.corners();
         cv::Mat previousFrame =imgProc.previous();
         b2Vec2 optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
@@ -91,17 +92,17 @@ int main(int argc, char** argv) {
     if (argc>1){
         a=*argv[1];
     }
-	AlphaBot motors;
-    Libcam2OpenCV camera;
-    Libcam2OpenCVSettings settings;
-    settings.framerate = 30;
-	MotorCallback cb;
+	AlphaBot motors;	
+    MotorCallback cb;
     cb.setA(a);
     CameraCallback cameraCB(&cb);
+    Libcam2OpenCV camera;
     camera.registerCallback(&cameraCB);
+    Libcam2OpenCVSettings settings;
+    settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-    camera.start(settings);
 	motors.start();
+    camera.start(settings);
 	// do {
     //    // if (getchar()){
     //         //char a=getchar();
