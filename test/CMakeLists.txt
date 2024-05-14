@@ -15,7 +15,7 @@ find_package(PkgConfig)
 #include_directories(blank ${HEAD})
 add_executable(blank blank.cpp)	
 
-target_link_libraries(blank CloCK Dox2D ${OpenCV_LIBS})
+target_link_libraries(blank CloCK box2d ${OpenCV_LIBS})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
 	include_directories(task_ofs ${LIBCAMERA_INCLUDE_DIRS})
@@ -27,7 +27,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	#target_link_libraries(testController box2d ${OpenCV_LIBS} CLoCK a1lidarrpi pthread pigpio)
 	#target_link_libraries(test_optic_flow box2d ${OpenCV_LIBS} CLoCK a1lidarrpi pthread pigpio)
 	#target_include_directories(task_ofs ${LIBCAMERA_INCLUDE_DIRS})
-	target_link_libraries(task_ofs Box2D PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
+	target_link_libraries(task_ofs box2d PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
 		
 message("build test cases")
 endif()
