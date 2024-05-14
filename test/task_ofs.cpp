@@ -20,6 +20,7 @@ void step( AlphaBot &motors){
     }
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
+    printf("char =%c\n", a);
 }
 
 void setA(char _a){
@@ -97,10 +98,10 @@ int main(int argc, char** argv) {
     camera.start(settings);
 	motors.start();
 	do {
-        if (getchar()){
+       // if (getchar()){
             char a=getchar();
             cb.setA(a);
-        } 
+       // } 
 	} while(true);
 	motors.stop();
     camera.stop();
