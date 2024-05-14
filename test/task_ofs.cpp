@@ -1,9 +1,10 @@
 #include "task.h"
+#include "sensor.h"
 #include "libcam2opencv.h"
 #include "alphabot.h"
 
 class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
-    unsigned int step=0;
+    unsigned int m_step=0;
     char a='0';
     int n_l, n_r, n_s;
 public:
@@ -12,8 +13,8 @@ Task t=Task(STOP);
 Callback(){}
 
 void step( AlphaBot &motors){
-    step--;
-    if (step==0){
+    m_step--;
+    if (m_step==0){
         a='0';
         t=Task(STOP);
     }
@@ -25,17 +26,17 @@ void setA(char _a){
     a=_a;
     if (a== 'l'){
         t=Task(LEFT);
-        step=14;
+        m_step=14;
         n_l++;
     }
     else if (a=='r'){
         t=Task(RIGHT);
-        step=14;
+        m_step=14;
         n_r++;
     }
     else if (a=='s'){
         t=Task(DEFAULT);
-        step=22;
+        m_step=22;
         n_s++;
     }
     else{
@@ -75,7 +76,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     }
 private:
 ImgProc imgProc;
-Callback cb*=NULL;
+Callback *cb=NULL;
 };
 
 int main(int argc, char** argv) {
