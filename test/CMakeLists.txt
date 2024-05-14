@@ -18,7 +18,7 @@ add_executable(blank blank.cpp)
 target_link_libraries(blank CloCK box2d ${OpenCV_LIBS})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
-	include_directories(task_ofs ${LIBCAMERA_INCLUDE_DIRS})
+	include_directories(${LIBCAMERA_INCLUDE_DIRS})
 	#add_executable(noMotors noMotors.cpp)
 	#add_executable(testController testController.cpp)
 	#add_executable(test_optic_flow test_optic_flow.cpp)

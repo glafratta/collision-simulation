@@ -247,7 +247,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
             cv::goodFeaturesToTrack(frame_grey, corners, gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT\n");
         }
-        if (it>0 & !corners.empty()){
+        if (!corners.empty()){
             cv::calcOpticalFlowPyrLK(previousFrame_grey, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
             printf("LK\n");
         }
