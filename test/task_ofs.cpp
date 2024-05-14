@@ -73,7 +73,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         std::vector <cv::Point2f> corners= imgProc.corners();
         cv::Mat previousFrame =imgProc.previous();
         b2Vec2 optic_flow;
-        //optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
+        optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         // //if (cb->t.direction!=STOP){
              char dumpname[50];
