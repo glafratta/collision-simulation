@@ -3,14 +3,14 @@
 #include "libcam2opencv.h"
 #include "alphabot.h"
 
-class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
+class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
     char a='0';
     int n_l, n_r, n_s;
 public:
 Task t=Task(STOP);
 
-Callback(){}
+MotorCallback(){}
 
 void step( AlphaBot &motors){
     m_step--;
@@ -18,8 +18,8 @@ void step( AlphaBot &motors){
         a='0';
         t=Task(STOP);
     }
-    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
+    motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
+    motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
 }
 
 void setA(char _a){
@@ -61,14 +61,14 @@ int getCount(){
 };
 
 struct CameraCallback: Libcam2OpenCV::Callback {
-    CameraCallback(Callback * _cb):cb(_cb){}
+    CameraCallback(MotorCallback * _cb):cb(_cb){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		b2Vec2 optic_flow=imgProc.opticFlow(frame, imgProc.corners(), imgProc.previous());
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         //if (cb->t.direction!=STOP){
             char dumpname[50];
-            sprintf(dump, "%s_%i.txt", cb->a, cb->getCount());
+            sprintf(dumpname, "%s_%i.txt", cb->a, cb->getCount());
             FILE * dump=fopen(dumpname, "a+");
             fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
             fclose(dump);
@@ -76,7 +76,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     }
 private:
 ImgProc imgProc;
-Callback *cb=NULL;
+MotorCallback *cb=NULL;
 };
 
 int main(int argc, char** argv) {
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
         return 0;
     }
 	AlphaBot motors;
-	Callback cb();
+	MotorCallback cb();
 	motors.registerStepCallback(&cb);
 	motors.start();
 	do {
