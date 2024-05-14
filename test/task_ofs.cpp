@@ -73,14 +73,14 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         std::vector <cv::Point2f> corners= imgProc.corners();
         cv::Mat previousFrame =imgProc.previous();
         b2Vec2 optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
-		// cb->t.correct.update(optic_flow.x); //for now just going straight
+		cb->t.correct.update(optic_flow.x); //for now just going straight
         // //if (cb->t.direction!=STOP){
-        //     char dumpname[50];
-        //     sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
-        //     FILE * dump=fopen(dumpname, "a+");
-        //     fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-        //     fclose(dump);
-        // //}
+             char dumpname[50];
+            sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
+            FILE * dump=fopen(dumpname, "a+");
+            fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+            fclose(dump);
+        //}
     }
 private:
 ImgProc imgProc;
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	motors.start();
+	//motors.start();
     camera.start(settings);
 	// do {
     //    // if (getchar()){
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     //    // } 
 	// } while(true);
     getchar();
-	motors.stop();
+	//motors.stop();
     camera.stop();
 
 }
