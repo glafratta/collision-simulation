@@ -70,8 +70,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		printf("has frame\n");
-        std::vector <cv::Point2f> corners= imgProc.corners();
-        cv::Mat previousFrame =imgProc.previous();
+        std::vector <cv::Point2f> corners= imgProc.get_corners();
+        cv::Mat previousFrame =imgProc.get_previous();
         b2Vec2 optic_flow;
         optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
