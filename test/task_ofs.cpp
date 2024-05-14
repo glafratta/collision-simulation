@@ -58,17 +58,23 @@ int getCount(){
         return 0;
     }
 }
+
+char getID(){
+    return a;
+}
 };
 
 struct CameraCallback: Libcam2OpenCV::Callback {
     CameraCallback(MotorCallback * _cb):cb(_cb){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-		b2Vec2 optic_flow=imgProc.opticFlow(frame, imgProc.corners(), imgProc.previous());
+		std::vector <cv::Point2f> corners= imgProc.corners();
+        cv::Mat previousFrame =imgProc.previous();
+        b2Vec2 optic_flow=imgProc.opticFlow(frame,corners, previousFrame);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         //if (cb->t.direction!=STOP){
             char dumpname[50];
-            sprintf(dumpname, "%s_%i.txt", cb->a, cb->getCount());
+            sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
             FILE * dump=fopen(dumpname, "a+");
             fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
             fclose(dump);
@@ -80,12 +86,15 @@ MotorCallback *cb=NULL;
 };
 
 int main(int argc, char** argv) {
-    if (argc==1){
-        return 0;
-    }
 	AlphaBot motors;
-	MotorCallback cb();
+    Libcam2OpenCV camera;
+    CameraCallback cameraCB;
+    camera.registerCallback(&cameraCB);
+    Libcam2OpenCVSettings settings;
+    settings.framerate = 30;
+	MotorCallback cb;
 	motors.registerStepCallback(&cb);
+    camera.start(settings);
 	motors.start();
 	do {
         if (getchar()){
@@ -94,6 +103,7 @@ int main(int argc, char** argv) {
         } 
 	} while(true);
 	motors.stop();
+    camera.stop();
 
 }
 	
