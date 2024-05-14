@@ -258,19 +258,19 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
         //if (it==1){
         int i=0;
         printf("pre-fill in status, new corners size =%i\n", new_corners.size());
-        for (i; i<corners.size();i++){
+        for (i; i<new_corners.size();i++){
             if (status[i]==1){
                 good_corners.push_back(new_corners[i]); //og corners
             }
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
+        printf("good corners = %i, corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
            	optic_flow.x=corners[0].x-new_corners[0].x;
             optic_flow.y=corners[0].y-new_corners[0].y;
 			
         }
-        printf("good corners = %i, corners %i\n", good_corners.size(),i);
 
         printf("updated %i\n", it);
         previousFrame_grey=frame_grey.clone();
