@@ -19,7 +19,7 @@ add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   include_directories(target ${LIBCAMERA_INCLUDE_DIRS})
-  add_executable(target target.cpp)
+  add_executable(target custom.h target.cpp)
   add_executable(targetless targetless.cpp)
   add_executable(targetless_benchmark targetless_benchmark.cpp) 
   add_executable(targetless_benchmark_alt targetless_benchmark_alt.cpp)  
