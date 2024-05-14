@@ -88,11 +88,11 @@ MotorCallback *cb=NULL;
 int main(int argc, char** argv) {
 	AlphaBot motors;
     Libcam2OpenCV camera;
-    CameraCallback cameraCB;
-    camera.registerCallback(&cameraCB);
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	MotorCallback cb;
+    CameraCallback cameraCB(&cb);
+    camera.registerCallback(&cameraCB);
 	motors.registerStepCallback(&cb);
     camera.start(settings);
 	motors.start();
