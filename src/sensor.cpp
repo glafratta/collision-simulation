@@ -273,7 +273,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
         }
 
         printf("updated %i\n", it);
-        previousFrame_grey=frame_grey.clone();
+        previousFrame_grey=frame_grey;
         corners=good_corners;
         it++;
 		return optic_flow;
