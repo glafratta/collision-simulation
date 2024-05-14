@@ -247,7 +247,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
             printf("GFT, corners empty=%i\n", corners.empty());
      //   }
         if (!corners.empty()){
-            //cv::calcOpticalFlowPyrLK(previousFrame_grey, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
+            cv::calcOpticalFlowPyrLK(previousFrame_grey, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
             printf("LK\n");
         }
         else{
@@ -265,7 +265,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
-        printf("good corners = %i, corners %i\n", good_corners.size(),i);
+        printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
            	optic_flow.x=corners[0].x-new_corners[0].x;
             optic_flow.y=corners[0].y-new_corners[0].y;
@@ -273,8 +273,8 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
         }
 
         printf("updated %i\n", it);
-        //previousFrame_grey=frame_grey.clone();
-        //corners=good_corners;
+        previousFrame_grey=frame_grey.clone();
+        corners=good_corners;
         it++;
 		return optic_flow;
 
