@@ -10,16 +10,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(OpenCV REQUIRED)
 
-find_package(box2d REQUIRED)
+find_package(Box2D REQUIRED)
 
 #find_package(PkgConfig)
 
-if(box2d_FOUND)
-#        target_link_libraries(CloCK box2d ${OpenCV_LIBS} pthread)
+if(Box2D_FOUND)
+        target_link_libraries(CloCK Box2D ${OpenCV_LIBS} pthread)
         message("box2d installed ${BOX2D_LIBS}")
 else()
        #set(BOX2D_BIN_DIR ${"../box2d/build/bin"})
-       #target_link_libraries(HICS ${BOX2D_BIN_DIR}/libbox2d.a ${OpenCV_LIBS} pthread)
+       target_link_libraries(HICS ${BOX2D_BIN_DIR}/libBox2D.a ${OpenCV_LIBS} pthread)
        #message("fetching static library from ${BOX2D_BIN_DIR}")
 	message("BOX2D NOT INSTALLED")
 endif()
@@ -29,14 +29,6 @@ add_library(CloCK ${SRC} ${HEAD})
 set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
 PUBLIC_HEADER "${HEAD}")
 
-if(Box2D_FOUND)
-	target_link_libraries(CloCK ${OpenCV_LIBS} box2d pthread)
-	message("box2d installed in")
-else()
-	#set(BOX2D_BIN_DIR ${"/usr/local/lib"})
-	target_link_libraries(CloCK /usr/local/lib/libbox2d.a ${OpenCV_LIBS} pthread)
-	message("fetching static library from ${BOX2D_BIN_DIR}")
-endif()
 install(TARGETS CloCK 
 	EXPORT CloCK-targets 
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
