@@ -241,7 +241,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector <uchar> status;
         std::vector<float> err;
         cv::cvtColor(frame, frame_grey, cv::COLOR_BGR2GRAY);
-
+        previous=frame_grey.clone();
         if (it%60==0){ //resample corners every 2 seconds (30fps)
             corners.clear();
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
@@ -253,19 +253,21 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         }
         else{
             status=std::vector<uchar>(corners.size(), 1);
+			printf("corners %i, status %i\n", corners.size(), status.size());
         }
 
         std::vector <cv::Point2f> good_corners;
         //if (it==1){
         int i=0;
         printf("pre-fill in status, new corners size =%i\n", new_corners.size());
-        for (i; i<new_corners.size();i++){
+        for (i; i<corners.size();i++){
             if (status[i]==1){
                 good_corners.push_back(new_corners[i]); //og corners
             }
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
+		corners=good_corners;
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
            	optic_flow.x=corners[0].x-new_corners[0].x;
@@ -274,8 +276,6 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         }
 
         printf("updated %i\n", it);
-        previous=frame_grey.clone();
-        corners=good_corners;
         it++;
 		return optic_flow;
 
