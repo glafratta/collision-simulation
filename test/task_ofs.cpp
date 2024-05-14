@@ -87,11 +87,16 @@ MotorCallback *cb=NULL;
 };
 
 int main(int argc, char** argv) {
+    char a=0;
+    if (argc>1){
+        a=argv[1];
+    }
 	AlphaBot motors;
     Libcam2OpenCV camera;
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	MotorCallback cb;
+    cb.setA(a);
     CameraCallback cameraCB(&cb);
     camera.registerCallback(&cameraCB);
 	motors.registerStepCallback(&cb);
@@ -99,8 +104,8 @@ int main(int argc, char** argv) {
 	motors.start();
 	do {
        // if (getchar()){
-            char a=getchar();
-            cb.setA(a);
+            //char a=getchar();
+            
        // } 
 	} while(true);
 	motors.stop();
