@@ -14,6 +14,16 @@ find_package(box2d REQUIRED)
 
 #find_package(PkgConfig)
 
+if(box2d_FOUND)
+#        target_link_libraries(CloCK box2d ${OpenCV_LIBS} pthread)
+        message("box2d installed ${BOX2D_LIBS}")
+else()
+       #set(BOX2D_BIN_DIR ${"../box2d/build/bin"})
+       #target_link_libraries(HICS ${BOX2D_BIN_DIR}/libbox2d.a ${OpenCV_LIBS} pthread)
+       #message("fetching static library from ${BOX2D_BIN_DIR}")
+	message("BOX2D NOT INSTALLED")
+endif()
+
 add_library(CloCK ${SRC} ${HEAD})
 
 set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE 
