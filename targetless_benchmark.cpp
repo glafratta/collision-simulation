@@ -6,8 +6,6 @@ int main(int argc, char** argv) {
     Task controlGoal;
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
-	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = A_STAR;
 	configurator.planning =1;
 	configurator.setBenchmarking(1);
 	if (argc>1){
