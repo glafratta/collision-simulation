@@ -219,7 +219,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor);
 
-std::vector <vertexDescriptor> Configurator::checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
+std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float& );
 
@@ -250,7 +250,6 @@ void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescripto
 // std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
 
-std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem&, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0))); //returns if plan fails and at what index in the plan
 									
 ExecutionError trackTaskExecution(Task &);
 
