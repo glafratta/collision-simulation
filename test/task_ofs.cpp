@@ -89,7 +89,7 @@ MotorCallback *cb=NULL;
 int main(int argc, char** argv) {
     char a=0;
     if (argc>1){
-        a=argv[1];
+        a=*argv[1];
     }
 	AlphaBot motors;
     Libcam2OpenCV camera;
