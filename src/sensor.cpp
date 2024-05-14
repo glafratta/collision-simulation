@@ -247,7 +247,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT, corners size=%i\n", corners.size());
         }
-        if (it>0 & !corners.empty()){
+        if (it>0 || !corners.empty()){
             cv::calcOpticalFlowPyrLK(previous, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
             printf("LK\n");
         }
@@ -259,11 +259,15 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector <cv::Point2f> good_corners;
         //if (it==1){
         int i=0;
+		bool isstatus1=1;
         printf("pre-fill in status, new corners size =%i\n", new_corners.size());
         for (i; i<corners.size();i++){
             if (status[i]==1){
-                good_corners.push_back(new_corners[i]); //og corners
+                good_corners.push_back(corners[i]); //og corners
             }
+			else{
+				isstatus1=0;
+			}
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
