@@ -118,11 +118,21 @@ class ImgProc{
 
     cv::Mat cropRight(cv::Mat);
 
-    b2Vec2 opticFlow(const cv::Mat&, std::vector <cv::Point2f>&, cv::Mat&);
+    b2Vec2 opticFlow(const cv::Mat&);
 
-	std::vector <cv::Point2f> corners();
+	std::vector <cv::Point2f> get_corners();
 
-	cv::Mat previous();
+	cv::Mat get_previous();
+
+	void setPrevious(cv::Mat m){
+		previous=m;
+	}
+
+	void setCorners(std::vector <cv::Point2f> c){
+		corners=c;
+	}
+
+
 
     private:
 	int it=0;
@@ -133,8 +143,8 @@ class ImgProc{
     	const int BLOCK_SIZE=7;
 	}gfp;
 
-    std::vector <cv::Point2f> corners_left, corners_right; //must be single-precision float
-    cv::Mat previous_grey_left, previous_grey_right;
+    std::vector <cv::Point2f> corners_left, corners_right, corners; //must be single-precision float
+    cv::Mat previous_grey_left, previous_grey_right, previous;
 };
 
 

@@ -234,22 +234,21 @@ cv::Mat ImgProc::cropRight(cv::Mat mat){
         return result;
 }
 
-b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corners, cv::Mat& previousFrame_grey){
-	    b2Vec2 optic_flow;
+b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
+		b2Vec2 optic_flow;
 		cv::Mat frame_grey;
         std::vector <cv::Point2f> new_corners;
         std::vector <uchar> status;
         std::vector<float> err;
-        cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
+        cv::cvtColor(frame, frame_grey, cv::COLOR_BGR2GRAY);
 
         if (it%60==0){ //resample corners every 2 seconds (30fps)
             corners.clear();
-            cv::goodFeaturesToTrack(frame_grey, corners, gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
+            cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT, corners size=%i\n", corners.size());
         }
-        if (it>0 &!corners.empty()){
-			printf("pre-LK\n");
-            cv::calcOpticalFlowPyrLK(previousFrame_grey, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
+        if (it>0 & !corners.empty()){
+            cv::calcOpticalFlowPyrLK(previous, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
             printf("LK\n");
         }
         else{
@@ -260,7 +259,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
         //if (it==1){
         int i=0;
         printf("pre-fill in status, new corners size =%i\n", new_corners.size());
-        for (i; i<corners.size();i++){
+        for (i; i<new_corners.size();i++){
             if (status[i]==1){
                 good_corners.push_back(new_corners[i]); //og corners
             }
@@ -275,17 +274,17 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame, std::vector <cv::Point2f>& corne
         }
 
         printf("updated %i\n", it);
-        previousFrame_grey=frame_grey.clone();
+        previous=frame_grey.clone();
         corners=good_corners;
         it++;
 		return optic_flow;
 
 }
 
-std::vector <cv::Point2f> ImgProc::corners(){
-	return corners_left;
+std::vector <cv::Point2f> ImgProc::get_corners(){
+	return corners;
 }
 
-cv::Mat ImgProc::previous(){
-	return previous_grey_left;
+cv::Mat ImgProc::get_previous(){
+	return previous;
 }
