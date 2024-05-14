@@ -127,7 +127,7 @@ class ImgProc{
     private:
 	int it=0;
 	struct GoodFeaturesParameters{
-		const int MAX_CORNERS=100;
+		const int MAX_CORNERS=30;
     	const float QUALITY_LEVEL=0.5;
    		const int MIN_DISTANCE=7;
     	const int BLOCK_SIZE=7;

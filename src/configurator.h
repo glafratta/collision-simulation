@@ -219,6 +219,10 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor);
 
+std::vector <vertexDescriptor> Configurator::checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
+
+b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float& );
+
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
 EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
