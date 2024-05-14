@@ -27,12 +27,12 @@ void setA(char _a){
     a=_a;
     if (a== 'l'){
         t=Task(LEFT);
-        m_step=14;
+        m_step=15;
         n_l++;
     }
     else if (a=='r'){
         t=Task(RIGHT);
-        m_step=14;
+        m_step=15;
         n_r++;
     }
     else if (a=='s'){
@@ -102,12 +102,13 @@ int main(int argc, char** argv) {
 	motors.registerStepCallback(&cb);
     camera.start(settings);
 	motors.start();
-	do {
-       // if (getchar()){
-            //char a=getchar();
+	// do {
+    //    // if (getchar()){
+    //         //char a=getchar();
             
-       // } 
-	} while(true);
+    //    // } 
+	// } while(true);
+    getchar();
 	motors.stop();
     camera.stop();
 
