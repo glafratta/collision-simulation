@@ -106,7 +106,7 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	if (c->plan.empty()){
+	if (c->planVertices.empty()){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
@@ -114,14 +114,14 @@ void step( AlphaBot &motors){
     ExecutionError ee =c->trackTaskExecution(*c->getTask());
     if (c->getTask()->motorStep>0){
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(ee.theta(), action, MOTOR_CALLBACK);
+        c->getTask()->correct(action, MOTOR_CALLBACK);
     }
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
 		c->controlGoal.change =1;
 	}
 
-	printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose.p.x, c->controlGoal.disturbance.pose.p.y);
+	printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y);
 	c->changeTask(c->getTask()->change,  ogStep);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
@@ -133,11 +133,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     CameraCallback(Configurator * _c):c(_c){}
 
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-        if (NULL==ci){
+        if (NULL==c->ci){
             return;
         }
         //c->ci->visual_field=frame;
-		b2Vec2 optic_flow=c->imgProc.opticFlow(frame, c->imgProc.corners(), c->imgProc.previous());
+		std::vector <cv::Point2f> corners=c->imgProc.corners();
+		b2Vec2 optic_flow=c->imgProc.opticFlow(frame,corners , c->imgProc.previous());
 		c->getTask()->correct.update(optic_flow.x); //for now just going straight
     }
     private:
@@ -147,9 +148,9 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 float Configurator::taskRotationError(){
     float error=0, theta_left=0, theta_right=0; //difference in rotation between left and right visual field
     //get Left
-    if (visual_field.empty()){
-        return error;
-    }
+    // if (ci->.empty()){
+    //     return error;
+    // }
     // cv::Mat left_vf= imgProc.cropLeft(ci->visual_field);
     // //get Right
     // cv::Mat right_vf= imgProc.cropRight(ci->visual_field);

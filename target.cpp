@@ -139,8 +139,6 @@ int main(int argc, char** argv) {
     Task controlGoal(target, DEFAULT);
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
-	configurator.numberOfM = THREE_M;
-	configurator.graphConstruction = A_STAR;
 	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
