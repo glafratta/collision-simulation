@@ -74,14 +74,13 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         //cv::Mat previousFrame =imgProc.get_previous();
         b2Vec2 optic_flow;
         optic_flow=imgProc.opticFlow(frame);
-		cb->t.correct.update(optic_flow.x); //for now just going straight
-        // //if (cb->t.direction!=STOP){
-             char dumpname[50];
-            sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
-            FILE * dump=fopen(dumpname, "a+");
-            fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-            fclose(dump);
-        //}
+        printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+		// cb->t.correct.update(optic_flow.x); //for now just going straight
+        //      char dumpname[50];
+        //     sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
+        //     FILE * dump=fopen(dumpname, "a+");
+        //     fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        //     fclose(dump);
     }
 private:
 ImgProc imgProc;
