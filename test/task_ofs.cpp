@@ -58,6 +58,9 @@ int getCount(){
     else if (a='0'){
         return 0;
     }
+    else{
+        return ' ';
+    }
 }
 
 char getID(){
@@ -78,12 +81,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         char dumpname[50];
         sprintf(dumpname, "%s_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(dumpname, "a+");
-        if (FILE==NULL){
-            printf("you idiot there's a memory leak\n");
-        }
-        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-        fclose(dump);
+    //     FILE * dump=fopen(dumpname, "a+");
+    //    // if (FILE==NULL){
+    //       //  printf("you idiot there's a memory leak\n");
+    //     //}
+    //     fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+    //     fclose(dump);
     }
 private:
 ImgProc imgProc;
