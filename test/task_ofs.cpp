@@ -50,10 +50,10 @@ void setA(char _a='0'){
         t=Task(STOP);
     }
   // 
-    snprintf(dumpname, "%c_%i.txt", getID(), getCount());
-   dumpname =std::string(tmp);
-    FILE * dump=fopen(dumpname, "w+");
-    fclose(dump);
+//     snprintf(dumpname, "%c_%i.txt", getID(), getCount());
+//    dumpname =std::string(tmp);
+//     FILE * dump=fopen(dumpname, "w+");
+//     fclose(dump);
 }
 
 int getCount(){
