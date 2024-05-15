@@ -10,7 +10,7 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
     int n_l, n_r, n_s;
 public:
 Task t=Task(STOP);
-std::string dumpname;
+char dumpname[50];
 
 
 MotorCallback(){}
@@ -27,8 +27,10 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-    //memset(dumpname, 0, sizeof(dumpname));
-    dumpname.clear();
+    printf("size of dn=%i\n", sizeof(dumpname));
+    memset(dumpname, 0, sizeof(dumpname));
+    printf("cleared dumpname\n");
+    //dumpname.clear();
     if (a== 'l'){
         t=Task(LEFT);
         m_step=15;
@@ -47,10 +49,10 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-    char tmp[50];
-    sprintf(tmp, "%c_%i.txt", getID(), getCount());
-    dumpname =std::string(tmp);
-    FILE * dump=fopen(dumpname.c_str(), "w+");
+  //  char tmp[50];
+    sprintf(dumpname, "%c_%i.txt", getID(), getCount());
+   // dumpname =std::string(tmp);
+    FILE * dump=fopen(dumpname, "w+");
         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
     fclose(dump);
 }
@@ -91,8 +93,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         //char dumpname[50];
         //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(cb->dumpname.c_str(), "a+");
-        //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        FILE * dump=fopen(cb->dumpname, "a+");
+        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
         fclose(dump);
     }
 private:
