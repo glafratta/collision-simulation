@@ -28,8 +28,9 @@ void step( AlphaBot &motors){
 void setA(char _a='0'){
     a=_a;
     printf("size of dn=%i\n", sizeof(dumpname));
-   memset(dumpname, 0, sizeof(dumpname));
-    printf("cleared dumpname\n");
+    memset(dumpname, 0, sizeof(dumpname));
+    printf("cleared dumpname, size =%i\n", sizeof(dumpname));
+    dumpname =char[50];
     //dumpname.clear();
     if (a== 'l'){
         t=Task(LEFT);
@@ -49,7 +50,7 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-  //  char tmp[50];
+  // 
     sprintf(dumpname, "%c_%i.txt", getID(), getCount());
    // dumpname =std::string(tmp);
     FILE * dump=fopen(dumpname, "w+");
