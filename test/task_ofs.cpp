@@ -92,7 +92,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         // char dumpname[50];
         // sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(cb->dumpname, "a+");
+        FILE * dump=fopen(dumpname, "a+");
 
         fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
         fclose(dump);
