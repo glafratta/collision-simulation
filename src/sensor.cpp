@@ -242,7 +242,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector<float> err;
         cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
         if (corners.empty()){ //resample corners every 2 seconds (30fps)
-            corners.clear();
+            //corners.clear();
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT, corners size=%i\n", corners.size());
         }
