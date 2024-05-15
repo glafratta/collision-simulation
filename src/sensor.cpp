@@ -241,7 +241,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector <uchar> status;
         std::vector<float> err;
         cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
-        if (it==0){ //resample corners every 2 seconds (30fps)
+        if (corners.empty()){ //resample corners every 2 seconds (30fps)
             corners.clear();
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT, corners size=%i\n", corners.size());
@@ -277,7 +277,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
            	printf("getting optic flow\n");
 			optic_flow.x=corners[0].x-new_corners[0].x;
             optic_flow.y=corners[0].y-new_corners[0].y;
-			printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+			//printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 
         }
 
