@@ -45,7 +45,7 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-    sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
+    sprintf(dumpname, "%c_%i.txt", getID(), getCount());
     FILE * dump=fopen(dumpname, "w+");
         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
     fclose(dump);
