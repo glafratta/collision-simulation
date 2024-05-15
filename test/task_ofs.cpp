@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
     MotorCallback cb;
     cb.setA(a);
     CameraCallback cameraCB(&cb);
-    sprintf(cameraCB.dumpname, "%c_%i.txt", cb.getID(), cb.getCount());
+    sprintf(cameraCB.dumpname, "%s_%i.txt", cb.getID(), cb.getCount());
     FILE * dump=fopen(cameraCB.dumpname, "w+");
     fclose(dump);
     Libcam2OpenCV camera;
