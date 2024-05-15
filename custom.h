@@ -101,6 +101,7 @@ Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
 	printf("g size=%i\n", c->transitionSystem.m_vertices.size());
+	c->printPlan();
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
