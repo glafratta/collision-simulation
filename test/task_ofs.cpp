@@ -27,8 +27,8 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-    printf("size of dn=%i\n", sizeof(dumpname));
-    memset(dumpname, 0, sizeof(dumpname));
+    //printf("size of dn=%i\n", sizeof(dumpname));
+   // memset(dumpname, 0, sizeof(dumpname));
     printf("cleared dumpname\n");
     //dumpname.clear();
     if (a== 'l'){
@@ -88,12 +88,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         b2Vec2 optic_flow;
         optic_flow=imgProc.opticFlow(frame);
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
-		cb->t.correct.update(optic_flow.x); //for now just going straight
-        //char dumpname[50];
-        //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(cb->dumpname, "a+");
-        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-        fclose(dump);
+		//cb->t.correct.update(optic_flow.x); //for now just going straight
+        // //char dumpname[50];
+        // //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
+        // FILE * dump=fopen(cb->dumpname, "a+");
+        // fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        // fclose(dump);
     }
 private:
 ImgProc imgProc;
