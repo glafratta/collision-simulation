@@ -143,8 +143,8 @@ class ImgProc{
     	const int BLOCK_SIZE=7;
 	}gfp;
 
-    std::vector <cv::Point2f> corners_left, corners_right, corners; //must be single-precision float
-    cv::Mat previous_grey_left, previous_grey_right, previous;
+    std::vector <cv::Point2f> corners; //must be single-precision float
+    cv::Mat previous;
 };
 
 
