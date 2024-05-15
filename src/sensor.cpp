@@ -241,7 +241,6 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector <uchar> status;
         std::vector<float> err;
         cv::cvtColor(frame, frame_grey, cv::COLOR_BGR2GRAY);
-        previous=frame_grey.clone();
         if (it%60==0){ //resample corners every 2 seconds (30fps)
             corners.clear();
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
@@ -271,6 +270,7 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
+		previous=frame_grey.clone();
 		corners=good_corners;
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
