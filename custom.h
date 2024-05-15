@@ -100,6 +100,7 @@ int ogStep=0;
 Callback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
+	printf("g size=%i\n", c->transitionSystem.m_vertices.size());
 	if (c ==NULL){
 		printf("null pointer to configurator in stepcallback\n");
 	}
