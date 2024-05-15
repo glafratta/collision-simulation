@@ -9,22 +9,24 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
     int n_l, n_r, n_s;
 public:
 Task t=Task(STOP);
+char dumpname[50];
+
 
 MotorCallback(){}
 
 void step( AlphaBot &motors){
     m_step--;
     if (m_step==0){
-        a='0';
-        t=Task(STOP);
+        setA();
     }
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
     printf("char =%c\n", a);
 }
 
-void setA(char _a){
+void setA(char _a='0'){
     a=_a;
+    memset(word, 0, sizeof(word));
     if (a== 'l'){
         t=Task(LEFT);
         m_step=15;
@@ -43,6 +45,10 @@ void setA(char _a){
     else{
         t=Task(STOP);
     }
+    sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
+    FILE * dump=fopen(dumpname, "w+");
+        //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+    fclose(dump);
 }
 
 int getCount(){
@@ -79,13 +85,10 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         optic_flow=imgProc.opticFlow(frame);
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
-        char dumpname[50];
-        sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(dumpname, "a+");
-       // if (FILE==NULL){
-          //  printf("you idiot there's a memory leak\n");
-        //}
-        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        //char dumpname[50];
+        //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
+        FILE * dump=fopen(cb->dumpname, "a+");
+        //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
         fclose(dump);
     }
 private:
