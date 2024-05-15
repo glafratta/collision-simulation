@@ -10,7 +10,7 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
     int n_l=0, n_r=0, n_s=0;
 public:
 Task t=Task(STOP);
-//char dumpname[50];
+char dumpname[50];
 
 
 MotorCallback(){}
@@ -27,8 +27,8 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-    //printf("size of dn=%i\n", sizeof(dumpname));
-   // memset(dumpname, 0, sizeof(dumpname));
+    printf("size of dn=%i\n", sizeof(dumpname));
+   memset(dumpname, 0, sizeof(dumpname));
     printf("cleared dumpname\n");
     //dumpname.clear();
     if (a== 'l'){
@@ -49,12 +49,11 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-//   //  char tmp[50];
-//     sprintf(dumpname, "%c_%i.txt", getID(), getCount());
-//    // dumpname =std::string(tmp);
-//     FILE * dump=fopen(dumpname, "w+");
-//         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-//     fclose(dump);
+  //  char tmp[50];
+    sprintf(dumpname, "%c_%i.txt", getID(), getCount());
+   // dumpname =std::string(tmp);
+    FILE * dump=fopen(dumpname, "w+");
+    fclose(dump);
 }
 
 int getCount(){
@@ -89,11 +88,11 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         optic_flow=imgProc.opticFlow(frame);
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
-        // //char dumpname[50];
-        // //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        // FILE * dump=fopen(cb->dumpname, "a+");
-        // fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
-        // fclose(dump);
+        //char dumpname[50];
+        //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
+        FILE * dump=fopen(cb->dumpname, "a+");
+        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        fclose(dump);
     }
 private:
 ImgProc imgProc;
