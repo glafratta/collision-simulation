@@ -26,7 +26,7 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-    memset(word, 0, sizeof(word));
+    memset(dumpname, 0, sizeof(dumpname));
     if (a== 'l'){
         t=Task(LEFT);
         m_step=15;
