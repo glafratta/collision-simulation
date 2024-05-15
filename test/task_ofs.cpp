@@ -2,6 +2,7 @@
 #include "sensor.h"
 #include "libcam2opencv.h"
 #include "alphabot.h"
+#include <string>
 
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
@@ -9,7 +10,7 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
     int n_l, n_r, n_s;
 public:
 Task t=Task(STOP);
-char dumpname[50];
+std::string dumpname;
 
 
 MotorCallback(){}
@@ -26,7 +27,8 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-    memset(dumpname, 0, sizeof(dumpname));
+    //memset(dumpname, 0, sizeof(dumpname));
+    dumpname.clear();
     if (a== 'l'){
         t=Task(LEFT);
         m_step=15;
@@ -45,7 +47,9 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-    sprintf(dumpname, "%c_%i.txt", getID(), getCount());
+    char tmp[50];
+    sprintf(tmp, "%c_%i.txt", getID(), getCount());
+    dumpname =std::string(tmp);
     FILE * dump=fopen(dumpname, "w+");
         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
     fclose(dump);
