@@ -240,12 +240,13 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         std::vector <cv::Point2f> new_corners;
         std::vector <uchar> status;
         std::vector<float> err;
-        cv::cvtColor(frame, frame_grey, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
         if (it%60==0){ //resample corners every 2 seconds (30fps)
             corners.clear();
             cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
             printf("GFT, corners size=%i\n", corners.size());
         }
+		previous=frame_grey.clone();
         if (it>0 || !corners.empty()){
             cv::calcOpticalFlowPyrLK(previous, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
             printf("LK\n");
@@ -270,7 +271,6 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
 			//float RADIUS=5;
             //cv::circle(frame, corners[i], RADIUS, cv::Scalar(0,0,255));
         }
-		previous=frame_grey.clone();
 		corners=good_corners;
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
