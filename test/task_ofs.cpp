@@ -50,7 +50,7 @@ void setA(char _a='0'){
     char tmp[50];
     sprintf(tmp, "%c_%i.txt", getID(), getCount());
     dumpname =std::string(tmp);
-    FILE * dump=fopen(dumpname, "w+");
+    FILE * dump=fopen(dumpname.c_str(), "w+");
         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
     fclose(dump);
 }
@@ -91,7 +91,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         //char dumpname[50];
         //sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(cb->dumpname, "a+");
+        FILE * dump=fopen(cb->dumpname.c_str(), "a+");
         //fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
         fclose(dump);
     }
