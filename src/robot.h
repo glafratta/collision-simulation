@@ -8,9 +8,9 @@
 #include <math.h>
 const float SAFE_ANGLE =M_PI_2;
 const float MAX_TURN =M_PI;
-const float ROBOT_HALFLENGTH =0.11; //uncomment for robot
+const float ROBOT_HALFLENGTH =0.135; //uncomment for robot
 const float ROBOT_HALFWIDTH =0.09; //real
-const float ROBOT_BOX_OFFSET_X= -0.05;
+const float ROBOT_BOX_OFFSET_X= -0.09;
 const float ROBOT_BOX_OFFSET_Y =0;
 const float ROBOT_BOX_OFFSET_ANGLE =0;
 const float BETWEEN_WHEELS =.15;
