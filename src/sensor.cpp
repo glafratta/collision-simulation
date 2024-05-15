@@ -277,7 +277,8 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
            	printf("getting optic flow\n");
 			optic_flow.x=corners[0].x-new_corners[0].x;
             optic_flow.y=corners[0].y-new_corners[0].y;
-			
+			printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+
         }
 
         printf("updated %i\n", it);
