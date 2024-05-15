@@ -7,7 +7,7 @@
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
     char a='0';
-    int n_l,=0 n_r=0, n_s=0;
+    int n_l=0, n_r=0, n_s=0;
 public:
 Task t=Task(STOP);
 char dumpname[50];
