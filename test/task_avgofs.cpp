@@ -21,7 +21,7 @@ void step( AlphaBot &motors){
     }
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
-    printf("char =%c\n", a);
+    printf("char =%c, step=%i\n", a, m_step);
 }
 
 void setA(char _a='0'){
@@ -43,7 +43,7 @@ void setA(char _a='0'){
     }
     else if (a=='s'){
         t=Task(DEFAULT);
-        m_step=22;
+        m_step=100;
         n_s++;
     }
     else{
@@ -83,12 +83,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-		printf("has frame\n");
+		//printf("has frame\n");
         //std::vector <cv::Point2f> corners= imgProc.get_corners();
         //cv::Mat previousFrame =imgProc.get_previous();
         b2Vec2 optic_flow;
         optic_flow=imgProc.avgOpticFlow(frame);
-        printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+        //printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 		cb->t.correct.update(optic_flow.x); //for now just going straight
         // char dumpname[50];
         // sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
