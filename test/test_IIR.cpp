@@ -85,10 +85,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         int cutoff_frequency=4; //HZ
         int band_width=0.5;
     }filter_parameters;
-    //Iir::Butterworth::
-    Lowpass<filter_parameters.order>low_pass;
-    //Iir::Butterworth::
-    BandStop<filter_parameters.order>band_stop;
+    Iir::Butterworth::LowPass<filter_parameters.order>low_pass;
+    Iir::Butterworth::BandStop<filter_parameters.order>band_stop;
 
     CameraCallback(MotorCallback * _cb):cb(_cb){
         low_pass.setup(FPS, filter_parameters.cutoff_frequency);
