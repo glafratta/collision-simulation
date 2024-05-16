@@ -14,8 +14,8 @@ find_package(PkgConfig)
 
 #include_directories(blank ${HEAD})
 add_executable(blank blank.cpp)	
-add_executable(target callbacks.h target.cpp)
-target_link_libraries(target CloCK ${OpenCV_LIBS} box2d cpptimer rt pthread)
+add_executable(target_sim callbacks.h target_sim.cpp)
+target_link_libraries(target_sim CloCK ${OpenCV_LIBS} box2d cpptimer rt pthread)
 target_link_libraries(blank CloCK box2d ${OpenCV_LIBS})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
