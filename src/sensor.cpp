@@ -287,6 +287,56 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
 
 }
 
+b2Vec2 ImgProc::avgOpticFlow(const cv::Mat& frame){
+		b2Vec2 optic_flow;
+		cv::Mat frame_grey;
+        std::vector <cv::Point2f> new_corners;
+        std::vector <uchar> status;
+        std::vector<float> err;
+        cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
+        if (corners.empty()){ //resample corners every 2 seconds (30fps)
+            cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
+            printf("GFT, corners size=%i\n", corners.size());
+        }
+        if (it>0 & !corners.empty()){
+            cv::calcOpticalFlowPyrLK(previous, frame_grey, corners, new_corners, status, err); //no flags: error is L1 distance between points /tot pixels
+            printf("LK\n");
+        }
+        else{
+            status=std::vector<uchar>(corners.size(), 1);
+			printf("corners %i, status %i\n", corners.size(), status.size());
+        }
+
+        std::vector <cv::Point2f> good_corners;
+        //if (it==1){
+        int i=0;
+        printf("pre-fill in status, new corners size =%i\n", new_corners.size());
+		for (i; i<corners.size();i++){
+            if (status[i]==1){
+                good_corners.push_back(corners[i]); //og corners
+				optic_flow.x=corners[i].x-new_corners[i].x;
+				optic_flow.y=corners[i].y-new_corners[i].y;
+            }
+        }
+		optic_flow.x/=good_corners.size();
+		optic_flow.y/=good_corners.size();
+		corners=good_corners;
+		previous=frame_grey.clone();
+        printf("good corners = %i, new corners %i\n", good_corners.size(),i);
+        // if (corners.size()==new_corners.size()){ //corners are ordered from strongest to weakest
+        //    	printf("getting optic flow\n");
+		// 	optic_flow.x=corners[0].x-new_corners[0].x;
+        //     optic_flow.y=corners[0].y-new_corners[0].y;
+		// 	//printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+
+        // }
+
+        printf("updated %i\n", it);
+        it++;
+		return optic_flow;
+
+}
+
 std::vector <cv::Point2f> ImgProc::get_corners(){
 	return corners;
 }
