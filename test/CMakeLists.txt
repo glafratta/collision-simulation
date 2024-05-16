@@ -35,7 +35,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	#target_include_directories(task_ofs ${LIBCAMERA_INCLUDE_DIRS})
 	target_link_libraries(task_ofs box2d PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
 	target_link_libraries(task_avgofs box2d PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
-	target_link_libraries(test_IIR box2d iir::iir PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
+	target_link_libraries(test_IIR box2d iir::iir_static PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
 		
 message("build test cases")
 endif()
