@@ -26,7 +26,7 @@ void step( AlphaBot &motors){
     }
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
-    printf("char =%c\n", a);
+    printf("char =%c, step=%i\n", a, m_step);
 }
 
 void setA(char _a='0'){
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	//motors.start();
+	motors.start();
     camera.start(settings);
 	// do {
     //    // if (getchar()){
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
     //    // } 
 	// } while(true);
     getchar();
-	//motors.stop();
+	motors.stop();
     camera.stop();
 
 }
