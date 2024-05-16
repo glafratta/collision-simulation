@@ -8,6 +8,7 @@ find_package(box2d REQUIRED)
 
 find_package(PkgConfig)
 
+find_package(Threads)
 
 #pkg_check_modules(clock REQUIRED IMPORTED_TARGET libCLoCK)
 
