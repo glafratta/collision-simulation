@@ -3,7 +3,6 @@
 #include "libcam2opencv.h"
 #include "alphabot.h"
 #include "Iir.h"
-#include <string>
 
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
@@ -80,14 +79,16 @@ char* getID(){
 
 struct CameraCallback: Libcam2OpenCV::Callback {
     char dumpname[8];
-    struct{
+    struct FilterParameters{
         int order=3;
         int DC=0; //HZ
         int cutoff_frequency=4; //HZ
         int band_width=0.5;
     }filter_parameters;
-    Iir::Butterworth::Lowpass<filter_parameters.order>low_pass;
-    Iir::Butterworth::BandStop<filter_parameters.order>band_stop;
+    //Iir::Butterworth::
+    Lowpass<filter_parameters.order>low_pass;
+    //Iir::Butterworth::
+    BandStop<filter_parameters.order>band_stop;
 
     CameraCallback(MotorCallback * _cb):cb(_cb){
         low_pass.setup(FPS, filter_parameters.cutoff_frequency);
