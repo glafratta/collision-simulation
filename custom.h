@@ -112,7 +112,7 @@ void step( AlphaBot &motors){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-	c->trackTaskExecution(*(c->getTask()));	
+	//c->trackTaskExecution(*(c->getTask()));	
     ExecutionError ee =c->trackTaskExecution(*c->getTask());
     if (c->getTask()->motorStep>0){
         Task::Action action= c->getTask()->getAction();

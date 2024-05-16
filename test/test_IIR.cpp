@@ -86,7 +86,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     char dumpname[50];
     //struct FilterParameters{
     //};
-    float signal=0, filtered_signal=0;
+    float signal=0;
+    float filtered_signal=0;
    // FilterParameters filter_parameters;
     Iir::Butterworth::LowPass<order>low_pass;
     Iir::Butterworth::BandStop<order>band_stop;
@@ -102,15 +103,14 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         b2Vec2 optic_flow=imgProc.avgOpticFlow(frame);
         b2Vec2 optic_flow_filtered=optic_flow;
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
-        signal+=optic_flow.x;
+        signal= signal+optic_flow.x;
         optic_flow_filtered.x=float(low_pass.filter(optic_flow.x));
         optic_flow_filtered.x=float(band_stop.filter(optic_flow_filtered.x));
 		//cb->t.correct.update(optic_flow.x); //for now just going straight
-        filtered_signal+=optic_flow_filtered.x;
+        filtered_signal=filtered_signal+optic_flow_filtered.x;
         FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
-            optic_flow.x, optic_flow.y, optic_flow_filtered.x, optic_flow_filtered.y, 
-                signal, filtered_signal);
+            optic_flow.x, optic_flow.y, optic_flow_filtered.x, optic_flow_filtered.y, signal, filtered_signal);
         fclose(dump);
     }
 private:
