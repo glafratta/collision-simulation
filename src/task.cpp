@@ -117,7 +117,7 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 			action.R=-1;
 		}
 	
-
+	}
 }
 
 float Task::Correct::errorCalc(Action a, float x){
