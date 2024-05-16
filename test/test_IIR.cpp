@@ -44,7 +44,7 @@ void setA(char _a='0'){
     }
     else if (a=='s'){
         t=Task(DEFAULT);
-        m_step=22;
+        m_step=100;
         n_s++;
     }
     else{
@@ -97,12 +97,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		printf("has frame\n");
-        b2Vec2 optic_flow=imgProc.opticFlow(frame);
+        b2Vec2 optic_flow=imgProc.avgOpticFlow(frame);
         b2Vec2 optic_flow_filtered=optic_flow;
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
         optic_flow_filtered.x=float(low_pass.filter(optic_flow.x));
         optic_flow_filtered.x=float(band_stop.filter(optic_flow_filtered.x));
-		cb->t.correct.update(optic_flow.x); //for now just going straight
+		//cb->t.correct.update(optic_flow.x); //for now just going straight
         FILE * dump=fopen(dumpname, "a+");
 
         fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     MotorCallback cb;
     cb.setA(a);
     CameraCallback cameraCB(&cb);
-    sprintf(cameraCB.dumpname, "%s_%i.txt", cb.getID(), cb.getCount());
+    sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
     FILE * dump=fopen(cameraCB.dumpname, "w+");
     fclose(dump);
     Libcam2OpenCV camera;
