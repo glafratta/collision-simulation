@@ -79,20 +79,20 @@ char* getID(){
 
 struct CameraCallback: Libcam2OpenCV::Callback {
     char dumpname[8];
-    struct FilterParameters{
+    //struct FilterParameters{
         const int order=3;
         const int DC=0; //HZ
         const int cutoff_frequency=4; //HZ
         const int band_width=0.5;
-    };
+    //};
     float signal=0, filtered_signal=0;
-    FilterParameters filter_parameters;
-    Iir::Butterworth::LowPass<filter_parameters.order>low_pass;
-    Iir::Butterworth::BandStop<filter_parameters.order>band_stop;
+   // FilterParameters filter_parameters;
+    Iir::Butterworth::LowPass<order>low_pass;
+    Iir::Butterworth::BandStop<order>band_stop;
 
     CameraCallback(MotorCallback * _cb):cb(_cb){
-        low_pass.setup(FPS, filter_parameters.cutoff_frequency);
-        band_stop.setup(FPS, filter_parameters.DC, filter_parameters.band_width);
+        low_pass.setup(FPS, cutoff_frequency);
+        band_stop.setup(FPS, DC, band_width);
     }
 
 
