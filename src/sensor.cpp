@@ -314,8 +314,11 @@ b2Vec2 ImgProc::avgOpticFlow(const cv::Mat& frame){
 		for (i; i<corners.size();i++){
             if (status[i]==1){
                 good_corners.push_back(corners[i]); //og corners
-				optic_flow.x=corners[i].x-new_corners[i].x;
-				optic_flow.y=corners[i].y-new_corners[i].y;
+				if (new_corners.size()==corners.size()){
+					optic_flow.x=corners[i].x-new_corners[i].x;
+					optic_flow.y=corners[i].y-new_corners[i].y;					
+				}
+
             }
         }
 		optic_flow.x/=good_corners.size();
