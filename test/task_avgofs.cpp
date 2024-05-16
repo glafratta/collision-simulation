@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	//motors.start();
+	motors.start();
     camera.start(settings);
 	// do {
     //    // if (getchar()){
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     //    // } 
 	// } while(true);
     getchar();
-	//motors.stop();
+	motors.stop();
     camera.stop();
 
 }
