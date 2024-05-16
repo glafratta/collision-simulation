@@ -84,7 +84,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         int DC=0; //HZ
         int cutoff_frequency=4; //HZ
         int band_width=0.5;
-    }filter_parameters;
+    };
+    FilterParameters filter_parameters;
     Iir::Butterworth::LowPass<filter_parameters.order>low_pass;
     Iir::Butterworth::BandStop<filter_parameters.order>band_stop;
 
