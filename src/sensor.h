@@ -120,6 +120,8 @@ class ImgProc{
 
     b2Vec2 opticFlow(const cv::Mat&);
 
+	b2Vec2 avgOpticFlow(const cv::Mat&);
+
 	std::vector <cv::Point2f> get_corners();
 
 	cv::Mat get_previous();
