@@ -323,13 +323,7 @@ b2Vec2 ImgProc::avgOpticFlow(const cv::Mat& frame){
 		corners=good_corners;
 		previous=frame_grey.clone();
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
-        // if (corners.size()==new_corners.size()){ //corners are ordered from strongest to weakest
-        //    	printf("getting optic flow\n");
-		// 	optic_flow.x=corners[0].x-new_corners[0].x;
-        //     optic_flow.y=corners[0].y-new_corners[0].y;
-		// 	//printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 
-        // }
 
         printf("updated %i\n", it);
         it++;
