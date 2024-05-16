@@ -83,7 +83,7 @@ char* getID(){
 };
 
 struct CameraCallback: Libcam2OpenCV::Callback {
-    char dumpname[8];
+    char dumpname[50];
     //struct FilterParameters{
     //};
     float signal=0, filtered_signal=0;
