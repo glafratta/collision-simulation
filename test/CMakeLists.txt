@@ -10,6 +10,8 @@ find_package(PkgConfig)
 
 find_package(Threads)
 
+find_package(iir)
+
 #pkg_check_modules(clock REQUIRED IMPORTED_TARGET libCLoCK)
 
 
@@ -26,12 +28,14 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	#add_executable(test_optic_flow test_optic_flow.cpp)
 	add_executable(task_ofs task_ofs.cpp)
 	add_executable(task_avgofs task_avgofs.cpp)
+	add_executable(test_IIR test_IIR.cpp)
 	#target_link_libraries(noMotors box2d ${OpenCV_LIBS} HICS a1lidarrpi pthread pigpio)
 	#target_link_libraries(testController box2d ${OpenCV_LIBS} CLoCK a1lidarrpi pthread pigpio)
 	#target_link_libraries(test_optic_flow box2d ${OpenCV_LIBS} CLoCK a1lidarrpi pthread pigpio)
 	#target_include_directories(task_ofs ${LIBCAMERA_INCLUDE_DIRS})
 	target_link_libraries(task_ofs box2d PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
 	target_link_libraries(task_avgofs box2d PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
+	target_link_libraries(test_IIR box2d iir::iir PkgConfig::LIBCAMERA cam2opencv ${OpenCV_LIBS} CloCK alphabot pthread pigpio)
 		
 message("build test cases")
 endif()

@@ -95,12 +95,14 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 	}
 	//accumulatedError += timeStepError; 
 	if (fabs(p1)>tolerance){
-		//printf("error non norm = %f, error norm= %f\n",timeStepError, normAccErr);
-		if (p1<0){
-			action.L -= p1*kp;  //-
+		float correction= (p1*kp)/2; //do not increase one wheel speed too much
+		if (p1>0){	//too much to the left
+			action.L += correction;
+			action.R-=correction;  
 		}
-		else if (p1>0){
-			action.R -= p1 *kp; //+
+		else if (p1<0){ //too much to the R
+			action.R -= correction; 
+			action.L+= correction;
 		}
 		if (p1>1.0){
 		action.L=1.0;
@@ -114,9 +116,21 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 		if (action.R<(-1.0)){
 			action.R=-1;
 		}
-	}
+	
 
 }
+
+float Task::Correct::errorCalc(Action a, float x){
+	float result=0;
+	if (a.getOmega()!=0){
+		return result;
+	}
+	else{
+		return a.getOmega()-x; //-ve error if robot goes R, +ve error if goes L
+	}	
+
+}
+
 
 float Task::Correct::update(float e){
 	float p0=p();
