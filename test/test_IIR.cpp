@@ -80,11 +80,12 @@ char* getID(){
 struct CameraCallback: Libcam2OpenCV::Callback {
     char dumpname[8];
     struct FilterParameters{
-        int order=3;
-        int DC=0; //HZ
-        int cutoff_frequency=4; //HZ
-        int band_width=0.5;
+        const int order=3;
+        const int DC=0; //HZ
+        const int cutoff_frequency=4; //HZ
+        const int band_width=0.5;
     };
+    float signal=0, filtered_signal=0;
     FilterParameters filter_parameters;
     Iir::Butterworth::LowPass<filter_parameters.order>low_pass;
     Iir::Butterworth::BandStop<filter_parameters.order>band_stop;
@@ -100,14 +101,15 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         b2Vec2 optic_flow=imgProc.avgOpticFlow(frame);
         b2Vec2 optic_flow_filtered=optic_flow;
         printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
+        signal+=optic_flow.x;
         optic_flow_filtered.x=float(low_pass.filter(optic_flow.x));
         optic_flow_filtered.x=float(band_stop.filter(optic_flow_filtered.x));
 		//cb->t.correct.update(optic_flow.x); //for now just going straight
+        filtered_signal+=optic_flow_filtered.x;
         FILE * dump=fopen(dumpname, "a+");
-
         fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
             optic_flow.x, optic_flow.y, optic_flow_filtered.x, optic_flow_filtered.y, 
-                cb->t.correct.);
+                signal, filtered_signal);
         fclose(dump);
     }
 private:
