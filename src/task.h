@@ -205,7 +205,7 @@ struct Correct{
 
     void operator()( Action&, float timeElapsed=0.1);
 
-    float errorCalc(Action, float);
+    float errorCalc(Action, double);
 
     float getError(){
         return p();

@@ -25,8 +25,8 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
 		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
         	Task::Action action= cb->t.getAction();
-			cb->t.correct.errorCalc(action, optic_flow_filtered[0]);
-			cb->t.correct.update(); //for now just going straight
+			float error= cb->t.correct.errorCalc(action, optic_flow_filtered[0]);
+			cb->t.correct.update(error); //for now just going straight
 		}
         FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 

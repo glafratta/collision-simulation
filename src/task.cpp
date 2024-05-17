@@ -125,7 +125,7 @@ float Task::Correct::errorCalc(Action a, float x){
 		return result;
 	}
 	else{
-		return sin(a.getOmega())*MOTOR_CALLBACK-x; //-ve error if robot goes R, +ve error if goes L
+		return sin(a.getOmega())*MOTOR_CALLBACK-float(x); //-ve error if robot goes R, +ve error if goes L
 	}	
 
 }
