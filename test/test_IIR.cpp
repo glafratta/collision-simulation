@@ -29,6 +29,10 @@ void step( AlphaBot &motors){
     printf("char =%c, step=%i\n", a, m_step);
 }
 
+unsigned int getStep(){
+    return m_step;
+}
+
 void setA(char _a='0'){
     a=_a;
   //  printf("size of dn=%i\n", sizeof(dumpname));
@@ -100,6 +104,9 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		printf("has frame\n");
+        if (cb->t.motorStep==cb.getStep()|| cb.getStep()==0){
+            return;
+        }
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
@@ -135,8 +142,8 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	motors.start();
     camera.start(settings);
+	motors.start();
 	// do {
     //    // if (getchar()){
     //         //char a=getchar();
