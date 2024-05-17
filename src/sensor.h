@@ -15,12 +15,14 @@ double y(cv::Vec2d v){
 	return v[1];
 }
 
-void setX(cv::Vec2d& v, float x){
-	v[0]=x;
+template <typename tn>
+void setX(cv::Vec2d& v, tn x){
+	v[0]=double(x);
 }
 
-void setY(cv::Vec2d& v, float y){
-	v[1]=y;
+template <typename tn>
+void setY(cv::Vec2d& v, tn y){
+	v[1]=double(y);
 }
 
 class Pointf: public cv::Point2f{
