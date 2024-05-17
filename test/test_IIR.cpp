@@ -1,6 +1,6 @@
 #include "iir_test_headers.h"
 
-void::MotorCallback::step( AlphaBot &motors){
+void MotorCallback::step( AlphaBot &motors){
     m_step--;
     if (m_step==0){
         setA();

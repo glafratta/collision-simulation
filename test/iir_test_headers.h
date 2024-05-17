@@ -19,7 +19,7 @@ Task t=Task(STOP);
 
 MotorCallback(){}
 
-void step( AlphaBot &motors);
+void step( AlphaBot &);
 
 unsigned int getStep(){
     return m_step;
