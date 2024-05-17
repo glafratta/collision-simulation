@@ -31,7 +31,9 @@ int main(int argc, char** argv){
     std::pair <State, Edge> sk;
     simResult sr;
     sr.resultCode=simResult::crashed;
-    b2Vec2 d_pos(conf.transitionSystem[v0].disturbance.pose().p.x, conf.transitionSystem[v1_old].endPose.p.y);
+    float x=conf.transitionSystem[v0].disturbance.pose().p.x;
+    float y=conf.transitionSystem[v1_old].endPose.p.y;
+    b2Vec2 d_pos(x, y);
     sr.collision= Disturbance(AVOID, d_pos);
     sr.endPose= b2Transform(b2Vec2(conf.transitionSystem[26].disturbance.pose().p.x,
         conf.transitionSystem[v1_old].endPose.p.y+.05), 
