@@ -24,7 +24,7 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
         filtered_signal=filtered_signal+optic_flow_filtered[0];
 		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
-        	Task::Action action= t.getAction();
+        	Task::Action action= cb->t.getAction();
 			cb->t.correct.errorCalc(action, optic_flow_filtered[0]);
 			cb->t.correct.update(); //for now just going straight
 		}
