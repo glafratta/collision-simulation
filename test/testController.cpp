@@ -6,7 +6,7 @@ void::MotorCallback::step( AlphaBot &motors){
     if (m_step==0){
         setA();
     }
-	t.correct(t.action, MOTOR_CALLBACK);
+	t.correct(t.getAction(), MOTOR_CALLBACK);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
     printf("char =%c, step=%i\n", a, m_step);
@@ -14,7 +14,6 @@ void::MotorCallback::step( AlphaBot &motors){
 
 void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
 		printf("has frame\n");
-        cv::Vec2d  optic_flow;
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
