@@ -93,7 +93,6 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		return;
 	}
-	//accumulatedError += timeStepError; 
 	if (fabs(p1)>tolerance){
 		float correction= (p1*kp)/2; //do not increase one wheel speed too much
 		if (p1>0){	//too much to the left
@@ -126,7 +125,7 @@ float Task::Correct::errorCalc(Action a, float x){
 		return result;
 	}
 	else{
-		return a.getOmega()-x; //-ve error if robot goes R, +ve error if goes L
+		return sin(a.getOmega())*MOTOR_CALLBACK-x; //-ve error if robot goes R, +ve error if goes L
 	}	
 
 }
