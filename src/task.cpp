@@ -119,7 +119,7 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 	}
 }
 
-float Task::Correct::errorCalc(Action a, float x){
+float Task::Correct::errorCalc(Action a, double x){
 	float result=0;
 	if (a.getOmega()!=0){
 		return result;
