@@ -29,6 +29,7 @@ struct Edge{
 	//Direction direction=DEFAULT;
 	float probability=1.0;
 	int step=0;
+	int it_observed=-1; //last iteration where this edge was observed
 
 	Edge()=default;
 };
@@ -173,15 +174,15 @@ namespace gt{
 
 	int simToMotorStep(int);
 
-	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int); //returns disturbance rror based on expected vs observed D
 
-	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int);
 
-	std::pair< bool, edgeDescriptor> getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>);
+	std::pair< bool, edgeDescriptor> getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>, int);
 
 	std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
-	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction);
+	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction, int);
 
 	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);
 

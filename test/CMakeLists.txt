@@ -10,17 +10,20 @@ find_package(PkgConfig)
 
 find_package(Threads)
 
-find_package(iir)
+
 
 #pkg_check_modules(clock REQUIRED IMPORTED_TARGET libCLoCK)
 
 
-#include_directories(blank ${HEAD})
+message("making simulation test cases")
 add_executable(blank blank.cpp)	
 add_executable(target_sim callbacks.h target_sim.cpp)
+add_executable(expected_d callbacks.h expected_d.cpp)
 target_link_libraries(target_sim CloCK ${OpenCV_LIBS} box2d cpptimer rt pthread)
+target_link_libraries(expected_d CloCK ${OpenCV_LIBS} box2d cpptimer rt pthread)
 target_link_libraries(blank CloCK box2d ${OpenCV_LIBS})
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
+	find_package(iir)
 	pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)
 	include_directories(${LIBCAMERA_INCLUDE_DIRS})
 	#add_executable(noMotors noMotors.cpp)

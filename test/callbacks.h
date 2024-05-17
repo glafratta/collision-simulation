@@ -61,8 +61,7 @@ class DataInterface {
 public:
 int iteration = 0;
 ConfiguratorInterface * ci;
-//CoordinateContainer data;
-// CoordinateContainer data2fp;
+
 char * folder;
     DataInterface(ConfiguratorInterface * _ci): ci(_ci){}
 

@@ -360,7 +360,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, &t, _simulationStep);
-			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction);
+			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
 			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
 			setStateLabel(sk.first, v0, t.direction); //new
 			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
@@ -393,7 +393,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 			}
 			if(edge.second){
-				gt::set(edge.first, sk, g, v1==currentVertex, errorMap);
+				gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
 				gt::adjustProbability(g, edge.first);
 			}
 			// if (debugOn){
@@ -458,7 +458,7 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 			e=ie[0];
 		}
 		toReassign.push_back(e);
-		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap);
+		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap, iteration);
 		for (edgeDescriptor r:toReassign){ //reassigning edges
 			gt::add_edge(r.m_source, pair.second, g);
 		}
@@ -603,11 +603,11 @@ std::vector <vertexDescriptor> Configurator::checkPlan(b2World& world, std::vect
 			vertexDescriptor v1;
 			edge =addVertex(planVertices[it-1], v1,g, Disturbance(), g[ep.first], 1);
 			//g[v1].set(s);
-			gt::set(edge.first, sk, g, it==currentVertex, errorMap);
+			gt::set(edge.first, sk, g, it==currentVertex, errorMap, iteration);
 		}
 		else{
 			//g[planVertices[it]].nObs++;
-			gt::update(edge.first, sk, g,planVertices[it]==currentVertex, errorMap);
+			gt::update(edge.first, sk, g,planVertices[it]==currentVertex, errorMap, iteration);
 		}
 		gt::adjustProbability(g, edge.first);
 		if (sk.first.outcome == simResult::crashed){ //has to replan
@@ -1225,7 +1225,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
 		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
-			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
+			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
 			if (!most_likely.first){
 			}
 			else if (g[most_likely.second].probability>prob){

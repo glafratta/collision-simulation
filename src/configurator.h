@@ -46,7 +46,7 @@ public:
 	bool running =0;
 	std::thread * t=NULL;
 	bool debugOn=0;
-	float simulationStep=BOX2DRANGE;
+	float simulationStep=2*std::max(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH);
 	b2Transform ogGoal;
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;

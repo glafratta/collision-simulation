@@ -40,7 +40,7 @@ int gt::simToMotorStep(int simStep){
 // 	return result;
 // }
 
-void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap){
+void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
 	if (e==edgeDescriptor()){
 		return;
 	}
@@ -66,11 +66,12 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
+	g[e].it_observed=it;
 	//adjustProbability(g, e);
 }
 
-void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap){
-	update(e, sk, g, current, errorMap);
+void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
+	update(e, sk, g, current, errorMap, it);
 	g[e.m_target].outcome = sk.first.outcome;
 	//g[e.m_target].label=sk.first.label;
 }
@@ -86,13 +87,13 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 	return result;
 }
 
-std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe){
+std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe, int it){
 	std::pair< bool, edgeDescriptor> mostLikely(false, edgeDescriptor());
 	float prob=0;
 	for (edgeDescriptor e:oe){
 		if (g[e].probability>prob){
 			mostLikely.second=e;
-			prob=g[e].probability;
+			prob=g[e].probability*(g[e].it_observed/it);
 		}
 	}
 	mostLikely.first=!oe.empty();
@@ -100,13 +101,13 @@ std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vec
 }
 
 
-Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, Direction d){
+Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, Direction d, int it){
 	std::vector<edgeDescriptor> oe=outEdges(g, v, d);
 	Disturbance result=Disturbance();
 	if (oe.empty()){
 		return result;
 	}
-	std::pair<bool,edgeDescriptor> mostLikely=getMostLikely(g, oe);
+	std::pair<bool,edgeDescriptor> mostLikely=getMostLikely(g, oe, it);
 	if (mostLikely.first){
 		result=g[mostLikely.second.m_target].disturbance;
 	}
