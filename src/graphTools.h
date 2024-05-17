@@ -32,6 +32,10 @@ struct Edge{
 	int it_observed=-1; //last iteration where this edge was observed
 
 	Edge()=default;
+
+	float weighted_probability(int it){
+		return float(probability*(it_observed/it));
+	}
 };
 
 

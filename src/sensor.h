@@ -118,9 +118,9 @@ class ImgProc{
 
     cv::Mat cropRight(cv::Mat);
 
-    b2Vec2 opticFlow(const cv::Mat&);
+    cv::Point2d  opticFlow(const cv::Mat&);
 
-	b2Vec2 avgOpticFlow(const cv::Mat&);
+	cv::Point2d avgOpticFlow(const cv::Mat&);
 
 	std::vector <cv::Point2f> get_corners();
 

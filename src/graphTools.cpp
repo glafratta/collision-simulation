@@ -91,9 +91,9 @@ std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vec
 	std::pair< bool, edgeDescriptor> mostLikely(false, edgeDescriptor());
 	float prob=0;
 	for (edgeDescriptor e:oe){
-		if (g[e].probability>prob){
+		if (g[e].weighted_probability(it)>prob){
 			mostLikely.second=e;
-			prob=g[e].probability*(g[e].it_observed/it);
+			prob=g[e].weighted_probability(it);
 		}
 	}
 	mostLikely.first=!oe.empty();
