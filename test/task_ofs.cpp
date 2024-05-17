@@ -26,12 +26,7 @@ void step( AlphaBot &motors){
 
 void setA(char _a='0'){
     a=_a;
-  //  printf("size of dn=%i\n", sizeof(dumpname));
-    //memset(dumpname, 0, sizeof(dumpname));
-    //printf("cleared dumpname, size =%i\n", sizeof(dumpname));
-    //dumpname =char[50];
-    //dumpname.clear();
-    if (a== 'l'){
+   if (a== 'l'){
         t=Task(LEFT);
         m_step=15;
         n_l++;
@@ -49,11 +44,6 @@ void setA(char _a='0'){
     else{
         t=Task(STOP);
     }
-  // 
-//     snprintf(dumpname, "%c_%i.txt", getID(), getCount());
-//    dumpname =std::string(tmp);
-//     FILE * dump=fopen(dumpname, "w+");
-//     fclose(dump);
 }
 
 int getCount(){
@@ -84,16 +74,9 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		printf("has frame\n");
-        //std::vector <cv::Point2f> corners= imgProc.get_corners();
-        //cv::Mat previousFrame =imgProc.get_previous();
-        b2Vec2 optic_flow;
+        cv::Vec2d optic_flow;
         optic_flow=imgProc.opticFlow(frame);
-        printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
-		cb->t.correct.update(optic_flow.x); //for now just going straight
-        // char dumpname[50];
-        // sprintf(dumpname, "%c_%i.txt", cb->getID(), cb->getCount());
-        FILE * dump=fopen(dumpname, "a+");
-
+        printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[0]);       FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
         fclose(dump);
     }
@@ -119,16 +102,9 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	//motors.start();
     camera.start(settings);
-	// do {
-    //    // if (getchar()){
-    //         //char a=getchar();
-            
-    //    // } 
-	// } while(true);
+    motors.start();
     getchar();
-	//motors.stop();
     camera.stop();
 
 }

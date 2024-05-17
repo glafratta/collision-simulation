@@ -247,7 +247,7 @@ struct Correct{
         return sum;
     }
     std::vector <float>p_buffer=std::vector <float>(3,0);
-    float kp=55.0, kd=1, ki=1;
+    float kp=0.08, kd=1, ki=1;
     float i=0, d=0;
 
 }correct;

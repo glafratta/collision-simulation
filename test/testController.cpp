@@ -1,119 +1,64 @@
-//#include "Box2D/Box2D.h"
-#include "src/configurator.h"
-#include "a1lidarrpi.h"
-#include "alphabot.h"
-#include "CppTimer.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <bits/stdc++.h>
-#include <iostream>
-#include <sys/stat.h>
-#include <sys/types.h>
-#define _USE_MATH_DEFINES
+#include "iir_test_headers.h"
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-    std::vector <BodyFeatures> result;
-    for (Point p: points){
-            BodyFeatures feature;
-            feature.pose.p = p.getb2Vec2(); 
-            result.push_back(feature);  
+
+void::MotorCallback::step( AlphaBot &motors){
+    m_step--;
+    if (m_step==0){
+        setA();
     }
-    return result;
+	t.correct(t.action, MOTOR_CALLBACK);
+    motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
+    motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
+    printf("char =%c, step=%i\n", a, m_step);
 }
 
-//the environment is sampled by the LIDAR every .2 seconds
-
-class LidarInterface : public A1Lidar::DataInterface{
-Configurator * c;
-std::vector <Point> previous;
-
-char folder[250];
-public: 
-    int mapCount =0;
-
-    LidarInterface(Configurator * _c): c(_c){
-		c->timeElapsed = 0.2;
+void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
+		printf("has frame\n");
+        cv::Vec2d  optic_flow;
+        cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
+        cv::Vec2d  optic_flow_filtered=optic_flow;
+        printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
+        signal= signal+optic_flow[0];
+        optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
+        optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
+        filtered_signal=filtered_signal+optic_flow_filtered[0];
+		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
+																//signal while the robot isn' moving
+        	cb->t.correct.update(optic_flow_filtered[0]); //for now just going straight
 		}
-
-	void newScanAvail(float, A1LidarData (&data)[A1Lidar::nDistance]){ //uncomment sections to write x and y to files
-	    mapCount++;
-		std::vector <Point> current;
-		Point p1, p0;
-		for (A1LidarData &data:data){
-			if (data.valid&& data.r <1.0){
-				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
-				float x = round(data.x*1000)/1000;
-				float y = round(data.y*1000)/1000;
-				p1= (Point(x, y));
-				if (p1!= p0){
-					current.push_back(p1);
-				}
-				
-				p0= p1;
-            }
-		}
-		//c->NewScan(current);
-		c->addIteration();
-		Configurator::getVelocityResult r =c->GetRealVelocity(current, previous);
-		c->getTask()->setRecordedVelocity(r.vector.p);
-		printf("current = %i, previous = %i\n", current.size(), previous.size());
-		printf("velocity = (%f, %f), angle = %f pi, r = %f\n", r.vector.p.x, r.vector.p.y, atan(r.vector.p.y/r.vector.p.x)/M_PI, r.vector.p.Length());
-		
-		previous = current;
-		//current.clear();
-		c->applyController(1, *c->getTask());
-
-	}
-
-	char * getFolder(){
-		return folder;
-	}
-
-
-};
-
-class Callback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
-    int iteration=0;
-    int confIteration=0;
-    Configurator * c;
-    float L,R;
-
-public:
-
-Callback(Configurator *conf): c(conf){
-}
-void step( AlphaBot &motors){
-	L= (c->getTask()->getAction().getLWheelSpeed());
-	R = (c->getTask()->getAction().getRWheelSpeed());
-    motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
-    motors.setLeftWheelSpeed(L);
-	printf("step: R=%f\tL=%f, conf iteration = %i\n", R, L, c->getIteration());
-    iteration++;
-}
-};
-
-
+        FILE * dump=fopen(dumpname, "a+");
+        fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
+            optic_flow[0], optic_flow[1], optic_flow_filtered[0], optic_flow_filtered[1], signal, filtered_signal);
+        fclose(dump);
+    }
 
 int main(int argc, char** argv) {
-	//world setup with environment class
-	A1Lidar lidar;
-	AlphaBot motors;
-    Task desiredTask;
-    Configurator configurator(desiredTask);
-	LidarInterface dataInterface(&configurator);
-	Callback cb(&configurator);
-	lidar.registerInterface(&dataInterface);
+    char a=0;
+    if (argc>1){
+        a=*argv[1];
+    }
+	AlphaBot motors;	
+    MotorCallback cb;
+    cb.setA(a);
+    CameraCallback cameraCB(&cb);
+    sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
+    FILE * dump=fopen(cameraCB.dumpname, "w+");
+    fclose(dump);
+    Libcam2OpenCV camera;
+    camera.registerCallback(&cameraCB);
+    Libcam2OpenCVSettings settings;
+    settings.framerate = 30;
 	motors.registerStepCallback(&cb);
-	lidar.start();
+    camera.start(settings);
 	motors.start();
-
-	do {
-	} while (!getchar());
-
-
+	// do {
+    //    // if (getchar()){
+    //         //char a=getchar();
+            
+    //    // } 
+	// } while(true);
+    getchar();
 	motors.stop();
-	lidar.stop();
+    camera.stop();
 
 }
-	
-	
