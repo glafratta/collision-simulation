@@ -76,7 +76,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         cv::Vec2d optic_flow=imgProc.avgOpticFlow(frame);
 		cb->t.correct.update(optic_flow[0]); //for now just going straight
         FILE * dump=fopen(dumpname, "a+");
-        fprintf(dump, "%f\t%f\n", optic_flow.x, optic_flow.y);
+        fprintf(dump, "%f\t%f\n", optic_flow[0], optic_flow[1]);
         fclose(dump);
     }
 private:
