@@ -1,12 +1,12 @@
 #include "iir_test_headers.h"
 
 
-void::MotorCallback::step( AlphaBot &motors){
+void MotorCallback::step( AlphaBot &motors){
     m_step--;
     if (m_step==0){
         setA();
     }
-	Task::Action action=cb->t.getAction();
+	Task::Action action=t.getAction();
 	t.correct(action, MOTOR_CALLBACK);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
@@ -25,7 +25,7 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
 		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
         	Task::Action action= t.getAction();
-			cb->t.correct.errorCalc(action-optic_flow_filtered[0])
+			cb->t.correct.errorCalc(action, optic_flow_filtered[0])
 			cb->t.correct.update(); //for now just going straight
 		}
         FILE * dump=fopen(dumpname, "a+");

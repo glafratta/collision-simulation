@@ -46,8 +46,7 @@ int main(int argc, char** argv){
 	if (!e.second){
         printf("what??\n");
     }
-    sk.second.it_observed=2;
-    gt::set(e.first, sk, conf.transitionSystem, v1==conf.currentVertex, conf.errorMap, conf.getIteration());
+    gt::set(e.first, sk, conf.transitionSystem, v1==conf.currentVertex, conf.errorMap, 2);
 	gt::adjustProbability(conf.transitionSystem, e.first);
     conf.Spawner(ci.data, ci.data2fp);
     printGraph(conf.transitionSystem);
