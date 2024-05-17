@@ -6,7 +6,8 @@ void::MotorCallback::step( AlphaBot &motors){
     if (m_step==0){
         setA();
     }
-	t.correct(t.getAction(), MOTOR_CALLBACK);
+	Task::Action action=t.getAction();
+	t.correct(action, MOTOR_CALLBACK);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
     printf("char =%c, step=%i\n", a, m_step);
