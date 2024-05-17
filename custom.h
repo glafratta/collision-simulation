@@ -141,8 +141,8 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         //c->ci->visual_field=frame;
 		// std::vector <cv::Point2f> corners=c->imgProc.get_corners();
 		// cv::Mat previousFrame = c->imgProc.get_previous();
-		b2Vec2 optic_flow=c->imgProc.opticFlow(frame);
-		c->getTask()->correct.update(optic_flow.x); //for now just going straight
+		cv::Vec2d optic_flow=c->imgProc.opticFlow(frame);
+		c->getTask()->correct.update(optic_flow[0]); //for now just going straight
     }
     private:
     Configurator * c;
