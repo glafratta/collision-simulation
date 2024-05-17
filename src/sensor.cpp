@@ -234,8 +234,8 @@ cv::Mat ImgProc::cropRight(cv::Mat mat){
         return result;
 }
 
-b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
-		b2Vec2 optic_flow;
+cv::Vec2d ImgProc::opticFlow(const cv::Mat& frame){
+		cv::Vec2d  optic_flow;
 		cv::Mat frame_grey;
         std::vector <cv::Point2f> new_corners;
         std::vector <uchar> status;
@@ -275,8 +275,8 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
            	printf("getting optic flow\n");
-			optic_flow.x=corners[0].x-new_corners[0].x;
-            optic_flow.y=corners[0].y-new_corners[0].y;
+			setX(optic_flow,corners[0].x-new_corners[0].x);
+            setY(optic_flow, corners[0].y-new_corners[0].y);
 			//printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 
         }
@@ -287,8 +287,8 @@ b2Vec2 ImgProc::opticFlow(const cv::Mat& frame){
 
 }
 
-b2Vec2 ImgProc::avgOpticFlow(const cv::Mat& frame){
-		b2Vec2 optic_flow;
+cv::Vec2d  ImgProc::avgOpticFlow(const cv::Mat& frame){
+		cv::Vec2d  optic_flow;
 		cv::Mat frame_grey;
         std::vector <cv::Point2f> new_corners;
         std::vector <uchar> status;
@@ -315,14 +315,14 @@ b2Vec2 ImgProc::avgOpticFlow(const cv::Mat& frame){
             if (status[i]==1){
                 good_corners.push_back(corners[i]); //og corners
 				if (new_corners.size()==corners.size()){
-					optic_flow.x=corners[i].x-new_corners[i].x;
-					optic_flow.y=corners[i].y-new_corners[i].y;					
+					setX(optic_flow, corners[i].x-new_corners[i].x);
+					setY(optic_flow,corners[i].y-new_corners[i].y);					
 				}
 
             }
         }
-		optic_flow.x/=good_corners.size();
-		optic_flow.y/=good_corners.size();
+		setX(optic_flow, x(optic_flow)/good_corners.size());
+		setY(optic_flow, y(optic_flow)/good_corners.size());
 		corners=good_corners;
 		previous=frame_grey.clone();
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);

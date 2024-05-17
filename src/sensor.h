@@ -7,6 +7,21 @@
 class ConfiguratorInterface;
 class Configurator;
 
+double x(cv::Vec2d v){
+	return v[0];
+}
+
+double y(cv::Vec2d v){
+	return v[1];
+}
+
+void setX(cv::Vec2d& v, float x){
+	v[0]=x;
+}
+
+void setY(cv::Vec2d& v, float y){
+	v[1]=y;
+}
 
 class Pointf: public cv::Point2f{
 	public: 
@@ -118,9 +133,9 @@ class ImgProc{
 
     cv::Mat cropRight(cv::Mat);
 
-    cv::Point2d  opticFlow(const cv::Mat&);
+    cv::Vec2d  opticFlow(const cv::Mat&);
 
-	cv::Point2d avgOpticFlow(const cv::Mat&);
+	cv::Vec2d avgOpticFlow(const cv::Mat&);
 
 	std::vector <cv::Point2f> get_corners();
 

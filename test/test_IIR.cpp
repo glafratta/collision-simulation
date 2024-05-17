@@ -100,17 +100,17 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
 		printf("has frame\n");
-        cv::Point2d  optic_flow=imgProc.avgOpticFlow(frame);
-        cv::Point2d  optic_flow_filtered=optic_flow;
+        cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
+        cv::Vec2d  optic_flow_filtered=optic_flow;
         printf("optic flow = %d, %d\n", optic_flow.x, optic_flow.y);
-        signal= signal+optic_flow.x;
-        optic_flow_filtered.x=(low_pass.filter(double(optic_flow.x)));
-        optic_flow_filtered.x=(band_stop.filter(optic_flow_filtered.x));
+        signal= signal+x(optic_flow);
+        setX(optic_flow_filtered,low_pass.filter((optic_flow.x)));
+        setX(optic_flow_filtered, band_stop.filter(optic_flow_filtered.x));
 		//cb->t.correct.update(optic_flow.x); //for now just going straight
         filtered_signal=filtered_signal+optic_flow_filtered.x;
         FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%d\t%d\t%d\t%d\t%d\t%d\n", 
-            optic_flow.x, optic_flow.y, optic_flow_filtered.x, optic_flow_filtered.y, signal, filtered_signal);
+            x(optic_flow), y(optic_flow), x(optic_flow_filtered), y(optic_flow_filtered), signal, filtered_signal);
         fclose(dump);
     }
 private:
