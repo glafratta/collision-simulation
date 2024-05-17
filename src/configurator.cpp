@@ -460,7 +460,8 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		toReassign.push_back(e);
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap, iteration);
 		for (edgeDescriptor r:toReassign){ //reassigning edges
-			gt::add_edge(r.m_source, pair.second, g);
+			auto new_edge= gt::add_edge(r.m_source, pair.second, g);
+			g[new_edge.first].it_observed=iteration;
 		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);
