@@ -35,6 +35,8 @@ int main(int argc, char** argv){
     float y=conf.transitionSystem[v1_old].endPose.p.y;
     b2Vec2 d_pos(x, y);
     sr.collision= Disturbance(AVOID, d_pos);
+    sr.collision.bodyFeatures().halfWidth=0.05;
+    sr.collision.bodyFeatures().halfWidth= 0.05;
     sr.step=24;
     sr.endPose= b2Transform(b2Vec2(conf.transitionSystem[26].disturbance.pose().p.x,
         conf.transitionSystem[v1_old].endPose.p.y+.05), 
