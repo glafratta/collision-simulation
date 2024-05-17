@@ -275,8 +275,8 @@ cv::Vec2d ImgProc::opticFlow(const cv::Mat& frame){
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);
         if (!corners.empty()&!new_corners.empty()){ //corners are ordered from strongest to weakest
            	printf("getting optic flow\n");
-			setX(optic_flow,corners[0].x-new_corners[0].x);
-            setY(optic_flow, corners[0].y-new_corners[0].y);
+			optic_flow[0]=corners[0].x-new_corners[0].x;
+        	optic_flow[1]= corners[0].y-new_corners[0].y;
 			//printf("optic flow = %f, %f\n", optic_flow.x, optic_flow.y);
 
         }
@@ -315,14 +315,14 @@ cv::Vec2d  ImgProc::avgOpticFlow(const cv::Mat& frame){
             if (status[i]==1){
                 good_corners.push_back(corners[i]); //og corners
 				if (new_corners.size()==corners.size()){
-					setX(optic_flow, corners[i].x-new_corners[i].x);
-					setY(optic_flow,corners[i].y-new_corners[i].y);					
+					optic_flow[0]=corners[i].x-new_corners[i].x;
+					optic_flow[1]=corners[i].y-new_corners[i].y;					
 				}
 
             }
         }
-		setX(optic_flow, x(optic_flow)/good_corners.size());
-		setY(optic_flow, y(optic_flow)/good_corners.size());
+		optic_flow[0]/=good_corners.size();
+		optic_flow[1]/=good_corners.size();
 		corners=good_corners;
 		previous=frame_grey.clone();
         printf("good corners = %i, new corners %i\n", good_corners.size(),i);

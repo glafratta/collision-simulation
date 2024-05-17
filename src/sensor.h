@@ -4,26 +4,29 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/tracking.hpp>
 
+
+// double get_x(cv::Vec2d v){
+// 	return v[0];
+// }
+
+// double get_y(cv::Vec2d v){
+// 	return v[1];
+// }
+
+// template <typename tn>
+// void set_x(cv::Vec2d& v, tn x){
+// 	v[0]=double(x);
+// }
+
+// template <typename tn>
+// void set_y(cv::Vec2d& v, tn y){
+// 	v[1]=double(y);
+// }
+
 class ConfiguratorInterface;
 class Configurator;
 
-double x(cv::Vec2d v){
-	return v[0];
-}
 
-double y(cv::Vec2d v){
-	return v[1];
-}
-
-template <typename tn>
-void setX(cv::Vec2d& v, tn x){
-	v[0]=double(x);
-}
-
-template <typename tn>
-void setY(cv::Vec2d& v, tn y){
-	v[1]=double(y);
-}
 
 class Pointf: public cv::Point2f{
 	public: 

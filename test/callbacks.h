@@ -1,3 +1,6 @@
+#ifndef CALLBACKS_H
+#define CALLBACKS_H
+
 #include <thread>
 #include "configurator.h"
 #include <unistd.h>
@@ -217,3 +220,5 @@ float Configurator::taskRotationError(){
     //errorMap.insert_or_assign(g[currentVertex].ID, exErr);
     return theta_error;
 }
+
+#endif
