@@ -37,9 +37,13 @@ int main(int argc, char** argv) {
     if (argc>1){
         a=*argv[1];
     }
+
 	AlphaBot motors;	
     MotorCallback cb;
     cb.setA(a);
+	if (argc>2){
+		cb.setK(atof(argv[2]));
+	}
     CameraCallback cameraCB(&cb);
     sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
     FILE * dump=fopen(cameraCB.dumpname, "w+");

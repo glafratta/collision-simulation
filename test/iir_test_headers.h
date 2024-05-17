@@ -25,6 +25,10 @@ unsigned int getStep(){
     return m_step;
 }
 
+void setK(float f){
+    t.kp=f;
+}
+
 void setA(char _a='0'){
     a=_a;
     if (a== 'l'){
