@@ -26,7 +26,7 @@ unsigned int getStep(){
 }
 
 void setK(float f){
-    t.kp=f;
+    t.correct.kp=f;
 }
 
 void setA(char _a='0'){

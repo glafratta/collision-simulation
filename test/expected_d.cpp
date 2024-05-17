@@ -40,6 +40,7 @@ int main(int argc, char** argv){
         b2Rot(conf.transitionSystem[30].endPose.q.GetAngle()));
     gt::fill(sr, &sk.first, &sk.second);
     sk.first.direction=DEFAULT;
+    sk.second.it_observed=conf.getIteration()+1;
     bool topDown=1;
     std::pair<edgeDescriptor, bool> e= conf.addVertex(v0, v1, conf.transitionSystem, Disturbance(), sk.second, topDown);
 	if (!e.second){
