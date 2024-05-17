@@ -35,17 +35,18 @@ int main(int argc, char** argv){
     float y=conf.transitionSystem[v1_old].endPose.p.y;
     b2Vec2 d_pos(x, y);
     sr.collision= Disturbance(AVOID, d_pos);
+    sr.step=24;
     sr.endPose= b2Transform(b2Vec2(conf.transitionSystem[26].disturbance.pose().p.x,
         conf.transitionSystem[v1_old].endPose.p.y+.05), 
         b2Rot(conf.transitionSystem[30].endPose.q.GetAngle()));
     gt::fill(sr, &sk.first, &sk.second);
     sk.first.direction=DEFAULT;
-    sk.second.it_observed=2;
     bool topDown=1;
     std::pair<edgeDescriptor, bool> e= conf.addVertex(v0, v1, conf.transitionSystem, Disturbance(), sk.second, topDown);
 	if (!e.second){
         printf("what??\n");
     }
+    sk.second.it_observed=2;
     gt::set(e.first, sk, conf.transitionSystem, v1==conf.currentVertex, conf.errorMap, conf.getIteration());
 	gt::adjustProbability(conf.transitionSystem, e.first);
     conf.Spawner(ci.data, ci.data2fp);

@@ -6,7 +6,7 @@ void::MotorCallback::step( AlphaBot &motors){
     if (m_step==0){
         setA();
     }
-	Task::Action action=t.getAction();
+	Task::Action action=cb->t.getAction();
 	t.correct(action, MOTOR_CALLBACK);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
