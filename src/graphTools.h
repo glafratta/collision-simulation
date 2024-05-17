@@ -34,7 +34,7 @@ struct Edge{
 	Edge()=default;
 
 	float weighted_probability(int it){
-		return probability*float(it_observed/it);
+		return probability*float(it_observed)/float(it);
 	}
 };
 
