@@ -7,7 +7,6 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 class Task{
 public:
     friend class Configurator;
-    friend class Correct;
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
@@ -236,6 +235,7 @@ struct Correct{
 
 }correct;
 
+friend Correct;    
 
 };
 
