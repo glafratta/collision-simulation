@@ -107,7 +107,7 @@ void Task::Correct::operator()(Action & action){
 			action.R -= p_correction+ i_correction; 
 		 	action.L+= p_correction+ i_correction;
 		// }
-		if (p1>1.0){
+		if (action.L>1.0){
 		action.L=1.0;
 		}
 		if (action.R>1.0){
