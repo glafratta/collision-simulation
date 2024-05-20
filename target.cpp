@@ -26,13 +26,13 @@ int main(int argc, char** argv) {
     settings.framerate = FPS;
 	motors.registerStepCallback(&cb);
 	configurator.start();
-	lidar.start();
+	//lidar.start();
     camera.start(settings);
-	//motors.start();
+	motors.start();
 	getchar();
 	configurator.stop();
-	//motors.stop();
-	lidar.stop();
+	motors.stop();
+	//lidar.stop();
 	camera.stop();
 }
 	
