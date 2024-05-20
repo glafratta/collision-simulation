@@ -15,10 +15,10 @@ void MotorCallback::step( AlphaBot &motors){
 }
 
 void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
-		printf("has frame\n");
+		//printf("has frame\n");
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
-        printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
+        //printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
         signal= signal+optic_flow[0];
         optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
         optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
@@ -45,9 +45,11 @@ int main(int argc, char** argv) {
 	AlphaBot motors;	
     MotorCallback cb;
     cb.setA(a);
-	if (argc>2){
-		cb.setK(atof(argv[2]));
+	if (argc>3){
+        char k=*argv[3];
+		cb.setK(atof(argv[2]), k);
 	}
+    if argc>
     CameraCallback cameraCB(&cb);
     sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
     FILE * dump=fopen(cameraCB.dumpname, "w+");

@@ -178,7 +178,8 @@ struct Correct{
 
     float update(float);
 
-    float kp=0.08;
+    float kp=0.08;    
+    float kd=1, ki=1;
     private:
 
 
@@ -191,7 +192,7 @@ struct Correct{
     }
     int bufferSize=3;
     std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
-    float kd=1, ki=1;
+
     float i=0, d=0;
     float tolerance_upper=0.01, tolerance_lower=-0.01;
     
