@@ -255,7 +255,7 @@ ExecutionError trackTaskExecution(Task &);
 
 b2Transform assignDeltaPose(Task::Action, float);
 
-void changeTask(bool, int&);
+std::vector <vertexDescriptor> changeTask(bool, int&, std::vector <vertexDescriptor>);
 
 int motorStep(Task::Action a);
 

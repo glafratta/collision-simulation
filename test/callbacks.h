@@ -135,7 +135,7 @@ public:
             printf("goal reached\n");
 	    }
 	//c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction(), error);
-	    c->changeTask(c->getTask()->change,  ogStep);
+	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
         if (c->debugOn){
             printf("current vertex= %i, graph size= %i\n", c->currentVertex, c->transitionSystem.m_vertices.size());
         }

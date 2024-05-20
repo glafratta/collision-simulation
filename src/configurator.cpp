@@ -1389,18 +1389,18 @@ int Configurator::motorStep(Task::Action a){
 	    return abs(result);
     }
 
-void Configurator::changeTask(bool b, int &ogStep){
+std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
 	if (!b){
-		return;
+		return pv;
 	}
 	if (planning){
-		if (planVertices.empty()){
+		if (pv.empty()){
 			currentVertex=movingVertex;
-			return;
+			return pv;
 		}
 		if (currentVertex!=movingVertex){
-			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, planVertices[0], transitionSystem);
-			currentVertex= planVertices[0];
+			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
+			currentVertex= pv[0];
 			currentEdge=ep.first;
 		}
 		// if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
@@ -1408,8 +1408,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		// }
 		// transitionSystem[currentEdge.m_target].direction=direction;
 		boost::clear_vertex(movingVertex, transitionSystem);
-
-		planVertices.erase(planVertices.begin());
+		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentVertex].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
 	}
@@ -1428,6 +1427,7 @@ void Configurator::changeTask(bool b, int &ogStep){
 		printf("changed to reactive\n");
 	}
 	ogStep = currentTask.motorStep;
+	return pv;
 }
 
 void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float error){
