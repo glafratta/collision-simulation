@@ -16,6 +16,7 @@ void MotorCallback::step( AlphaBot &motors){
 
 void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
 		//printf("has frame\n");
+        float error=0;
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         //printf("optic flow = %f, %f\n", optic_flow[0], optic_flow[1]);
@@ -26,13 +27,13 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
 		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
         	Task::Action action= cb->t.getAction();
-			float error= cb->t.correct.errorCalc(action, double(optic_flow_filtered[0]));
+			error= cb->t.correct.errorCalc(action, double(optic_flow_filtered[0]));
 			printf("error=%f\n", error);
-            cb->t.correct.update(error); //for now just going straight
 		}
+        cb->t.correct.update(error); //for now just going straight
         FILE * dump=fopen(dumpname, "a+");
-        fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
-            optic_flow[0], optic_flow[1], optic_flow_filtered[0], optic_flow_filtered[1], signal, filtered_signal);
+        fprintf(dump, "%f\t%f\t%f\t%f\n", 
+            error, cb->t.correct.getError(), cb->t.correct.get_i(), cb->t.correct.get_d());
         fclose(dump);
     }
 
@@ -50,7 +51,7 @@ int main(int argc, char** argv) {
 		cb.setK(atof(argv[2]), k);
 	}
     CameraCallback cameraCB(&cb);
-    sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
+    sprintf(cameraCB.dumpname, "errors_p%f_i%f_d%f.txt", cb.t.correct.Kp(), cb.t.correct.Ki(), cb.t.correct.Kd());
     FILE * dump=fopen(cameraCB.dumpname, "w+");
     fclose(dump);
     Libcam2OpenCV camera;

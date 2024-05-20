@@ -94,17 +94,17 @@ void Task::Correct::operator()(Action & action){
 		printf("returning\n");
 		return;
 	}
-	printf("error buffer sum = %f\n", p1);
+	printf("error buffer sum = %f, i=%f\n", p1, get_i());
 	if (fabs(get_i())>tolerance){
 		float correction= ((p1/bufferSize)*kp)/2; //do not increase one wheel speed too much
-		if (p1>0){	//too much to the left
-			action.L += correction;
-			action.R-=correction;  
-		}
-		else if (p1<0){ //too much to the R
+		// if (p1>0){	//too much to the left
+		// 	action.L += correction;
+		// 	action.R-=correction;  
+		// }
+		// else if (p1<0){ //too much to the R
 			action.R -= correction; 
-			action.L+= correction;
-		}
+		 	action.L+= correction;
+		// }
 		if (p1>1.0){
 		action.L=1.0;
 		}

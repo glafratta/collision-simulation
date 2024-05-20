@@ -172,8 +172,23 @@ struct Correct{
         return p();
     }
 
+    float Ki(){
+        return ki;
+    }
+
+    float Kp(){
+        return kp;
+    }
+    float Kd(){
+        return kd;
+    }
+
     float get_i(){
         return i;
+    }
+
+    float get_d(){
+        return d;
     }
 
     float update(float);
