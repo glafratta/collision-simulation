@@ -360,8 +360,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 			float _simulationStep=simulationStep;
 			adjustStepDistance(v0, g, &t, _simulationStep);
-			Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
-			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction, expectedD); //was g[v].endPose
+			//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
+			worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
 			setStateLabel(sk.first, v0, t.direction); //new
 			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 			gt::fill(sim, &sk.first, &sk.second); //find simulation result

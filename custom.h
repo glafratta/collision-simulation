@@ -96,16 +96,19 @@ void step( AlphaBot &motors){
  	   motors.setLeftWheelSpeed(0);		
 	}
     ExecutionError ee =c->trackTaskExecution(*c->getTask());
+	//printf("tracked\n");
     if (c->getTask()->motorStep>0){
         //Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(c->getTask()->action);
     }
+	//printf("corrected\n");
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
 		c->controlGoal.change =1;
 	}
-	printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y);
+	//printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y);
 	c->changeTask(c->getTask()->change,  ogStep);
+	//printf("changed")
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("og step: %i ,R=%f\tL=%f\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed());
