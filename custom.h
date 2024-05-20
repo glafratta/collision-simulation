@@ -116,7 +116,7 @@ void step( AlphaBot &motors){
     ExecutionError ee =c->trackTaskExecution(*c->getTask());
     if (c->getTask()->motorStep>0){
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action, MOTOR_CALLBACK);
+        c->getTask()->correct(action);
     }
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
