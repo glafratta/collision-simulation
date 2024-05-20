@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
-//const float LEFT_WHEEL_WEIGHT =.9;
+
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
     std::vector <BodyFeatures> result;
@@ -76,12 +76,12 @@ public:
 };
 
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
-    Configurator * c;
     float L=0;
 	float R=0;
 
 public:
 int ogStep=0;
+Configurator * c;
 
 MotorCallback(Configurator *conf): c(conf){
 }
@@ -135,7 +135,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         filtered_signal=filtered_signal+optic_flow_filtered[0];
 		if (cb->c->getTask()->motorStep!=cb->ogStep & cb->c->getTask()->motorStep!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
-        	Task::Action action= cb->t.getAction();
+        	Task::Action action= cb->c->getTask().getAction();
 			error= cb->t.correct.errorCalc(action, double(optic_flow_filtered[0]));
 		}
         cb->c->getTask()->correct.update(error); //for now just going straight
