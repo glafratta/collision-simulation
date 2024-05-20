@@ -15,21 +15,26 @@ int main(int argc, char** argv) {
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
 	}
-	printf("CHASING A TARGET\n");
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
-	Callback cb(&configurator);
+	MotorCallback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
+	CameraCallback cameraCB(&cb);
+	Libcam2OpenCV camera;
+    camera.registerCallback(&cameraCB);
+    Libcam2OpenCVSettings settings;
+    settings.framerate = FPS;
 	motors.registerStepCallback(&cb);
 	configurator.start();
 	lidar.start();
+    camera.start(settings);
 	motors.start();
 	do {
 	} while (!getchar());
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
-
+	camera.stop();
 }
 	
 	
