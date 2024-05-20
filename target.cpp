@@ -25,14 +25,14 @@ int main(int argc, char** argv) {
     Libcam2OpenCVSettings settings;
     settings.framerate = FPS;
 	motors.registerStepCallback(&cb);
-	configurator.start();
-	//lidar.start();
+	//configurator.start();
+	lidar.start();
     camera.start(settings);
 	motors.start();
 	getchar();
-	configurator.stop();
+	//configurator.stop();
 	motors.stop();
-	//lidar.stop();
+	lidar.stop();
 	camera.stop();
 }
 	
