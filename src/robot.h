@@ -34,6 +34,10 @@ const float FORGET_THRESHOLD=0.05;
 const int POS_IT=2;
 const int VEL_IT=6;
 const int FPS=30;
+const int order=3;
+const int DC=0; //HZ
+const int cutoff_frequency=4; //HZ
+const int band_width=0.5;
 
 class Robot {
 private: 

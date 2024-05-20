@@ -2,6 +2,7 @@
 #include "libcam2opencv.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
+#include "Iir.h"
 #include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,7 +83,7 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
 public:
 int ogStep=0;
 
-Callback(Configurator *conf): c(conf){
+MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
 	printf("g size=%i, current vertex=%i\n", c->transitionSystem.m_vertices.size(), c->currentVertex);
@@ -132,15 +133,12 @@ struct CameraCallback: Libcam2OpenCV::Callback {
         optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
         optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
         filtered_signal=filtered_signal+optic_flow_filtered[0];
-		if (cb->t.motorStep!=cb->getStep() & cb->getStep()!=0){ //, in the future t.motorStepdiscard will be t.change
+		if (cb->c->getTask()->motorStep!=cb->ogStep & cb->c->getTask()->motorStep!=0){ //, in the future t.motorStepdiscard will be t.change
 																//signal while the robot isn' moving
         	Task::Action action= cb->t.getAction();
 			error= cb->t.correct.errorCalc(action, double(optic_flow_filtered[0]));
 		}
-        if (cb->getStep()<=0){
-            return;
-        }
-        cb->t.correct.update(error); //for now just going straight
+        cb->c->getTask()->correct.update(error); //for now just going straight
     }
 private:
 ImgProc imgProc;
