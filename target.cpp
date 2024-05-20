@@ -27,14 +27,14 @@ int main(int argc, char** argv) {
 	motors.registerStepCallback(&cb);
 	configurator.start();
 	lidar.start();
-    camera.start(settings);
+   // camera.start(settings);
 	motors.start();
 	do {
 	} while (!getchar());
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
-	camera.stop();
+	//camera.stop();
 }
 	
 	
