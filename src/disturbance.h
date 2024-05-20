@@ -20,6 +20,14 @@ class BodyFeatures{
 
     BodyFeatures(b2Transform _pose):pose(_pose){}
 
+    void setHalfLength(float f){
+        halfLength=f;
+    }
+
+    void setHalfWidth(float f){
+        halfWidth=f;
+    }
+
 
 
 };

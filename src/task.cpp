@@ -93,6 +93,7 @@ void Task::Correct::operator()(Action & action, float timeElapsed){
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		return;
 	}
+	printf("error buffer sum = %f\n", p1);
 	if (fabs(p1)>tolerance){
 		float correction= (p1*kp)/2; //do not increase one wheel speed too much
 		if (p1>0){	//too much to the left
