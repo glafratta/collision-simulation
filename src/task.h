@@ -7,6 +7,7 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 class Task{
 public:
     friend class Configurator;
+    friend class Correct;
     char planFile[250]; //for debug
     b2Transform start;
     bool change =0;
@@ -201,9 +202,10 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
 struct Correct{
+    
     Correct(){}
 
-    void operator()( Action&, float timeElapsed=0.1);
+    void operator()( Action&);
 
     float errorCalc(Action, double);
 
