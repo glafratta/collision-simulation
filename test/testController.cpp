@@ -31,6 +31,9 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
 			printf("error=%f\n", error);
 		}
         cb->t.correct.update(error); //for now just going straight
+        if (cb->getStep()<=0){
+            return;
+        }
         FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%f\t%f\t%f\t%f\n", 
             error, cb->t.correct.getError(), cb->t.correct.get_i(), cb->t.correct.get_d());
@@ -51,7 +54,7 @@ int main(int argc, char** argv) {
 		cb.setK(atof(argv[2]), k);
 	}
     CameraCallback cameraCB(&cb);
-    sprintf(cameraCB.dumpname, "errors_p%f_i%f_d%f.txt", cb.t.correct.Kp(), cb.t.correct.Ki(), cb.t.correct.Kd());
+    sprintf(cameraCB.dumpname, "errors_p%.3f_i%.3f_d%.3f.txt", cb.t.correct.Kp(), cb.t.correct.Ki(), cb.t.correct.Kd());
     FILE * dump=fopen(cameraCB.dumpname, "w+");
     fclose(dump);
     Libcam2OpenCV camera;
