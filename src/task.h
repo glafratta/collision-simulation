@@ -192,10 +192,8 @@ struct Correct{
 
 public:
 friend Task::Correct;    
-
-private:
 Action action;
-public:
+
 Disturbance disturbance;
 
 Task::Action getAction(){
