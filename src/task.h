@@ -235,7 +235,7 @@ struct Correct{
 
 }correct;
 
-friend Correct;    
+friend Task::Correct;    
 
 };
 
