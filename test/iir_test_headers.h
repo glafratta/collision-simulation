@@ -39,32 +39,7 @@ void setK(float f, char k){
    
 }
 
-void setA(char _a='0'){
-    a=_a;
-    if (a== 'l'){
-        t=Task(LEFT);
-        m_step=15;
-        n_l++;
-    }
-    else if (a=='r'){
-        t=Task(RIGHT);
-        m_step=15;
-        n_r++;
-    }
-    else if (a=='s'){
-        t=Task(DEFAULT);
-        m_step=100;
-        n_s++;
-    }
-    else{
-        t=Task(STOP);
-    }
-  // 
-//     snprintf(dumpname, "%c_%i.txt", getID(), getCount());
-//    dumpname =std::string(tmp);
-//     FILE * dump=fopen(dumpname, "w+");
-//     fclose(dump);
-}
+void setA(char a='0');
 
 int getCount(){
     if (a=='s'){

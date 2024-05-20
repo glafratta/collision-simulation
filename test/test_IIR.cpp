@@ -9,6 +9,28 @@ void MotorCallback::step( AlphaBot &motors){
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
     printf("char =%c, step=%i\n", a, m_step);
 }
+void MotorCallback::setA(char _a){
+    a=_a;
+    if (a== 'l'){
+        t=Task(LEFT);
+        m_step=15;
+        n_l++;
+    }
+    else if (a=='r'){
+        t=Task(RIGHT);
+        m_step=15;
+        n_r++;
+    }
+    else if (a=='s'){
+        t=Task(DEFAULT);
+        m_step=100;
+        n_s++;
+    }
+    else{
+        t=Task(STOP);
+        
+    }
+}
 
 void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
 		printf("has frame\n");
