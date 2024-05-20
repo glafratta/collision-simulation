@@ -192,6 +192,8 @@ struct Correct{
 
 Action action;
 public:
+friend Task::Correct;    
+
 Disturbance disturbance;
 
 Task::Action getAction(){
@@ -236,7 +238,6 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
-friend Task::Correct;    
 
 };
 
