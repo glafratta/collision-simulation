@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
         char k=*argv[3];
 		cb.setK(atof(argv[2]), k);
 	}
-    if argc>
     CameraCallback cameraCB(&cb);
     sprintf(cameraCB.dumpname, "avg%s_%i_iir.txt", cb.getID(), cb.getCount());
     FILE * dump=fopen(cameraCB.dumpname, "w+");
