@@ -76,7 +76,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			currentVertex=boost::add_vertex(transitionSystem);
 			currentTask.action.setVelocities(0,0);
 		}
-		movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		//movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
 		transitionSystem[movingVertex].disturbance.invalidate();
 		if (debugOn){
@@ -1402,13 +1402,13 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
-			movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		}
 		// if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
 		// 	direction= transitionSystem[edge.first.m_target].direction;
 		// }
 		// transitionSystem[currentEdge.m_target].direction=direction;
 		boost::clear_vertex(movingVertex, transitionSystem);
+		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentVertex].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
