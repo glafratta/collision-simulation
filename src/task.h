@@ -153,7 +153,43 @@ class Listener : public b2ContactListener {
 		}
         
 	};
+
 private:
+struct Correct{
+    
+    Correct(){}
+
+    void operator()( Action&);
+
+    float errorCalc(Action, double);
+
+    float getError(){
+        return p();
+    }
+
+    float get_i(){
+        return i;
+    }
+
+    float update(float);
+
+    float kp=0.08;
+    private:
+
+
+    float p(){
+        float sum=0;
+        for (int j=0;j<p_buffer.size(); j++){
+            sum+=p_buffer[j];
+        }
+        return sum;
+    }
+    std::vector <float>p_buffer=std::vector <float>(3,0);
+    float kd=1, ki=1;
+    float i=0, d=0;
+
+}correct;
+
 Action action;
 public:
 Disturbance disturbance;
@@ -199,41 +235,6 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
 }
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
-
-struct Correct{
-    
-    Correct(){}
-
-    void operator()( Action&);
-
-    float errorCalc(Action, double);
-
-    float getError(){
-        return p();
-    }
-
-    float get_i(){
-        return i;
-    }
-
-    float update(float);
-
-    float kp=0.08;
-    private:
-
-
-    float p(){
-        float sum=0;
-        for (int j=0;j<p_buffer.size(); j++){
-            sum+=p_buffer[j];
-        }
-        return sum;
-    }
-    std::vector <float>p_buffer=std::vector <float>(3,0);
-    float kd=1, ki=1;
-    float i=0, d=0;
-
-}correct;
 
 friend Task::Correct;    
 
