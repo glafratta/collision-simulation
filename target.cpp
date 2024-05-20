@@ -29,8 +29,9 @@ int main(int argc, char** argv) {
 	lidar.start();
    // camera.start(settings);
 	motors.start();
-	do {
-	} while (!getchar());
+	// do {
+	// } while (!getchar());
+	getchar();
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
