@@ -100,6 +100,11 @@ void setVelocities(float l, float r){
     return omega;
     }
 
+    float getOmega(float l, float r){
+        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION;
+        return result;
+    }
+
     void setOmega(float o){
         omega =o;
     }
@@ -184,9 +189,12 @@ struct Correct{
         }
         return sum;
     }
-    std::vector <float>p_buffer=std::vector <float>(3,0);
+    int bufferSize=3;
+    std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
     float kd=1, ki=1;
     float i=0, d=0;
+    float tolerance_upper=0.01, tolerance_lower=-0.01;
+    
 
 }correct;
 
