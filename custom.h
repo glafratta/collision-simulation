@@ -126,6 +126,15 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 
 
 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
+		if (cb==NULL){
+			printf("null cb\n");
+		}
+		if (cb->c==NULL){
+			printf("null c\n");
+		}
+		if (cb->c->getTask()==NULL){
+			printf("null task\n");
+		}
         float error=0;
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
