@@ -189,11 +189,13 @@ struct Correct{
     float i=0, d=0;
 
 }correct;
-private:
-Action action;
+
 public:
 friend Task::Correct;    
 
+private:
+Action action;
+public:
 Disturbance disturbance;
 
 Task::Action getAction(){
