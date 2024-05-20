@@ -1402,6 +1402,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
+			movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		}
 		// if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
 		// 	direction= transitionSystem[edge.first.m_target].direction;
