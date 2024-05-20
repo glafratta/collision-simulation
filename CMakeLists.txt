@@ -37,7 +37,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   #target_include_directories(reactive ${LIBCAMERA_INCLUDE_DIRS})
   #target_include_directories(reactive_target ${LIBCAMERA_INCLUDE_DIRS})
   #target_link_libraries(reactive ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
-  target_link_libraries(target ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
+  target_link_libraries(target ${OpenCV_LIBS} iir::iir_static box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
   #target_link_libraries(targetless ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
   #target_link_libraries(targetless_benchmark ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
   #target_link_libraries(target_benchmark ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
