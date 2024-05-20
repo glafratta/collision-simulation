@@ -10,6 +10,7 @@ void MotorCallback::step( AlphaBot &motors){
 	t.correct(action, MOTOR_CALLBACK);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
+    printf("L=%f, R=%f\n", t.getAction().getLWheelSpeed() ,t.getAction().getRWheelSpeed())
     printf("char =%c, step=%i\n", a, m_step);
 }
 
@@ -26,7 +27,8 @@ void CameraCallback::hasFrame(const cv::Mat &frame, const libcamera::ControlList
 																//signal while the robot isn' moving
         	Task::Action action= cb->t.getAction();
 			float error= cb->t.correct.errorCalc(action, double(optic_flow_filtered[0]));
-			cb->t.correct.update(error); //for now just going straight
+			printf("error=%f\n", error);
+            cb->t.correct.update(error); //for now just going straight
 		}
         FILE * dump=fopen(dumpname, "a+");
         fprintf(dump, "%f\t%f\t%f\t%f\t%f\t%f\n", 
