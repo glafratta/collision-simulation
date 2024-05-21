@@ -8,7 +8,7 @@ void MotorCallback::step( AlphaBot &motors){
         return;
     }
 	//Task::Action action=t.getAction();
-	t.correct(t.action, m_step);
+	t.correct(t.action);
     motors.setRightWheelSpeed(t.getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(t.getAction().getLWheelSpeed());
     printf("L=%f, R=%f\n", t.getAction().getLWheelSpeed() ,t.getAction().getRWheelSpeed());

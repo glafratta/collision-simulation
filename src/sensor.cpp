@@ -287,7 +287,7 @@ cv::Vec2d ImgProc::opticFlow(const cv::Mat& frame){
 
 }
 
-cv::Vec2d  ImgProc::avgOpticFlow(const cv::Mat& frame, int t_step){
+cv::Vec2d  ImgProc::avgOpticFlow(const cv::Mat& frame){
 		cv::Vec2d  optic_flow;
 		cv::Mat frame_grey;
         std::vector <cv::Point2f> new_corners;

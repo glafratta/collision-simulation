@@ -140,7 +140,7 @@ class ImgProc{
 
     cv::Vec2d  opticFlow(const cv::Mat&);
 
-	cv::Vec2d avgOpticFlow(const cv::Mat&, int);
+	cv::Vec2d avgOpticFlow(const cv::Mat&);
 
 	std::vector <cv::Point2f> get_corners();
 
