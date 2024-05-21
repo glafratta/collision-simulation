@@ -193,6 +193,13 @@ struct Correct{
 
     float update(float);
 
+    void reset(){
+        p_buffer=std::vector <float>(bufferSize,0);
+        i=0;
+        d=0;
+        mf.buffer=std::vector<float>(mf.kernelSize,0);
+    }
+
     float kp=0.024;    
     float kd=0, ki=0;
     private:

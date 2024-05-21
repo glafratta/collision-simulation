@@ -154,6 +154,10 @@ class ImgProc{
 		corners=c;
 	}
 
+	void reset(){
+		previous= cv::Mat();
+		corners.clear();
+	}
 
 
     private:

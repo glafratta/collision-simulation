@@ -294,9 +294,7 @@ cv::Vec2d  ImgProc::avgOpticFlow(const cv::Mat& frame, int t_step){
         std::vector <uchar> status;
         std::vector<float> err;
         cv::cvtColor(frame, frame_grey, cv::COLOR_RGB2GRAY);
-        if (corners.empty()|| t_step%10==0){ //resample corners every 2 seconds (30fps)
-            corners.clear();
-			previous = cv::Mat();
+        if (corners.empty()){ //resample corners every 2 seconds (30fps)
 			cv::goodFeaturesToTrack(frame_grey, corners , gfp.MAX_CORNERS, gfp.QUALITY_LEVEL, gfp.MIN_DISTANCE);
         //    printf("GFT, corners size=%i\n", corners.size());
         }

@@ -121,6 +121,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
     double filtered_signal=0;
     Iir::Butterworth::LowPass<order>low_pass;
     Iir::Butterworth::BandStop<order>band_stop;
+	const int reset_hz=10;
 
     CameraCallback(MotorCallback * _cb):cb(_cb){
         low_pass.setup(FPS, cutoff_frequency);
@@ -140,6 +141,10 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		}
 		//cv::Mat frame_cropped=frame(cv::Range(0, frame.width()), cv::Range(frame.height()*2/3, frame.height()));
         float error=0;
+		if (cb->c->getTask()->motorStep%reset_hz==0){
+			imgProc.reset();
+			cb->c->getTask()->correct.reset();
+		}
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame, cb->c->getTask()->motorStep);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         signal= signal+optic_flow[0];
