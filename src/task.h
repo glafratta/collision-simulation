@@ -200,7 +200,7 @@ struct Correct{
         mf.buffer=std::vector<float>(mf.kernelSize,0);
     }
 
-    float kp=0.024;    
+    float kp=0.075;    
     float kd=0, ki=0;
     private:
 

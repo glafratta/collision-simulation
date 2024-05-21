@@ -141,10 +141,10 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		}
 		//cv::Mat frame_cropped=frame(cv::Range(0, frame.width()), cv::Range(frame.height()*2/3, frame.height()));
         float error=0;
-		if (cb->c->getTask()->motorStep%reset_hz==0){
+	//	if (cb->c->getTask()->motorStep%reset_hz==0){
 			imgProc.reset();
 			cb->c->getTask()->correct.reset();
-		}
+	//	}
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame, cb->c->getTask()->motorStep);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         signal= signal+optic_flow[0];
