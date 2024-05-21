@@ -133,10 +133,10 @@ struct Visited{ //for debug
 	TransitionSystem *g;
 };
 
-struct is_not_current_v{
-	is_not_current_v(){}
+struct is_not_v{
+	is_not_v(){}
 	//CurrentV(TransitionSystem * ts): g(ts){}
-	is_not_current_v(vertexDescriptor _cv): cv(_cv){}
+	is_not_v(vertexDescriptor _cv): cv(_cv){}
 	bool operator()(edgeDescriptor e){
 		return e.m_target!=cv;
 	}	

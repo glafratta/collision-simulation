@@ -109,7 +109,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		planVertices= planner(transitionSystem, src);
-		is_not_current_v not_cv(currentVertex);
+		is_not_v not_cv(currentVertex);
 		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		if (debugOn & timerOff){
 			printPlan();
@@ -349,6 +349,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	// 	}
 	// 	printf("\n");
 	// }
+	printf("exploring\n");
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
@@ -1403,9 +1404,13 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		if (currentVertex!=movingVertex){
+			printf("change plan\n");
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
+		}
+		else{
+			printf("current=0\n");
 		}
 		// if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
 		// 	direction= transitionSystem[edge.first.m_target].direction;
