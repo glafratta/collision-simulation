@@ -205,7 +205,8 @@ struct Correct{
         }
         return sum;
     }
-    int bufferSize=9;
+    int correction_rate=2; //Hz
+    int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
     std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
 
     float i=0, d=0;

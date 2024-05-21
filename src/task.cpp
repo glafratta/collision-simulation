@@ -95,7 +95,7 @@ void Task::Correct::operator()(Action & action, int step){
 		return;
 	}
 	printf("error buffer sum = %f, i=%f\n", p1, get_i());
-	if (fabs(get_i())>tolerance & step>0 & step%3==0){
+	if (fabs(get_i())>tolerance & step>0 & step%correction_rate==0){
 		float p_correction= ((p1/bufferSize)*kp)/2; //do not increase one wheel speed too much
 		float i_correction= (get_i()*ki)/2; //do not increase one wheel speed too much
 		float d_correction= (get_d()*kd)/2; //do not increase one wheel speed too much
