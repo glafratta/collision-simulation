@@ -40,7 +40,7 @@ x_s_axisx=np.linspace(0, framerate, len(x_s))
 n=len(x_s_fft)
 denoised_s=x_s_fft.copy()
 denoised=x_fft.copy()
-indices= [[0,1], [3,nyquist]]
+indices= [[0,1], [2,nyquist]]
 for step in range(0, len(indices)):
     k_low1 = int(len(x_s_fft)/framerate*indices[step][0])
     k_hi1 = int(len(x_s_fft)/framerate*indices[step][-1])
