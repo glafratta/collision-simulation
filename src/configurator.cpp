@@ -76,7 +76,11 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			currentVertex=boost::add_vertex(transitionSystem);
 			currentTask.action.setVelocities(0,0);
 		}
-		//movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
+		if (!checkedge.second){
+			printf("no edge\n");
+			return;
+		}
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
 		transitionSystem[movingVertex].disturbance.invalidate();
 		if (debugOn){
