@@ -4,10 +4,10 @@
 #include "alphabot.h"
 #include "Iir.h"
 
-const int order=3;
-const int DC=0; //HZ
-const int cutoff_frequency=4; //HZ
-const int band_width=0.5;
+// const int order=3;
+// const int DC=0; //HZ
+// const int cutoff_frequency=4; //HZ
+// const int band_width=0.5;
 
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
