@@ -164,7 +164,7 @@ class ImgProc{
 	int it=0;
 	struct GoodFeaturesParameters{
 		const int MAX_CORNERS=30;
-    	const float QUALITY_LEVEL=0.5;
+    	const float QUALITY_LEVEL=0.7;
    		const int MIN_DISTANCE=7;
     	const int BLOCK_SIZE=7;
 	}gfp;
