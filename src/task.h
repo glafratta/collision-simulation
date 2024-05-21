@@ -193,7 +193,7 @@ struct Correct{
 
     float update(float);
 
-    float kp=0.08;    
+    float kp=0.024;    
     float kd=0, ki=0;
     private:
 
