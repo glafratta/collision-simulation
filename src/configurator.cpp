@@ -79,7 +79,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
 		if (!checkedge.second){
 			printf("no edge\n");
-			return;
+			return 0;
 		}
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
 		transitionSystem[movingVertex].disturbance.invalidate();
