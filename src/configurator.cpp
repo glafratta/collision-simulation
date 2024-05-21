@@ -71,7 +71,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		edgeDescriptor movingEdge;
+		//edgeDescriptor movingEdge;
 		if (currentVertex==movingVertex){
 			currentVertex=boost::add_vertex(transitionSystem);
 			currentTask.action.setVelocities(0,0);
@@ -86,10 +86,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		if (debugOn){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
-			//errorMap.emplace(transitionSystem[currentEdge].ID , 0);
-		//transitionSystem[movingEdge].direction=currentTask.direction;
-		//transitionSystem[movingEdge].direction=currentTask.direction; //because direction is in the state
-		transitionSystem[movingEdge].step=currentTask.motorStep;
+//		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
 		if (iteration>1){
@@ -1395,29 +1392,33 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
+
 	if (!b){
 		return pv;
 	}
 	if (planning){
 		if (pv.empty()){
 			currentVertex=movingVertex;
+			printf("set as moving\n");
+			//currentVertex=boost::add_vertex(transitionSystem);
+			//currentTask.action.setVelocities(0,0);
 			return pv;
 		}
-		if (currentVertex!=movingVertex){
+		//if (currentVertex!=movingVertex){
+		if (pv.empty()){
 			printf("change plan\n");
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
 		}
-		else{
-			printf("current=0\n");
-		}
-		// if (auto edge= boost::edge(movingVertex, planVertices[0], transitionSystem); edge.second){
-		// 	direction= transitionSystem[edge.first.m_target].direction;
+		// else{
+		// 	currentVertex=boost::add_vertex(transitionSystem);
+		// 	currentTask.action.setVelocities(0,0);
+		// 	printf("current=0\n");
 		// }
-		// transitionSystem[currentEdge.m_target].direction=direction;
 		boost::clear_vertex(movingVertex, transitionSystem);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentVertex].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
