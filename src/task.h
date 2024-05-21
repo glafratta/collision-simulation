@@ -164,7 +164,7 @@ struct Correct{
     
     Correct(){}
 
-    void operator()( Action&);
+    void operator()( Action&, int);
 
     float errorCalc(Action, double);
 
@@ -205,7 +205,7 @@ struct Correct{
         }
         return sum;
     }
-    int bufferSize=3;
+    int bufferSize=9;
     std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
 
     float i=0, d=0;

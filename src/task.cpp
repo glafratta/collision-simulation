@@ -87,7 +87,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 // 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 // }
 
-void Task::Correct::operator()(Action & action){
+void Task::Correct::operator()(Action & action, int step){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
 	float p1=p();
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
@@ -95,7 +95,7 @@ void Task::Correct::operator()(Action & action){
 		return;
 	}
 	printf("error buffer sum = %f, i=%f\n", p1, get_i());
-	if (fabs(get_i())>tolerance){
+	if (fabs(get_i())>tolerance & step>0 & step%3==0){
 		float p_correction= ((p1/bufferSize)*kp)/2; //do not increase one wheel speed too much
 		float i_correction= (get_i()*ki)/2; //do not increase one wheel speed too much
 		float d_correction= (get_d()*kd)/2; //do not increase one wheel speed too much
