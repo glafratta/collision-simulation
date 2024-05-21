@@ -1340,10 +1340,10 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	}
 	//PROLONGING DURATION OF TASK IF NEEDED
 	std::unordered_map<State*, ExecutionError>::iterator it;
-	if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-		error=it->second;
-		it->second=ExecutionError();
-	}
+	// if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
+	// 	error=it->second;
+	// 	it->second=ExecutionError();
+	// }
 	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
 		t.motorStep--;
 		printf("step =%i\n", t.motorStep);
