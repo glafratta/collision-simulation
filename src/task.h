@@ -208,9 +208,19 @@ struct Correct{
     int correction_rate=2; //Hz
     int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
     std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
-
     float i=0, d=0;
     float tolerance_upper=0.01, tolerance_lower=-0.01;
+
+    struct MedianFilter{
+        int kernelSize=3;
+        std::vector<float>buffer=std::vector<float>(kernelSize,0);
+
+        float get_median(){
+            std::vector <float> tmp=buffer;
+            std::sort(tmp.begin(), tmp.end());
+            return tmp[int(kernelSize/2)];
+        }
+    }mf;
     
 
 }correct;

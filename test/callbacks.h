@@ -127,7 +127,7 @@ public:
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
        // if (c->getTask()->motorStep>0){
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action);
+        c->getTask()->correct(action, c->getTask()->motorStep);
         //}
         EndedResult er = c->controlGoal.checkEnded();
 	    if (er.ended){

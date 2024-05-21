@@ -89,14 +89,14 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 
 void Task::Correct::operator()(Action & action, int step){
 	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
-	float p1=p();
+	//float p1=p();
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		printf("returning\n");
 		return;
 	}
-	printf("error buffer sum = %f, i=%f\n", p1, get_i());
-	if (fabs(get_i())>tolerance & step>0 & step%correction_rate==0){
-		float p_correction= ((p1/bufferSize)*kp)/2; //do not increase one wheel speed too much
+	printf("error buffer sum = %f, i=%f\n", p(), get_i());
+	if (fabs(get_i())>tolerance & step>correction_rate){
+		float p_correction= (mf.get_median()*kp)/2; //do not increase one wheel speed too much
 		float i_correction= (get_i()*ki)/2; //do not increase one wheel speed too much
 		float d_correction= (get_d()*kd)/2; //do not increase one wheel speed too much
 		// if (p1>0){	//too much to the left
@@ -141,6 +141,8 @@ float Task::Correct::update(float e){
 	p_buffer.erase(p_buffer.begin());
 	p_buffer.push_back(e);
 	float p1=p();
+	mf.buffer.erase(mf.buffer.begin());
+	mf.buffer.push_back(p1);
 	d=p1-p0;
 	i+=e;
 	return p1;
