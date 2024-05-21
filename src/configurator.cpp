@@ -105,8 +105,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
 		planVertices= planner(transitionSystem, src);
-		is_current_v icv(currentVertex);
-		boost::remove_out_edge_if(movingVertex, icv, transitionSystem);
+		is_not_current_v not_cv(currentVertex);
+		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		if (debugOn & timerOff){
 			printPlan();
 			printf("graph size= %i\n", transitionSystem.m_vertices.size());
