@@ -99,7 +99,7 @@ void step( AlphaBot &motors){
 	//printf("tracked\n");
     if (c->getTask()->motorStep>0){
         //Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
+        //c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     }
 	//printf("corrected\n");
 	EndedResult er = c->controlGoal.checkEnded();
