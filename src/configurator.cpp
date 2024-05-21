@@ -1405,7 +1405,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		//if (currentVertex!=movingVertex){
-		if (pv.empty()){
+		if (!pv.empty()){
 			printf("change plan\n");
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
