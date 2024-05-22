@@ -155,7 +155,7 @@ void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
-std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction ); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
 std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
 
@@ -218,7 +218,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor);
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, bool been=0);
 
 std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
 
@@ -250,8 +250,10 @@ void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescripto
 
 // std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
+std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, State);
 
-									
+
+
 ExecutionError trackTaskExecution(Task &);
 
 b2Transform assignDeltaPose(Task::Action, float);

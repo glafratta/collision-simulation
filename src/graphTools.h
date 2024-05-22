@@ -238,6 +238,7 @@ struct StateMatcher{
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
+		std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
 	private:
 
 	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;

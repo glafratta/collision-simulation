@@ -526,19 +526,19 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 
 // }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src){
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src, bool been){
 	std::vector <vertexDescriptor> plan;
 	vertexDescriptor connecting; //og: src=currentV
 	std::vector <edgeDescriptor> frontier;
 	bool run=true;
 	do{
-		frontier=frontierVertices(src, g, DEFAULT);
+		frontier=frontierVertices(src, g, DEFAULT, been);
 		connecting=TransitionSystem::null_vertex();
-		float phi=2; //very large phi, will get overwritten
+		float phi=2, src_prob=0; //very large phi, will get overwritten
 		bool changed_src=false;
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
-			if (g[e.m_target].phi<phi){
+			if (g[e.m_target].phi<phi & (g[e.m_target].direction==g[src].direction & g[e].weighted_probability(iteration)>=src_prob)){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
 						connecting=e.m_source;
@@ -546,10 +546,6 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 					src=e.m_target;
 					changed_src=true;
 			}
-//			else if (g[e.m_target].label!=UNLABELED){
-			// else if (e.m_source==movingVertex){
-			//  	boost::clear_vertex(e.m_target, g);
-			// }
 			else if (g[e.m_source].label!=UNLABELED){
 			 	boost::clear_vertex(e.m_source, g);
 			}
@@ -985,6 +981,32 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector <std::pair
 	queue.push_back(std::pair(v, phi));
 }
 
+std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g, State target){
+	std::pair <bool, vertexDescriptor> result(0, TransitionSystem::null_vertex());
+	// if (target.disturbance.getAffIndex()!=PURSUE){
+	// 	return result;
+	// }
+	std::pair <float, vertexDescriptor> best(10000, TransitionSystem::null_vertex());
+	auto vs=boost::vertices(g);
+
+	for (auto vi=vs.first; vi!=vs.second; vi++ ){
+		//b2Transform difference= g[*vi].endPose-target.disturbance.pose();
+		DistanceVector difference={g[*vi].endPose.p.x-target.disturbance.pose().p.x,
+									g[*vi].endPose.p.y-target.disturbance.pose().p.y,
+									g[*vi].endPose.q.GetAngle()-target.disturbance.pose().q.GetAngle()
+									};
+		float sum=matcher.sumVector(difference);
+		if (difference[0]<matcher.error.dPosition
+			& difference[1]<matcher.error.dPosition
+			& difference[2]<matcher.error.angle & sum<best.first){
+				best.first=sum;
+				best.second=*vi;
+			}
+	}
+	return result; //if been there, do not explore, extract a plan then check it
+}
+
+
 
 // std::vector <Pointf> Configurator::neighbours(b2Vec2 pos, float radius){ //more accurate orientation
 // 	std::vector <Pointf> result;
@@ -1177,7 +1199,7 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	return result;
 } 
 
-std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d){
+std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d, bool been){
 	std::vector <edgeDescriptor> result;
 	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
 	std::vector <vertexDescriptor>connecting;
@@ -1187,7 +1209,7 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 		}
 		auto es=boost::out_edges(v, g);
 		for (auto ei=es.first; ei!=es.second; ei++){
-			if (g[(*ei).m_target].visited()){
+			if (g[(*ei).m_target].visited() || been){
 				if (g[(*ei).m_target].direction==d){
 					result.push_back((*ei)); //assumes maximum depth of 2 vertices traversed
 				}
