@@ -446,11 +446,11 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		}
 		if (ep.first.m_target!=v1){
 			g[ep.first.m_target].disturbance = dist;
+			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose); //reassign cost
+			g[ep.first.m_target].phi =evaluationFunction(er);	
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g, g[ep.first.m_target].direction);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-				EndedResult er=estimateCost(g[pair.second], g[ep.first.m_source].endPose); //reassign cost
-				g[pair.second].phi =evaluationFunction(er);	
 				deletion.push_back(pair);			//first is eliminated, the second is its match
 				}
 		}
