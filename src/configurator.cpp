@@ -385,7 +385,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 			gt::fill(sim, &sk.first, &sk.second); //find simulation result
 			sk.first.direction=t.direction;
-			er  = estimateCost(sk.first, g[v0].endPose, t.direction);
+			er  = estimateCost(sk.first, g[v0].endPose);
 			State * source=NULL;
 			bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
 																			//v=0 and currentEdge =src will match so we try to prevent
