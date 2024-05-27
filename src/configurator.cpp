@@ -449,6 +449,8 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g, g[ep.first.m_target].direction);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
+				EndedResult er=estimateCost(g[pair.second], g[ep.first.m_source].endPose); //reassign cost
+				g[pair.second].phi =evaluationFunction(er);	
 				deletion.push_back(pair);			//first is eliminated, the second is its match
 				}
 		}
@@ -481,10 +483,10 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		float match_distance=10000;
 		for (edgeDescriptor r:toReassign){ //reassigning edges
 			auto new_edge= gt::add_edge(r.m_source, pair.second, g);
-			if (g[r.m_source].visited()){
-				EndedResult er=estimateCost(g[pair.second], g[r.m_source].endPose); //reassign cost
-				g[pair.second].phi =evaluationFunction(er);	
-			}
+			// if (g[r.m_source].visited()){
+			// 	EndedResult er=estimateCost(g[pair.second], g[r.m_source].endPose); //reassign cost
+			// 	g[pair.second].phi =evaluationFunction(er);	
+			// }
 			g[new_edge.first].it_observed=iteration;
 		}
 		boost::clear_vertex(pair.first, g);
