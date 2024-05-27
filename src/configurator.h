@@ -147,7 +147,7 @@ void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tr
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
-void updateGraph(TransitionSystem&, ExecutionError error);
+void updateGraph(TransitionSystem&, ExecutionError error, b2Transform);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
@@ -218,17 +218,17 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, bool been=0);
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor match=TransitionSystem::null_vertex(), bool been=0);
 
-std::vector <vertexDescriptor> checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
+bool checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float& );
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
-EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
+EndedResult estimateCost(State&, b2Transform); //returns whether the controlGoal has ended and fills node with cost and error
 
-EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
+//EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
 float evaluationFunction(EndedResult);
 
@@ -250,7 +250,7 @@ void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescripto
 
 // std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
-std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, State);
+std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance);
 
 
 

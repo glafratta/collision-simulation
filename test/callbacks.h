@@ -122,14 +122,12 @@ public:
         //     return;
         // }
         printf("task d orientation %f, valid = %i, step = %i\n", c->getTask()->disturbance.getOrientation().second, c->getTask()->disturbance.isValid(), c->getTask()->motorStep);
-        float task_rotation_error=c->taskRotationError();
-        //float task_rotation_error=0;
+       // float task_rotation_error=c->taskRotationError();
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
-       // if (c->getTask()->motorStep>0){
         Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(action, c->getTask()->motorStep);
         //}
-        EndedResult er = c->controlGoal.checkEnded();
+        EndedResult er = c->controlGoal.checkEnded(c->controlGoal.start, c->getTask()->direction);
 	    if (er.ended){
 		    c->controlGoal.change =1;
             printf("goal reached\n");

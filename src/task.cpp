@@ -212,7 +212,10 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	
 }
 
-EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
+EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir){ //self-ended
+	if (dir==UNDEFINED){
+		dir=direction;
+	}
 	EndedResult r;
 	Angle a;
 	Distance d;
@@ -235,7 +238,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform){ //self-ended
 			r.ended = d<=endCriteria.distance; 
 		}
 	}
-	else{
+	else if (dir==LEFT || dir ==RIGHT){
 		float angleL = start.q.GetAngle()+endCriteria.angle.get();
 		float angleR = start.q.GetAngle()-endCriteria.angle.get();
 		r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
@@ -252,7 +255,7 @@ EndedResult Task::checkEnded(State n){ //check error of node compared to the pre
 	EndedResult r;
 	Angle a;
 	Distance d;
-	r = checkEnded(n.endPose);
+	r = checkEnded(n.endPose, n.direction);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }
