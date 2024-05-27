@@ -104,11 +104,19 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("provisional plan\n");
 			plan_provisional=planner(transitionSystem, src, been.second, been.first);
 		}
-		if (!plan_provisional.empty() & checkPlan(world, plan_provisional, transitionSystem)){			
+		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
+		if (!plan_provisional.empty() & plan_works){			
 			planVertices=plan_provisional;
 		}
+		//else{
+		//}
 		//if plan fails or not there, 
 		else{
+			if (!plan_works){
+				planVertices.clear();
+				currentTask.motorStep=0;
+				src=movingVertex;
+			}
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
@@ -420,7 +428,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			// }
 			applyTransitionMatrix(g, v1, t.direction, er.ended);
 			g[v1].phi=evaluationFunction(er);
-			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, v,g)); //og v1 v0
+			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 			v0=v1;
 			pruneEdges(toPrune,g, v, priorityQueue, toRemove);
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
@@ -433,7 +441,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 }
 
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0, vertexDescriptor&v,TransitionSystem&g){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v1].outcome == simResult::successful ){
 		return deletion;
@@ -468,8 +476,8 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 		if (pair.first==src){
 			src=pair.second;
 		}
-		std::vector<edgeDescriptor> ie =inEdges(g, pair.second, DEFAULT); //first vertex that satisfies that edge requirement
-		std::vector <edgeDescriptor> toReassign=inEdges(g, pair.first, DEFAULT);
+		std::vector<edgeDescriptor> ie =gt::inEdges(g, pair.second, DEFAULT); //first vertex that satisfies that edge requirement
+		std::vector <edgeDescriptor> toReassign=gt::inEdges(g, pair.first, DEFAULT);
 		edgeDescriptor e =edgeDescriptor(), r_visited=edgeDescriptor();
 		edgeDescriptor e2 = gt::visitedEdge(toReassign, g);
 		if (ie.empty()){
@@ -595,20 +603,21 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
 	//std::vector <vertexDescriptor> graphError;
-	bool result=false;
+	bool result=true;
 	if (p.empty()){
 		return result;
 	}
-	Task t= currentTask;
+	//Task t= currentTask;
 	//t.check=1;
-	int it=-1;//this represents the source vertex in edge e
+	int it=-1;//this represents currentv
 	//edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
-	auto ep=boost::edge(movingVertex, p[0], g);
+	auto ep=boost::edge(movingVertex, currentVertex, g);
 	do {
+		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 		float stepDistance=BOX2DRANGE;
-		CoordinateContainer dCloud;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk;
+		sk.first.direction=t.direction;
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
@@ -620,65 +629,77 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		start = sk.first.endPose;
 		// DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
 		// if (!matcher.isPerfectMatch(distance)){
-		bool ismatch=matcher.isPerfectMatch(g[planVertices[it]], sk.first);			
-		std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+		bool ismatch=matcher.isPerfectMatch(g[ep.first.m_source], sk.first);			
+		vertexDescriptor v1=ep.first.m_source;
+		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
+		//vertexDescriptor v0;
+		if (!prev_edge.first){
+			//v0=prev_edge.second.m_source;
+			prev_edge.second.m_source=movingVertex;
+			prev_edge.second.m_target=v1;
+		}
+
 		if (!ismatch){
-			vertexDescriptor v1;
-			edge =addVertex(planVertices[it-1], v1,g, Disturbance(), g[ep.first], 1);
-			//g[v1].set(s);
-			gt::set(edge.first, sk, g, it==currentVertex, errorMap, iteration);
+			g[prev_edge.second.m_source].options.push_back(t.direction);
+			ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
+			gt::set(prev_edge.second, sk, g, it==currentVertex, errorMap, iteration);
+			if (sk.first.outcome==simResult::crashed){
+				result=false;
+			}
 		}
 		else{
-			//g[planVertices[it]].nObs++;
-			gt::update(edge.first, sk, g,planVertices[it]==currentVertex, errorMap, iteration);
+			gt::update(prev_edge.second, sk, g,planVertices[it]==currentVertex, errorMap, iteration);
 		}
-		gt::adjustProbability(g, edge.first);
-		// if (sk.first.outcome == simResult::crashed){ //has to replan
-		// 	for (int i=it; i<p.size();i++){
-		// 		graphError.push_back(p[i]);
-		// 	}
-		// 	break;
-		// }
-		//it++;
-		//e=boost::in_edges(p[it], g).first.dereference();
-		t= Task(g[planVertices[it]].disturbance, g[planVertices[it]].direction, start, true);
-		//t.check=1;
-	}while (it+2<p.size());
+		propagateD(v1,prev_edge.second.m_source, g);
+		gt::adjustProbability(g, ep.first);
+		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
+	}while (it<p.size() & result==true);
 	return result;
 }
 
 
-b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step){
-	int stepsTraversed= 0;
-	if(e.m_target==planVertices[0]){
-		t->motorStep- transitionSystem[e].step;
-		if (t->getAction().getOmega()!=0){
-			float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
-			remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
-			t->setEndCriteria(Angle(remainingAngle));
-		}
+b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step){ 
+	//int stepsTraversed= 0;
+	// if(e.m_target==planVertices[0]){
+	// 	t->motorStep- transitionSystem[e].step;
+	// 	if (t->getAction().getOmega()!=0){
+	// 		float remainingAngle = t->endCriteria.angle.get()-stepsTraversed*t->action.getOmega();
+	// 		remainingAngle+=fabs(g[e.m_source].endPose.q.GetAngle() -g[e.m_target].endPose.q.GetAngle());
+	// 		t->setEndCriteria(Angle(remainingAngle));
+	// 	}
+	// }
+	b2Transform result;
+	if (g[e.m_target].disturbance.isValid()){
+		step=b2Vec2(g[e.m_target].endPose.p-g[e.m_target].disturbance.pose().p).Length();
 	}
-	if (g[e.m_source].disturbance.isValid()){
-		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_source].disturbance.pose().p).Length();
+	else{
+		adjustStepDistance(e.m_source,g, t, step);
 	}
-	while (g[e.m_target].direction==t->direction & i+1<planVertices.size()){
+	do{
 		//if (t->endCriteria.angle.isValid()){
 		i++;
-		if (boost::out_degree(e.m_target,g)>0){
+	//	if (boost::out_degree(e.m_target,g)>0){
 			auto es = boost::out_edges(e.m_target, g);
+			if (es.first==es.second){
+				vertexDescriptor new_src=e.m_target;
+				e.m_source=new_src;
+				e.m_target=TransitionSystem::null_vertex();
+			}
 			for (auto ei = es.first; ei!=es.second; ++ei){
-				if ((*ei).m_target == planVertices[i+1]){
+				if ((*ei).m_target == planVertices[i]){
 					e= (*ei);
 					break;
 				}
 			}
-		}
-		else{
-			break;
-		}
-		}
+		result=g[e.m_source].endPose;
 
-	return g[planVertices[i]].endPose;
+	//	}
+	//	else{
+	//		break;
+	//	}
+		}while (g[e.m_target].direction==t->direction & i<planVertices.size());
+
+	return result;
 }
 
 
@@ -1156,17 +1177,6 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 
 
 
-std::vector <edgeDescriptor> Configurator::inEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
-	std::vector <edgeDescriptor> result;
-	auto es = boost::in_edges(v, g);
-	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei).m_target].direction == d){
-			result.push_back(*ei);
-		}
-	}
-	return result;
-}
-
 std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDescriptor> ev, TransitionSystem& g){
 	std::pair <edgeDescriptor, bool> result;
 	if (ev.empty()){
@@ -1215,7 +1225,7 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	 	std::vector <edgeDescriptor> result;
 		edgeDescriptor e; 
 		do{
-			std::vector <edgeDescriptor> directionEdges=inEdges(g, v, d);
+			std::vector <edgeDescriptor> directionEdges=gt::inEdges(g, v, d);
 			if (directionEdges.empty()){
 				break;
 			}
@@ -1277,7 +1287,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
-		std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
+		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 		//if (dir!=Direction::UNDEFINED){
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//}
@@ -1320,7 +1330,7 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	int nObs=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		if (*vi!=v){
-			std::vector <edgeDescriptor> ie=inEdges(g, v, dir);
+			std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 			bool Tmatch=true;
 			//if (dir!=Direction::UNDEFINED){
 			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;

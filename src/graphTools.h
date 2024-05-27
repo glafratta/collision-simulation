@@ -190,6 +190,8 @@ namespace gt{
 
 	std::vector <edgeDescriptor> outEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the out-edges of a vertex which have the specified direction
 
+	std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
+
 	Disturbance getExpectedDisturbance(TransitionSystem&, vertexDescriptor, Direction, int);
 
 	edgeDescriptor visitedEdge(std::vector <edgeDescriptor>, TransitionSystem&);

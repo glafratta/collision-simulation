@@ -139,7 +139,7 @@ Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, vertexDescriptor&, TransitionSystem&);
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, std::vector <std::pair<vertexDescriptor, float>>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
@@ -156,8 +156,6 @@ void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
 std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
-
-std::vector <edgeDescriptor> inEdges(TransitionSystem&, vertexDescriptor, Direction); //returns a vector containing all the in-edges of a vertex which have the specified direction
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
