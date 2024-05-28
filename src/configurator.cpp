@@ -15,6 +15,18 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	transitionSystem[currentVertex].nObs++;
 	transitionSystem[currentVertex].direction=DEFAULT;
+	// std::pair<bool, vertexDescriptor> match = findExactMatch(transitionSystem[currentVertex], transitionSystem, NULL, transitionSystem[currentVertex].direction);
+	// if (match.first){
+	// 	currentVertex=match.second;
+	// 	std::vector<edgeDescriptor> in_edges= gt::inEdges(transitionSystem, match.second, transitionSystem[match.second].direction);
+	// 	if (!in_edges.empty()){
+	// 		std::pair <bool, edgeDescriptor>in_edge=gt::getMostLikely(transitionSystem, in_edges, iteration);
+	// 		src= in_edge.second.m_source;
+	// 	}
+	// 	else{
+	// 		src=movingVertex;
+	// 	}
+	// }
 	currentTask.direction= transitionSystem[currentVertex].direction;
 	currentTask.action.setVelocities(0,0);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
@@ -128,12 +140,14 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//}
 		//if plan fails or not there, 
 		else{
+			is_not_v not_cv(currentVertex);
 			if (!plan_works){
 				planVertices.clear();
-				dummy_vertex(currentVertex);
-				//currentTask.motorStep=0;
+				boost::clear_vertex(movingVertex, transitionSystem);
+				dummy_vertex(movingVertex);//currentEdge.m_source
 				currentTask.change=1;
 				//src=movingVertex;
+				//currentTask=Task(controlGoal.disturbance, DEFAULT);
 			}
 			src=currentVertex;
 			resetPhi(transitionSystem);
@@ -146,7 +160,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
 			planVertices= planner(transitionSystem, src);
-			is_not_v not_cv(currentVertex);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		}
 		if (debugOn){
@@ -505,16 +518,14 @@ void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDesc
 			e=ie[0];
 			toReassign.push_back(e); 
 		}
-		// toReassign.push_back(e); 
 		gt::update(e, std::pair <State, Edge>(g[pair.first], g[e2]),g, pair.second==currentVertex, errorMap, iteration);
 		float match_distance=10000;
 		for (edgeDescriptor r:toReassign){ //reassigning edges
-			auto new_edge= gt::add_edge(r.m_source, pair.second, g);
+			auto new_edge= gt::add_edge(r.m_source, pair.second, g, iteration);
 			// if (g[r.m_source].visited()){
 			// 	EndedResult er=estimateCost(g[pair.second], g[r.m_source].endPose); //reassign cost
 			// 	g[pair.second].phi =evaluationFunction(er);	
 			// }
-			g[new_edge.first].it_observed=iteration;
 		}
 		boost::clear_vertex(pair.first, g);
 		toRemove.push_back(pair);
@@ -657,10 +668,15 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_source=movingVertex;
 			prev_edge.second.m_target=v1;
 		}
-
 		if (!ismatch){
+			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.first.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
-			ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
+			if (!match.first){
+				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
+			}
+			else{
+				ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
+			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
 			if (sk.first.outcome==simResult::crashed){
 				result=false;
@@ -669,7 +685,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		else{
 			gt::update(prev_edge.second, sk, g,planVertices[it]==currentVertex, errorMap, iteration);
 		}
-		propagateD(v1,prev_edge.second.m_source, g);
+		std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1,prev_edge.second.m_source, g);
 		gt::adjustProbability(g, ep.first);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 	}while (it<p.size() & result==true);
@@ -1352,9 +1368,9 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 			std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 			bool Tmatch=true;
 			//if (dir!=Direction::UNDEFINED){
-			Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
+			Tmatch= !ie.empty()||dir==Direction::UNDEFINED;
 			//}
-			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>0){
+			if (matcher.isPerfectMatch(g[v], g[*vi])&*vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>=ie.size()){ //
 			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			//if (!most_likely.first){
 			//}

@@ -253,15 +253,17 @@ void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
 void setErrorWeights();
 
-EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED);
+EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))), Direction dir=UNDEFINED);
 
-EndedResult checkEnded(State);
+EndedResult checkEnded(State, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)))); //usually used to check against control goal
 
 Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
-    setEndCriteria(0);    
+    //Angle a(0);
+    //a.setValid(0);
+    //setEndCriteria(SAFE_ANGLE, 0);    
     printf("default constructro\n");
 }
 

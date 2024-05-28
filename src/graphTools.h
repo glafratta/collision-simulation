@@ -198,7 +198,8 @@ namespace gt{
 
 	void adjustProbability(TransitionSystem&, edgeDescriptor);
 
-	std::pair <edgeDescriptor, bool> add_edge(vertexDescriptor, vertexDescriptor, TransitionSystem&); //wrapper around boost function, disallows edges to self
+	std::pair <edgeDescriptor, bool> add_edge(vertexDescriptor, vertexDescriptor, TransitionSystem&, int); //wrapper around boost function, disallows edges to self
+
 }
 
 
@@ -240,7 +241,9 @@ struct StateMatcher{
 		
 		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
-		std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
+		//std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
+
+		std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
 	private:
 
 	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;

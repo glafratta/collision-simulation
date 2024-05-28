@@ -212,9 +212,13 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	
 }
 
-EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir){ //self-ended
+EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transform> use_start, Direction dir){ //self-ended
 	if (dir==UNDEFINED){
 		dir=direction;
+	}
+	b2Transform this_start= start;
+	if (!use_start.first){
+		this_start=use_start.second;
 	}
 	EndedResult r;
 	Angle a;
@@ -239,12 +243,12 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir){ //self-
 		}
 	}
 	else if (dir==LEFT || dir ==RIGHT){
-		float angleL = start.q.GetAngle()+endCriteria.angle.get();
-		float angleR = start.q.GetAngle()-endCriteria.angle.get();
+		float angleL = this_start.q.GetAngle()+endCriteria.angle.get();
+		float angleR = this_start.q.GetAngle()-endCriteria.angle.get();
 		r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
 	}
 //	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
-	b2Vec2 distance=start.p-robotTransform.p;
+	b2Vec2 distance=this_start.p-robotTransform.p;
 	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
@@ -253,11 +257,12 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir){ //self-
 
 }
 
-EndedResult Task::checkEnded(State n){ //check error of node compared to the present Task
+EndedResult Task::checkEnded(State n, std::pair<bool,b2Transform> use_start){ //check error of node compared to the present Task
 	EndedResult r;
 	Angle a;
 	Distance d;
-	r = checkEnded(n.endPose, n.direction);
+
+	r = checkEnded(n.endPose, use_start, n.direction);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }

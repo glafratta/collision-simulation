@@ -76,6 +76,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
+	transitionSystem[movingVertex].direction=UNDEFINED;
 	//currentVertex=movingVertex;
 	//currentVertex = boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);

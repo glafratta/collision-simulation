@@ -135,7 +135,7 @@ public:
         c->getTask()->correct(action, c->getTask()->motorStep);
         //}
 //        EndedResult er = c->controlGoal.checkEnded(c->controlGoal.start, c->getTask()->direction);
-        EndedResult er = c->controlGoal.checkEnded(c->transitionSystem[c->currentVertex]);
+        EndedResult er = c->controlGoal.checkEnded();
 	    if (er.ended){
 		    c->controlGoal.change =1;
             printf("goal reached\n");

@@ -152,15 +152,15 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	}
 }
 
-std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescriptor v, TransitionSystem& g){
+std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescriptor v, TransitionSystem& g, int it){
 	std::pair <edgeDescriptor, bool> result(edgeDescriptor(), false);
 	if (u==v){
 		return result;
 	}
 	result =boost::add_edge(u, v, g);
+	g[result.first].it_observed=it;
 	return result;
 }
-
 
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
@@ -232,6 +232,22 @@ void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
 		weights[i]+=mu*E[i]*dE[i];
 	}
 }
+
+std::pair <bool, vertexDescriptor> StateMatcher::soft_match(TransitionSystem& g, b2Transform pose){
+	std::pair <bool, vertexDescriptor> result;
+	auto es= boost::edges(g);
+	for (auto ei=es.first; ei!=es.second; ei++){
+		float x=g[(*ei).m_target].endPose.p.x- pose.p.x;
+		float y=g[(*ei).m_target].endPose.p.y- pose.p.y;
+		float theta=g[(*ei).m_target].endPose.q.GetAngle()- pose.q.GetAngle();
+
+		if (fabs(x)<error.endPosition & fabs(y)<error.endPosition & fabs(theta)<error.angle){
+
+		}
+	}
+	return result;
+}
+
 
 bool operator!=(Transform const &t1, Transform const& t2){
 	return t1.p.x != t2.p.x || t1.p.y != t2.p.y || t1.q.GetAngle() != t2.q.GetAngle();
