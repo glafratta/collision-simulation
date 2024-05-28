@@ -10,6 +10,19 @@ bool ConfiguratorInterface::isReady(){
 	return ready;
 }
 
+void Configurator::dummy_vertex(vertexDescriptor src){
+	currentVertex=boost::add_vertex(transitionSystem);
+	gt::fill(simResult(), &transitionSystem[currentVertex]);
+	transitionSystem[currentVertex].nObs++;
+	transitionSystem[currentVertex].direction=DEFAULT;
+	currentTask.direction= transitionSystem[currentVertex].direction;
+	currentTask.action.setVelocities(0,0);
+	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
+	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
+
+}
+
 
 bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
 	//PREPARE VECTORS TO RECEIVE DATA
@@ -60,10 +73,14 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	//float rotation_Error=taskRotationError();
 	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
 	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
-	if (controlGoal.change){
-		Disturbance loopD(PURSUE, -(ogGoal.p));
-		controlGoal=Task(loopD,DEFAULT);
-	}
+	
+	
+	// if (controlGoal.change){
+	// 	Disturbance loopD(PURSUE, -(ogGoal.p));
+	// 	controlGoal=Task(loopD,DEFAULT);
+	// }
+
+
 	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
 	//isSameTask = wasAvoiding == currentTask.disturbance.isValid();
 	simResult result;
@@ -71,11 +88,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		//edgeDescriptor movingEdge;
-		if (currentVertex==movingVertex){
-			currentVertex=boost::add_vertex(transitionSystem);
-			currentTask.action.setVelocities(0,0);
-		}
+		// if (currentVertex==movingVertex){
+		// 	currentVertex=boost::add_vertex(transitionSystem);
+		// 	currentTask.action.setVelocities(0,0);
+		// }
 		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
 		if (!checkedge.second){
 			printf("no edge\n");
@@ -95,7 +111,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			src=movingVertex;
 		}
 		else{
-		 	currentTask.action.setVelocities(0,0);
+		 	//currentTask.action.setVelocities(0,0);
 			src=currentVertex;
 		}
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
@@ -114,9 +130,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		else{
 			if (!plan_works){
 				planVertices.clear();
-				currentTask.motorStep=0;
+				dummy_vertex(currentVertex);
+				//currentTask.motorStep=0;
+				currentTask.change=1;
 				//src=movingVertex;
 			}
+			src=currentVertex;
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
@@ -642,7 +661,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		if (!ismatch){
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
-			gt::set(prev_edge.second, sk, g, it==currentVertex, errorMap, iteration);
+			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
 			if (sk.first.outcome==simResult::crashed){
 				result=false;
 			}
@@ -1472,23 +1491,25 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	if (planning){
 		if (pv.empty()){
 			//currentVertex=movingVertex;
-			printf("set as moving\n");
-			currentVertex=boost::add_vertex(transitionSystem);
-			gt::fill(simResult(), &transitionSystem[currentVertex]);
-			transitionSystem[currentVertex].direction=DEFAULT;
-			currentTask.action.setVelocities(0,0);
-			currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
+			printf("no plan, bas\n");
+			//dummy_vertex(currentVertex);
+			// currentVertex=boost::add_vertex(transitionSystem);
+			// gt::fill(simResult(), &transitionSystem[currentVertex]);
+			// transitionSystem[currentVertex].direction=DEFAULT;
+			// currentTask.action.setVelocities(0,0);
+			// movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			// currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			// errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
 
 			return pv;
 		}
 		//if (currentVertex!=movingVertex){
-		if (!pv.empty()){
+		//if (!pv.empty()){
 			printf("change plan\n");
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
-		}
+		//}
 		// else{
 		// 	currentVertex=boost::add_vertex(transitionSystem);
 		// 	currentTask.action.setVelocities(0,0);
@@ -1572,6 +1593,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	
 	// }
 	if(controlGoal.disturbance.isValid()){
+		controlGoal.start-=deltaPose;
 		controlGoal.disturbance.subtractPose(deltaPose);
 	}
 

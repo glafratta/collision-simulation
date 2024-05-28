@@ -243,7 +243,9 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir){ //self-
 		float angleR = start.q.GetAngle()-endCriteria.angle.get();
 		r.ended = robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR;
 	}
-	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
+//	if (round(robotTransform.p.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
+	b2Vec2 distance=start.p-robotTransform.p;
+	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		r.ended =true;
 	}
 	r.estimatedCost = endCriteria.getStandardError(a,d);

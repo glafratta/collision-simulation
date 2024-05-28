@@ -32,6 +32,13 @@ void printEdges(TransitionSystem& g, Predicate p){
     }
 }
 
+void printEdges(TransitionSystem& g){
+    auto es = boost::edges(g);
+    for (auto ei=es.first; ei!=es.second;ei++){
+        printf("%i->%i, direction=%i,probability=%f\n", (*ei).m_source, (*ei).m_target, g[(*ei).m_target].direction, g[*ei].probability);
+    }
+}
+
 void print_forget(TransitionSystem& g){
     Remember p;
     printEdges(g, p);
@@ -127,7 +134,8 @@ public:
         Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(action, c->getTask()->motorStep);
         //}
-        EndedResult er = c->controlGoal.checkEnded(c->controlGoal.start, c->getTask()->direction);
+//        EndedResult er = c->controlGoal.checkEnded(c->controlGoal.start, c->getTask()->direction);
+        EndedResult er = c->controlGoal.checkEnded(c->transitionSystem[c->currentVertex]);
 	    if (er.ended){
 		    c->controlGoal.change =1;
             printf("goal reached\n");
