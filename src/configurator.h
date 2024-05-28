@@ -76,13 +76,12 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	previousTimeScan = std::chrono::high_resolution_clock::now();
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
-///	transitionSystem[movingVertex].label=VERTEX_LABEL::MOVING;
-	currentVertex = boost::add_vertex(transitionSystem);
+	//currentVertex = boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
-	gt::fill(simResult(), &transitionSystem[currentVertex]);
+	// gt::fill(simResult(), &transitionSystem[currentVertex]);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
+	// currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	// errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
 
 }
 

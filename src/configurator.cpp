@@ -115,7 +115,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			if (!plan_works){
 				planVertices.clear();
 				currentTask.motorStep=0;
-				src=movingVertex;
+				//src=movingVertex;
 			}
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
@@ -1471,10 +1471,15 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	}
 	if (planning){
 		if (pv.empty()){
-			currentVertex=movingVertex;
+			//currentVertex=movingVertex;
 			printf("set as moving\n");
-			//currentVertex=boost::add_vertex(transitionSystem);
-			//currentTask.action.setVelocities(0,0);
+			currentVertex=boost::add_vertex(transitionSystem);
+			gt::fill(simResult(), &transitionSystem[currentVertex]);
+			transitionSystem[currentVertex].direction=DEFAULT;
+			currentTask.action.setVelocities(0,0);
+			currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
+
 			return pv;
 		}
 		//if (currentVertex!=movingVertex){
