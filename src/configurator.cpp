@@ -11,24 +11,13 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::dummy_vertex(vertexDescriptor src){
-	currentTask.action.setVelocities(0,0);
 	currentVertex=boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	transitionSystem[currentVertex].nObs++;
 	transitionSystem[currentVertex].direction=STOP;
-	// std::pair<bool, vertexDescriptor> match = findExactMatch(transitionSystem[currentVertex], transitionSystem, NULL, transitionSystem[currentVertex].direction);
-	// if (match.first){
-	// 	currentVertex=match.second;
-	// 	std::vector<edgeDescriptor> in_edges= gt::inEdges(transitionSystem, match.second, transitionSystem[match.second].direction);
-	// 	if (!in_edges.empty()){
-	// 		std::pair <bool, edgeDescriptor>in_edge=gt::getMostLikely(transitionSystem, in_edges, iteration);
-	// 		src= in_edge.second.m_source;
-	// 	}
-	// 	else{
-	// 		src=movingVertex;
-	// 	}
-	// }
-	currentTask.direction= transitionSystem[currentVertex].direction;
+	currentTask=Task(Direction::STOP);
+	//currentTask.action.init(transitionSystem[currentVertex].direction);
+	//currentTask.direction= transitionSystem[currentVertex].direction;
 	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
