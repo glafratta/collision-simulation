@@ -11,10 +11,11 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::dummy_vertex(vertexDescriptor src){
+	currentTask.action.setVelocities(0,0);
 	currentVertex=boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	transitionSystem[currentVertex].nObs++;
-	transitionSystem[currentVertex].direction=DEFAULT;
+	transitionSystem[currentVertex].direction=STOP;
 	// std::pair<bool, vertexDescriptor> match = findExactMatch(transitionSystem[currentVertex], transitionSystem, NULL, transitionSystem[currentVertex].direction);
 	// if (match.first){
 	// 	currentVertex=match.second;
@@ -28,7 +29,6 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	// 	}
 	// }
 	currentTask.direction= transitionSystem[currentVertex].direction;
-	currentTask.action.setVelocities(0,0);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
