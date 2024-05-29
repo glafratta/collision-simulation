@@ -29,6 +29,7 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	// 	}
 	// }
 	currentTask.direction= transitionSystem[currentVertex].direction;
+	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());

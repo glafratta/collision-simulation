@@ -46,8 +46,10 @@ public:
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
-		printf("%s\n", name);
-		f=fopen(name, "w");
+		if (ci->debugOn){
+			printf("%s\n", name);
+			f=fopen(name, "w");
+		}
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <LIDAR_RANGE){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
@@ -64,7 +66,9 @@ public:
 				}
             }
 		}
+		if (c->debugOn){
 		fclose(f);
+		}
 		if (!ci->data.empty()){
 			ci->setReady(1);
 		}
