@@ -47,13 +47,10 @@ public:
         L = -0.5;
         R = -0.5;
         break;
-        case Direction::STOP:
+        default:
         L=0;
         R=0;
         direction=Direction::DEFAULT;
-        break;
-        default:
-        throw std::invalid_argument("not a valid direction for M");
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
