@@ -1517,7 +1517,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			// currentVertex=boost::add_vertex(transitionSystem);
 			// gt::fill(simResult(), &transitionSystem[currentVertex]);
 			// transitionSystem[currentVertex].direction=DEFAULT;
-			// currentTask.action.setVelocities(0,0);
+			currentTask.action.setVelocities(0,0);
 			// movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 			// currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 			// errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
