@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
 	printf("TARGETLESS PLANNING");
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
-	Callback cb(&configurator);
+	MotorCallback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
 	configurator.start();
