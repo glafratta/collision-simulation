@@ -88,10 +88,11 @@ MotorCallback(Configurator *conf): c(conf){
 void step( AlphaBot &motors){
 	printf("g size=%i, current vertex=%i\n", c->transitionSystem.m_vertices.size(), c->currentVertex);
 	c->printPlan();
+	printf("current task dir =%i\n", c->getTask()->direction);
 	if (c->getIteration() <=0){
 		return;
 	}
-	if (c->planVertices.empty()){
+	if (c->planVertices.empty() & c->planning){
 		printf("nae plan\n");
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
