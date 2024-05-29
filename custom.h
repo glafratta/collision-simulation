@@ -66,7 +66,7 @@ public:
 				}
             }
 		}
-		if (c->debugOn){
+		if (ci->debugOn){
 		fclose(f);
 		}
 		if (!ci->data.empty()){
