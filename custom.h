@@ -92,6 +92,7 @@ void step( AlphaBot &motors){
 		return;
 	}
 	if (c->planVertices.empty()){
+		printf("nae plan\n");
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}

@@ -50,7 +50,7 @@ public:
         default:
         L=0;
         R=0;
-        direction=Direction::DEFAULT;
+       // direction=Direction::DEFAULT;
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
