@@ -593,14 +593,18 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	vertexDescriptor connecting; //og: src=currentV
 	std::vector <edgeDescriptor> frontier;
 	bool run=true;
+	//std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(src,0)};
 	do{
+		//priorityQueue.erase(priorityQueue.begin());
 		frontier=frontierVertices(src, g, DEFAULT, been);
 		connecting=TransitionSystem::null_vertex();
 		float phi=2, src_prob=0; //very large phi, will get overwritten
 		bool changed_src=false;
+		int out_deg=0;
 		for (edgeDescriptor e:frontier){
 			planPriority(g, e.m_target);
-			if (g[e.m_target].phi<phi){ //& (g[e.m_target].direction==g[src].direction & g[e].weighted_probability(iteration)>=src_prob)){
+			//addToPriorityQueue(e.m_target, priorityQueue, g[e.m_target].phi);
+			if (g[e.m_target].phi<phi || boost::out_degree(e.m_target, g)>out_deg){ //& (g[e.m_target].direction==g[src].direction & g[e].weighted_probability(iteration)>=src_prob)){
 					phi=g[e.m_target].phi;
 					if (e.m_source!=src){
 						connecting=e.m_source;
@@ -611,6 +615,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			else if (g[e.m_source].label!=UNLABELED){
 			 	boost::clear_vertex(e.m_source, g);
 			}
+			out_deg=boost::out_degree(e.m_target, g);
 		}
 		if (connecting!=TransitionSystem::null_vertex()){
 			g[connecting].label=VERTEX_LABEL::UNLABELED;
@@ -683,9 +688,9 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			}
 		}
 		else{
-			gt::update(prev_edge.second, sk, g,planVertices[it]==currentVertex, errorMap, iteration);
+			gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
 		}
-		std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =propagateD(v1,prev_edge.second.m_source, g);
+		propagateD(v1,prev_edge.second.m_source, g);
 		gt::adjustProbability(g, ep.first);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 	}while (it<p.size() & result==true);
@@ -1434,9 +1439,9 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
-	if (planVertices.empty() & planning){
-		return error;
-	}
+	// if (planVertices.empty() & planning){
+	// 	return error;
+	// }
 	//PROLONGING DURATION OF TASK IF NEEDED
 	std::unordered_map<State*, ExecutionError>::iterator it;
 	// if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
@@ -1522,21 +1527,24 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		//if (currentVertex!=movingVertex){
 		//if (!pv.empty()){
 			printf("change plan\n");
+			//std::vector ie=gt::inEdges(transitionSystem, pv[0], transitionSystem[pv[0]].direction);
+			//edgeDescriptor visited_edge=gt::visitedEdge(ie, transitionSystem);
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
+			// int m_step=0;
+			// if (visited_edge!=edgeDescriptor()){
+			// 	m_step=transitionSystem[visited_edge].step;
+			// }
+			// transitionSystem[ep.first].step=m_step;
 			currentVertex= pv[0];
 			currentEdge=ep.first;
 		//}
-		// else{
-		// 	currentVertex=boost::add_vertex(transitionSystem);
-		// 	currentTask.action.setVelocities(0,0);
-		// 	printf("current=0\n");
-		// }
 		boost::clear_vertex(movingVertex, transitionSystem);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentVertex].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
+
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){

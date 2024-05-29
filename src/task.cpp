@@ -261,7 +261,6 @@ EndedResult Task::checkEnded(State n, std::pair<bool,b2Transform> use_start){ //
 	EndedResult r;
 	Angle a;
 	Distance d;
-
 	r = checkEnded(n.endPose, use_start, n.direction);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;

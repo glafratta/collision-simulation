@@ -154,6 +154,8 @@ void updateGraph(TransitionSystem&, ExecutionError error, b2Transform);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
+//void deadEnd(Tra)
+
 void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
