@@ -1231,16 +1231,16 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 		return;
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
-	int stepsTraversed= g[eb.first].step-currentTask.motorStep;
+	int stepsTraversed= g[currentEdge].step-currentTask.motorStep; //eb.first
 	float theta_exp=stepsTraversed*MOTOR_CALLBACK*currentTask.action.getOmega();
-	float theta_obs=currentTask.correct.getError()-theta_exp;
+	float theta_obs=theta_exp;//currentTask.correct.getError()-theta_exp;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(theta_obs);
-		printf("remaining angle=%f\n", remainingAngle);
+		printf("step =%i/%i, remaining angle=%f\n", currentTask.motorStep, transitionSystem[currentEdge].step,remainingAngle);
 		if (t->direction==getOppositeDirection(currentTask.direction).second){
 			remainingAngle=M_PI-remainingAngle;
 		}
-		else{
+		else if (t->direction==currentTask.direction){
 			currentTask.setEndCriteria(Angle(remainingAngle));
 		}
 		t->setEndCriteria(Angle(remainingAngle));
