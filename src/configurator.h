@@ -77,14 +77,8 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex].direction=UNDEFINED;
-	//currentVertex=movingVertex;
-	//currentVertex = boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
-	// gt::fill(simResult(), &transitionSystem[currentVertex]);
-	// movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	// currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	// errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
-	dummy_vertex(movingVertex);
+//	dummy_vertex(movingVertex);
 }
 
 void setBenchmarking(bool b){

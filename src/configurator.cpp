@@ -131,14 +131,12 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//if plan fails or not there, 
 		else{
 			is_not_v not_cv(currentVertex);
-			if (!plan_works){
+			//if (!plan_works){
 				planVertices.clear();
 				boost::clear_vertex(movingVertex, transitionSystem);
 				dummy_vertex(movingVertex);//currentEdge.m_source
 				currentTask.change=1;
-				//src=movingVertex;
-				//currentTask=Task(controlGoal.disturbance, DEFAULT);
-			}
+//			}
 			src=currentVertex;
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
