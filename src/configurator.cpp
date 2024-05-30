@@ -1240,9 +1240,6 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 		if (t->direction==getOppositeDirection(currentTask.direction).second){
 			remainingAngle=M_PI-remainingAngle;
 		}
-		else if (t->direction==currentTask.direction){
-			//currentTask.setEndCriteria(Angle(remainingAngle));
-		}
 		t->setEndCriteria(Angle(remainingAngle));
 	}
 	if(currentTask.getAction().getLinearSpeed()>0){
