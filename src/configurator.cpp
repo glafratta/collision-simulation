@@ -176,13 +176,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	}
 	worldBuilder.resetBodies();
-	//CHOOSE BEXT NEXT Task BASED ON LOOKING AHEAD OF THE PRESENT OBSTACLE
-
-	//IF THE TASK DIDN'T CHANGE, CORRECT PATH
-//	if (currentTask.motorStep<pl){
-	//currentTask.controller(lateralError, timeElapsed);
-//	}
-
 	return 1;
 }
 
@@ -205,91 +198,6 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	}
 	return result;
 }
-
-// DeltaPose Configurator::GetRealVelocity(CoordinateContainer &_current, CoordinateContainer &_previous){	 //does not modify current vector, creates copy
-// 		DeltaPose result;
-// 		float theta=0;
-// 		if (iteration==1){
-// 			return result;
-// 		}
-// 	 	theta = currentTask.getAction().getOmega()* timeElapsed;
-// 		result.p ={currentTask.getAction().getLinearSpeed()*cos(theta),currentTask.getAction().getLinearSpeed()*sin(theta)};
-// 		result.q.Set(currentTask.getAction().getOmega());
-
-//         //adjust for discrepancies in vector size		//int diff = currSize-prevSize;
-// 		std::vector <cv::Point2f> currentTmp, previousTmp;
-// 		//MAKE OPENCV VECTORS
-// 		for (cv::Point2f p:_current){
-// 			if (length(p)<.25){
-// 				currentTmp.push_back(cv::Point2f(p.x, p.y));
-// 			}
-// 		}
-// 		for (cv::Point2f p: _previous){
-// 			if (length(p)<.25){
-// 				previousTmp.push_back(cv::Point2f(p.x, p.y));
-// 			}
-// 		}
-// 		int diff = currentTmp.size()-previousTmp.size(); //if +ve,current is bigger, if -ve, previous is bigger
-
-// 		if(diff>0){
-// 			if (previousTmp.empty()){
-// 				//previousTmp = currentTmp;
-// 				return result;
-// 				}
-// 			else{
-// 				for (int i=0; i<abs(diff); i++){
-// 					previousTmp.push_back(previousTmp[0]); //before it was [-1]
-// 				if (previousTmp[-1].x == 0 && previousTmp[-1].y ==0){
-// 					printf("can't get previous data\n");
-// 				}
-
-// 			}
-// 			}
-// 		}
-// 		else if (diff<0){
-// 			if (currentTmp.empty()){
-// 				printf("no data\n");
-// 					return result;
-// 				}
-// 			else{
-// 				for (int i=0; i<abs(diff); i++){
-// 					currentTmp.push_back(currentTmp[0]);
-// 				}
-// 			}
-// 		}
-// 	//use partial affine transformation to estimate displacement
-// 	cv::Mat transformMatrix =cv::estimateAffinePartial2D(previousTmp, currentTmp, cv::noArray(), cv::LMEDS);
-// 	if (!transformMatrix.empty()){
-// 		result.p.x= -(transformMatrix.at<double>(0,2))/timeElapsed;
-// 		result.p.y = -(transformMatrix.at<double>(1,2))/timeElapsed;
-// 		result.q.Set(acos(transformMatrix.at<double>(0,0))/timeElapsed);
-// 		float posAngle = atan(result.p.y/result.p.x); //atan2 gives results between pi and -pi, atan gives pi/2 to -pi/2
-// 		if (result.p.y ==0 && result.p.x ==0){
-// 			posAngle =0;
-// 		}
-// 		if (result.p.Length()>MAX_SPEED){
-// 			result.p.x = currentTask.getAction().getLinearSpeed() *cos(posAngle);
-// 			result.p.y = currentTask.getAction().getLinearSpeed() *sin(posAngle);
-// 		}
-
-// 	}
-// 	return result;
-// 	}
-
-
-
-// void Configurator::reactiveAvoidance(b2World & world, simResult &r, Task &s){ //returns true if disturbance needs to be eliminated
-// 	r =s.willCollide(world, iteration, debugOn, SIM_DURATION, simulationStep);
-// 	if (r.resultCode == simResult::crashed){
-// 		printf("crashed\n");
-// 		//IF THERE IS NO PLAN OR THE Disturbance WE CRASHED INTO IS NOT ALREADY BEING AVOIDED ADD NEW Task TO THE PLAN
-// 		Point p(r.collision.getPosition());
-// 		if ((!s.disturbance.isValid()|| !(p.isInRadius(s.disturbance.getPosition())))){
-// 			s = Task(r.collision, Direction::DEFAULT);
-// 		}
-// 	}
-// }
-
 Disturbance Configurator::getDisturbance(TransitionSystem&g, vertexDescriptor v){
 	if (!g[v].disturbance.isValid()){
 		return controlGoal.disturbance;
@@ -382,14 +290,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
-	// if (debugOn){
-	// 	auto vs=boost::vertices(g);
-	// 	printf("previously in graph:");
-	// 	for (auto vi=vs.first; vi!=vs.second; vi++){
-	// 		printf(" v%i", (*vi));
-	// 	}
-	// 	printf("\n");
-	// }
 	printf("exploring\n");
 	do{
 		v=bestNext;
