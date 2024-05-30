@@ -1499,33 +1499,13 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	}
 	if (planning){
 		if (pv.empty()){
-			//currentVertex=movingVertex;
 			printf("no plan, bas\n");
-			//dummy_vertex(currentVertex);
-			// currentVertex=boost::add_vertex(transitionSystem);
-			// gt::fill(simResult(), &transitionSystem[currentVertex]);
-			// transitionSystem[currentVertex].direction=DEFAULT;
-			//currentTask.action.setVelocities(0,0);
-			// movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			// currentEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			// errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
-
 			return pv;
 		}
-		//if (currentVertex!=movingVertex){
-		//if (!pv.empty()){
 			printf("change plan\n");
-			//std::vector ie=gt::inEdges(transitionSystem, pv[0], transitionSystem[pv[0]].direction);
-			//edgeDescriptor visited_edge=gt::visitedEdge(ie, transitionSystem);
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-			// int m_step=0;
-			// if (visited_edge!=edgeDescriptor()){
-			// 	m_step=transitionSystem[visited_edge].step;
-			// }
-			// transitionSystem[ep.first].step=m_step;
 			currentVertex= pv[0];
 			currentEdge=ep.first;
-		//}
 		boost::clear_vertex(movingVertex, transitionSystem);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
@@ -1536,10 +1516,10 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){
-			currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
+			currentTask = Task(transitionSystem[currentVertex].disturbance, DEFAULT); //reactive
 		}
 		else if(currentTask.direction!=DEFAULT){
-				currentTask = Task(transitionSystem[0].disturbance, DEFAULT); //reactive
+				currentTask = Task(transitionSystem[currentVertex].disturbance, DEFAULT); //reactive
 		}
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
