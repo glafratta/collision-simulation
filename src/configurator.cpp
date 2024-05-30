@@ -1131,7 +1131,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 		return;
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
-	int stepsTraversed= g[currentEdge].step-currentTask.motorStep; //eb.first
+	int stepsTraversed= g[eb.first].step-currentTask.motorStep; //eb.first
 	float theta_exp=stepsTraversed*MOTOR_CALLBACK*currentTask.action.getOmega();
 	float theta_obs=theta_exp;//currentTask.correct.getError()-theta_exp;
 	if (currentTask.getAction().getOmega()!=0){
