@@ -3,6 +3,7 @@
 
 #include <thread>
 #include "configurator.h"
+#include "CppTimer.h"
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
@@ -13,7 +14,8 @@
 #include <ctime>
 #include <dirent.h>
 #include <filesystem>
-#include "CppTimer.h"
+#define _USE_MATH_DEFINES
+
 
 void printGraph(TransitionSystem& g){
     boost::print_graph(g);
