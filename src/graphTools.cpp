@@ -27,7 +27,8 @@ void gt::fill(simResult sr, State* s, Edge* e){
 }
 
 int gt::simToMotorStep(int simStep){
-	return std::floor(simStep/(HZ*MOTOR_CALLBACK)+0.5);
+	float result =std::floor(float(simStep)/(HZ*MOTOR_CALLBACK)+0.5);
+	return int(result);
 }
 
 // simResult State::getSimResult(){
