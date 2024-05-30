@@ -82,12 +82,14 @@ public:
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     float L=0;
 	float R=0;
+	vertexDescriptor start;
 
 public:
 int ogStep=0;
 Configurator * c;
 
 MotorCallback(Configurator *conf): c(conf){
+	start=c->currentVertex;
 }
 void step( AlphaBot &motors){
 	c->printPlan();
