@@ -90,31 +90,26 @@ Configurator * c;
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	printf("g size=%i, current vertex=%i\n", c->transitionSystem.m_vertices.size(), c->currentVertex);
 	c->printPlan();
-	printf("current task dir =%i\n", c->getTask()->direction);
 	if (c->getIteration() <=0){
 		return;
 	}
 	if (c->planVertices.empty() & c->planning){
-		printf("nae plan\n");
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
     ExecutionError ee =c->trackTaskExecution(*c->getTask());
-	//printf("tracked\n");
     if (c->getTask()->motorStep>0){
-        //Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     }
-	//printf("corrected\n");
 	EndedResult er = c->controlGoal.checkEnded();
 	if (er.ended){
-		c->controlGoal.change =1;
+		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);
+		c->controlGoal = Task(new_goal, DEFAULT);
+		start=c->currentVertex;
+		printf("goal reached\n");
 	}
-	//printf("tracking, d is x =%f, y=%f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y);
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-	//printf("changed")
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
