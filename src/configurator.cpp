@@ -488,6 +488,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	vertexDescriptor connecting; //og: src=currentV
 	std::vector <edgeDescriptor> frontier;
 	bool run=true;
+	if (currentVertex==movingVertex){
+		return plan;
+	}
 	//std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(src,0)};
 	do{
 		//priorityQueue.erase(priorityQueue.begin());
