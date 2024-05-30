@@ -122,6 +122,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			plan_provisional=planner(transitionSystem, src, been.second, been.first);
 		}
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
+		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() & plan_works){			
 			planVertices=plan_provisional;
 		}
