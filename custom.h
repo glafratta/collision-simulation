@@ -105,7 +105,7 @@ void step( AlphaBot &motors){
         c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     }
 	EndedResult er = c->controlGoal.checkEnded();
-	printf("control goal start: %f, %f, %f\n");
+	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.q.GetAngle());
 	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
 	if (er.ended){
 		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);
