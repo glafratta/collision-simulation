@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
 	}
-	printf("TARGETLESS PLANNING, hz=%f, turn f=%f", HZ, TURN_FRICTION);
+	printf("TARGETLESS PLANNING, hz=%f, turn f=%f yallaaaaa", HZ, TURN_FRICTION);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);
