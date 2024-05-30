@@ -95,10 +95,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		// 	currentTask.action.setVelocities(0,0);
 		// }
 		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
-		if (!checkedge.second){
-			printf("no edge\n");
-			return 0;
-		}
+		// if (!checkedge.second){
+		// 	printf("no edge\n");
+		// 	return 0;
+		// }
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
 		transitionSystem[movingVertex].disturbance.invalidate();
 		if (debugOn){
