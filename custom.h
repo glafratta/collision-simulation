@@ -97,7 +97,8 @@ void step( AlphaBot &motors){
 	if (c->getIteration() <=0){
 		return;
 	}
-	if (c->planVertices.empty() & c->planning){
+	//if (c->planVertices.empty() & c->planning){
+	if (!c->running){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}

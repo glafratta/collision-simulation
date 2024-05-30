@@ -23,9 +23,9 @@ int main(int argc, char** argv) {
 	MotorCallback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
 	motors.registerStepCallback(&cb);
-	configurator.start();
 	lidar.start();
 	motors.start();
+	configurator.start();
 	do {
 	} while (!getchar());
 	configurator.stop();
