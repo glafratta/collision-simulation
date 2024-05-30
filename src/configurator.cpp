@@ -1360,6 +1360,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 
 	//FINDING IF ROBOT IS GOING STRAIGHT
 	updateGraph(transitionSystem, error, deltaPose);//lateral error is hopefully noise and is ignored
+	printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){
 		t.change=1;
 	}
