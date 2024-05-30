@@ -10,6 +10,7 @@ find_package(PkgConfig)
 find_package(OpenCV REQUIRED)
 find_package(box2d REQUIRED)
 
+
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
