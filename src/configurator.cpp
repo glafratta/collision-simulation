@@ -1485,8 +1485,8 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	
 	// }
 	if(controlGoal.disturbance.isValid()){
-		controlGoal.start-=deltaPose;
 		controlGoal.disturbance.subtractPose(deltaPose);
 	}
+	controlGoal.start-=deltaPose;
 
 }
