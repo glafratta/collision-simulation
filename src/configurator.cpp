@@ -113,7 +113,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			src=movingVertex;
 		}
 		else{
-		 	//currentTask.action.setVelocities(0,0);
 			src=currentVertex;
 		}
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
@@ -130,14 +129,21 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//}
 		//if plan fails or not there, 
 		else{
+			//if (!plan_works)
 			is_not_v not_cv(currentVertex);
-			//if (!plan_works){
 				planVertices.clear();
 				boost::clear_vertex(movingVertex, transitionSystem);
 				dummy_vertex(movingVertex);//currentEdge.m_source
 				currentTask.change=1;
-//			}
+				//}
+		if (!planVertices.empty()){
+			src=movingVertex;
+		}
+		else{
 			src=currentVertex;
+		}
+//			src=currentVertex;
+
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
