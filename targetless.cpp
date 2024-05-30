@@ -12,6 +12,7 @@ int main(int argc, char** argv) {
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
+		printf("debug = %i\n", atoi(argv[1]));
 	}
 	if (argc>2){
 		configurator.simulationStep = atof(argv[2]);
