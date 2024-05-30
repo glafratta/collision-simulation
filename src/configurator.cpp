@@ -1236,6 +1236,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	float theta_obs=currentTask.correct.getError()-theta_exp;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(theta_obs);
+		printf("remaining angle=%f\n", remainingAngle);
 		if (t->direction==getOppositeDirection(currentTask.direction).second){
 			remainingAngle=M_PI-remainingAngle;
 		}
