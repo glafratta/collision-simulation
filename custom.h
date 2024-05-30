@@ -46,8 +46,8 @@ public:
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
+		printf("%s\n", name);
 		if (ci->debugOn){
-			printf("%s\n", name);
 			f=fopen(name, "w");
 		}
 		for (A1LidarData &data:data){
