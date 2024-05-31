@@ -386,13 +386,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v; //node being expanded
 			v1 =v0; //frontier
+			vertexDescriptor v0_exp=v0;
+			for (Direction d:g[v0].options){
 			do {
 			std::pair <State, Edge> sk(State(g[v0].options[0]), Edge());
 			bool topDown=1;
 			changeStart(start, v0, g);
-			vertexDescriptor v0_exp=v0;
-			for (Direction d:g[v0].options){
-				t = Task(getDisturbance(g, v0_exp), g[v0_exp].options[0], start, topDown);
+				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 				float _simulationStep=simulationStep;
 				adjustStepDistance(v0_exp, g, &t, _simulationStep);
 				//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
@@ -439,9 +439,10 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 				v0_exp=v1;
 				pruneEdges(toPrune,g, v, priorityQueue, toRemove);
-			}
+			
 			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
 			addToPriorityQueue(v1, priorityQueue, g[v1].phi);
+			}
 		}
 		bestNext=priorityQueue[0].first;
 		direction = g[boost::in_edges(bestNext, g).first.dereference().m_target].direction;
