@@ -173,6 +173,8 @@ void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task a
 
 //void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer_old(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
+
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
@@ -240,7 +242,7 @@ static void run(Configurator *);
 
 void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIGHT
 
-void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool);
+void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <std::pair<vertexDescriptor, float>>&, float phi=0);
 

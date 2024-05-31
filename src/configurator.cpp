@@ -288,7 +288,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 
-std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
+std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer_old(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	vertexDescriptor v1, v0, bestNext=v;
 	//Direction direction= t.direction;
 	Direction direction=g[v].direction;
@@ -303,7 +303,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		if (er.ended){
 			printf("ended %i\n", v);
 		}
-		applyTransitionMatrix(g, v, direction, er.ended);
+		applyTransitionMatrix(g, v, direction, er.ended, v);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0=v; //node being expanded
 			v1 =v0; //frontier
@@ -353,7 +353,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			// if (debugOn){
 			// 	printf("v= %i, start = (%f, %f, %f\n)", v1, start.p.x, start.p.y, start.q.GetAngle());
 			// }
-			applyTransitionMatrix(g, v1, t.direction, er.ended);
+			applyTransitionMatrix(g, v1, t.direction, er.ended, v);
 			g[v1].phi=evaluationFunction(er);
 			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 			v0=v1;
@@ -366,6 +366,89 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	}while(g[bestNext].options.size()>0);
 	return toRemove;
 }
+
+std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
+	vertexDescriptor v1=v, v0=v, bestNext=v;
+	//Direction direction= t.direction;
+	Direction direction=g[v].direction;
+	std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(bestNext,0)};
+	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
+	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
+	printf("exploring\n");
+	do{
+		v=bestNext;
+		priorityQueue.erase(priorityQueue.begin());
+		EndedResult er = controlGoal.checkEnded(g[v]);
+		if (er.ended){
+			printf("ended %i\n", v);
+		}
+		applyTransitionMatrix(g, v, direction, er.ended, v);
+		for (Direction d: g[v].options){ //add and evaluate all vertices
+			v0=v; //node being expanded
+			v1 =v0; //frontier
+			do {
+			std::pair <State, Edge> sk(State(g[v0].options[0]), Edge());
+			bool topDown=1;
+			changeStart(start, v0, g);
+			vertexDescriptor v0_exp=v0;
+			for (Direction d:g[v0].options){
+				t = Task(getDisturbance(g, v0_exp), g[v0_exp].options[0], start, topDown);
+				float _simulationStep=simulationStep;
+				adjustStepDistance(v0_exp, g, &t, _simulationStep);
+				//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
+				worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
+				setStateLabel(sk.first, v0_exp, t.direction); //new
+				simResult sim=simulate(sk.first, g[v0_exp], t, w, _simulationStep);
+				gt::fill(sim, &sk.first, &sk.second); //find simulation result
+				sk.first.direction=t.direction;
+				er  = estimateCost(sk.first, g[v0_exp].endPose);
+				State * source=NULL;
+				bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
+																				//v=0 and currentEdge =src will match so we try to prevent
+																				//changing the movign vertex which is by default the origin
+				if (v0_exp==movingVertex & vm){
+					source= g[currentEdge.m_source].ID;
+				}
+				else{
+					source=g[v0_exp].ID;
+				}
+				std::pair<bool, vertexDescriptor> match=findExactMatch(sk.first, g, source, t.direction);			
+				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+				if (!match.first){
+					edge= addVertex(v0_exp, v1,g, Disturbance(),sk.second);
+					g[edge.first.m_target].label=sk.first.label; //new edge, valid
+				}
+				else{
+					g[v0_exp].options.erase(g[v0_exp].options.begin());
+					v1=match.second; //frontier
+					if (!(v0_exp==v1)){
+						edge.first= boost::add_edge(v0_exp, v1, g).first; //assumes edge added
+						edge.second=true; //just means that the edge is valid
+						g[edge.first]=sk.second;//t.direction;
+					}
+				}
+				if(edge.second){
+					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
+					gt::adjustProbability(g, edge.first);
+				}
+				// if (debugOn){
+				// 	printf("v= %i, start = (%f, %f, %f\n)", v1, start.p.x, start.p.y, start.q.GetAngle());
+				// }
+				applyTransitionMatrix(g, v1, t.direction, er.ended, v);
+				g[v1].phi=evaluationFunction(er);
+				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
+				v0_exp=v1;
+				pruneEdges(toPrune,g, v, priorityQueue, toRemove);
+			}
+			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
+			addToPriorityQueue(v1, priorityQueue, g[v1].phi);
+		}
+		bestNext=priorityQueue[0].first;
+		direction = g[boost::in_edges(bestNext, g).first.dereference().m_target].direction;
+	}while(g[bestNext].options.size()>0);
+	return toRemove;
+}
+
 
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g){
@@ -831,7 +914,10 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	}
 	else { //will only enter if successful
 		if (d== LEFT || d == RIGHT){
-			state.options = {DEFAULT, state.direction};
+			state.options = {DEFAULT};
+			if (src==currentVertex){
+				state.options.push_back(state.direction);
+			}
 		}
 		else {
 			if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
@@ -871,8 +957,8 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	// }
 }
 
-void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v, Direction d, bool ended){
-	if (!g[v].options.empty()){
+void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src){
+	if (!g[v0].options.empty()){
 		return;
 	}
 	if (controlGoal.endCriteria.hasEnd()){
@@ -880,10 +966,10 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v,
 			return;
 		}
 	}
-	else if(round(g[v].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
+	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	transitionMatrix(g[v], d, v);
+	transitionMatrix(g[v0], d, src);
 }
 
 
