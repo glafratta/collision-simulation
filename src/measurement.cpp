@@ -73,18 +73,10 @@ float EndCriteria::getStandardError(EndCriteria ec){ //standard error
 
 float EndCriteria::getStandardError(Angle a, Distance d, State n){
     float result =0, coefficient=0.3;
-    // float outcomeError=0;
-    if (n.filled){
-        switch (n.outcome){
-            case simResult::crashed: 
-            //outcomeError+=2; 
-            coefficient=1;
-            break; //the max error is 3 (1 from norm angle and distance, 2 from outcome)
-            default:
-            break;
-        }
+    if (n.filled & n.outcome== simResult::crashed){
+        coefficient=1;
     }
-    result = getStandardError(a, d)*coefficient; //+ weights[2]*outcomeError;
+    result = getStandardError(a, d); //+ weights[2]*outcomeError;
     return result; //normalised to max value it can take
 }
 

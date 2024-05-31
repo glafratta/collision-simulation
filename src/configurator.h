@@ -238,7 +238,7 @@ void registerInterface(ConfiguratorInterface *);
 
 static void run(Configurator *);
 
-void transitionMatrix(State&, Direction); //DEFAULT, LEFT, RIGHT
+void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIGHT
 
 void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool);
 

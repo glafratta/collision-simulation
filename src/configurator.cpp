@@ -700,14 +700,7 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start){
 }
 
 
-float Configurator::evaluationFunction(EndedResult er){
-	// float planPriority=0.0;
-    // for (vertexDescriptor p:planVertices){
-	// 	if (p==v){
-    //    		planPriority=0.0;
-	// 		break;
-	// 	}
-    // } 
+float Configurator::evaluationFunction(EndedResult er){ 
 	return (abs(er.estimatedCost)+abs(er.cost))/2; //normalised to 1
 }
 
@@ -818,7 +811,7 @@ void Configurator::run(Configurator * c){
 }
 
 
-void Configurator::transitionMatrix(State& state, Direction d){
+void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor src){
 	Task temp(controlGoal.disturbance, DEFAULT, state.endPose); //reflex to disturbance
 	//switch (numberOfM){
 	//	case (THREE_M):{
@@ -835,6 +828,9 @@ void Configurator::transitionMatrix(State& state, Direction d){
 				}
 			}
 			}
+		else if (src==currentVertex){
+			state.options.push_back(state.direction);
+		}
 	}
 	else { //will only enter if successful
 		if (d== LEFT || d == RIGHT){
@@ -890,7 +886,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v,
 	else if(round(g[v].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	transitionMatrix(g[v], d);
+	transitionMatrix(g[v], d, v);
 }
 
 
