@@ -828,13 +828,10 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 				}
 			}
 			}
-		else if (src==currentVertex){
-			state.options.push_back(state.direction);
-		}
 	}
 	else { //will only enter if successful
 		if (d== LEFT || d == RIGHT){
-			state.options = {DEFAULT};
+			state.options = {DEFAULT, state.direction};
 		}
 		else {
 			if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
