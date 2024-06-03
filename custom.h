@@ -110,7 +110,7 @@ void step( AlphaBot &motors){
 	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
 	if (er.ended){
 		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);
-		printf("new goal v=%i, position= %f, %f\n", start, new_goal.pose().p.x, new_goal.pose().p.y);
+		printf("new goal v=%i, position= %f, %f, valid =%i\n", start, new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
 		c->controlGoal = Task(new_goal, DEFAULT);
 		printf("goal reached\n");
 	}

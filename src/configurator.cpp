@@ -16,8 +16,6 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	transitionSystem[currentVertex].nObs++;
 	transitionSystem[currentVertex].direction=STOP;
 	currentTask=Task(Direction::STOP);
-	//currentTask.action.init(transitionSystem[currentVertex].direction);
-	//currentTask.direction= transitionSystem[currentVertex].direction;
 	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
@@ -90,25 +88,15 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	if (planning){ //|| !planError.m_vertices.empty())
-		// if (currentVertex==movingVertex){
-		// 	currentVertex=boost::add_vertex(transitionSystem);
-		// 	currentTask.action.setVelocities(0,0);
-		// }
 		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
-		// if (!checkedge.second){
-		// 	printf("no edge\n");
-		// 	return 0;
-		// }
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
 		transitionSystem[movingVertex].disturbance.invalidate();
 		if (debugOn){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		std::pair<bool, vertexDescriptor> been= been_there(transitionSystem, controlGoal.disturbance);
-//		transitionSystem[movingEdge].step=currentTask.motorStep;
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
-//		if (iteration>1){
 		if (!planVertices.empty()){
 			src=movingVertex;
 		}
@@ -116,7 +104,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			src=currentVertex;
 		}
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
-		//if been there and plan exists, check plan
 		if (been.first){
 			printf("provisional plan\n");
 			plan_provisional=planner(transitionSystem, src, been.second, been.first);
@@ -141,7 +128,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		else{
 			src=currentVertex;
 		}
-//			src=currentVertex;
 			resetPhi(transitionSystem);
 			toRemove=explorer_old(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);

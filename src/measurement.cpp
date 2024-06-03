@@ -33,13 +33,13 @@ bool Measurement::operator>=(Measurement &m2){
     return r;
 }
 
-float Measurement::getError(Measurement m2){
-    float result =0;
-    if (m2.isValid() & this->isValid()){
-        result= this->get()-m2.get();
-    }
-    return result;
-}
+// float Measurement::getError(Measurement m2){
+//     float result =0;
+//     if (m2.isValid() & this->isValid()){
+//         result= this->get()-m2.get();
+//     }
+//     return result;
+// }
 
 float Measurement::getStandardError(Measurement m2, float max){ 
     float result =0;
@@ -53,23 +53,18 @@ float Measurement::getStandardError(Measurement m2, float max){
     return result;
 }
 
-float EndCriteria::getError(EndCriteria ec){ //not normalised
-    float result =0;
-    result = angle.getError(ec.angle) + distance.getError(ec.distance);
-    return result;
-}
+// float EndCriteria::getError(EndCriteria ec){ //not normalised
+//     float result =0;
+//     result = angle.getError(ec.angle) + distance.getError(ec.distance);
+//     return result;
+// }
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = weights[0]*fabs(angle.getStandardError(a, MAX_ANGLE_ERROR))+weights[1]*fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR)); //max =2;
+    result = fabs(angle.getStandardError(a, MAX_ANGLE_ERROR))+fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR)); //max =2;
     return result/2; //return normalise
 }
 
-float EndCriteria::getStandardError(EndCriteria ec){ //standard error
-    float result =0;
-    result = getStandardError(ec.angle, ec.distance);
-    return result;
-}
 
 float EndCriteria::getStandardError(Angle a, Distance d, State n){
     float result =0, coefficient=0.3;
@@ -91,11 +86,3 @@ float SignedVectorLength(b2Vec2 v){
 bool EndCriteria::hasEnd(){
     return angle.isValid() || distance.isValid();
 }
-
-// float EndedResult::evaluationFunction(std::vector <vertexDescriptor> plan, vertexDescriptor v){ //h(n) = error, cost is the n of D
-// 	float planPriority=0.0;
-//     if (!plan.empty() & u_long(v)>=0){
-//         planPriority=1.0;
-//     } 
-//     return abs(estimatedCost) +abs(cost)+planPriority;
-// 	}

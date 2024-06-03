@@ -37,9 +37,7 @@ public:
 
 class Configurator{
 protected:
-//	double samplingRate = 1.0/ 5.0; //default
 	int iteration=0; //represents that hasn't started yet, robot isn't moving and there are no map data
-	//char fileNameBuffer[50];
 	Task currentTask;
 	bool benchmark=0;
 public:
@@ -58,13 +56,10 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	//SensorProc * sensorProc=NULL;
 	PointCloudProc pcProc;
 	ImgProc imgProc;
 	std::vector <vertexDescriptor> planVertices;
-	bool discretized =0;
 	TransitionSystem transitionSystem;
-	//Model model;
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
 	vertexDescriptor movingVertex;
@@ -81,7 +76,6 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	currentVertex=movingVertex;
 	transitionSystem[movingVertex].direction=STOP;
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
-	//dummy_vertex(movingVertex);
 }
 
 void setBenchmarking(bool b){
@@ -121,8 +115,6 @@ int getIteration(){
 	return iteration;
 }
 
-//DeltaPose GetRealVelocity(CoordinateContainer &, CoordinateContainer &);
-
 void addIteration(){
 	iteration++;
 }
@@ -150,8 +142,6 @@ void trackDisturbance(b2Transform &, Task::Action, float);
 void updateGraph(TransitionSystem&, ExecutionError error, b2Transform);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
-
-//void deadEnd(Tra)
 
 void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
 
