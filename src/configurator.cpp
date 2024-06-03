@@ -144,9 +144,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			src=currentVertex;
 		}
 //			src=currentVertex;
-
 			resetPhi(transitionSystem);
-			toRemove=explorer(src, transitionSystem, currentTask, world);
+			toRemove=explorer_old(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
 			Connected connected(&transitionSystem);
 			FilteredTS fts(transitionSystem, boost::keep_all(), connected);
@@ -389,10 +388,10 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			vertexDescriptor v0_exp=v0;
 			for (Direction d:g[v0].options){
 			do {
-			std::pair <State, Edge> sk(State(g[v0].options[0]), Edge());
+			std::pair <State, Edge> sk(State(g[v0_exp].options[0]), Edge());
 			bool topDown=1;
 			changeStart(start, v0, g);
-				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
+				t = Task(getDisturbance(g, v0_exp), g[v0_exp].options[0], start, topDown);
 				float _simulationStep=simulationStep;
 				adjustStepDistance(v0_exp, g, &t, _simulationStep);
 				//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
