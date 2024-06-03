@@ -126,8 +126,6 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		if (!plan_provisional.empty() & plan_works){			
 			planVertices=plan_provisional;
 		}
-		//else{
-		//}
 		//if plan fails or not there, 
 		else{
 			//if (!plan_works)
@@ -1481,7 +1479,6 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
-
 	if (!b){
 		return pv;
 	}

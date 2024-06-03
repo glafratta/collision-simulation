@@ -31,6 +31,8 @@ public:
 		pcProc->updatePrevious(data);
 	}
 
+
+
 };
 
 class Configurator{
@@ -40,7 +42,6 @@ protected:
 	//char fileNameBuffer[50];
 	Task currentTask;
 	bool benchmark=0;
-	vertexDescriptor movingVertex;
 public:
 	ConfiguratorInterface * ci=NULL;
 	bool running =0;
@@ -66,6 +67,7 @@ public:
 	//Model model;
 	StateMatcher matcher;
 	WorldBuilder worldBuilder;
+	vertexDescriptor movingVertex;
 	vertexDescriptor currentVertex;
 	edgeDescriptor movingEdge, currentEdge;
 	std::unordered_map <State*, ExecutionError> errorMap;
