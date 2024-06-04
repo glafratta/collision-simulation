@@ -61,18 +61,20 @@ float Measurement::getStandardError(Measurement m2, float max){
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = fabs(angle.getStandardError(a, MAX_ANGLE_ERROR))+fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR)); //max =2;
+    float a_error=fabs(angle.getStandardError(a, MAX_ANGLE_ERROR));
+    float d_error=fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR));
+    result = a_error +d_error; //max =2;
     return result/2; //return normalise
 }
 
 
 float EndCriteria::getStandardError(Angle a, Distance d, State n){
-    float result =0, coefficient=0.3;
-    if (n.filled & n.outcome== simResult::crashed){
-        coefficient=1;
-    }
+    float result =0;
     result = getStandardError(a, d); //+ weights[2]*outcomeError;
-    return result; //normalised to max value it can take
+    if (n.filled & n.outcome== simResult::crashed){
+        result+=2;
+    }
+    return result/3; //normalised to max value it can take
 }
 
 float SignedVectorLength(b2Vec2 v){

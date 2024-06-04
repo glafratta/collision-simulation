@@ -258,23 +258,18 @@ Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     direction = DEFAULT;
     action.init(direction);
-    //Angle a(0);
-    //a.setValid(0);
-    //setEndCriteria(SAFE_ANGLE, 0);    
     printf("default constructro\n");
 }
 
 Task(Direction d){
     direction=d;
     action.init(direction);
-    //setEndCriteria();
 }
 
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
     direction = H(disturbance, d, topDown);  
-    //action = Action(direction);
     action.init(direction);
     setEndCriteria();
 }

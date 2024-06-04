@@ -145,8 +145,8 @@ Direction Task::H(Disturbance ob, Direction d, bool topDown){
 void Task::setEndCriteria(Angle angle, Distance distance){
 	switch(disturbance.getAffIndex()){
 		case PURSUE:{
-			endCriteria.angle=angle;
-			endCriteria.angle.setValid(0);
+			endCriteria.angle=Angle(0);
+			//endCriteria.angle.setValid(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
@@ -155,7 +155,9 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 		endCriteria.angle = angle;
 		break;
 	}
-	
+	if (disturbance.isValid()){
+		endCriteria.valid_d=true;
+	}
 }
 
 EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transform> use_start, Direction dir){ //self-ended
@@ -177,14 +179,15 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
 		if (action.getOmega()!=0){
-			float angleL = start.q.GetAngle()+endCriteria.angle.get();
-			float angleR = start.q.GetAngle()-endCriteria.angle.get();
+			float angleL = start.q.GetAngle()+SAFE_ANGLE;
+			float angleR = start.q.GetAngle()-SAFE_ANGLE;
 			if (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR){
 				disturbance.invalidate();
 				r.ended = 1;
 			}
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
+			a =Angle(robotTransform.q.GetAngle());
 			r.ended = true;
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){

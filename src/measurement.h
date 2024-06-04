@@ -56,11 +56,9 @@ class Distance: public Measurement{
 struct EndCriteria{
     Angle angle;
     Distance distance;    //max distance, ideal
-    //float getError(EndCriteria); //expresses magnitude of error, not normalised
-    //float getStandardError(EndCriteria);
+    bool valid_d=false;
     float getStandardError(Angle, Distance);
     float getStandardError(Angle, Distance, State);
-   // std::vector <float> weights = {1, 1, 1}; //0:angle, 1: distance, 2: outcome (if node)
     bool hasEnd();
 
 };
