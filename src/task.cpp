@@ -195,7 +195,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 	else if (dir==LEFT || dir ==RIGHT){
 		float angleL = this_start.q.GetAngle()+endCriteria.angle.get();
 		float angleR = this_start.q.GetAngle()-endCriteria.angle.get();
-		r.ended = (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR) & r.ended;
+		r.ended = (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR);
 	}
 	r.estimatedCost = endCriteria.getStandardError(a,d);
 	return r;
