@@ -16,9 +16,10 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	transitionSystem[currentVertex].nObs++;
 	//transitionSystem[currentVertex].direction=STOP;
 	currentTask=Task(Direction::STOP);
-	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
+//	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
+	("dummy, current edge = %i, %i\n", src, currentVertex);
 	transitionSystem[movingEdge].direction=STOP;
 	transitionSystem[currentEdge].direction=STOP;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
@@ -96,6 +97,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		std::pair<bool, vertexDescriptor> been= been_there(transitionSystem, controlGoal.disturbance);
+		printf("checked been = %i\n", been);
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
 		if (!planVertices.empty()){
@@ -109,6 +111,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("provisional plan\n");
 			plan_provisional=planner(transitionSystem, src, been.second, been.first);
 		}
+		printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() & plan_works){			
@@ -633,6 +636,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	int it=-1;//this represents currentv
 	//edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 	auto ep=boost::edge(movingVertex, currentVertex, g);
+	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -664,6 +668,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
 				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
+				printf("added vertex %i in check plan\n", v1);
 			}
 			else{
 				ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
@@ -694,6 +699,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	do{
 		i++;
+		printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			if (es.first==es.second){
 				vertexDescriptor new_src=e.m_target;
@@ -708,12 +714,9 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 			}
 		result=g[e.m_source].endPose;
 
-	//	}
-	//	else{
-	//		break;
-	//	}
-		}while (g[e].direction==t->direction & i<planVertices.size());
 
+		}while (g[e].direction==t->direction & i<planVertices.size());
+	printf("ended skip\n");
 	return result;
 }
 
@@ -1057,8 +1060,10 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 			& difference[2]<matcher.error.angle & sum<best.first){
 				best.first=sum;
 				best.second=*vi;
+				result.first=true;
 			}
 	}
+	result.second=best.second;
 	return result; //if been there, do not explore, extract a plan then check it
 }
 
@@ -1226,7 +1231,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	if(currentTask.getAction().getLinearSpeed()>0){
 		step-= (stepsTraversed*MOTOR_CALLBACK)*currentTask.action.getLinearSpeed();
 	}			// -estimated distance covered
-
+	printf("adjusted\n");
 }
 
 
@@ -1477,15 +1482,16 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			printf("no plan, bas\n");
 			return pv;
 		}
-			printf("change plan\n");
-			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-			currentVertex= pv[0];
-			currentEdge=ep.first;
-			boost::clear_vertex(movingVertex, transitionSystem);
-			movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
-			//transitionSystem[currentEdge].direction=transitionSystem[movingEdge].direction;
-		
+		printf("change plan\n");
+		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
+		printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
+		currentVertex= pv[0];
+		currentEdge=ep.first;
+		boost::clear_vertex(movingVertex, transitionSystem);
+		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
+		//transitionSystem[currentEdge].direction=transitionSystem[movingEdge].direction;
+	
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);

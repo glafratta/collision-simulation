@@ -55,7 +55,6 @@ void WorldBuilder::setRect(std::vector <Pointf>nb, BodyFeatures& feature){//gets
     feature.halfLength=h/2;
     feature.halfWidth=w/2;
     feature.pose.p=b2Vec2(x_glob, y_glob);
-    feature.
 }
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
