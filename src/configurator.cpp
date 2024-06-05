@@ -631,7 +631,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	bool result=true;
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
-	if (p.empty()){
+	if (p.empty()||currentTask.motorStep==0){
 		return false;
 	}
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
@@ -674,6 +674,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
 			if (sk.first.outcome==simResult::crashed){
+				printf("plan crashes\n");
 				result=false;
 			}
 		}
