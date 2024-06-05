@@ -114,7 +114,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
-		if ((!plan_provisional.empty() & transitionSystem[currentEdge].direction!=STOP)& plan_works){			
+		if (!plan_provisional.empty()& plan_works){			
 			planVertices=plan_provisional;
 			printf("going with old plan\n");
 		}
@@ -631,7 +631,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	bool result=true;
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
-	if (p.empty() & currentTask.motorStep==0){
+	if (p.empty()){
 		return false;
 	}
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
