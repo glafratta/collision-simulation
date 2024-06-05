@@ -142,7 +142,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			transitionSystem.swap(tmp);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
-			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, ep.second);
+			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 
 		}
 		if (debugOn){
