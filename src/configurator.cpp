@@ -114,7 +114,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
-		if (!plan_provisional.empty() & plan_works){			
+		if ((!plan_provisional.empty() & transitionSystem[currentEdge].direction!=STOP)& plan_works){			
 			planVertices=plan_provisional;
 			printf("going with old plan\n");
 		}
@@ -631,8 +631,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	bool result=true;
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
-	if (p.empty()){
-		return result;
+	if (p.empty() & currentTask.motorStep==0){
+		return false;
 	}
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
 
@@ -1484,9 +1484,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		printf("change plan\n");
-		if (transitionSystem[currentEdge].direction!=STOP){
-			pv.erase(pv.begin());
-		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 	//	printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
 		currentVertex= pv[0];
@@ -1496,7 +1493,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		// pv.erase(pv.begin());
+		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
