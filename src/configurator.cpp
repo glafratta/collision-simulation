@@ -116,6 +116,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() & plan_works){			
 			planVertices=plan_provisional;
+			printf("going with old plan\n");
 		}
 		//if plan fails or not there, 
 		else{
