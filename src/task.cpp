@@ -205,11 +205,11 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 
 }
 
-EndedResult Task::checkEnded(State n, std::pair<bool,b2Transform> use_start){ //check error of node compared to the present Task
+EndedResult Task::checkEnded(State n,  Direction dir, std::pair<bool,b2Transform> use_start){ //check error of node compared to the present Task
 	EndedResult r;
 	Angle a;
 	Distance d;
-	r = checkEnded(n.endPose, use_start, n.direction);
+	r = checkEnded(n.endPose, use_start, dir);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }

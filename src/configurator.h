@@ -74,7 +74,8 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex=movingVertex;
-	transitionSystem[movingVertex].direction=STOP;
+	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	transitionSystem[movingEdge].direction=STOP;
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
 
@@ -184,7 +185,7 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		v1 = boost::add_vertex(g);
 		result = add_edge(src, v1, g);
 		g[result.first] =edge;
-		g[v1].direction=g[src].options[0];
+		g[result.first].direction=g[src].options[0];
 		if (!topDown){
 			g[src].options.erase(g[src].options.begin());
 		}

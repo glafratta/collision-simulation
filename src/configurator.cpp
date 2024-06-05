@@ -359,7 +359,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	do{
 		v=bestNext;
 		priorityQueue.erase(priorityQueue.begin());
-		EndedResult er = controlGoal.checkEnded(g[v]);
+		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
 		if (er.ended){
 			printf("ended %i\n", v);
 		}
