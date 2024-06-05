@@ -33,7 +33,7 @@ struct Edge{
 
 	Edge()=default;
 
-	Edge(Direction d=DEFAULT):direction(d){}
+	Edge(Direction d):direction(d){}
 
 	float weighted_probability(int it){
 		float result=0;
