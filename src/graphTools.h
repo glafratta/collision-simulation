@@ -26,12 +26,14 @@ enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 typedef std::vector <float> DistanceVector;
 
 struct Edge{
-	//Direction direction=DEFAULT;
+	Direction direction=DEFAULT;
 	float probability=1.0;
 	int step=0;
 	int it_observed=-1; //last iteration where this edge was observed
 
 	Edge()=default;
+
+	Edge(Direction d=DEFAULT):direction(d){}
 
 	float weighted_probability(int it){
 		float result=0;
@@ -54,12 +56,12 @@ struct State{
 	State* ID=this;
 	float phi=10.0; //arbitrarily large phi
 	VERTEX_LABEL label=VERTEX_LABEL::UNLABELED;
-	Direction direction=DEFAULT;
+	//Direction direction=DEFAULT;
 
 	
 	State()=default;
 
-	State(Direction d): direction(d){}
+	//State(Direction d): direction(d){}
 
 	bool visited(){
 		return phi<=1.0;

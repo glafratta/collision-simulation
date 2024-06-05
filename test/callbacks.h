@@ -29,7 +29,7 @@ void printEdges(TransitionSystem& g, Predicate p){
     auto es = boost::edges(g);
     for (auto ei=es.first; ei!=es.second;ei++){
         if (!p(*ei)){
-            printf("%i->%i, direction=%i,probability=%f, step=%i\n", (*ei).m_source, (*ei).m_target, g[(*ei).m_target].direction, g[*ei].probability, g[*ei].step);
+            printf("%i->%i, direction=%i,probability=%f, step=%i\n", (*ei).m_source, (*ei).m_target, g[(*ei)].direction, g[*ei].probability, g[*ei].step);
         }
     }
 }
@@ -37,7 +37,7 @@ void printEdges(TransitionSystem& g, Predicate p){
 void printEdges(TransitionSystem& g){
     auto es = boost::edges(g);
     for (auto ei=es.first; ei!=es.second;ei++){
-        printf("%i->%i, direction=%i,probability=%f, step=%i\n", (*ei).m_source, (*ei).m_target, g[(*ei).m_target].direction, g[*ei].probability, g[*ei].step);
+        printf("%i->%i, direction=%i,probability=%f, step=%i\n", (*ei).m_source, (*ei).m_target, g[(*ei)].direction, g[*ei].probability, g[*ei].step);
     }
 }
 

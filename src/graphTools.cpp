@@ -49,7 +49,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!current){
 		g[e].step = sk.second.step;
 	}
-	else if (g[e.m_target].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
+	else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
 		result.setR(g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x);
 		errorMap.insert_or_assign(g[e.m_target].ID, result);
 	}
@@ -81,7 +81,7 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 	std::vector <edgeDescriptor> result;
 	auto es = boost::out_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei).m_target].direction == d){
+		if (g[(*ei)].direction == d){
 			result.push_back(*ei);
 		}
 	}
@@ -92,7 +92,7 @@ std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, vertexDescriptor v,
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei).m_target].direction == d){
+		if (g[(*ei)].direction == d){
 			result.push_back(*ei);
 		}
 	}
@@ -141,7 +141,7 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	std::vector <edgeDescriptor> sameTask;
 	//find total observations
 	for (auto ei= es.first; ei!=es.second; ei++){
-		if (g[((*ei).m_target)].direction==g[e.m_target].direction){
+		if (g[((*ei))].direction==g[e].direction){
 			totObs+=g[(*ei).m_target].nObs;
 			sameTask.push_back(*ei);
 			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
@@ -217,7 +217,7 @@ std::pair<bool, vertexDescriptor> StateMatcher::isPerfectMatch(TransitionSystem 
     std::pair<bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto edges= boost::out_edges(src, g);
 	for (auto ei=edges.first; ei!=edges.second; ++ei){
-		if (g[(*ei).m_target].direction==d & isPerfectMatch(s, g[ei.dereference().m_source])){
+		if (g[(*ei)].direction==d & isPerfectMatch(s, g[ei.dereference().m_source])){
 			result.first=true;
 			result.second=(*ei).m_target;
 			break;

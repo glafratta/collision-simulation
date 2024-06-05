@@ -14,11 +14,13 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	currentVertex=boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	transitionSystem[currentVertex].nObs++;
-	transitionSystem[currentVertex].direction=STOP;
+	//transitionSystem[currentVertex].direction=STOP;
 	currentTask=Task(Direction::STOP);
 	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
+	transitionSystem[movingEdge].direction=STOP;
+	transitionSystem[currentEdge].direction=STOP;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
 
 }
@@ -349,7 +351,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	//Direction direction= t.direction;
-	Direction direction=g[v].direction;
+	Direction direction=g[currentEdge].direction;
 	std::vector <vertexDescriptor> priorityQueue = {bestNext};
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
@@ -370,7 +372,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				v0=v0_exp; //node being expanded
 				v1 =v0; //frontier
 			do {
-			std::pair <State, Edge> sk(State(g[v0].options[0]), Edge());
+			std::pair <State, Edge> sk(State(), Edge(g[v0].options[0]));
 			bool topDown=1;
 			changeStart(start, v0, g);
 				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
@@ -381,8 +383,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				setStateLabel(sk.first, v0, t.direction); //new
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
-				sk.first.direction=t.direction;
-				er  = estimateCost(sk.first, g[v0].endPose);
+				sk.second.direction=t.direction;
+				er  = estimateCost(sk.first, g[v0].endPose, sk.second.direction);
 				State * source=NULL;
 				bool vm= matcher.isPerfectMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
 																				//v=0 and currentEdge =src will match so we try to prevent
@@ -425,7 +427,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 		}
 		bestNext=priorityQueue[0];
-		direction = g[boost::in_edges(bestNext, g).first.dereference().m_target].direction;
+		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
 	return toRemove;
 }
@@ -440,14 +442,14 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].disturbance;
 	while (ep.second){
-		if(g[ep.first.m_target].direction!=DEFAULT){
+		if(g[ep.first].direction!=DEFAULT){
 			break;
 		}
 		if (ep.first.m_target!=v1){
 			g[ep.first.m_target].disturbance = dist;
-			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose); //reassign cost
+			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
 			g[ep.first.m_target].phi =evaluationFunction(er);	
-			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g, g[ep.first.m_target].direction);
+			std::pair <bool, vertexDescriptor> match= findExactMatch(ep.first.m_target, g, g[ep.first].direction);
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.push_back(pair);			//first is eliminated, the second is its match
@@ -632,11 +634,11 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	//edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
 	auto ep=boost::edge(movingVertex, currentVertex, g);
 	do {
-		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
+		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, t.disturbance);
-		std::pair <State, Edge> sk;
-		sk.first.direction=t.direction;
+		std::pair <State, Edge> sk(State(), Edge(t.direction));
+		//sk.first.direction=t.direction;
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
@@ -658,7 +660,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
-			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.first.direction);
+			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
 				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
@@ -710,7 +712,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	//	else{
 	//		break;
 	//	}
-		}while (g[e.m_target].direction==t->direction & i<planVertices.size());
+		}while (g[e].direction==t->direction & i<planVertices.size());
 
 	return result;
 }
@@ -767,9 +769,9 @@ std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, v
 // }
 
 
-EndedResult Configurator::estimateCost(State &state, b2Transform start){
+EndedResult Configurator::estimateCost(State &state, b2Transform start, Direction d){
 	EndedResult er = controlGoal.checkEnded(state);
-	Task t(state.disturbance, state.direction, start);
+	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
 	return er;
 }
@@ -822,7 +824,7 @@ void Configurator::printPlan(){
 			printf("no edge: %i-> ", edge.first.m_source);
 		}
 		else{
-			auto a=dirmap.find(transitionSystem[edge.first.m_target].direction);
+			auto a=dirmap.find(transitionSystem[edge.first].direction);
 			printf("%i, %s, ", edge.first.m_target, (*a).second);
 		}
 		pre=edge.first.m_target;
@@ -908,7 +910,7 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 		if (d== LEFT || d == RIGHT){
 			state.options = {DEFAULT};
 			if (src==currentVertex & controlGoal.getAffIndex()==PURSUE){
-				state.options.push_back(state.direction);
+				state.options.push_back(d);
 			}
 		}
 		else {
@@ -1240,7 +1242,7 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 			e = *eit;
 			result.push_back(e);
 			v=e.m_source;
-		}while (g[e.m_target].direction==d);
+		}while (g[e].direction==d);
 	return result;
 } 
 
@@ -1259,7 +1261,7 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 				// 	EndedResult er= estimateCost(g[(*ei).m_target], g[(*ei).m_source].endPose, g[(*ei).m_target].direction);
 				// 	g[(*ei).m_target].phi= evaluationFunction(er);
 				// }
-				if (g[(*ei).m_target].direction==d){
+				if (g[(*ei)].direction==d){
 					result.push_back((*ei)); //assumes maximum depth of 2 vertices traversed
 				}
 				else{
@@ -1479,8 +1481,11 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 			currentVertex= pv[0];
 			currentEdge=ep.first;
-		boost::clear_vertex(movingVertex, transitionSystem);
-		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			boost::clear_vertex(movingVertex, transitionSystem);
+			movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
+			//transitionSystem[currentEdge].direction=transitionSystem[movingEdge].direction;
+		
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentVertex].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);

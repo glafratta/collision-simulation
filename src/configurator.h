@@ -218,7 +218,7 @@ b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float& );
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
-EndedResult estimateCost(State&, b2Transform); //returns whether the controlGoal has ended and fills node with cost and error
+EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
 
 //EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
