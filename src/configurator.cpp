@@ -97,7 +97,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		std::pair<bool, vertexDescriptor> been= been_there(transitionSystem, controlGoal.disturbance);
-		printf("checked been = %i\n", been);
+		printf("checked been = %i\n", been.first);
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
 		if (!planVertices.empty()){
@@ -119,19 +119,17 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		//if plan fails or not there, 
 		else{
-			//if (!plan_works)
 			is_not_v not_cv(currentVertex);
-				planVertices.clear();
-				boost::clear_vertex(movingVertex, transitionSystem);
-				dummy_vertex(movingVertex);//currentEdge.m_source
-				currentTask.change=1;
-				//}
-		if (!planVertices.empty()){
-			src=movingVertex;
-		}
-		else{
-			src=currentVertex;
-		}
+			planVertices.clear();
+			boost::clear_vertex(movingVertex, transitionSystem);
+			dummy_vertex(movingVertex);//currentEdge.m_source
+			currentTask.change=1;
+			if (!planVertices.empty()){
+				src=movingVertex;
+			}
+			else{
+				src=currentVertex;
+			}
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
@@ -143,6 +141,8 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 			transitionSystem.swap(tmp);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
+			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, ep.second);
+
 		}
 		if (debugOn){
 			printPlan();
