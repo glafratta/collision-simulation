@@ -628,17 +628,14 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 // }
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
-	//std::vector <vertexDescriptor> graphError;
 	bool result=true;
+	int it=-1;//this represents currentv
+	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	if (p.empty()){
 		return result;
 	}
-	//Task t= currentTask;
-	//t.check=1;
-	int it=-1;//this represents currentv
-	//edgeDescriptor e=boost::in_edges(p[0], g).first.dereference();
-	auto ep=boost::edge(movingVertex, currentVertex, g);
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
+
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -1491,6 +1488,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		currentVertex= pv[0];
 		currentEdge=ep.first;
 		boost::clear_vertex(movingVertex, transitionSystem);
+		printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
