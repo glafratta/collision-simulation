@@ -71,6 +71,7 @@ Configurator()=default;
 
 Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), currentTask(_task), debugOn(debug), timerOff(noTimer){
 	previousTimeScan = std::chrono::high_resolution_clock::now();
+	worldBuilder.debug=debug;
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex=movingVertex;

@@ -108,10 +108,10 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		}
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
 		if (been.first){
-			printf("provisional plan\n");
+		//	printf("provisional plan\n");
 			plan_provisional=planner(transitionSystem, src, been.second, been.first);
 		}
-		printf("plan provisional size = %i\n", plan_provisional.size());
+		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() & plan_works){			
@@ -162,7 +162,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 	printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
-		printf("open stat\n");
+		//printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
 		fclose(f);
 		//return 0; //stops when finished and doesn't execute
@@ -365,7 +365,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
 		if (er.ended){
-			printf("ended %i\n", v);
+		//	printf("ended %i\n", v);
 		}
 		applyTransitionMatrix(g, v, direction, er.ended, v);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
@@ -551,7 +551,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			}
 			else if (g[e.m_source].label!=UNLABELED){
 			 	boost::clear_vertex(e.m_source, g);
-				printf("cleared %i\n", e.m_source);
+			//	printf("cleared %i\n", e.m_source);
 			}
 			out_deg=boost::out_degree(e.m_target, g);
 		}
@@ -667,7 +667,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
 				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
-				printf("added vertex %i in check plan\n", v1);
+			//	printf("added vertex %i in check plan\n", v1);
 			}
 			else{
 				ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
@@ -698,7 +698,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	do{
 		i++;
-		printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
+		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			if (es.first==es.second){
 				vertexDescriptor new_src=e.m_target;
@@ -715,7 +715,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 
 		}while (g[e].direction==t->direction & i<planVertices.size());
-	printf("ended skip\n");
+//	printf("ended skip\n");
 	return result;
 }
 
@@ -1473,7 +1473,7 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
-	printf("currentTask change= %i\n", currentTask.change);
+	//printf("currentTask change= %i\n", currentTask.change);
 	if (!b){
 		return pv;
 	}
@@ -1484,18 +1484,18 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		}
 		printf("change plan\n");
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-		printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
+	//	printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
 		currentVertex= pv[0];
 		currentEdge=ep.first;
 		boost::clear_vertex(movingVertex, transitionSystem);
-		printf("changed current %i + cleared 0\n", currentVertex);
+	//	printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
-		printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
+	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
 	else{
 		if (transitionSystem[0].disturbance.isValid()){

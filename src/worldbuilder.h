@@ -24,7 +24,7 @@ class WorldBuilder{
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength); //returns bottom and top of bounding box
 
-    void setRect(std::vector <Pointf>, BodyFeatures&);//gets bounding box of points
+    std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pointf>);//gets bounding box of points
 
     b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 

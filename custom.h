@@ -12,20 +12,29 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+// std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+//     int count =0;
+//     std::vector <BodyFeatures> result;
+//     for (Pointf p: points){
+//         if (count%2==0){
+//             BodyFeatures feature;
+//             feature.pose.p = getb2Vec2(p); 
+//             result.push_back(feature);  
+//         }
+//         count++;
+//     }
+//     return result;
+// }
+
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-    int count =0;
     std::vector <BodyFeatures> result;
-    for (Pointf p: points){
-        if (count%2==0){
-            BodyFeatures feature;
-            feature.pose.p = getb2Vec2(p); 
-            result.push_back(feature);  
-        }
-        count++;
+    std::vector <Pointf> ptset= set2vec(points);
+    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
+    if (feature.first){
+        result.push_back(feature.second);
     }
     return result;
 }
-
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
@@ -109,10 +118,11 @@ void step( AlphaBot &motors){
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
 	if (er.ended){
-		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);
-		printf("new goal v=%i, position= %f, %f, valid =%i\n", start, new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
-		c->controlGoal = Task(new_goal, DEFAULT);
 		printf("goal reached\n");
+		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);
+		printf("new goal v=%i, position= %f, %f, 
+		valid =%i\n", start, new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
+		c->controlGoal = Task(new_goal, DEFAULT);
 	}
 	if (er.ended || start==c->movingVertex){
 		start=c->currentVertex;

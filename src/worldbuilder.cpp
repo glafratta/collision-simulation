@@ -28,13 +28,14 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     return result;
     }
 
-void WorldBuilder::setRect(std::vector <Pointf>nb, BodyFeatures& feature){//gets bounding box of points
+std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb){//gets bounding box of points
     float  h=fabs(0.0005*2), w=fabs(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
     // b2Transform pose;
+    std::pair <bool, BodyFeatures> result(0, BodyFeatures());
     if (nb.empty()){
-        return ;
+        return result;
     }
     CompareX compareX;
     CompareY compareY;
@@ -48,13 +49,14 @@ void WorldBuilder::setRect(std::vector <Pointf>nb, BodyFeatures& feature){//gets
         w= fabs((*maxx).x-(*minx).x);
     }
     x_glob= ((*maxx).x+(*minx).x)/2;
-    x_glob= ((*maxx).x+(*minx).x)/2;
+    y_glob= ((*maxy).y+(*miny).y)/2;
     // x_loc= x_glob -(*maxx).x;
     // y_loc=y_glob +(*miny).y;
     // rect=cv::Rect2f(x_loc, y_loc, w, h);
-    feature.halfLength=h/2;
-    feature.halfWidth=w/2;
-    feature.pose.p=b2Vec2(x_glob, y_glob);
+    result.second.halfLength=h/2;
+    result.second.halfWidth=w/2;
+    result.second.pose.p=b2Vec2(x_glob, y_glob);
+    result.first=true;
 }
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
@@ -151,7 +153,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         makeBody(world, f);
     }
 	FILE *f;
-	if (debug & disturbance.isValid()){
+	if (debug){
 		f = fopen(bodyFile, "a+");
 		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
 			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);

@@ -153,17 +153,27 @@ public:
     }
 };
 
+// std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+//     int count =0;
+// 	//buildType =2;
+//     std::vector <BodyFeatures> result;
+//     for (Pointf p: points){
+//         if (count%2==0){
+//             BodyFeatures feature;
+//             feature.pose.p = getb2Vec2(p); 
+//             result.push_back(feature);  
+//         }
+//         count++;
+//     }
+//     return result;
+// }
+
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-    int count =0;
-	//buildType =2;
     std::vector <BodyFeatures> result;
-    for (Pointf p: points){
-        if (count%2==0){
-            BodyFeatures feature;
-            feature.pose.p = getb2Vec2(p); 
-            result.push_back(feature);  
-        }
-        count++;
+    std::vector <Pointf> ptset= set2vec(points);
+    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
+    if (feature.first){
+        result.push_back(feature.second);
     }
     return result;
 }

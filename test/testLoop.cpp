@@ -53,4 +53,6 @@ int main(int argc, char** argv){
     printGraph(conf.transitionSystem);
    // conf.planner(conf.transitionSystem, src);
     conf.printPlan();
+    conf.planVertices =conf.changeTask(1, cb.ogStep, conf.planVertices);
+
 }
