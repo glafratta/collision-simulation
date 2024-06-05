@@ -225,8 +225,8 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
 	// pcProc.findOrientation(nb);
 	
-	cv::Rect2f rect =worldBuilder.getRect(nb);
-	result.collision.setAsBox(rect.width/2, rect.height/2);
+	// cv::Rect2f rect =worldBuilder.getRect(nb);
+	// result.collision.setAsBox(rect.width/2, rect.height/2);
 	return result;
 	}
 
@@ -1288,28 +1288,22 @@ std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, State * src, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
-	//MoreLikely more_likely;
-	//float nObs=0;
 	float prob=0;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
-		//if (dir!=Direction::UNDEFINED){
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
-		//}
 		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
 			if (!most_likely.first){
 			}
 			else if (g[most_likely.second].probability>prob){
-			//if(g[v].nObs>nObs){	
 				result.first=true;
 				result.second=v;
 				prob=g[most_likely.second].probability;
 
 			}
-			//break;
 		}
 	}
 	return result;

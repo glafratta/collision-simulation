@@ -14,7 +14,7 @@ class BodyFeatures{
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
-    b2FixtureDef fixtureDef;
+    //b2FixtureDef fixtureDef;
 
     BodyFeatures(){}
 
