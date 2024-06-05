@@ -19,7 +19,7 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 //	printf("currentTask l=%f, r=%f\n", currentTask.action.L, currentTask.action.R);
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
-	("dummy, current edge = %i, %i\n", src, currentVertex);
+	printf("dummy, current edge = %i, %i\n", src, currentVertex);
 	transitionSystem[movingEdge].direction=STOP;
 	transitionSystem[currentEdge].direction=STOP;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
@@ -551,6 +551,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			}
 			else if (g[e.m_source].label!=UNLABELED){
 			 	boost::clear_vertex(e.m_source, g);
+				printf("cleared %i\n", e.m_source);
 			}
 			out_deg=boost::out_degree(e.m_target, g);
 		}
@@ -1475,6 +1476,7 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
+	printf("currentTask change= %i\n", currentTask.change);
 	if (!b){
 		return pv;
 	}
@@ -1491,8 +1493,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		boost::clear_vertex(movingVertex, transitionSystem);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
-		//transitionSystem[currentEdge].direction=transitionSystem[movingEdge].direction;
-	
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
