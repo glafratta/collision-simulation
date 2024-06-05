@@ -29,7 +29,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 void WorldBuilder::setRect(std::vector <Pointf>nb, BodyFeatures& feature){//gets bounding box of points
-    float  h=fabs(0.0005*2), w=fabs(0.0005*2), ;
+    float  h=fabs(0.0005*2), w=fabs(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
     // b2Transform pose;

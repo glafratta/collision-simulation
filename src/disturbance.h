@@ -9,8 +9,8 @@
 class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
-    float halfLength=0.001; //x
-    float halfWidth=0.001; //y
+    float halfLength=0.0005; //x
+    float halfWidth=0.0005; //y
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
