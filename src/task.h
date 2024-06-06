@@ -7,13 +7,13 @@ class Task{
 public:
     friend class Configurator;
     char planFile[250]; //for debug
+    bool debug_k=false; //delete this it's for debugging on the bhenchod pi
     b2Transform start;
     bool change =0;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
-    bool debug_k =false; //delete this it's for debugging on the bhenchod pi
 //delet
 
 struct Action{
