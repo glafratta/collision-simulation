@@ -170,7 +170,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 	EndedResult r;
 	Angle a;
 	Distance d;
-	printf("check ended\n");
+	//printf("check ended\n");
 	b2Vec2 distance=this_start.p-robotTransform.p;
 	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		// if (DEBUG_K){
