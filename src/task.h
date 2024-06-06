@@ -276,7 +276,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     setEndCriteria();
     //DELETE!
     if (ob.getAffIndex()==PURSUE){
-        DEBUG_K=1;
+        DEBUG_K=true;
     }
 }
 
