@@ -61,14 +61,9 @@ public:
 		}
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <LIDAR_RANGE){
-				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
-				//float x = round(data.x*1000)/1000;
-				//float y = round(data.y*1000)/1000;
 				float x2 = round(data.x*100)/100;
 				float y2 = round(data.y*100)/100;
-				//p= (Pointf(x, y));
 				p2f=Pointf(x2, y2);
-				//ci->data.insert(p);
 				ci->data2fp.insert(p2f);
 				if (ci->debugOn){
 					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
