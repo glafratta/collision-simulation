@@ -91,13 +91,13 @@ public:
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     float L=0;
 	float R=0;
-	//vertexDescriptor start=TransitionSystem::null_vertex();
+	vertexDescriptor start=TransitionSystem::null_vertex();
 public:
 int ogStep=0;
 Configurator * c;
 
 MotorCallback(Configurator *conf): c(conf){
-	//start=c->currentVertex;
+	start=c->currentVertex;
 }
 void step( AlphaBot &motors){
 	c->printPlan();
@@ -116,7 +116,7 @@ void step( AlphaBot &motors){
     }
 	EndedResult er = c->controlGoal.checkEnded();
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
-	//printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
+	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y, c->transitionSystem[start].endPose.q.GetAngle());
 	printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
 	
 	if (er.ended){
