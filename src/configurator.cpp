@@ -632,7 +632,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	if (p.empty()||currentTask.motorStep==0){
-		return false;
+		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
+		return result;
 	}
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
 
