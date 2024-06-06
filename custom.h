@@ -117,7 +117,7 @@ void step( AlphaBot &motors){
 	EndedResult er = c->controlGoal.checkEnded();
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
-
+	printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[currentVertex].endPose.p.x, c->transitionSystem[currentVertex].endPose.p.y, c->transitionSystem[currentVertex].endPose.q.GetAngle());
 	
 	if (er.ended){
 		printf("goal reached\n");
