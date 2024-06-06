@@ -28,8 +28,6 @@ class BodyFeatures{
         halfWidth=f;
     }
 
-
-
 };
 
 struct Disturbance{ //this generates error
