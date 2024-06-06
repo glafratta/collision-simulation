@@ -781,9 +781,7 @@ std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, v
 
 
 EndedResult Configurator::estimateCost(State &state, b2Transform start, Direction d){
-	DEBUG_K=controlGoal.getAffIndex()==PURSUE;
 	EndedResult er = controlGoal.checkEnded(state);
-	DEBUG_K=0;
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
 	return er;
