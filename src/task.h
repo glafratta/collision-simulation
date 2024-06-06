@@ -273,9 +273,9 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     action.init(direction);
     setEndCriteria();
     //DELETE!
-    // if (ob.getAffIndex()==PURSUE){
-    //     debug_k=true;
-    // }
+    if (ob.getAffIndex()==PURSUE){
+        debug_k=true;
+    }
 }
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
