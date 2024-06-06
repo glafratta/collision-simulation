@@ -147,6 +147,7 @@ bool Configurator::Spawner(){
 		}
 		if (debugOn){
 			printPlan();
+			boost::print_graph(transitionSystem);
 			printf("graph size= %i\n", transitionSystem.m_vertices.size());
 		}
 
