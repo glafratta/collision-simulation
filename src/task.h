@@ -13,7 +13,7 @@ public:
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
-    bool DEBUG_K =false; //delete this it's for debugging on the bhenchod pi
+    bool debug_k =false; //delete this it's for debugging on the bhenchod pi
 //delet
 
 struct Action{
@@ -274,7 +274,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     setEndCriteria();
     //DELETE!
     // if (ob.getAffIndex()==PURSUE){
-    //     DEBUG_K=true;
+    //     debug_k=true;
     // }
 }
 
