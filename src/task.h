@@ -13,10 +13,8 @@ public:
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
-protected:
-public:
+    bool DEBUG_K=false; //delete this it's for debugging on the bhenchod pi
 //delet
-bool DEBUG_K=0; //delete this it's for debugging on the bhenchod pi
 
 struct Action{
 private:
