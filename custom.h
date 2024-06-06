@@ -78,7 +78,7 @@ public:
 		if (ci->debugOn){
 		fclose(f);
 		}
-		if (!ci->data2fpempty()){
+		if (!ci->data2fp.empty()){
 			ci->setReady(1);
 		}
 		ci->iteration++;
