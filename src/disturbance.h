@@ -14,7 +14,6 @@ class BodyFeatures{
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
-    //b2FixtureDef fixtureDef;
 
     BodyFeatures(){}
 
@@ -34,7 +33,6 @@ struct Disturbance{ //this generates error
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
-  //  float angleToRobot=0;
     bool rotation_valid=0;    
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
@@ -83,26 +81,14 @@ public:
         else{
             affordanceIndex = i;
         }
-		//bf.pose.Set(p, a);
         valid =1;
-        //partOfObject=1;
     }    
-
-    // void setAngle(float a){ //angle to robot
-    //     angleToRobot =a; 
-    // }
-   // void setAngle(b2Transform);
-
 
     float getAngle(b2Transform);
 
     float getAngle(b2Body* b){
         return getAngle(b->GetTransform());
     }
-
-    // float getAngle(){
-    //     return angleToRobot;
-    // }
 
     void setPosition(b2Vec2 pos){
         bf.pose.p.Set(pos.x, pos.y);
@@ -134,10 +120,6 @@ public:
     
         return std::pair<bool, float>(rotation_valid, bf.pose.q.GetAngle());
     }
-
-    // bool isPartOfObject(){
-    //     return partOfObject;
-    // }
 
     b2Transform pose(){
         return bf.pose;
@@ -184,10 +166,8 @@ struct simResult{
     resultType resultCode= successful;
     Disturbance collision;
     bool valid = 0;
-    //float distanceCovered =0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     int step=0;
-  //  int step=0;
 
 
     simResult(){}

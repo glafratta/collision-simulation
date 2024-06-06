@@ -1391,23 +1391,6 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 }
 
 
-// std::pair<bool, vertexDescriptor> Configurator::findBestMatch(State s){
-// 	//std::vector <vertexDescriptor> matches;
-// 	//vertexDescriptor v = boost::add_vertex(g);
-// 	//g[v].fill(sim);
-// 	std::pair<bool, vertexDescriptor> result(0, -1);
-// 	float bestDistance=10000;
-// 	for (vertexDescriptor stateV: transitionSystem.m_vertices){
-// 		DistanceVector dv = matcher.getDistance(:transitionSystem[stateV], s);
-// 		if (matcher.isPerfectMatch(dv) & matcher.sumVector(dv)<bestDistance){
-// 			result.second= stateV;
-// 			result.first=true;
-// 		}
-// 	}
-// 	return result;
-// }
-
-
 ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
 	// if (planVertices.empty() & planning){
@@ -1433,19 +1416,15 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	}		
 
 	b2Transform deltaPose;
-	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-	//float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error.r();
 	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
 	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
 	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					angularDisplacement); //og rot
-	//}
-
 	//FINDING IF ROBOT IS GOING STRAIGHT
 	updateGraph(transitionSystem, error, deltaPose);//lateral error is hopefully noise and is ignored
-	printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
+	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){
 		t.change=1;
 	}

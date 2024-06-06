@@ -113,17 +113,17 @@ void step( AlphaBot &motors){
         c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     }
 	EndedResult er = c->controlGoal.checkEnded();
-	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
 	
 	if (er.ended){
 		printf("goal reached\n");
+		printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 		Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		printf("new goal position= %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
 		c->controlGoal = Task(new_goal, DEFAULT);
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()); //temporary fix because motors on despacito are the wrong way around
+    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*0.95); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
