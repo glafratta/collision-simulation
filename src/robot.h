@@ -40,7 +40,7 @@ const int DC=0; //HZ
 const int cutoff_frequency=4; //HZ
 const int band_width=0.5;
 //delete
-bool DEBUG_K=0; //delete this it's for debugging on the bhenchod pi
+extern bool DEBUG_K=0; //delete this it's for debugging on the bhenchod pi
 
 class Robot {
 private: 
