@@ -114,7 +114,7 @@ bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
-		if (!plan_provisional.empty()& plan_works){			
+		if (!plan_provisional.empty() || plan_works){	//		
 			planVertices=plan_provisional;
 			printf("going with old plan\n");
 		}
@@ -631,11 +631,11 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	bool result=true;
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
-	if (p.empty()||currentTask.motorStep==0){
-		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
-		return result;
-	}
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
+	if (p.empty() & currentTask.motorStep==0){
+		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
+		return false;
+	}
 
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
@@ -1302,6 +1302,9 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
+		if (v==12){
+			printf("direction of in edges searched: %i, size = %i, ie deg=%i\n", dir, ie.size(), boost::in_degree(v, g));
+		}
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
@@ -1495,9 +1498,9 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		pv.erase(pv.begin());
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
+		pv.erase(pv.begin());
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
 	else{
