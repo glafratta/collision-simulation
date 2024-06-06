@@ -48,7 +48,7 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
-		ci->data.clear();
+		//ci->data.clear();
 		ci->data2fp.clear();
 		mapCount++;
 		Pointf p, p2f;
@@ -62,13 +62,13 @@ public:
 		for (A1LidarData &data:data){
 			if (data.valid&& data.r <LIDAR_RANGE){
 				//DATA IS ROUNDED AND DUPLICATES ARE ELIMINATED
-				float x = round(data.x*1000)/1000;
-				float y = round(data.y*1000)/1000;
+				//float x = round(data.x*1000)/1000;
+				//float y = round(data.y*1000)/1000;
 				float x2 = round(data.x*100)/100;
 				float y2 = round(data.y*100)/100;
-				p= (Pointf(x, y));
+				//p= (Pointf(x, y));
 				p2f=Pointf(x2, y2);
-				ci->data.insert(p);
+				//ci->data.insert(p);
 				ci->data2fp.insert(p2f);
 				if (ci->debugOn){
 					fprintf(f, "%.2f\t%.2f\n", p2f.x, p2f.y);
@@ -78,7 +78,7 @@ public:
 		if (ci->debugOn){
 		fclose(f);
 		}
-		if (!ci->data.empty()){
+		if (!ci->data2fpempty()){
 			ci->setReady(1);
 		}
 		ci->iteration++;
@@ -117,6 +117,8 @@ void step( AlphaBot &motors){
 	EndedResult er = c->controlGoal.checkEnded();
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	printf("start vertex v=%i, position= %f, %f\n", start, c->transitionSystem[start].endPose.p.x,  c->transitionSystem[start].endPose.p.y);
+
+	
 	if (er.ended){
 		printf("goal reached\n");
 		Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);

@@ -27,13 +27,13 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 }
 
 
-bool Configurator::Spawner(CoordinateContainer data, CoordinateContainer data2fp){ 
+bool Configurator::Spawner(){ 
 	//PREPARE VECTORS TO RECEIVE DATA
-	if (data.empty()){
+	if (data2fp.empty()){
 		printf("data empty!\n");
 		return 1;
 	}
-	currentBox2D = CoordinateContainer(data2fp);
+	//currentBox2D = CoordinateContainer(data2fp);
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
 
@@ -228,7 +228,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		return result;
 	}
 	// std::vector <Pointf> vec= set2vec(ci->data);
-	std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
+	//std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
 	// pcProc.findOrientation(nb);
 	
 	// cv::Rect2f rect =worldBuilder.getRect(nb);
@@ -383,7 +383,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				float _simulationStep=simulationStep;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
-				worldBuilder.buildWorld(w, currentBox2D, t.start, t.direction); //was g[v].endPose
+				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
 				setStateLabel(sk.first, v0, t.direction); //new
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
@@ -640,7 +640,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
-		worldBuilder.buildWorld(world, currentBox2D, start, t.direction, t.disturbance);
+		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(), Edge(t.direction));
 		//sk.first.direction=t.direction;
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
@@ -862,7 +862,7 @@ void Configurator::stop(){
 
 void Configurator::registerInterface(ConfiguratorInterface * _ci){
 	ci = _ci;
-	ci->pcProc=&pcProc;
+	//ci->pcProc=&pcProc;
 	//ci->ts = TaskSummary(controlGoal.disturbance, controlGoal.direction, motorStep(controlGoal.action));
 }
 
@@ -884,7 +884,8 @@ void Configurator::run(Configurator * c){
 		}
 		if (c->ci->isReady()){
 			c->ci->ready=0;
-			c->Spawner(c->ci->data, c->ci->data2fp);
+			c->data2fp= CoordinateContainer(c->ci->data2fp);
+			c->Spawner();
 			//c->pcProc.previous=set2vec(c->ci->data);
 			//c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
@@ -1302,9 +1303,9 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
-		if (v==12){
-			printf("direction of in edges searched: %i, size = %i, ie deg=%i\n", dir, ie.size(), boost::in_degree(v, g));
-		}
+		// if (v==12){
+		// 	printf("direction of in edges searched: %i, size = %i, ie deg=%i\n", dir, ie.size(), boost::in_degree(v, g));
+		// }
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);

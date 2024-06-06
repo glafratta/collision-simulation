@@ -15,21 +15,21 @@ class ConfiguratorInterface{
 public:
 	bool debugOn=0;
 	int iteration=0;
-	CoordinateContainer data;
+	//CoordinateContainer data;
 	CoordinateContainer data2fp;
 	//cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
-	PointCloudProc * pcProc=NULL;
+	//PointCloudProc * pcProc=NULL;
 	bool stop=0;
 
 	void setReady(bool b);
 
 	bool isReady();
 
-	void updatePCProc(){
-		pcProc->updatePrevious(data);
-	}
+	// void updatePCProc(){
+	// 	pcProc->updatePrevious(data);
+	// }
 
 
 
@@ -50,13 +50,13 @@ public:
 	Task controlGoal;
 	std::chrono::high_resolution_clock::time_point previousTimeScan;
 	float timeElapsed =0;
-	CoordinateContainer currentBox2D;
+	CoordinateContainer data2fp;
 	bool planning =1;
 	char statFile[100];
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	PointCloudProc pcProc;
+	//PointCloudProc pcProc;
 	ImgProc imgProc;
 	std::vector <vertexDescriptor> planVertices;
 	TransitionSystem transitionSystem;
@@ -111,7 +111,7 @@ void setBenchmarking(bool b){
 	printf("set\n");
 }
 
-bool Spawner(CoordinateContainer, CoordinateContainer); 
+bool Spawner(); 
 
 int getIteration(){
 	return iteration;
