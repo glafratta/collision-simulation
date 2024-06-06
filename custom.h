@@ -121,8 +121,7 @@ void step( AlphaBot &motors){
 	
 	if (er.ended){
 		printf("goal reached\n");
-		Disturbance new_goal(PURSUE, c->controlGoal.start.p);
-		new_goal.setOrientation(c->controlGoal.start.q.GetAngle());
+		Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		printf("new goal v=%i, position= %f, %f, valid =%i\n", start, new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
 		c->controlGoal = Task(new_goal, DEFAULT);
 	}
