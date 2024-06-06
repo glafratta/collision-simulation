@@ -1303,9 +1303,6 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, Transit
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
-		// if (v==12){
-		// 	printf("direction of in edges searched: %i, size = %i, ie deg=%i\n", dir, ie.size(), boost::in_degree(v, g));
-		// }
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		if (matcher.isPerfectMatch(s, g[v], src) & v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
@@ -1561,9 +1558,6 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-			if (*vIt==1){
-			printf("UPDATING 1 end x=%f, y=%f, theta=%f\n", g[currentVertex].endPose.p.x, g[currentVertex].endPose.p.y,g[*vIt].endPose.q.GetAngle());
-			}
 			g[*vIt].endPose.p.x=deltaPose.q.c*g[*vIt].endPose.p.Length()-deltaPose.p.x;
 			g[*vIt].endPose.p.y=deltaPose.q.s*g[*vIt].endPose.p.Length()-deltaPose.p.y;
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-deltaPose.q.GetAngle());
