@@ -1439,7 +1439,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
 	//float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error.r();
 	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	float xdistance=-angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
 	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
