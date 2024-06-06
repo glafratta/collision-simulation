@@ -143,11 +143,10 @@ bool Configurator::Spawner(){
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
-
+			boost::print_graph(transitionSystem);
 		}
 		if (debugOn){
 			printPlan();
-			boost::print_graph(transitionSystem);
 			printf("graph size= %i\n", transitionSystem.m_vertices.size());
 		}
 
