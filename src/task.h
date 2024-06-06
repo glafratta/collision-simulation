@@ -2,7 +2,6 @@
 #define TASK_H
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
-bool DEBUG_K=0; //delete this it's for debugging on the bhenchod pi
 
 class Task{
 public:
