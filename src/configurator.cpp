@@ -755,29 +755,6 @@ std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, v
 
 
 
-// Sequence Configurator::getUnprocessedSequence(TransitionSystem&g, vertexDescriptor leaf, vertexDescriptor root){
-// 	Sequence p;
-// 	if (leaf <root){
-// 		throw std::invalid_argument("wrong order of vertices for iteration\n");
-// 	}
-// 	while (leaf !=root){
-// 		if (boost::in_degree(leaf, g)<1){
-// 			break;
-// 		}
-// 		else{
-// 		edgeDescriptor e = boost::in_edges(leaf, g).first.dereference(); //get edge
-// 		vertexDescriptor src = boost::source(e,g);
-// 		Task::Action a;
-// 		a.init(g[e].direction);
-// 		//float step = motorStep(a);
-// 		TaskSummary ts(g[src].disturbance, g[e].direction, g[leaf].step);
-// 		p.insert(p.begin(), ts);
-// 		leaf = src; //go back
-// 		}
-// 	}
-// 	return p;
-
-// }
 
 
 EndedResult Configurator::estimateCost(State &state, b2Transform start, Direction d){
@@ -792,36 +769,7 @@ float Configurator::evaluationFunction(EndedResult er){
 	return (abs(er.estimatedCost)+abs(er.cost))/2; //normalised to 1
 }
 
-// EndedResult Configurator::estimateCost(vertexDescriptor v,TransitionSystem& g, Direction d){
-// 	EndedResult er = controlGoal.checkEnded(g[v]);
-// 	//g[v].heuristic = er.estimatedCost;
-// 	b2Transform start= b2Transform(b2Vec2(0, 0), b2Rot(0));
-// 	edgeDescriptor e;
-// 	if(boost::in_degree(v,g)>0){
-// 		e = boost::in_edges(v, g). first.dereference();
-// 		start =g[e.m_source].endPose;
-// 		d = g[e].direction;
-// 	}
-// 	Task s(g[v].disturbance, d, start);
-// 	er.cost += s.checkEnded(g[v].endPose).estimatedCost;
-// 	return er;
-// }
 
-
-// Sequence Configurator::getPlan(TransitionSystem &g, vertexDescriptor best){
-// 	Sequence p;
-// 	edgeDescriptor e;
-// 	while (boost::in_degree(best, g)){
-// 		best = e.m_source;
-// 		Task::Action a;
-// 		a.init(g[e].direction);
-// 		//float step = motorStep(a);
-// 		TaskSummary ts(g[best].disturbance, g[e].direction, g[best].step);
-// 		p.insert(p.begin(), ts);
-
-// 	}
-// 	return p;
-// }
 
 void Configurator::printPlan(){
 	vertexDescriptor pre=currentVertex;
@@ -984,49 +932,6 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 
 
 
-// bool Configurator::betterThanLeaves(TransitionSystem &g, vertexDescriptor v, std::vector <vertexDescriptor> _leaves, EndedResult& er, Direction d){
-// 	bool better =1;
-// 	er = controlGoal.checkEnded(g[v].endPose); //heuristic
-// 	g[v].heuristic = er.estimatedCost;
-// 	//expands node if it leads to less error than leaf
-// 	for (vertexDescriptor l: _leaves){
-// 		if (d==DEFAULT){
-// 			if (abs(g[v].evaluationFunction())< abs(g[l].evaluationFunction())){ //if error lower, regardless of distance, keep expanding
-// 				if (!controlGoal.endCriteria.hasEnd()){
-// 					if (g[v].endPose.p.Length() <= g[l].endPose.p.Length() ){//&& (g[v].outcome == g[l.vertex].outcome && g[v].totDs>g[l.vertex].totDs)){
-// 						if (g[v].totDs>=g[l].totDs){
-// 							better=0;
-// 							break;
-// 						}
-// 					}
-// 				}
-// 			}
-// 			else{
-// 				better =0;
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	return better;
-// }
-
-// bool Configurator::hasStickingPoint(TransitionSystem& g, vertexDescriptor v, EndedResult & er){
-// 	bool has =0;
-// 	vertexDescriptor src =v;
-// 	Point dPosition(g[v].disturbance.getPosition());
-// 	//check for repetition along the branch
-// 	while (boost::in_degree(src, g)>0 & g[v].disturbance.isValid()){ //&has two step
-// 		src =boost::source(boost::in_edges(src, g).first.dereference(), g);
-// 		if(dPosition.isInRadius(g[src].disturbance.getPosition(), 0.03)){ //if the current disturbance is within a 3cm radius from a previous one
-// 			has=1;
-// 			er = controlGoal.checkEnded(g[src].endPose);
-// 			break;
-// 		}
-// 	}
-// 	return has;
-
-// }
-
 
 // void Configurator::backtrack(TransitionSystem&g, vertexDescriptor &v){
 // 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
@@ -1093,67 +998,6 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 // 		}
 // 	}
 // 	return result;
-// }
-
-// std::pair <bool, float> Configurator::findOrientation(std::vector<Pointf> vec){
-// 	int count=0;
-// 	float sumY=0, sumX=0;
-// 	float avgY=0, avgX=0;
-// 	std::pair <bool, float>result(false, 0);
-// 	vec.shrink_to_fit();
-// 	for (Pointf p:vec){
-// 	//cv::Rect2f rect(pos.x-radius, pos.y+radius, radius, radius);//tl, br, w, h
-// 	//if (p.inside(rect)){
-// 		std::set <Pointf>set=vec2set(vec);
-// 		auto pIt =set.find(p);
-// 		CoordinateContainer::iterator pItNext = pIt++;
-// 		if (pIt!=set.end()){
-// 			float deltaY =pItNext->y- pIt->y;
-// 			float deltaX = pItNext->x - pIt->x;
-// 			result.first=true; //is there a neighbouring point?
-// 			count+=1;
-// 			sumY+=deltaY;
-// 			sumX+=deltaX;
-// 		}
-
-// 	//}
-// 	}
-// 	avgY = sumY/count;
-// 	avgX = sumX/count;
-// 	result.second=atan(avgY/avgX);
-// 	return result;
-// }
-
-
-// void Configurator::checkDisturbance(Point p, bool& obStillThere, Task * curr){
-// 	if (NULL!=curr){ //
-// 		if (p.isInRadius(curr->disturbance.getPosition())){
-// 			obStillThere =1;
-// 		}
-// 	}
-// }
-
-// void Configurator::adjustProbability(TransitionSystem &g, edgeDescriptor& e){
-// 	//g[e.m_source].nObs++;
-// 	//g[e.m_target].nObs++;
-// 	auto es= out_edges(e.m_source, g);
-// 	float totObs=0;
-// 	std::vector <edgeDescriptor> sameTask;
-// 	//find total observations
-// 	for (auto ei= es.first; ei!=es.second; ei++){
-// 		if (g[(*ei)].direction==g[e].direction){
-// 			totObs+=g[(*ei).m_target].nObs;
-// 			sameTask.push_back(*ei);
-// 			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
-// 		}
-// 	}
-// 	//adjust
-// 	// if (sameTask.size()==1){
-// 	// 	return;
-// 	// }
-// 	for (edgeDescriptor ed: sameTask){
-// 		g[ed].probability=g[ed.m_target].nObs/totObs;
-// 	}
 // }
 
 
