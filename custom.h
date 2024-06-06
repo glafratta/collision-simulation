@@ -121,6 +121,8 @@ void step( AlphaBot &motors){
 		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		printf("new goal position= %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
 		c->controlGoal = Task(new_goal, DEFAULT);
+		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
+		printf("new control goal start: %f, %f, %f, distance = %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length());
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*0.95); //temporary fix because motors on despacito are the wrong way around
