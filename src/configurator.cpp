@@ -422,8 +422,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				g[v1].phi=evaluationFunction(er);
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 				if (controlGoal.getAffIndex()==PURSUE){
-					auto a=dirmap.find(t.direction);
-					printf("v=%i, v0_exp=%i, v0=%i, v1=%i, phi=%i, options=%i, dir = %s\n", v, v0_exp, v0, v1, g[v1].phi, g[v1].options.size(), (*a).second);
+					printf("v=%i, v0_exp=%i, v0=%i, v1=%i, phi=%f, options=%li, dir = %i\n", v, v0_exp, v0, v1, g[v1].phi, g[v1].options.size(), t.direction);
 				}
 				v0_exp=v0;
 				options=g[v0_exp].options;
