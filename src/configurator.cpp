@@ -1439,7 +1439,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	//if (fabs(error)<TRACKING_ERROR_TOLERANCE){
 	//float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error.r();
 	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	float xdistance=-angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
 	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
@@ -1564,7 +1564,12 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-			g[*vIt].endPose-=deltaPose;
+			g[*vIt].endPose.p.x=deltaPose.q.c*g[*vIt].endPose.p.Length()-deltaPose.p.x;
+			g[*vIt].endPose.p.y=deltaPose.q.s*g[*vIt].endPose.p.Length()-deltaPose.p.y;
+			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-deltaPose.q.GetAngle());
+
+
+			//g[*vIt].endPose-=deltaPose;
 			if (g[*vIt].disturbance.isValid()){
 				g[*vIt].disturbance.subtractPose(deltaPose);
 			}
