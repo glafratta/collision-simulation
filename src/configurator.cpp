@@ -1465,18 +1465,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	// 				angularDisplacement); //og rot
 	// //}
 	auto vPair =boost::vertices(g);
-	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
-	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
+	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	b2Transform deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
-					angularDisplacement);
+					b2Rot(angularDisplacement));
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
 			float task_distance=g[*vIt].endPose.p.Length();
-			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement.GetAngle());
-			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle())+error.r();
+			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
+			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle());
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle());
 			if (g[*vIt].disturbance.isValid()){
 				g[*vIt].disturbance.subtractPose(deltaPose);
@@ -1492,10 +1492,10 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.subtractPose(deltaPose);
 	}
-	//controlGoal.start-=deltaPose;
-	controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
-	controlGoal.start.p.x=controlGoal.start.p.Length()*cos(controlGoal.start.q.GetAngle());
-	controlGoal.start.p.y=controlGoal.start.p.Length()*sin(controlGoal.start.q.GetAngle());
+	controlGoal.start-=deltaPose;
+	// controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
+	// controlGoal.start.p.x=controlGoal.start.p.Length()*cos(controlGoal.start.q.GetAngle());
+	// controlGoal.start.p.y=controlGoal.start.p.Length()*sin(controlGoal.start.q.GetAngle());
 
 
 }
