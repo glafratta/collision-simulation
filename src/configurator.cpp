@@ -543,6 +543,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	do{
 		//find frontier (STRAIGHT)
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
+		if (src==currentVertex){
+			printf("planning from src =%i, out vertices n%i\n", src, frontier_v.size());
+		}
 		for (Frontier f: frontier_v){ //add to priority queue
 			planPriority(g, f.first);
 			addToPriorityQueue(f, priorityQueue, g);
