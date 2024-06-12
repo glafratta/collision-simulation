@@ -114,9 +114,9 @@ void step( AlphaBot &motors){
 		printf("v 2 end x=%f, y=%f, theta%f\n", c->transitionSystem[2].endPose.p.x,c->transitionSystem[2].endPose.p.y, c->transitionSystem[2].endPose.q.GetAngle());
 
 	}
+	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	if (er.ended){
 		printf("goal reached\n");
-		printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		printf("new goal position= %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
