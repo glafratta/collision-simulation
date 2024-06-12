@@ -703,6 +703,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
+			printf("no match\n");
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
@@ -747,7 +748,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				e.m_source=new_src;
 				e.m_target=TransitionSystem::null_vertex();
 			}
-			for (auto ei = es.first; ei!=es.second; ++ei){
+			for (auto ei = es.first; ei!=es.second; ++ei){ //was ++ei
 				if ((*ei).m_target == planVertices[i]){
 					e= (*ei);
 					break;
@@ -757,7 +758,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 
 		}while (g[e].direction==t->direction & i<planVertices.size());
-//	printf("ended skip\n");
+	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	return result;
 }
 
