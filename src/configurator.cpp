@@ -703,6 +703,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
+			printf("state %i end:  %i: x=%f, y=%f, theta=%f\n", ep.first.m_source, sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
 			printf("no match with %i: x=%f, y=%f, theta=%f\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
