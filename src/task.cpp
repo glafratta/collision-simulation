@@ -174,7 +174,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 	b2Vec2 distance=this_start.p-robotTransform.p;
 	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		if (debug_k){
-			printf("distance of %f exceeds range, ended\n", distance.Length());
+		//	printf("distance of %f exceeds range, ended\n", distance.Length());
 		}
 		r.ended =true;
 	}
@@ -187,7 +187,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 			if (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR){
 				disturbance.invalidate();
 				if (debug_k){
-				printf("angle of %f exceeds range, ended\n", robotTransform.q.GetAngle());
+			//	printf("angle of %f exceeds range, ended\n", robotTransform.q.GetAngle());
 				}
 				r.ended = 1;
 			}
@@ -195,7 +195,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
 			a =Angle(robotTransform.q.GetAngle());
 			if (debug_k){
-				printf("control goal null has D, ended\n");
+			//	printf("control goal null has D, ended\n");
 			}			
 			r.ended = true;
 		}
@@ -203,7 +203,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 			a = Angle(disturbance.getAngle(robotTransform));
 			r.ended = d<=endCriteria.distance; 
 			if (debug_k & r.ended){
-				printf("robot %f %f has reached goal, ended =%i\n", robotTransform.p.x, robotTransform.p.y);
+			//	printf("robot %f %f has reached goal, ended =%i\n", robotTransform.p.x, robotTransform.p.y);
 			}	
 		}
 	}
@@ -212,7 +212,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		float angleR = this_start.q.GetAngle()-endCriteria.angle.get();
 		r.ended = (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR);
 		if (debug_k &r.ended){
-			printf("turn done, but no goal\n");
+			//printf("turn done, but no goal\n");
 		}	
 	}
 	r.estimatedCost = endCriteria.getStandardError(a,d);
