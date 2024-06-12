@@ -740,7 +740,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	do{
 		i++;
-		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
+		printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			if (es.first==es.second){
 				vertexDescriptor new_src=e.m_target;
@@ -1345,15 +1345,15 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.motorStep+=correction; //reflex
 	}		
 
-	b2Transform deltaPose;
-	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
-	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	deltaPose=b2Transform(b2Vec2(xdistance,
-					ydistance), 
-					angularDisplacement); //og rot
+	// b2Transform deltaPose;
+	// b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
+	// float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	// float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+	// deltaPose=b2Transform(b2Vec2(xdistance,
+	// 				ydistance), 
+	// 				angularDisplacement); //og rot
 	//FINDING IF ROBOT IS GOING STRAIGHT
-	updateGraph(transitionSystem, error, deltaPose);//lateral error is hopefully noise and is ignored
+	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
 	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){
 		t.change=1;
@@ -1454,7 +1454,7 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Transform deltaPose){
+void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	//b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	// b2Transform deltaPose;
 	// //if (fabs(error)<TRACKING_ERROR_TOLERANCE){
@@ -1465,13 +1465,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	// 				angularDisplacement); //og rot
 	// //}
 	auto vPair =boost::vertices(g);
-	float angularDisplacement =getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
+	b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
+	float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+	b2Transform deltaPose=b2Transform(b2Vec2(xdistance,
+					ydistance), 
+					angularDisplacement);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
 			float task_distance=g[*vIt].endPose.p.Length();
-			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
-			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle());
+			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement.GetAngle());
+			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle())+error.r();
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle());
 			if (g[*vIt].disturbance.isValid()){
 				g[*vIt].disturbance.subtractPose(deltaPose);
@@ -1487,6 +1492,10 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	if(controlGoal.disturbance.isValid()){
 		controlGoal.disturbance.subtractPose(deltaPose);
 	}
-	controlGoal.start-=deltaPose;
+	//controlGoal.start-=deltaPose;
+	controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
+	controlGoal.start.p.x=controlGoal.start.p.Length()*cos(controlGoal.start.q.GetAngle());
+	controlGoal.start.p.y=controlGoal.start.p.Length()*sin(controlGoal.start.q.GetAngle());
+
 
 }

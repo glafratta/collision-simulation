@@ -143,7 +143,7 @@ void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tr
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
-void updateGraph(TransitionSystem&, ExecutionError error, b2Transform);
+void updateGraph(TransitionSystem&, ExecutionError error);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
