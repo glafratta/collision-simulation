@@ -535,6 +535,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	bool run=true;
 	std::vector <Frontier> priorityQueue;
 	if (currentVertex==movingVertex){
+		printf("current %i =moving%i! return\n", currentVertex, movingVertex);
 		return plan;
 	}
 	std::vector <vertexDescriptor> add;
