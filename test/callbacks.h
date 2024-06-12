@@ -80,8 +80,8 @@ char * folder;
 	bool newScanAvail(){ //uncomment sections to write x and y to files		
         iteration++;
     	ci->ready=0;
-        ci->updatePCProc();
-		ci->data.clear();
+      //  ci->updatePCProc();
+	//	ci->data.clear();
 		ci->data2fp.clear();
 		char filePath[256];
         char folderName[256];
@@ -98,16 +98,16 @@ char * folder;
         }
         // std::vector<Pointfff > data;
 		std::ifstream file(filePath);
-        float x, y, x2, y2;
-        Pointf  p1, p2_1;
-		while (file>>x>>y){
-            x = round(x*1000)/1000;
-			y = round(y*1000)/1000;
-            x2 = round(x*100)/100;
-			y2 = round(y*100)/100;
-            Pointf  p(x,y);
+        float x2, y2;
+      //  Pointf  p1, p2_1;
+		while (file>>x2>>y2){
+         //   x = round(x*1000)/1000;
+			//y = round(y*1000)/1000;
+            x2 = round(x2*100)/100;
+			y2 = round(y2*100)/100;
+           // Pointf  p(x,y);
             Pointf  p2(x2,y2);
-            ci->data.insert(p);
+           // ci->data.insert(p);
             ci->data2fp.insert(p2);
 		}
 		file.close();
@@ -201,42 +201,42 @@ class TimerDI: public CppTimer{
     }
 };
 
-float Configurator::taskRotationError(){
-    printf("previous coord=%i\n", pcProc.previous.size());
-	b2Transform velocity = b2Transform(currentTask.getAction().getTransform());
-    float theta_error=0, theta=0;
-	if (currentTask.action.getOmega()==0){
-		float dataRange=0.25;
-	 	velocity= pcProc.affineTransEstimate(std::vector <Pointf>(ci->data.begin(), ci->data.end()), currentTask.action, MOTOR_CALLBACK, dataRange);
-        theta_error = atan(velocity.p.y/velocity.p.x)- currentTask.action.getOmega();
-	}
-	else{
-        //displacement will be garbage
-        if (currentTask.disturbance.isValid()){
-            orientation prev_orientation= currentTask.disturbance.getOrientation();
-            std::vector<Pointf> nb =pcProc.setDisturbanceOrientation(currentTask.disturbance, ci->data);
-            theta =subtract(currentTask.disturbance.getOrientation(), prev_orientation).second;
-            theta_error=(theta -currentTask.action.getOmega()*MOTOR_CALLBACK);
-            ExecutionError ee;
-            if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-                ee.setR(it->second.r());
-            }
-            ee.setTheta(theta_error);
-            errorMap.insert_or_assign(transitionSystem[currentVertex].ID, ee);
-            velocity.q.Set(theta/MOTOR_CALLBACK);
-            //get orientation
-            printf("prev orientation = %f, current orientation = %f, or error=%f, neighbours= %i, theta=%f\n", prev_orientation.second, currentTask.disturbance.pose().q.GetAngle(), theta_error, nb.size(), theta);
-        }
-		//velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
-	}
-	currentTask.action.setRec(SignedVectorLength(velocity.p), velocity.q.GetAngle());
-    // ExecutionError exErr;
-    // if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-    //     exErr= it->second;
-   // }
-    //exErr.setTheta(error);
-    //errorMap.insert_or_assign(g[currentVertex].ID, exErr);
-    return theta_error;
-}
+// float Configurator::taskRotationError(){
+//     printf("previous coord=%i\n", pcProc.previous.size());
+// 	b2Transform velocity = b2Transform(currentTask.getAction().getTransform());
+//     float theta_error=0, theta=0;
+// 	if (currentTask.action.getOmega()==0){
+// 		float dataRange=0.25;
+// 	 	velocity= pcProc.affineTransEstimate(std::vector <Pointf>(ci->data2fp.begin(), ci->data.end()), currentTask.action, MOTOR_CALLBACK, dataRange);
+//         theta_error = atan(velocity.p.y/velocity.p.x)- currentTask.action.getOmega();
+// 	}
+// 	else{
+//         //displacement will be garbage
+//         if (currentTask.disturbance.isValid()){
+//             orientation prev_orientation= currentTask.disturbance.getOrientation();
+//             std::vector<Pointf> nb =pcProc.setDisturbanceOrientation(currentTask.disturbance, ci->data2fp);
+//             theta =subtract(currentTask.disturbance.getOrientation(), prev_orientation).second;
+//             theta_error=(theta -currentTask.action.getOmega()*MOTOR_CALLBACK);
+//             ExecutionError ee;
+//             if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
+//                 ee.setR(it->second.r());
+//             }
+//             ee.setTheta(theta_error);
+//             errorMap.insert_or_assign(transitionSystem[currentVertex].ID, ee);
+//             velocity.q.Set(theta/MOTOR_CALLBACK);
+//             //get orientation
+//             printf("prev orientation = %f, current orientation = %f, or error=%f, neighbours= %i, theta=%f\n", prev_orientation.second, currentTask.disturbance.pose().q.GetAngle(), theta_error, nb.size(), theta);
+//         }
+// 		//velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
+// 	}
+// 	currentTask.action.setRec(SignedVectorLength(velocity.p), velocity.q.GetAngle());
+//     // ExecutionError exErr;
+//     // if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
+//     //     exErr= it->second;
+//    // }
+//     //exErr.setTheta(error);
+//     //errorMap.insert_or_assign(g[currentVertex].ID, exErr);
+//     return theta_error;
+// }
 
-#endif
+ #endif

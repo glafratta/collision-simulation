@@ -527,56 +527,86 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src, vertexDescriptor match, bool been){
+std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been){
 	std::vector <vertexDescriptor> plan;
-	vertexDescriptor connecting; //og: src=currentV
-	std::vector <edgeDescriptor> frontier;
+	std::vector<std::vector<vertexDescriptor>> paths;
+	paths.push_back(std::vector<vertexDescriptor>()={src});
+	std::vector <Frontier> frontier_v;
 	bool run=true;
-	std::vector <vertexDescriptor> priorityQueue={src};
+	std::vector <Frontier> priorityQueue;
 	if (currentVertex==movingVertex){
 		return plan;
 	}
-	//std::vector <std::pair<vertexDescriptor, float>> priorityQueue = {std::pair(src,0)};
+	std::vector <vertexDescriptor> add;
+	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
+	vertexDescriptor path_end=src;
 	do{
-		//priorityQueue.erase(priorityQueue.begin());
-		frontier=frontierVertices(src, g, DEFAULT, been);
-		connecting=TransitionSystem::null_vertex();
-		float phi=2, src_prob=0; //very large phi, will get overwritten
-		bool changed_src=false;
-		int out_deg=0;
-		for (edgeDescriptor e:frontier){
-			planPriority(g, e.m_target);
-			//addToPriorityQueue(e.m_target, priorityQueue, g[e.m_target].phi);
-			if (g[e.m_target].phi<phi || boost::out_degree(e.m_target, g)>out_deg){ //& (g[e.m_target].direction==g[src].direction & g[e].weighted_probability(iteration)>=src_prob)){
-					phi=g[e.m_target].phi;
-					if (e.m_source!=src){
-						connecting=e.m_source;
-					}
-					src=e.m_target;
-					changed_src=true;
-			}
-			else if (g[e.m_source].label!=UNLABELED){
-			 	boost::clear_vertex(e.m_source, g);
-			//	printf("cleared %i\n", e.m_source);
-			}
-			out_deg=boost::out_degree(e.m_target, g);
+		//find frontier (STRAIGHT)
+		frontier_v=frontierVertices(src, g, DEFAULT, been);
+		for (Frontier f: frontier_v){ //add to priority queue
+			planPriority(g, f.first);
+			addToPriorityQueue(f, priorityQueue, g);
 		}
-		if (connecting!=TransitionSystem::null_vertex()){
-			g[connecting].label=VERTEX_LABEL::UNLABELED;
-			plan.push_back(connecting);
-		}
-		//if (!frontier.empty()){
-		if (changed_src){
-			if (src!=currentVertex){
-				plan.push_back(src);
-				g[src].label=UNLABELED;
-			}
-		}
-		else{
-			run=false;
+		if (priorityQueue.empty()){
 			break;
 		}
-	}while(run);
+		src=priorityQueue.begin()->first;
+		add=std::vector <vertexDescriptor>(priorityQueue.begin()->second.begin(), priorityQueue.begin()->second.end());
+		add.push_back(src);
+		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
+		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
+		while (!edge.second ){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
+			vertexDescriptor end=*(pend.base()-1);
+			edge= boost::edge(end,add[0], g);
+			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
+													//other possible paths, go to previous paths
+				if (pend.base()-1!=(path->begin())){
+					pend++;
+				}
+				else{
+					path++;
+					pend=(*path).rbegin();
+				}
+			}
+			else if (edge.second & pend.base()!=path->rbegin().base()){
+				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
+				path=paths.rbegin();
+				break;
+			}
+			else{
+				break;
+			}
+			if ( path==paths.rend()) { //if there are no other paths
+				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
+				path=paths.rbegin();
+				break;
+			}	
+		}
+		priorityQueue.erase(priorityQueue.begin());
+		for (vertexDescriptor c:add){
+			g[c].label=VERTEX_LABEL::UNLABELED;
+			path->push_back(c);	
+			path_end=c;			
+		}
+	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end]).ended));
+	auto vs=boost::vertices(g);
+	float final_phi=10000;
+	for (std::vector<vertexDescriptor> p: paths){
+		vertexDescriptor end_plan= *(p.rbegin().base()-1);
+		if (end_plan==goal){
+			plan=std::vector(p.begin()+1, p.end());
+			break;
+		}
+		else if (g[end_plan].phi<final_phi){
+			plan=std::vector(p.begin()+1, p.end());
+			final_phi=g[end_plan].phi;
+		}
+	}
+	for (auto vi=vs.first; vi!=vs.second; vi++){
+		if (g[*vi].label!=UNLABELED){
+			boost::clear_vertex(*vi, g);
+		}
+	}
 	return plan;
 }
 
@@ -642,7 +672,6 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
 	}
-
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -937,7 +966,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 // 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
 // 		if(boost::in_degree(v, g)>0){
 // 			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
-// 			v = inEdge.m_source;
+// 			v = inEdge.m_source;	
 // 			if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
 // 				return;
 // 			}
@@ -958,6 +987,16 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDesc
 	queue.push_back(v);
 }
 
+void Configurator::addToPriorityQueue(Frontier f, std::vector<Frontier>& queue, TransitionSystem &g, vertexDescriptor goal){
+	for (auto i =queue.begin(); i!=queue.end(); i++){
+		if (g[f.first].phi <abs(g[(*i).first].phi)){
+			queue.insert(i, f);
+			return;
+		}
+	}
+	queue.push_back(f);
+}
+
 std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g, Disturbance target){
 	std::pair <bool, vertexDescriptor> result(0, TransitionSystem::null_vertex());
 	if (target.getAffIndex()!=PURSUE){
@@ -965,7 +1004,6 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	}
 	std::pair <float, vertexDescriptor> best(10000, TransitionSystem::null_vertex());
 	auto vs=boost::vertices(g);
-
 	for (auto vi=vs.first; vi!=vs.second; vi++ ){
 		//b2Transform difference= g[*vi].endPose-target.disturbance.pose();
 		DistanceVector difference={g[*vi].endPose.p.x-target.pose().p.x,
@@ -973,9 +1011,9 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 									g[*vi].endPose.q.GetAngle()-target.pose().q.GetAngle()
 									};
 		float sum=matcher.sumVector(difference);
-		if (difference[0]<matcher.error.dPosition
-			& difference[1]<matcher.error.dPosition
-			& difference[2]<matcher.error.angle & sum<best.first){
+		if (abs(difference[0])<matcher.error.dPosition
+			& abs(difference[1])<matcher.error.dPosition
+			& abs(difference[2])<matcher.error.angle & sum<best.first){
 				best.first=sum;
 				best.second=*vi;
 				result.first=true;
@@ -1059,46 +1097,129 @@ std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, 
 	return result;
 } 
 
-std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d, bool been){
-	std::vector <edgeDescriptor> result;
+std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d, bool been){
+	std::vector <Frontier> result;
 	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
-	std::vector <vertexDescriptor>connecting;
-	do{
+	vertexDescriptor v0=v, v1=v, v0_exp;
+	//do{
 		if ((controlGoal.disturbance.getPosition()-g[v].endPose.p).Length() < DISTANCE_ERROR_TOLERANCE){
-			break;
-		}
-		auto es=boost::out_edges(v, g);
-		for (auto ei=es.first; ei!=es.second; ei++){
-			if (g[(*ei).m_target].visited() || been){
-				// if (!g[(*ei).m_target].visited()){
-				// 	EndedResult er= estimateCost(g[(*ei).m_target], g[(*ei).m_source].endPose, g[(*ei).m_target].direction);
-				// 	g[(*ei).m_target].phi= evaluationFunction(er);
-				// }
-				if (g[(*ei)].direction==d){
-					result.push_back((*ei)); //assumes maximum depth of 2 vertices traversed
-				}
-				else{
-					connecting.push_back((*ei).m_target);
-				}
-			}
-		}
-		if(v==currentVertex & result.empty() 
-			& es.first!=es.second & ep.second){
-			v=ep.first.m_source;
-		}
-		else if (result.empty()&connecting.empty()){
-			break;
-		}
-		if (!connecting.empty()){
-			v=connecting[0];
-			connecting.erase(connecting.begin());
 		}
 		else{
-			break;
-		}
-	}while (true);
+			auto es=boost::out_edges(v, g);
+			for (auto ei=es.first; ei!=es.second; ei++){
+			std::vector <vertexDescriptor>connecting;
+			auto ei2=ei, ei3=ei;
+			auto es2=boost::out_edges((*ei).m_target, g);
+			auto es3=es2;
+			std::vector <vertexDescriptor>connecting2;
+			do {
+				//=connecting;
+				if (g[(*ei3).m_target].visited() || been){
+					if (!g[(*ei3).m_target].visited()){
+						EndedResult er = estimateCost(g[(*ei3).m_target], g[(*ei3).m_source].endPose, g[*ei3].direction);
+						g[(*ei3).m_target].phi=evaluationFunction(er);
+					}
+					if (g[(*ei3)].direction==d){
+						Frontier f;
+						//f_added=1;
+						f.first= (*ei3).m_target;
+						f.second=connecting2;
+						result.push_back(f);
+						if (ei3!=ei){
+							ei3++;
+							//connecting2.clear();
+							//ei2=ei3;
+						}
+						else{
+							connecting.clear();
+							break;
+						}
+					}
+					else if (ei3==ei){
+						connecting.push_back((*ei3).m_target);
+						connecting2=connecting;
+						es3=boost::out_edges((*ei3).m_target,g);
+						ei3=es3.first;
+						ei2=ei3;
+						es2=es3;
+					}
+					else if (ei2!=ei){
+						connecting2.push_back((*ei3).m_target);
+						es3=boost::out_edges((*ei3).m_target,g);
+						ei3=es3.first;
+						ei2++;
+					}
+				}
+				else if (ei3!=ei){
+					ei3++;
+				}
+				if(ei3==es3.second){
+					if (ei3!=ei2 & ei2!=ei){
+						ei2++;
+						ei3=ei2;
+						es3=es2;
+					}					
+				}
+			}while (ei3!=es3.second);
+	}
+	}
+
+	// if(v==currentVertex & result.empty() 
+	// 		& es.first!=es.second & ep.second){
+	// 		v=ep.first.m_source;
+	// 	}
+	// 	else if (result.empty()&connecting.empty()){
+	// 		break;
+	// 	}
+	// 	if (!connecting.empty()){
+	// 		v=connecting[0];
+	// 		connecting.erase(connecting.begin());
+	// 	}
+	// 	else{
+	// 		break;
+	// 	}
+	// }while (true);
 	return result;
 }
+
+
+
+// std::vector <edgeDescriptor> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d, bool been){
+// 	std::vector <edgeDescriptor> result;
+// 	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
+// 	std::vector <vertexDescriptor>connecting;
+// 	do{
+// 		if ((controlGoal.disturbance.getPosition()-g[v].endPose.p).Length() < DISTANCE_ERROR_TOLERANCE){
+// 			break;
+// 		}
+// 		auto es=boost::out_edges(v, g);
+// 		for (auto ei=es.first; ei!=es.second; ei++){
+// 			if (g[(*ei).m_target].visited() || been){
+// 				if (g[(*ei)].direction==d){
+// 					result.push_back((*ei)); //assumes maximum depth of 2 vertices traversed
+// 				}
+// 				else{
+// 					connecting.push_back((*ei).m_target);
+// 				}
+// 			}
+// 		}
+// 		if(v==currentVertex & result.empty() 
+// 			& es.first!=es.second & ep.second){
+// 			v=ep.first.m_source;
+// 		}
+// 		else if (result.empty()&connecting.empty()){
+// 			break;
+// 		}
+// 		if (!connecting.empty()){
+// 			v=connecting[0];
+// 			connecting.erase(connecting.begin());
+// 		}
+// 		else{
+// 			break;
+// 		}
+// 	}while (true);
+// 	return result;
+// }
 
 std::pair <bool, vertexDescriptor> Configurator::findExactMatch(State s, TransitionSystem& g, State * src, Direction dir){
 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());

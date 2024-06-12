@@ -42,14 +42,15 @@ int main(int argc, char** argv){
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
     AltCallback cb(&conf);
-    ci.data.emplace(Pointf(-1.0, -1.0));
     ci.data2fp.emplace(Pointf(-1.0, -1.0));
-    conf.Spawner(ci.data, ci.data2fp);
+    conf.data2fp.emplace(Pointf(-1.0, -1.0));
+    conf.Spawner();
     cb.step();
     conf.planVertices =conf.changeTask(1, cb.ogStep, conf.planVertices);
     conf.updateGraph(conf.transitionSystem, ExecutionError(), controlGoal.disturbance.pose());
     cb.step();
-    conf.Spawner(ci.data, ci.data2fp);
+    conf.getTask()->motorStep=0;
+    conf.Spawner();
     printGraph(conf.transitionSystem);
    // conf.planner(conf.transitionSystem, src);
     conf.printPlan();

@@ -176,6 +176,16 @@ struct ExecutionError{
 	float _theta=0;
 };
 
+typedef std::pair<vertexDescriptor, std::vector<vertexDescriptor>> Frontier;
+
+struct ComparePhi{
+
+	ComparePhi(){}
+
+	bool operator()(const std::pair<State*, Frontier>& p1, const std::pair<State*, Frontier>& p2) const{
+		return (*p1.first).phi<(*p2.first).phi;
+	}
+};
 
 
 namespace gt{
@@ -250,5 +260,7 @@ struct StateMatcher{
 
 	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;
 };
+
+
 
 #endif

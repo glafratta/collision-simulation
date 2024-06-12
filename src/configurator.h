@@ -151,7 +151,10 @@ void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
-std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+//std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+
+std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
+
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
@@ -214,7 +217,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor match=TransitionSystem::null_vertex(), bool been=0);
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
 bool checkPlan(b2World&, std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
 
@@ -241,6 +244,9 @@ void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIG
 void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&);
+
+void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, vertexDescriptor goal=TransitionSystem::null_vertex());
+
 
 // std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 

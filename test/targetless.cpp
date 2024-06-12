@@ -68,9 +68,10 @@ int main(int argc, char** argv) {
             configurator.running=1;           
             //configurator.Spawner(configuratorInterface.data, configuratorInterface.data2fp);
             if (configuratorInterface.isReady()){
-                if (configuratorInterface.data2fp != configurator.currentBox2D){
+                if (configuratorInterface.data2fp != configurator.data2fp){
                     //printf("confINt data size = %i\n", configuratorInterface.data.size());
-                    configurator.Spawner(configuratorInterface.data, configuratorInterface.data2fp);
+                    configurator.data2fp=configuratorInterface.data2fp;
+                    configurator.Spawner();
                     // configuratorInterface.data.clear();
                     // configuratorInterface.data2fp.clear();
                     // configuratorInterface.ready=0;
