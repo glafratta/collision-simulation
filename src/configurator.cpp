@@ -703,7 +703,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
-			printf("no match\n");
+			printf("no match with %i\n", v1);
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
@@ -712,6 +712,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 				printf("dist valid = %i, end %f, %f, %f\n", g[v1].disturbance.isValid(), g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());			
 			}
 			else{
+				printf("instead matched with %i\n", match.second);
 				ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
