@@ -759,7 +759,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		result=g[e.m_source].endPose;
 
 
-		}while (g[e].direction==t->direction & i<planVertices.size());
+		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	return result;
 }
