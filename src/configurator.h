@@ -10,13 +10,19 @@
 #include <sys/stat.h>
 
 //FOR DEBUG
-void graph_file(int it, TransitionSystem& g){
+void graph_file(int it, TransitionSystem& g, Disturbance goal){
 	char fileName[50];
 	sprintf(fileName, "/tmp/graph%04i.txt", it);
 	FILE * f=fopen(fileName, "w");
 	auto vs=boost::vertices(g);
 	for (auto vi=vs.first; vi!=vs.second; vi++){
 		auto es=boost::out_edges(*vi, g);
+		if (goal.getAffIndex()!=NONE){
+			b2Vec2 v = goal.getPosition() - g[*vi].endPose.p; //distance between disturbance and robot
+			if (v.Length()<DISTANCE_ERROR_TOLERANCE){
+				fprintf(f, "*");
+			}
+		}
 		fprintf(f,"%i -> ");
 		for (auto ei=es.first; ei!=es.second; ei++){
 			fprintf(f, "%i ", (*ei).m_target);
