@@ -1516,7 +1516,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 
 			}
 			if (*vIt==2 || *vIt==3){
-				printf("vit=%i, x=%f, y=%f, theta=%f\n", g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle()));
+				printf("vit=%i, x=%f, y=%f, theta=%f\n", g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle());
 			}
 		}
 	}
