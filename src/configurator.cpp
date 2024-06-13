@@ -1491,12 +1491,13 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	// //}
 	auto vPair =boost::vertices(g);
 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
-	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
+	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	b2Transform deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
 	float linearDisplacement = SignedVectorLength(deltaPose.p);
+	printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
