@@ -418,9 +418,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
 				g[v1].phi=evaluationFunction(er);
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
-				if (controlGoal.getAffIndex()==PURSUE){
-					printf("v=%i, v0_exp=%i, v0=%i, v1=%i, phi=%f, options=%li, dir = %i\n", v, v0_exp, v0, v1, g[v1].phi, g[v1].options.size(), t.direction);
-				}
+				// if (controlGoal.getAffIndex()==PURSUE){
+				// 	printf("v=%i, v0_exp=%i, v0=%i, v1=%i, phi=%f, options=%li, dir = %i\n", v, v0_exp, v0, v1, g[v1].phi, g[v1].options.size(), t.direction);
+				// }
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
@@ -589,6 +589,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			path->push_back(c);	
 			path_end=c;			
 		}
+		printf("planning, path size= %i\n",path->size() );
 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end]).ended));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
