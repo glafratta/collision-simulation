@@ -700,8 +700,9 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 			prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
-			printf("state %i end:  %i: x=%f, y=%f, theta=%f\n", ep.first.m_source, sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
+			printf("state end: x=%f, y=%f, theta=%f\n", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
 			printf("no match with %i: x=%f, y=%f, theta=%f\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());
+			printf("simulation duration step=%i, started from %f, %f, %f\n", sk.second.step, g[prev_edge.second.m_source].endPose.p.x, g[prev_edge.second.m_source].endPose.p.y,g[prev_edge.second.m_source].endPose.q.GetAngle());
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
@@ -1472,15 +1473,22 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	b2Transform deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
+	float linearDisplacement = SignedVectorLength(deltaPose.p);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
-			float task_distance=g[*vIt].endPose.p.Length();
+			float task_distance=g[*vIt].endPose.p.Length()-linearDisplacement; //minus linear displacement
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
 			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle());
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle());
-			if (g[*vIt].disturbance.isValid()){
-				g[*vIt].disturbance.subtractPose(deltaPose);
+			if (g[*vIt].disturbance.getAffIndex()!=NONE){
+				//g[*vIt].disturbance.subtractPose(deltaPose);
+				controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
+				float d_distance=g[*vIt].disturbance.pose().p.Length()- linearDisplacement;
+				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle());
+				float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle());
+				controlGoal.disturbance.pose().p.Set(d_x, d_y);
+
 			}
 		}
 	}
@@ -1493,9 +1501,10 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	if(controlGoal.getAffIndex()!=NONE){
 		//controlGoal.disturbance.subtractPose(deltaPose);
 		controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
-		float d_distance=controlGoal.disturbance.pose().p.Length();
-		float d_x= d_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
-		float d_y= d_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
+		float goal_distance=controlGoal.disturbance.pose().p.Length()- linearDisplacement;
+		float goal_x= goal_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
+		float goal_y= goal_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
+		controlGoal.disturbance.pose().p.Set(goal_x, goal_y);
 	}
 	controlGoal.start-=deltaPose;
 	// controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
