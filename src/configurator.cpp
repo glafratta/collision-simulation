@@ -1501,26 +1501,30 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
+
 			float task_distance=g[*vIt].endPose.p.Length()-linearDisplacement; //minus linear displacement
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
 			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle());
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle());
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
 				//g[*vIt].disturbance.subtractPose(deltaPose);
-				controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
+				g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
 				float d_distance=g[*vIt].disturbance.pose().p.Length()- linearDisplacement;
 				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle());
 				float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle());
-				controlGoal.disturbance.pose().p.Set(d_x, d_y);
+				g[*vIt].disturbance.pose().p.Set(d_x, d_y);
 
+			}
+			if (*vIt==2 || *vIt==3){
+				printf("vit=%i, x=%f, y=%f, theta=%f\n", g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle()));
 			}
 		}
 	}
+
 	// if (fabs(error)>TRACKING_ERROR_TOLERANCE){
 	// 	deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
 	// 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 	// 					rot);
-	
 	// }
 	if(controlGoal.getAffIndex()!=NONE){
 		//controlGoal.disturbance.subtractPose(deltaPose);
