@@ -81,7 +81,7 @@ public:
         else{
             affordanceIndex = i;
         }
-        bf.pose.Set(p, a);
+        bf.pose.Set(p,a);
         valid =1;
     }    
 

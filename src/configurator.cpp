@@ -1490,7 +1490,11 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	
 	// }
 	if(controlGoal.disturbance.isValid()){
-		controlGoal.disturbance.subtractPose(deltaPose);
+		//controlGoal.disturbance.subtractPose(deltaPose);
+		controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
+		float d_distance=controlGoal.disturbance.pose().p.Length();
+		float d_x= d_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
+		float d_y= d_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
 	}
 	controlGoal.start-=deltaPose;
 	// controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
