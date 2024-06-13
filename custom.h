@@ -12,19 +12,22 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
-// std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-//     int count =0;
-//     std::vector <BodyFeatures> result;
-//     for (Pointf p: points){
-//         if (count%2==0){
-//             BodyFeatures feature;
-//             feature.pose.p = getb2Vec2(p); 
-//             result.push_back(feature);  
-//         }
-//         count++;
-//     }
-//     return result;
-// }
+void graph_file(int it, TransitionSystem& g){
+	char fileName[50];
+	sprintf(fileName, "/tmp/graph%04i.txt", it);
+	FILE * f=fopen(fileName, "w");
+	auto vs=boost::vertices(g);
+	for (auto vi=vs.first; vi!=vs.second; vi++){
+		auto es=boost::out_edges(*vi, g);
+		fprintf(f,"%i -> ")
+		for (auto ei=es.first; ei!=es.second; ei++){
+			fprintf(f, "%i ", (*ei).m_target);
+		}
+		fprintf(f, "(x=%f, y= %f, theta= %f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
+	}
+	fclose(f);
+}
+
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;

@@ -9,6 +9,25 @@
 #include <algorithm>
 #include <sys/stat.h>
 
+//FOR DEBUG
+void graph_file(int it, TransitionSystem& g){
+	char fileName[50];
+	sprintf(fileName, "/tmp/graph%04i.txt", it);
+	FILE * f=fopen(fileName, "w");
+	auto vs=boost::vertices(g);
+	for (auto vi=vs.first; vi!=vs.second; vi++){
+		auto es=boost::out_edges(*vi, g);
+		fprintf(f,"%i -> ");
+		for (auto ei=es.first; ei!=es.second; ei++){
+			fprintf(f, "%i ", (*ei).m_target);
+		}
+		fprintf(f, "(x=%f, y= %f, theta= %f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
+	}
+	fclose(f);
+}
+
+//
+
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
 
 //typedef b2Transform DeltaPose;
