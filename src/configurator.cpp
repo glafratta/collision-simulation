@@ -794,7 +794,7 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	EndedResult er = controlGoal.checkEnded(state);
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
-	controlGoal.disturbance.validate();
+	//controlGoal.disturbance.validate();
 	return er;
 }
 
@@ -1490,7 +1490,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	// 					rot);
 	
 	// }
-	if(controlGoal.disturbance.isValid()){
+	if(controlGoal.getAffIndex()!=NONE){
 		//controlGoal.disturbance.subtractPose(deltaPose);
 		controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
 		float d_distance=controlGoal.disturbance.pose().p.Length();
