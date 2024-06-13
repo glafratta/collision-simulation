@@ -47,7 +47,7 @@ int main(int argc, char** argv){
     conf.Spawner();
     cb.step();
     conf.planVertices =conf.changeTask(1, cb.ogStep, conf.planVertices);
-    conf.updateGraph(conf.transitionSystem, ExecutionError(), controlGoal.disturbance.pose());
+    conf.updateGraph(conf.transitionSystem, ExecutionError());
     cb.step();
     conf.getTask()->motorStep=0;
     conf.Spawner();

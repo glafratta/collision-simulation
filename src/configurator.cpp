@@ -1504,8 +1504,12 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 
 			float task_distance=g[*vIt].endPose.p.Length(); //minus linear displacement
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
-			g[*vIt].endPose.p.x=(task_distance)*cos(g[*vIt].endPose.q.GetAngle())-xdistance;
-			g[*vIt].endPose.p.y=(task_distance)*sin(g[*vIt].endPose.q.GetAngle())-ydistance;
+			//g[*vIt].endPose.p.x=(task_distance)*cos(g[*vIt].endPose.q.GetAngle())-xdistance;
+			g[*vIt].endPose.p.x-=xdistance;
+			g[*vIt].endPose.p.y-=ydistance;
+			g[*vIt].endPose.p.x= g[*vIt].endPose.p.x* cos(angularDisplacement)+ g[*vIt].endPose.p.y*sin(angularDisplacement);
+			g[*vIt].endPose.p.y= g[*vIt].endPose.p.y* cos(angularDisplacement)- g[*vIt].endPose.p.x*sin(angularDisplacement);
+			//g[*vIt].endPose.p.y=(task_distance)*sin(g[*vIt].endPose.q.GetAngle())-ydistance;
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
 				//g[*vIt].disturbance.subtractPose(deltaPose);
 				g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
