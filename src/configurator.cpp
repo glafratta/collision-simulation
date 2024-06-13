@@ -1,7 +1,7 @@
 #include "configurator.h"
 #include <chrono>
 
-void graph_file(int it, TransitionSystem& g, Disturbance goal){
+void debug::graph_file(int it, TransitionSystem& g, Disturbance goal){
 	char fileName[50];
 	sprintf(fileName, "/tmp/graph%04i.txt", it);
 	FILE * f=fopen(fileName, "w");

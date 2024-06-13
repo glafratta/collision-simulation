@@ -10,8 +10,9 @@
 #include <sys/stat.h>
 
 //FOR DEBUG
-
+namespace debug{
 void graph_file(int it, TransitionSystem& g, Disturbance goal);
+}
 //
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
