@@ -402,9 +402,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
 				float _simulationStep=simulationStep;
 				adjustStepDistance(v0, g, &t, _simulationStep);
-				//Disturbance expectedD=gt::getExpectedDisturbance(g, v0, t.direction, iteration);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
-				setStateLabel(sk.first, v0, t.direction); //new
+			//	setStateLabel(sk.first, v0, t.direction); //new
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
@@ -627,11 +626,11 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			final_phi=g[end_plan].phi;
 		}
 	}
-	for (auto vi=vs.first; vi!=vs.second; vi++){
-		if (g[*vi].label!=UNLABELED){
-			boost::clear_vertex(*vi, g);
-		}
-	}
+	// for (auto vi=vs.first; vi!=vs.second; vi++){
+	// 	if (g[*vi].label!=UNLABELED){
+	// 		boost::clear_vertex(*vi, g);
+	// 	}
+	// }
 	return plan;
 }
 
@@ -1509,7 +1508,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
 				//g[*vIt].disturbance.subtractPose(deltaPose);
 				g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
-				float d_distance=g[*vIt].disturbance.pose().p.Length()- linearDisplacement;
+				float d_distance=g[*vIt].disturbance.pose().p.Length();
 				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle());
 				float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle());
 				g[*vIt].disturbance.pose().p.Set(d_x, d_y);
