@@ -14,11 +14,11 @@ void debug::graph_file(int it, TransitionSystem& g, Disturbance goal){
 				fprintf(f, "*");
 			}
 		}
-		fprintf(f,"%i -> ");
+		fprintf(f,"%i -> ", *vi);
 		for (auto ei=es.first; ei!=es.second; ei++){
 			fprintf(f, "%i ", (*ei).m_target);
 		}
-		fprintf(f, "(x=%f, y= %f, theta= %f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
+		fprintf(f, "\t(x=%.3f, y= %.3f, theta= %.3f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
 	}
 	fclose(f);
 }
