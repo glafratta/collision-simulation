@@ -1502,7 +1502,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
 
-			float task_distance=g[*vIt].endPose.p.Length()-linearDisplacement; //minus linear displacement
+			float task_distance=g[*vIt].endPose.p.Length(); //minus linear displacement
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
 			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle());
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle());
@@ -1516,7 +1516,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 
 			}
 			if (*vIt==2 || *vIt==3){
-				printf("vit=%i, x=%f, y=%f, theta=%f\n", g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle());
+				printf("vit=%i, x=%f, y=%f, theta=%f\n", *vIt, g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle());
 			}
 		}
 	}
