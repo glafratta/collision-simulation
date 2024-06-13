@@ -116,6 +116,10 @@ public:
         valid =0;
     }
 
+    void validate(){
+        valid=1;
+    }
+
 
     std::pair<bool, float> getOrientation(){
     

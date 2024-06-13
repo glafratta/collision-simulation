@@ -794,6 +794,7 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	EndedResult er = controlGoal.checkEnded(state);
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
+	controlGoal.disturbance.validate();
 	return er;
 }
 
