@@ -1503,13 +1503,13 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 
 			float task_distance=g[*vIt].endPose.p.Length(); //minus linear displacement
 			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
-			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle())- ydistance;
+			g[*vIt].endPose.p.x=task_distance*cos(g[*vIt].endPose.q.GetAngle())+ ydistance;
 			g[*vIt].endPose.p.y=task_distance*sin(g[*vIt].endPose.q.GetAngle())-xdistance;
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
 				//g[*vIt].disturbance.subtractPose(deltaPose);
 				g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
 				float d_distance=g[*vIt].disturbance.pose().p.Length();
-				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle())-ydistance;
+				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle())+ydistance;
 				float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle())-xdistance;
 				g[*vIt].disturbance.pose().p.Set(d_x, d_y);
 
