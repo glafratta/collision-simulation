@@ -140,7 +140,7 @@ bool Configurator::Spawner(){
 			boost::copy_graph(fts, tmp);
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
-			graph_file(iteration, transitionSystem);
+			graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
