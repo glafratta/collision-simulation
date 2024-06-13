@@ -25,6 +25,8 @@ enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
 typedef std::vector <float> DistanceVector;
 
+typedef std::vector <bool> MatchVector;
+
 struct Edge{
 	Direction direction=DEFAULT;
 	float probability=1.0;

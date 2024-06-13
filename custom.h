@@ -107,13 +107,10 @@ void step( AlphaBot &motors){
     if (c->getTask()->motorStep>0){
         c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     }
+	c->controlGoal.debug_k=1;
 	EndedResult er = c->controlGoal.checkEnded();
+	c->controlGoal.debug_k=0;
 	printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
-	if (c->transitionSystem.m_vertices.size()>2){
-		printf("v 1 end x=%f, y=%f, theta%f\n", c->transitionSystem[1].endPose.p.x,c->transitionSystem[1].endPose.p.y, c->transitionSystem[1].endPose.q.GetAngle());
-		printf("v 2 end x=%f, y=%f, theta%f\n", c->transitionSystem[2].endPose.p.x,c->transitionSystem[2].endPose.p.y, c->transitionSystem[2].endPose.q.GetAngle());
-
-	}
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	if (er.ended){
 		printf("goal reached\n");

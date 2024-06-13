@@ -202,8 +202,11 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
 			r.ended = d<=endCriteria.distance; 
+			if (debug_k){
+				printf("distance to goal=%f, endCriteria.distance =%f", d.get(), endCriteria.distance.get());
+			}
 			if (debug_k & r.ended){
-			//	printf("robot %f %f has reached goal, ended =%i\n", robotTransform.p.x, robotTransform.p.y);
+				printf("robot %f %f has reached goal, ended =%i\n", robotTransform.p.x, robotTransform.p.y);
 			}	
 		}
 	}

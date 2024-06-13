@@ -162,11 +162,8 @@ bool Configurator::Spawner(){
 	printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
-		//printf("open stat\n");
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
 		fclose(f);
-		//return 0; //stops when finished and doesn't execute
-
 	}
 	worldBuilder.resetBodies();
 	return 1;
@@ -743,7 +740,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	do{
 		i++;
-		printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
+		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			if (es.first==es.second){
 				vertexDescriptor new_src=e.m_target;
@@ -760,7 +757,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
-	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
+//	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	return result;
 }
 
@@ -1075,7 +1072,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	float theta_obs=theta_exp;//currentTask.correct.getError()-theta_exp;
 	if (currentTask.getAction().getOmega()!=0){
 		float remainingAngle = currentTask.endCriteria.angle.get()-abs(theta_obs);
-		printf("step =%i/%i, remaining angle=%f\n", currentTask.motorStep, transitionSystem[currentEdge].step,remainingAngle);
+	//	printf("step =%i/%i, remaining angle=%f\n", currentTask.motorStep, transitionSystem[currentEdge].step,remainingAngle);
 		if (t->direction==getOppositeDirection(currentTask.direction).second){
 			remainingAngle=M_PI-remainingAngle;
 		}
@@ -1084,7 +1081,7 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	if(currentTask.getAction().getLinearSpeed()>0){
 		step-= (stepsTraversed*MOTOR_CALLBACK)*currentTask.action.getLinearSpeed();
 	}			// -estimated distance covered
-	printf("adjusted\n");
+	//printf("adjusted\n");
 }
 
 
