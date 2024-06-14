@@ -687,7 +687,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 // 	return plan;
 // }
 
-bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
+bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start){
 	bool result=true;
 	
 	int it=-1;//this represents currentv
@@ -747,7 +747,17 @@ bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor
 			}
 			else{
 				printf("instead matched with %i:  x=%f, y=%f, theta=%f\n", match.second, g[match.second].endPose.p.x, g[match.second].endPose.p.y, g[match.second].endPose.q.GetAngle());
-				ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
+				gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
+				p[it]=match.second;
+				if (ep.first.m_target!=TransitionSystem::null_vertex()){
+					ep=boost::edge(match.second, ep.first.m_target, g);
+					if (!ep.second){
+						ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
+					}
+				}
+				else{
+					ep.first.m_source=match.second;
+				}
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
 			if (sk.first.outcome==simResult::crashed){

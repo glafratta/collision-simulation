@@ -80,7 +80,7 @@ Configurator * c;
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	c->printPlan();
+	//c->printPlan();
 	printf("graph size=%i\n", c->transitionSystem.m_vertices.size());
 	if (c->getIteration() <=0){
 		return;
