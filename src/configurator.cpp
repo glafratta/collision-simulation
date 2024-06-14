@@ -162,7 +162,7 @@ bool Configurator::Spawner(){
 			boost::copy_graph(fts, tmp);
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
-			//debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
+			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
@@ -855,10 +855,11 @@ void Configurator::printPlan(){
 
 void Configurator::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
+	float og_x= pose.p.x, og_y=pose.p.y;
+	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
+	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
 	pose.p.x-=deltaPose.p.x;
-	pose.p.y-=deltaPose.p.x;
-	pose.p.x= pose.p.x* cos(deltaPose.q.GetAngle())+ pose.p.y*sin(deltaPose.q.GetAngle());
-	pose.p.y= pose.p.y* cos(deltaPose.q.GetAngle())- pose.p.x*sin(deltaPose.q.GetAngle());
+	pose.p.y-=deltaPose.p.y;
 }
 
 
