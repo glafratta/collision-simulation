@@ -760,7 +760,7 @@ bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor
 		propagateD(v1,prev_edge.second.m_source, g);
 		printf("propagated\n");
 		gt::adjustProbability(g, ep.first);
-		printf("adjust prov\n");
+		printf("adjust prov, it %i, p size =%i, result=%i\n", it, p.size(), result);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 	}while (it<p.size() & result==true);
 	printf("checked\n");
@@ -1437,6 +1437,12 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		if (pv.empty()){
 			//printf("no plan, bas\n");
 			return pv;
+		}
+		if (movingEdge==edgeDescriptor()){
+			printf("moving edge is null\n");
+		}
+		if (movingEdge.m_target==TransitionSystem::null_vertex()){
+			printf("null current\n");
 		}
 		//printf("change plan\n");
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
