@@ -95,7 +95,7 @@ void step( AlphaBot &motors){
 	printf("step =%i\n", c->getTask()->motorStep);
 	
 	c->updateGraph(c->transitionSystem, ee);
-	if(c->getTask()->motorStep==0){
+	if(c->getTask()->motorStep<=0){
 		c->getTask()->change=1;
 	}
     // if (c->getTask()->motorStep>0){
