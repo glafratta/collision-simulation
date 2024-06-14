@@ -1501,7 +1501,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 					ydistance), 
 					b2Rot(angularDisplacement));
 	float linearDisplacement = SignedVectorLength(deltaPose.p);
-	printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
+	//printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
 //			g[*vIt].endPose-=deltaPose;
@@ -1523,9 +1523,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 				g[*vIt].disturbance.pose().p.Set(d_x, d_y);
 
 			}
-			if (*vIt==2 || *vIt==3){
-				printf("vit=%i, x=%f, y=%f, theta=%f\n", *vIt, g[*vIt].endPose.p.x, g[*vIt].endPose.p.y, g[*vIt].endPose.q.GetAngle());
-			}
+		
 		}
 	}
 
