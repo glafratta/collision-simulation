@@ -724,8 +724,13 @@ bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor
 		//vertexDescriptor v0;
 		if (!prev_edge.first){
 			//v0=prev_edge.second.m_source;
-			prev_edge.second.m_source=movingVertex;
-			prev_edge.second.m_target=v1;
+			auto _moving=boost::add_edge(movingVertex, v1, g);
+			prev_edge.second=_moving.first;
+			if (_moving.second){
+				printf("new edge added moving\n");
+			}
+			// prev_edge.second.m_source=movingVertex;
+			// prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
 			printf("state end: x=%f, y=%f, theta=%f\n", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
