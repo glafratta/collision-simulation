@@ -6,6 +6,8 @@
 //#include "opencv2/opencv.hpp"
 #include <stdexcept>
 
+class Configurator;
+
 class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
@@ -30,11 +32,11 @@ class BodyFeatures{
 };
 
 struct Disturbance{ //this generates error
+friend Configurator;
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
     bool rotation_valid=0;    
-    BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
     void setOrientation(float f){ //returns orientation (angle) of a point, in order 
         rotation_valid=1;
@@ -49,8 +51,11 @@ private:
         setOrientation(dtheta);
     }
 }
+protected:
+    BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
 public:
+
     //b2Transform pose = {b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)};
     
    // bool safeForNow=1;

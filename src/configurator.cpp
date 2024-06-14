@@ -853,6 +853,15 @@ void Configurator::printPlan(){
 	printf("\n");
 }
 
+void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
+	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
+	pose.p.x-=deltaPose.p.x;
+	pose.p.y-=deltaPose.p.x;
+	pose.p.x= pose.p.x* cos(deltaPose.q.GetAngle())+ pose.p.y*sin(deltaPose.q.GetAngle());
+	pose.p.y= pose.p.y* cos(deltaPose.q.GetAngle())- pose.p.x*sin(deltaPose.q.GetAngle());
+}
+
+
 
 void Configurator::start(){
 	if (ci == NULL){
@@ -1322,22 +1331,6 @@ std::pair <bool, vertexDescriptor> Configurator::findExactMatch(vertexDescriptor
 	return result;
 }
 
-// std::pair <bool, vertexDescriptor> Configurator::exactPolicyMatch(vertexDescriptor v, TransitionSystem& g, Direction d){
-// 	std::pair <bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
-// 	auto vs= boost::vertices(g);
-// 	for (auto vi=vs.first; vi!= vs.second; vi++){
-// 		if (*vi!=v){
-// 			if (matcher.isPerfectMatch(g[*vi], g[v])&*vi!=movingVertex&& !inEdges(g, *vi, d).empty()){
-// 			result.first=true;
-// 			result.second=*vi;
-// 			break;
-// 		}
-// 		}
-
-
-// 	}
-// 	return result;
-// }
 
 void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
@@ -1504,23 +1497,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	//printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-//			g[*vIt].endPose-=deltaPose;
-
-			float task_distance=g[*vIt].endPose.p.Length(); //minus linear displacement
-			g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
-			//g[*vIt].endPose.p.x=(task_distance)*cos(g[*vIt].endPose.q.GetAngle())-xdistance;
-			g[*vIt].endPose.p.x-=xdistance;
-			g[*vIt].endPose.p.y-=ydistance;
-			g[*vIt].endPose.p.x= g[*vIt].endPose.p.x* cos(angularDisplacement)+ g[*vIt].endPose.p.y*sin(angularDisplacement);
-			g[*vIt].endPose.p.y= g[*vIt].endPose.p.y* cos(angularDisplacement)- g[*vIt].endPose.p.x*sin(angularDisplacement);
-			//g[*vIt].endPose.p.y=(task_distance)*sin(g[*vIt].endPose.q.GetAngle())-ydistance;
+			// g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
+			// g[*vIt].endPose.p.x-=xdistance;
+			// g[*vIt].endPose.p.y-=ydistance;
+			// g[*vIt].endPose.p.x= g[*vIt].endPose.p.x* cos(angularDisplacement)+ g[*vIt].endPose.p.y*sin(angularDisplacement);
+			// g[*vIt].endPose.p.y= g[*vIt].endPose.p.y* cos(angularDisplacement)- g[*vIt].endPose.p.x*sin(angularDisplacement);
+			applyAffineTrans(deltaPose, g[*vIt].endPose);
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
-				//g[*vIt].disturbance.subtractPose(deltaPose);
-				g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
-				float d_distance=g[*vIt].disturbance.pose().p.Length();
-				float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle())-xdistance;
-				float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle())-ydistance;
-				g[*vIt].disturbance.pose().p.Set(d_x, d_y);
+				// g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
+				// //float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle())-xdistance;
+				// float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle())-ydistance;
+				// g[*vIt].disturbance.pose().p.Set(d_x, d_y);
+				applyAffineTrans(deltaPose, g[*vIt].disturbance.bf.pose);
 
 			}
 		
@@ -1532,18 +1520,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	// 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
 	// 					rot);
 	// }
+	applyAffineTrans(deltaPose, controlGoal.start);
 	if(controlGoal.getAffIndex()!=NONE){
-		//controlGoal.disturbance.subtractPose(deltaPose);
-		controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
-		float goal_distance=controlGoal.disturbance.pose().p.Length()- linearDisplacement;
-		float goal_x= goal_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
-		float goal_y= goal_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
-		controlGoal.disturbance.pose().p.Set(goal_x, goal_y);
+		// //controlGoal.disturbance.subtractPose(deltaPose);
+		// controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
+		// float goal_distance=controlGoal.disturbance.pose().p.Length()- linearDisplacement;
+		// float goal_x= goal_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
+		// float goal_y= goal_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
+		// controlGoal.disturbance.pose().p.Set(goal_x, goal_y);
+		applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);
 	}
-	controlGoal.start-=deltaPose;
-	// controlGoal.start.q.Set(controlGoal.start.q.GetAngle()-angularDisplacement.GetAngle());
-	// controlGoal.start.p.x=controlGoal.start.p.Length()*cos(controlGoal.start.q.GetAngle());
-	// controlGoal.start.p.y=controlGoal.start.p.Length()*sin(controlGoal.start.q.GetAngle());
+	//controlGoal.start-=deltaPose;
+
 
 
 }

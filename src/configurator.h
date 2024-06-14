@@ -188,6 +188,8 @@ void resetPhi(TransitionSystem&g);
 
 void printPlan();
 
+void applyAffineTrans(const b2Transform&, b2Transform&);
+
 
 
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
