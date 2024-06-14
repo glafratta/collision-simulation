@@ -91,10 +91,10 @@ void step( AlphaBot &motors){
  	   motors.setLeftWheelSpeed(0);		
 	}
     ExecutionError ee;// =c->trackTaskExecution(*c->getTask());
-	c->getTask().motorStep--;
+	c->getTask()->motorStep--;
 	c->updateGraph(c->transitionSystem, ee);
-	if(t.motorStep==0){
-		t.change=1;
+	if(t->motorStep==0){
+		t->change=1;
 	}
     // if (c->getTask()->motorStep>0){
     //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
