@@ -162,7 +162,7 @@ bool Configurator::Spawner(){
 			boost::copy_graph(fts, tmp);
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
-			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
+			//debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
@@ -702,7 +702,9 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(), Edge(t.direction));
 		//sk.first.direction=t.direction;
+		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
+		printf("to it %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
