@@ -168,10 +168,10 @@ bool Configurator::Spawner(){
 			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 			//boost::print_graph(transitionSystem);
 		}
-		if (debugOn){
-			printPlan();
-			printf("graph size= %i\n", transitionSystem.m_vertices.size());
-		}
+		// if (debugOn){
+		// 	printPlan();
+		// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
+		// }
 
 	}
 	else if (!planning){
@@ -689,9 +689,11 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p, TransitionSystem &g, b2Transform start){
 	bool result=true;
+	
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
+	printPlan();
 	if (p.empty() & currentTask.motorStep==0){
 		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
