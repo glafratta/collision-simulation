@@ -186,7 +186,7 @@ std::pair <bool, Direction> getOppositeDirection(Direction);
 
 void resetPhi(TransitionSystem&g);
 
-void printPlan();
+void printPlan(std::vector <vertexDescriptor>* p=NULL);
 
 void applyAffineTrans(const b2Transform&, b2Transform&);
 

@@ -611,7 +611,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			path->push_back(c);	
 			path_end=c;			
 		}
-		printf("planning, path size= %i\n",path->size() );
+		//printf("planning, path size= %i\n",path->size() );
 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end]).ended));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
@@ -694,7 +694,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
 	printPlan();
-	if (p.empty() & currentTask.motorStep==0){
+	printPlan(&p);
+	if (p.empty() && currentTask.motorStep==0){
 		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
 	}
@@ -706,7 +707,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		//sk.first.direction=t.direction;
 		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
-		printf("to it %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
+		printf("to it %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
@@ -728,7 +729,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		}
 		if (!ismatch){
 			printf("state end: x=%f, y=%f, theta=%f\n", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
-			printf("no match with %i: x=%f, y=%f, theta=%f\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());
+			printf("NO MATCH with %i: x=%f, y=%f, theta=%f\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());
 			printf("simulation duration step=%i, started from %f, %f, %f\n", sk.second.step, g[prev_edge.second.m_source].endPose.p.x, g[prev_edge.second.m_source].endPose.p.y,g[prev_edge.second.m_source].endPose.q.GetAngle());
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
@@ -833,10 +834,18 @@ float Configurator::evaluationFunction(EndedResult er){
 
 
 
-void Configurator::printPlan(){
+void Configurator::printPlan(std::vector <vertexDescriptor>* p){
+	if (p==NULL){
+		printf("currently executed plan:\t");
+		p=&planVertices;
+	}
+	else{
+		printf("provisional plan:\t")
+	}
+	std::vector <vertexDescriptor> plan= *p;
 	vertexDescriptor pre=currentVertex;
 	printf("current=%i\t", pre);
-	for (vertexDescriptor v: planVertices){
+	for (vertexDescriptor v: plan){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
 		//auto a=dirmap.find(transitionSystem[edge.first].direction);
 		if (!edge.second){
@@ -1417,10 +1426,10 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	}
 	if (planning){
 		if (pv.empty()){
-			printf("no plan, bas\n");
+			//printf("no plan, bas\n");
 			return pv;
 		}
-		printf("change plan\n");
+		//printf("change plan\n");
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 	//	printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
 		currentVertex= pv[0];
