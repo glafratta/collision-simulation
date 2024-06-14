@@ -1434,7 +1434,9 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
 	//	printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
 		currentVertex= pv[0];
+		pv.erase(pv.begin());
 		currentEdge=ep.first;
+
 		boost::clear_vertex(movingVertex, transitionSystem);
 	//	printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
@@ -1442,7 +1444,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		currentTask = Task(transitionSystem[currentEdge.m_source].disturbance, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
-		pv.erase(pv.begin());
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
 	else{
