@@ -853,7 +853,7 @@ void Configurator::printPlan(){
 	printf("\n");
 }
 
-void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
+void Configurator::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
 	pose.p.x-=deltaPose.p.x;
 	pose.p.y-=deltaPose.p.x;
