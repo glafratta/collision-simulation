@@ -166,12 +166,16 @@ std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescript
 
 DistanceVector StateMatcher::getDistance(State s1, State s2){
 	DistanceVector result(6);
+
 	result[0]= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
 	result[1]= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
 	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
 	result[3]= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	result[4]=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	result[5]=s1.endPose.q.GetAngle()-s2.endPose.q.GetAngle(); //endpose angle
+	float diff_angle=s1.endPose.q.GetAngle()-s2.endPose.q.GetAngle(); //endpose angle
+	float diff_cos=cos(diff_angle);
+	float diff_sin=sin(diff_angle);
+	result[5]= atan2(diff_sin,diff_cos );
 	return result;
 }
 

@@ -92,6 +92,8 @@ void step( AlphaBot &motors){
 	}
     ExecutionError ee;// =c->trackTaskExecution(*c->getTask());
 	c->getTask()->motorStep--;
+	printf("step =%i\n", c->getTask()->motorStep);
+	
 	c->updateGraph(c->transitionSystem, ee);
 	if(c->getTask()->motorStep==0){
 		c->getTask()->change=1;
