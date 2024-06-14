@@ -840,7 +840,7 @@ void Configurator::printPlan(std::vector <vertexDescriptor>* p){
 		p=&planVertices;
 	}
 	else{
-		printf("provisional plan:\t")
+		printf("provisional plan:\t");
 	}
 	std::vector <vertexDescriptor> plan= *p;
 	vertexDescriptor pre=currentVertex;
