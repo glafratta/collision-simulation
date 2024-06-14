@@ -693,8 +693,9 @@ bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
-	//printPlan();
-	//printPlan(&p);
+	printPlan();
+	std::vector <vertexDescriptor> vpt=p;
+	printPlan(&vpt);
 	if (p.empty() && currentTask.motorStep==0){
 		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
@@ -718,7 +719,8 @@ bool Configurator::checkPlan(b2World& world, const std::vector <vertexDescriptor
 		start = sk.first.endPose;
 		// DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
 		// if (!matcher.isPerfectMatch(distance)){
-		bool ismatch=matcher.isPerfectMatch(g[ep.first.m_source], sk.first);			
+		bool ismatch=matcher.isPerfectMatch(g[ep.first.m_source], sk.first);
+		printf("sk dist = %i, exp vertex dist=%i\n", sk.first.disturbance.getAffIndex(), g[ep.first.m_source].disturbance.getAffIndex());			
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
 		//vertexDescriptor v0;
