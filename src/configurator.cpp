@@ -755,6 +755,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> & p,
 		gt::adjustProbability(g, ep.first);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 	}while (it<p.size() & result==true);
+	printf("checked\n");
 	return result;
 }
 
