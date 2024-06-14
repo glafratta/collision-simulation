@@ -91,8 +91,9 @@ void step( AlphaBot &motors){
  	   motors.setLeftWheelSpeed(0);		
 	}
     //ExecutionError ee =
+	printf("not tracked\n");
 	c->trackTaskExecution(*c->getTask());
-
+	printf("tracked\n");
     // if (c->getTask()->motorStep>0){
     //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     // }
