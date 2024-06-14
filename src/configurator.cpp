@@ -165,7 +165,7 @@ bool Configurator::Spawner(){
 			//debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			planVertices= planner(transitionSystem, src);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
-			printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
+		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 			//boost::print_graph(transitionSystem);
 		}
 		// if (debugOn){
