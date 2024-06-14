@@ -90,14 +90,8 @@ void step( AlphaBot &motors){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-    ExecutionError ee;// =c->trackTaskExecution(*c->getTask());
-	if(c->getTask()->motorStep<=0){
-		c->getTask()->change=1;
-	}
-	c->getTask()->motorStep--;
-	printf("step =%i\n", c->getTask()->motorStep);
-	
-	c->updateGraph(c->transitionSystem, ee);
+    //ExecutionError ee =
+	c->trackTaskExecution(*c->getTask());
 
     // if (c->getTask()->motorStep>0){
     //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
