@@ -28,7 +28,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			if (checkEnded(robot.body->GetTransform()).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep){
+			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep){
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
@@ -159,7 +159,7 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	}
 }
 
-EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transform> use_start, Direction dir){ //self-ended
+EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool relax, std::pair<bool,b2Transform> use_start){ //self-ended
 	if (dir==UNDEFINED){
 		dir=direction;
 	}
@@ -184,8 +184,25 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		if (action.getOmega()!=0){
 			float angleL = start.q.GetAngle()+SAFE_ANGLE;
 			float angleR = start.q.GetAngle()-SAFE_ANGLE;
-			if (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR){
-				disturbance.invalidate();
+			float robotAngle=robotTransform.q.GetAngle();
+			int mult= start.q.GetAngle()/(3*M_PI_4);
+			if (mult>0){
+				if (dir==LEFT& robotAngle<0){
+					robotAngle+=2*M_PI;
+				}
+			}
+			else if (mult<0){
+				if (dir==RIGHT & robotAngle>0){
+					robotAngle-=2*M_PI;
+				}
+			}
+			bool finishedLeft=false, finishedRight=false;
+				finishedLeft=robotAngle>=angleL;
+				finishedRight=robotAngle<=angleR;
+			if (finishedLeft|| finishedRight){
+				if (disturbance.getAffIndex()==AVOID){
+					disturbance.invalidate();
+				}
 				if (debug_k){
 			//	printf("angle of %f exceeds range, ended\n", robotTransform.q.GetAngle());
 				}
@@ -201,7 +218,17 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
-			r.ended = d<=endCriteria.distance; 
+			
+			if (relax){
+				Distance _d(DISTANCE_ERROR_TOLERANCE*3);
+				r.ended = d<=_d; 
+			}
+			else{
+				r.ended = d<=endCriteria.distance; 
+			}
+			//if (!r.ended){
+			//}
+			
 			if (debug_k){
 				printf("distance to goal=%f, endCriteria.distance =%f", d.get(), endCriteria.distance.get());
 			}
@@ -223,11 +250,11 @@ EndedResult Task::checkEnded(b2Transform robotTransform, std::pair<bool,b2Transf
 
 }
 
-EndedResult Task::checkEnded(State n,  Direction dir, std::pair<bool,b2Transform> use_start){ //check error of node compared to the present Task
+EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool,b2Transform> use_start){ //check error of node compared to the present Task
 	EndedResult r;
 	Angle a;
 	Distance d;
-	r = checkEnded(n.endPose, use_start, dir);
+	r = checkEnded(n.endPose, dir, relax, use_start);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }

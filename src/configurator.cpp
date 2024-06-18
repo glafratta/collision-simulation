@@ -562,6 +562,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	vertexDescriptor path_end=src;
 	do{
 		//find frontier (STRAIGHT)
+		printf("start\n");
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
 		if (src==currentVertex){
 			printf("planning from src =%i, out vertices n%i\n", src, frontier_v.size());
@@ -571,6 +572,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			addToPriorityQueue(f, priorityQueue, g);
 		}
 		if (priorityQueue.empty()){
+			printf("emtpy pq\n");
 			break;
 		}
 		src=priorityQueue.begin()->first;
@@ -579,6 +581,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second ){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
+			printf("possible paths:%i\n", paths.size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
@@ -611,8 +614,12 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			path->push_back(c);	
 			path_end=c;			
 		}
-		//printf("planning, path size= %i\n",path->size() );
-	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end]).ended));
+		printf("planning, path size= %i\n",path->size() );
+		printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
+		printf("conf running=%i\n", running);
+		
+	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
+	printf("exited while\n");
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
@@ -631,6 +638,8 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 	// 		boost::clear_vertex(*vi, g);
 	// 	}
 	// }
+	printf("done planning!\n");
+	printPlan();
 	return plan;
 }
 
@@ -700,6 +709,11 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
 	}
+	if (p.size()>0){
+		if (*p.begin()==currentVertex){
+			p.erase(p.begin());
+		}		
+	}	
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -707,7 +721,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		std::pair <State, Edge> sk(State(), Edge(t.direction));
 		//sk.first.direction=t.direction;
 		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
-		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance);
+		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
 		printf("to it %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
@@ -756,6 +770,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 					}
 				}
 				else{
+					printf("target=%i\n", ep.first.m_target);
 					ep.first.m_source=match.second;
 				}
 			}
@@ -774,13 +789,13 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		gt::adjustProbability(g, ep.first);
 		printf("adjust prov, it %i, p size =%i, result=%i\n", it, p.size(), result);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
-	}while (ep.first.m_target!=TransitionSystem::null_vertex() & result==true);
+	}while ((ep.first.m_target!=TransitionSystem::null_vertex() & it <p.size()-1 )& result==true );
 	printf("checked\n");
 	return result;
 }
 
 
-b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step){ 
+b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
 	if (g[e.m_target].disturbance.isValid()){
 		step=b2Vec2(g[e.m_target].endPose.p-g[e.m_target].disturbance.pose().p).Length();
@@ -798,7 +813,10 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				e.m_target=TransitionSystem::null_vertex();
 			}
 			for (auto ei = es.first; ei!=es.second; ++ei){ //was ++ei
-				if ((*ei).m_target == planVertices[i]){
+				if (plan.empty()){
+					break;
+				}
+				if ((*ei).m_target == plan[i]){
 					e= (*ei);
 					break;
 				}
@@ -1233,6 +1251,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 						es3=es2;
 					}					
 				}
+				//printf("is stuck, ei3=%i ->%i\n", (*ei).m_source, (*ei).m_target);
 			}while (ei3!=es3.second);
 	}
 	}

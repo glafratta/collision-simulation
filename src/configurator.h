@@ -229,7 +229,7 @@ std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vert
 
 bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
 
-b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float& );
+b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 

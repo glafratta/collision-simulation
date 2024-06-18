@@ -50,11 +50,5 @@ int main(int argc, char** argv){
   //  conf.getTask()->motorStep=0;
     conf.Spawner();
     printGraph(conf.transitionSystem);
-   // conf.planner(conf.transitionSystem, src);
-    // conf.printPlan();
-    // conf.planVertices =conf.changeTask(1, cb.ogStep, conf.planVertices);
-    do{
-        cb.step();
-    }while (!conf.planVertices.empty() || conf.getTask()->motorStep>0);    
 
 }

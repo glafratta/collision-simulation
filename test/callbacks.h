@@ -125,28 +125,25 @@ class StepCallback{
     Configurator * c;
     int ogStep=0;
 public:
+
+    StepCallback()=default;
+
     StepCallback(Configurator * _c): c(_c){}
     void step(){
-        // if (!c->running){
-        //     return;
-        // }
-        printf("task d orientation %f, valid = %i, step = %i\n", c->getTask()->disturbance.getOrientation().second, c->getTask()->disturbance.isValid(), c->getTask()->motorStep);
-       // float task_rotation_error=c->taskRotationError();
+        if (!c->running){
+            printf("not runing\n");
+            return;
+        }
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(action, c->getTask()->motorStep);
-        //}
-//        EndedResult er = c->controlGoal.checkEnded(c->controlGoal.start, c->getTask()->direction);
         EndedResult er = c->controlGoal.checkEnded();
 	    if (er.ended){
-		    c->controlGoal.change =1;
+            Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
+		    c->controlGoal = Task(new_goal, UNDEFINED);
             printf("goal reached\n");
 	    }
-	//c->controlGoal.trackDisturbance(c->controlGoal.disturbance, c->getTask()->getAction(), error);
 	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-        if (c->debugOn){
-            printf("current vertex= %i, graph size= %i\n", c->currentVertex, c->transitionSystem.m_vertices.size());
-        }
         L=c->getTask()->getAction().getLWheelSpeed();
         R= c->getTask()->getAction().getRWheelSpeed();
         printf("L=%f, R=%f\n", L, R);
