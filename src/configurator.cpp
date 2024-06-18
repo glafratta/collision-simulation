@@ -440,15 +440,12 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
 				g[v1].phi=evaluationFunction(er);
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
-				// if (controlGoal.getAffIndex()==PURSUE){
-				// 	printf("v=%i, v0_exp=%i, v0=%i, v1=%i, phi=%f, options=%li, dir = %i\n", v, v0_exp, v0, v1, g[v1].phi, g[v1].options.size(), t.direction);
-				// }
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
 				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 			
-			}while(t.direction !=DEFAULT & g[v0].options.size()!=0);
+			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
 			addToPriorityQueue(v1, priorityQueue, g);
 			}
 		}
@@ -698,7 +695,6 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start){
 	bool result=true;
-	
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	
 	printf("0->current=%i exists=%i\n", currentVertex, ep.second);
@@ -710,7 +706,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		return false;
 	}
 	if (p.size()>0){
-		if (*p.begin()==currentVertex){
+		if (p[0]==currentVertex){
 			p.erase(p.begin());
 		}		
 	}	
@@ -787,9 +783,9 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		propagateD(v1,prev_edge.second.m_source, g);
 		printf("propagated\n");
 		gt::adjustProbability(g, ep.first);
-		printf("adjust prov, it %i, p size =%i, result=%i\n", it, p.size(), result);
+		printf("adjust prov, it %i,is it target null=%i p size =%i, result=%i\n", it,ep.first.m_target!=TransitionSystem::null_vertex(), p.size(), result);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
-	}while ((ep.first.m_target!=TransitionSystem::null_vertex() & it <p.size()-1 )& result==true );
+	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
 	printf("checked\n");
 	return result;
 }
@@ -1090,7 +1086,14 @@ void Configurator::addToPriorityQueue(Frontier f, std::vector<Frontier>& queue, 
 
 std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g, Disturbance target){
 	std::pair <bool, vertexDescriptor> result(0, TransitionSystem::null_vertex());
-	if (target.getAffIndex()!=PURSUE){
+	vertexDescriptor ve=TransitionSystem::null_vertex();
+	if (!planVertices.empty()){
+		ve= *(planVertices.rbegin().base()-1);
+	}
+	else {
+		ve=currentVertex;
+	}
+	if (target.getAffIndex()!=PURSUE || controlGoal.checkEnded(g[ve], UNDEFINED, true).ended){
 		return result;
 	}
 	std::pair <float, vertexDescriptor> best(10000, TransitionSystem::null_vertex());

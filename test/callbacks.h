@@ -130,15 +130,18 @@ public:
 
     StepCallback(Configurator * _c): c(_c){}
     void step(){
-        if (!c->running){
+        if (!c->running ){
             printf("not runing\n");
             return;
         }
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
-        Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action, c->getTask()->motorStep);
-        EndedResult er = c->controlGoal.checkEnded();
-	    if (er.ended){
+      //  Task::Action action= c->getTask()->getAction();
+       // c->getTask()->correct(action, c->getTask()->motorStep);
+        EndedResult er = c->controlGoal.checkEnded(b2Transform(), UNDEFINED, true);
+	    if (c->controlGoal.disturbance.isValid()){
+            printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());
+        }
+        if (er.ended & c->getTask()->motorStep<1){
             Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		    c->controlGoal = Task(new_goal, UNDEFINED);
             printf("goal reached\n");
