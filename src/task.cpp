@@ -220,7 +220,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 			a = Angle(disturbance.getAngle(robotTransform));
 			
 			if (relax){
-				Distance _d(DISTANCE_ERROR_TOLERANCE*6);
+				Distance _d(RELAXED_DIST_ERROR_TOLERANCE);
 				r.ended = d<=_d; 
 			}
 			else{
