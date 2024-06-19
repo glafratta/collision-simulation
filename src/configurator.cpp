@@ -1085,6 +1085,7 @@ void Configurator::addToPriorityQueue(Frontier f, std::vector<Frontier>& queue, 
 }
 
 std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g, Disturbance target){
+	printf("ENTERED BEEN\n");
 	std::pair <bool, vertexDescriptor> result(0, TransitionSystem::null_vertex());
 	vertexDescriptor ve=TransitionSystem::null_vertex();
 	if (!planVertices.empty()){
@@ -1093,7 +1094,6 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	else {
 		ve=currentVertex;
 	}
-
 	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended;target.getAffIndex()!=PURSUE || fin){
 		printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 		return result;
