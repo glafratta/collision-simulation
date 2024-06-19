@@ -1399,7 +1399,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 }
 
 
-ExecutionError Configurator::trackTaskExecution(Task & t){
+ExecutionError Configurator::trackTaskExecution(Task & t, int ogStep){
 	ExecutionError error;
 	// if (planVertices.empty() & planning){
 	// 	return error;
@@ -1430,7 +1430,6 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	// deltaPose=b2Transform(b2Vec2(xdistance,
 	// 				ydistance), 
 	// 				angularDisplacement); //og rot
-	//FINDING IF ROBOT IS GOING STRAIGHT
 	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
 	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){

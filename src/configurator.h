@@ -264,7 +264,7 @@ std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance);
 
 
 
-ExecutionError trackTaskExecution(Task &);
+ExecutionError trackTaskExecution(Task &, int);
 
 b2Transform assignDeltaPose(Task::Action, float);
 
