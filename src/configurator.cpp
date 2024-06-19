@@ -119,7 +119,7 @@ bool Configurator::Spawner(){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		std::pair<bool, vertexDescriptor> been= been_there(transitionSystem, controlGoal.disturbance);
-		printf("checked been = %i\n", been.first);
+		//printf("checked been = %i\n", been.first);
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src;
 		if (!planVertices.empty()){
