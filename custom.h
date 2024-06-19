@@ -104,7 +104,7 @@ void step( AlphaBot &motors){
 		//printf("control goal disturbance: %f, %f, %f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y, c->controlGoal.disturbance.pose().q.GetAngle());
         printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());	
 	}
-	if (er.ended & c->getTask()->motorStep<1){
+	if (er.ended){
 		printf("goal reached\n");
 		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
