@@ -91,9 +91,9 @@ void step( AlphaBot &motors){
  	   motors.setLeftWheelSpeed(0);		
 	}
     //ExecutionError ee =
-	printf("not tracked\n");
+//	printf("not tracked\n");
 	c->trackTaskExecution(*c->getTask());
-	printf("tracked\n");
+//	printf("tracked\n");
     // if (c->getTask()->motorStep>0){
     //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     // }
@@ -101,20 +101,21 @@ void step( AlphaBot &motors){
 	//printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
 	printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	if (c->controlGoal.disturbance.isValid()){
-		printf("control goal disturbance: %f, %f, %f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y, c->controlGoal.disturbance.pose().q.GetAngle());
+		//printf("control goal disturbance: %f, %f, %f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y, c->controlGoal.disturbance.pose().q.GetAngle());
+        printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());	
 	}
 	if (er.ended){
 		printf("goal reached\n");
 		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
-		printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
+		//printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-		printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
+		//printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*0.95); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
+	//printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
 };
 
