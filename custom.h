@@ -115,7 +115,7 @@ void step( AlphaBot &motors){
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
     motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*0.95); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
-	//printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
+	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
 };
 

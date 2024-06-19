@@ -745,14 +745,14 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			// prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
-			//printf("state end: x=%f, y=%f, theta=%f\n", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle());
-			printf("NO MATCH with %i: x=%f, y=%f, theta=%f\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());
+			printf("state end: x=%f, y=%f, theta=%f, d valid=%i\n", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle(), sk.first.disturbance.isValid());
+			printf("NO MATCH with %i: x=%f, y=%f, theta=%f, d valid=%i\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle(), g[v1].endPose.q.GetAngle());
 			//printf("simulation duration step=%i, started from %f, %f, %f\n", sk.second.step, g[prev_edge.second.m_source].endPose.p.x, g[prev_edge.second.m_source].endPose.p.y,g[prev_edge.second.m_source].endPose.q.GetAngle());
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
 				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
-				// printf("added edge %i -> %i in check plan, dir %i\n",prev_edge.second.m_source, v1, g[ep.first].direction);
+				printf("added edge %i -> %i in check plan, dir %i\n",prev_edge.second.m_source, v1, g[ep.first].direction);
 				// printf("dist valid = %i, end %f, %f, %f\n", g[v1].disturbance.isValid(), g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());			
 			}
 			else{
