@@ -1093,7 +1093,9 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	else {
 		ve=currentVertex;
 	}
-	if (target.getAffIndex()!=PURSUE || controlGoal.checkEnded(g[ve], UNDEFINED, true).ended){
+
+	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended;target.getAffIndex()!=PURSUE || fin){
+		printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 		return result;
 	}
 	std::pair <float, vertexDescriptor> best(10000, TransitionSystem::null_vertex());
