@@ -1399,7 +1399,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 }
 
 
-ExecutionError Configurator::trackTaskExecution(Task & t, int ogStep){
+ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
 	// if (planVertices.empty() & planning){
 	// 	return error;
