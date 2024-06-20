@@ -11,7 +11,9 @@
 
 //FOR DEBUG
 namespace debug{
-void graph_file(int it, TransitionSystem& g, Disturbance goal);
+	template <typename T>;
+
+void graph_file(int it, T& g, Disturbance goal);
 }
 //
 

@@ -1,7 +1,7 @@
 #include "configurator.h"
 #include <chrono>
 
-template typename T;
+template <typename T>;
 void debug::graph_file(int it, T& g, Disturbance goal){
 	char fileName[50];
 	sprintf(fileName, "/tmp/graph%04i.txt", it);
