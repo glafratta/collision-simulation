@@ -776,7 +776,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				else{
 				//	printf("target=%i\n", ep.first.m_target);
 					//ep.first.m_source=match.second;
-					ep.first= boost::edge(match.second, ep.first.m_target, g);
+					ep.first= boost::edge(match.second, ep.first.m_target, g).first;
 				}
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
