@@ -191,7 +191,7 @@ bool Configurator::Spawner(){
 		fclose(f);
 	}
 	worldBuilder.resetBodies();
-	printg
+	printf("end explor\n");
 	return 1;
 }
 
