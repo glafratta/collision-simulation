@@ -11,8 +11,8 @@
 
 //FOR DEBUG
 namespace debug{
-	template <typename T>;
-
+	
+template <class T>;
 void graph_file(int it, T& g, Disturbance goal);
 }
 //
