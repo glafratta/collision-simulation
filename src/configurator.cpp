@@ -191,6 +191,7 @@ bool Configurator::Spawner(){
 		fclose(f);
 	}
 	worldBuilder.resetBodies();
+	printg
 	return 1;
 }
 
@@ -763,7 +764,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				// printf("dist valid = %i, end %f, %f, %f\n", g[v1].disturbance.isValid(), g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());			
 			}
 			else{
-			//	printf("instead matched with %i:  x=%f, y=%f, theta=%f\n", match.second, g[match.second].endPose.p.x, g[match.second].endPose.p.y, g[match.second].endPose.q.GetAngle());
+				printf("instead matched with %i:  x=%f, y=%f, theta=%f\n", match.second, g[match.second].endPose.p.x, g[match.second].endPose.p.y, g[match.second].endPose.q.GetAngle());
 				gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
 				p[it]=match.second;
 				if (ep.first.m_target!=TransitionSystem::null_vertex()){
@@ -774,7 +775,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				}
 				else{
 				//	printf("target=%i\n", ep.first.m_target);
-					ep.first.m_source=match.second;
+					//ep.first.m_source=match.second;
+					ep.first= boost::edge(match.second, TransitionSystem::null_vertex(), g);
 				}
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
