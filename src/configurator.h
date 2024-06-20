@@ -12,7 +12,7 @@
 //FOR DEBUG
 namespace debug{
 	
-template <class T>;
+template <class T>
 void graph_file(int it, T& g, Disturbance goal);
 }
 //
