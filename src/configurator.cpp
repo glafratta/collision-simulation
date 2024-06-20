@@ -33,6 +33,7 @@ bool ConfiguratorInterface::isReady(){
 }
 
 void Configurator::dummy_vertex(vertexDescriptor src){
+	vertexDescriptor prev_current=currentVertex;
 	currentVertex=boost::add_vertex(transitionSystem);
 	gt::fill(simResult(), &transitionSystem[currentVertex]);
 	transitionSystem[currentVertex].nObs++;
@@ -145,14 +146,15 @@ bool Configurator::Spawner(){
 			is_not_v not_cv(currentVertex);
 			planVertices.clear();
 			boost::clear_vertex(movingVertex, transitionSystem);
-			dummy_vertex(movingVertex);//currentEdge.m_source
+			dummy_vertex(currentVertex);//currentEdge.m_source
 			currentTask.change=1;
-			if (!planVertices.empty()){
-				src=movingVertex;
-			}
-			else{
-				src=currentVertex;
-			}
+			// if (!planVertices.empty()){
+			// 	src=movingVertex;
+			// }
+			// else{
+			// 	src=currentVertex;
+			// }
+			src=currentVertex;
 			resetPhi(transitionSystem);
 			toRemove=explorer(src, transitionSystem, currentTask, world);
 			clearFromMap(toRemove, transitionSystem, errorMap);
@@ -373,6 +375,11 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
+	if (controlGoal.disturbance.isValid()){
+		b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
+		printf("goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
+		printf("goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
+}
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	//Direction direction= t.direction;
 	Direction direction=g[currentEdge].direction;
@@ -1095,7 +1102,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	else {
 		ve=currentVertex;
 	}
-	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended;target.getAffIndex()!=PURSUE || fin){
+	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended; (target.getAffIndex()!=PURSUE || fin) & currentVertex){
 		printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 		return result;
 	}

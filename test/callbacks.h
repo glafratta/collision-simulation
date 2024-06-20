@@ -137,19 +137,24 @@ public:
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
       //  Task::Action action= c->getTask()->getAction();
        // c->getTask()->correct(action, c->getTask()->motorStep);
-        EndedResult er = c->controlGoal.checkEnded(b2Transform(), UNDEFINED, false);//true
+        EndedResult er = c->controlGoal.checkEnded(b2Transform(), UNDEFINED, true);//true
 	    if (c->controlGoal.disturbance.isValid()){
             printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());
         }
-        if (er.ended){ //& c->getTask()->motorStep<1
+        if (er.ended & c->getTask()->motorStep<1 & c->getTask()->direction!=STOP){ //& c->getTask()->motorStep<1
             Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		    c->controlGoal = Task(new_goal, UNDEFINED);
-            printf("goal reached\n");
+            b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
+            printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
+            printf("GOAL REACHED ");
+            if (c->getTask()->direction==STOP){
+                printf("but stopping");
+            }
 	    }
 	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
         L=c->getTask()->getAction().getLWheelSpeed();
         R= c->getTask()->getAction().getRWheelSpeed();
-        printf("L=%f, R=%f\n", L, R);
+        printf("\n L=%f, R=%f\n", L, R);
     }
 };
 
