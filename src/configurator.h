@@ -253,7 +253,7 @@ void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIG
 
 void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
 
-void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&);
+void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, std::vector <vertexDescriptor>&);
 
 void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, vertexDescriptor goal=TransitionSystem::null_vertex());
 

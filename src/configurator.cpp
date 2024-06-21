@@ -386,11 +386,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	//Direction direction= t.direction;
 	Direction direction=g[currentEdge].direction;
 	std::vector <vertexDescriptor> priorityQueue = {bestNext};
+	std::vector <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	printf("EXPLORING\n");
 	do{
 		v=bestNext;
+		closed.push_back(*priorityQueue.begin());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
 		if (er.ended){
@@ -436,11 +438,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				else{
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
-					if (!(v0==v1)){
+					if ((v0!=v1)){
 						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;//t.direction;
-						printf("same vertex\n");
+					}
+					else{
+						printf("same vertex %i\n", v1);
 					}
 				}
 				if(edge.second){
@@ -456,7 +460,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 			
 			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
-			addToPriorityQueue(v1, priorityQueue, g);
+			addToPriorityQueue(v1, priorityQueue, g, closed);
 			}
 		}
 		bestNext=priorityQueue[0];
@@ -1079,9 +1083,15 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 //     }
 // }
 
-void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g){
+void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g, std::vector <vertexDescriptor>& closed){
 	for (auto i =queue.begin(); i!=queue.end(); i++){
-		if (g[v].phi <abs(g[*i].phi)){
+		bool expanded=0;
+		for (vertexDescriptor c: closed){
+			if (v==c){
+				expanded=true;
+			}
+		}
+		if (g[v].phi <abs(g[*i].phi) & !expanded){
 			queue.insert(i, v);
 			return;
 		}
