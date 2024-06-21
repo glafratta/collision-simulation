@@ -460,7 +460,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		}
 		bestNext=priorityQueue[0];
 		if (controlGoal.getAffIndex()==PURSUE){
-			printf("best=%i", bestNext);
+			printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
 		}
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
@@ -1045,15 +1045,18 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	if (!g[v0].options.empty()){
 		return;
 	}
+	if (g[v0].visited()){
+		return;
+	}
 	if (controlGoal.endCriteria.hasEnd()){
 		if (ended){
-			printf("no options added because %i ended\n", v0);
+			//printf("no options added because %i ended\n", v0);
 			return;
 		}
 	}
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		if (controlGoal.getAffIndex()==PURSUE){
-			printf("no options added because %i out of bounds\n", v0);
+			//printf("no options added because %i out of bounds\n", v0);
 		}
 		return;
 	}
