@@ -2,17 +2,25 @@
 #include <chrono>
 
 template <class T>
-void debug::graph_file(int it, T& g, Disturbance goal){
+void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor> plan){
 	char fileName[50];
 	sprintf(fileName, "/tmp/graph%04i.txt", it);
 	FILE * f=fopen(fileName, "w");
 	auto vs=boost::vertices(g);
 	for (auto vi=vs.first; vi!=vs.second; vi++){
 		auto es=boost::out_edges(*vi, g);
-		if (goal.getAffIndex()!=NONE){
-			b2Vec2 v = goal.getPosition() - g[*vi].endPose.p; //distance between disturbance and robot
-			if (v.Length()<DISTANCE_ERROR_TOLERANCE){
-				fprintf(f, "*");
+		// if (goal.getAffIndex()!=NONE){
+		// 	b2Vec2 v = goal.getPosition() - g[*vi].endPose.p; //distance between disturbance and robot
+		// 	if (v.Length()<DISTANCE_ERROR_TOLERANCE){
+		// 		fprintf(f, "*");
+		// 	}
+		// }
+		if (*vi==currentVertex){
+			fprintf("!");
+		}
+		for (vertexDescriptor vp:plan){
+			if (*vi==vp){
+				fprintf("*");
 			}
 		}
 		fprintf(f,"%i -> ", *vi);
@@ -165,8 +173,8 @@ bool Configurator::Spawner(){
 			boost::copy_graph(fts, tmp);
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
-			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			planVertices= planner(transitionSystem, src);
+			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 			//boost::print_graph(transitionSystem);
