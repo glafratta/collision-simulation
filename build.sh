@@ -11,6 +11,7 @@ if [ $temp -lt 80000 ]
 then
 	echo "temperature of $temp ok, building"
 	rm targetless targetless_benchmark targetless_benchmark_alt target_benchmark target_benchmark_alt reactive target target_reactive CMakeCache.txt Makefile
+	sudo rm /tmp/graph*
 	cmake .
 	cd src/
 	sudo make install
