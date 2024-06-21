@@ -219,8 +219,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
 			
-			if (!relax){
-				Distance _d(0.005);
+			if (relax){
+				Distance _d(RELAXED_DIST_ERROR_TOLERANCE);
 				r.ended = d<=_d; 
 			}
 			else{

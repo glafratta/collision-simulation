@@ -145,7 +145,7 @@ public:
         if (c->controlGoal.disturbance.isValid()){
             printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());
         }
-        if (er.ended ||( c->getTask()->motorStep<1 & c->transitionSystem[c->movingEdge].direction!=STOP && c->planVertices.empty() && c->getIteration()>1)){ //& c->getTask()->motorStep<1
+        if (er.ended &( c->getTask()->motorStep<1 & c->transitionSystem[c->movingEdge].direction!=STOP && c->planVertices.empty() && c->getIteration()>1)){ //& c->getTask()->motorStep<1
            if (!er.ended){
                 printf("task step = %i\n", c->getTask()->motorStep);
            }
