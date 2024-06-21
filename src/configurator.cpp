@@ -440,6 +440,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;//t.direction;
+						printf("same vertex\n");
 					}
 				}
 				if(edge.second){
@@ -460,7 +461,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		}
 		bestNext=priorityQueue[0];
 		if (controlGoal.getAffIndex()==PURSUE){
-			printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
+			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
 		}
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
