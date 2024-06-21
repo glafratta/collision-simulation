@@ -564,6 +564,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		//printf("current %i =moving%i! return\n", currentVertex, movingVertex);
 		return plan;
 	}
+	printf("PLANNING src=%i, out deg=%i\n", src, boost::out_degree(src,g));
 	std::vector <vertexDescriptor> add;
 	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
 	vertexDescriptor path_end=src;
@@ -1043,9 +1044,6 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 
 void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src){
 	if (!g[v0].options.empty()){
-		return;
-	}
-	if (g[v0].visited()){
 		return;
 	}
 	if (controlGoal.endCriteria.hasEnd()){
