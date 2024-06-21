@@ -97,7 +97,9 @@ void step( AlphaBot &motors){
     // if (c->getTask()->motorStep>0){
     //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
     // }
+	c->controlGoal.debug_k=1;
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
+	c->controlGoal.debug_k=0;
 	//printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
 	// printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
 	// if (c->controlGoal.disturbance.isValid()){
@@ -105,7 +107,7 @@ void step( AlphaBot &motors){
     //     printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());	
 	// }
 	EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
-	if (er.ended != (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())){
+	if (er.ended || (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())){
 		printf("goal reached\n");
 		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 	//	printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());

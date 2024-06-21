@@ -137,7 +137,7 @@ public:
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(action, c->getTask()->motorStep);
-        EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);//true
+        EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);//true
 	    // if (c->getTask()->motorStep==0 && c->planVertices.empty() & c->transitionSystem.m_vertices.size()>2){ //&& (c->transitionSystem[c->movingEdge].step==0 || c->getIteration()<2)
         //     er.ended=1;
         // }
