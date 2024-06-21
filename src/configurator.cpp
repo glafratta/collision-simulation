@@ -564,7 +564,6 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		//printf("current %i =moving%i! return\n", currentVertex, movingVertex);
 		return plan;
 	}
-	printf("PLANNING src=%i, out deg=%i\n", src, boost::out_degree(src,g));
 	std::vector <vertexDescriptor> add;
 	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
 	vertexDescriptor path_end=src;
