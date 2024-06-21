@@ -464,6 +464,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		// }
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
+	printf("finished exploring\n");
 	return toRemove;
 }
 
@@ -587,7 +588,7 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second ){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
-		//	printf("possible paths:%i\n", paths.size());
+			printf("possible paths:%i\n", paths.size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
