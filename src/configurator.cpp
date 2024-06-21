@@ -459,9 +459,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 		}
 		bestNext=priorityQueue[0];
-		// if (controlGoal.getAffIndex()==PURSUE){
-		// 	//printf("best=%i", bestNext);
-		// }
+		if (controlGoal.getAffIndex()==PURSUE){
+			printf("best=%i", bestNext);
+		}
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
 	printf("finished exploring\n");
