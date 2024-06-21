@@ -703,6 +703,8 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 // }
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start){
+	b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
+	printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	bool result=true;
 	int it=-1;//this represents currentv
 	auto ep=boost::edge(movingVertex, currentVertex, g);	

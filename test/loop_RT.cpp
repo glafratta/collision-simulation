@@ -11,6 +11,7 @@ char * folder;
     DataInterface2(ConfiguratorInterface* _ci): ci(_ci){}
 
 	bool newScanAvail(){ //uncomment sections to write x and y to files		
+        
         ci->data2fp= {Pointf(-1.0, -1.0)};
         ci->ready=1;
         iteration++;
