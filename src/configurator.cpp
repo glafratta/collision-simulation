@@ -16,11 +16,11 @@ void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescri
 		// 	}
 		// }
 		if (*vi==currentVertex){
-			fprintf("!");
+			fprintf(f,"!");
 		}
 		for (vertexDescriptor vp:plan){
 			if (*vi==vp){
-				fprintf("*");
+				fprintf(f,"*");
 			}
 		}
 		fprintf(f,"%i -> ", *vi);
