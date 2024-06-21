@@ -13,7 +13,7 @@
 namespace debug{
 	
 template <class T>
-void graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor>);
+void graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor>, vertexDescriptor);
 }
 //
 

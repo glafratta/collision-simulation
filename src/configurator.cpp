@@ -2,7 +2,7 @@
 #include <chrono>
 
 template <class T>
-void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor> plan){
+void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor> plan, vertexDescriptor c){
 	char fileName[50];
 	sprintf(fileName, "/tmp/graph%04i.txt", it);
 	FILE * f=fopen(fileName, "w");
@@ -15,7 +15,7 @@ void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescri
 		// 		fprintf(f, "*");
 		// 	}
 		// }
-		if (*vi==currentVertex){
+		if (*vi==c){
 			fprintf(f,"!");
 		}
 		for (vertexDescriptor vp:plan){
