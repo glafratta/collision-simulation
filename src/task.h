@@ -36,12 +36,12 @@ public:
         R=.5;
         break;
         case Direction::LEFT:
-        L = -0.5;
-        R=0.5;
+        L = -0.2537;
+        R=0.2537;
         break;
         case Direction::RIGHT:
-        L=0.5;
-        R = - 0.5;
+        L=0.2537;
+        R = - 0.2537;
         break;
         case Direction::BACK:
         L = -0.5;

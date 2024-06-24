@@ -19,7 +19,14 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start.p, theta);
 		int stepb2d=0;
+		float traj_error=0;
 		for (stepb2d; stepb2d < (HZ*remaining); stepb2d++) {//3 second
+			// if (direction==DEFAULT){
+			// 	traj_error=remainder(robot.body->GetTransform().q.GetAngle(), M_PI_2);
+			// 	correct.update(traj_error);
+			// 	correct(action, stepb2d);
+			// 	printf("angle =%f,error =%f\n", robot.body->GetTransform().q.GetAngle(),traj_error);
+			// }
 			instVelocity.x = action.getLinearSpeed()*cos(theta);
 			instVelocity.y = action.getLinearSpeed()*sin(theta);
 			robot.body->SetLinearVelocity(instVelocity);
@@ -57,7 +64,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 
 
 void Task::Correct::operator()(Action & action, int step){
-	float tolerance = 0.01; //tolerance in radians/pi = just under 2 degrees degrees
+	float tolerance = 0.1; //tolerance in radians/pi = just under 2 degrees degrees
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
 		printf("returning\n");
 		return;
@@ -182,6 +189,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
 		if (action.getOmega()!=0){
+			//const float END_ANGLE_TOLERANCE= action.getOmega()/HZ;
 			float angleL = start.q.GetAngle()+SAFE_ANGLE;
 			float angleR = start.q.GetAngle()-SAFE_ANGLE;
 			float robotAngle=robotTransform.q.GetAngle();
@@ -196,9 +204,9 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 					robotAngle-=2*M_PI;
 				}
 			}
-			bool finishedLeft=false, finishedRight=false;
-				finishedLeft=robotAngle>=angleL;
-				finishedRight=robotAngle<=angleR;
+
+			bool finishedLeft=robotAngle>=angleL;
+			bool finishedRight=robotAngle<=angleR;
 			if (finishedLeft|| finishedRight){
 				if (disturbance.getAffIndex()==AVOID){
 					disturbance.invalidate();

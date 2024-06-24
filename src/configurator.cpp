@@ -1457,13 +1457,6 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.motorStep+=correction; //reflex
 	}		
 
-	// b2Transform deltaPose;
-	// b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	// float xdistance=angularDisplacement.c * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK +error.theta();
-	// float ydistance=angularDisplacement.s * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	// deltaPose=b2Transform(b2Vec2(xdistance,
-	// 				ydistance), 
-	// 				angularDisplacement); //og rot
 	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
 	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){
@@ -1590,44 +1583,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 					ydistance), 
 					b2Rot(angularDisplacement));
 	float linearDisplacement = SignedVectorLength(deltaPose.p);
+	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
 	//printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-			// g[*vIt].endPose.q.Set(g[*vIt].endPose.q.GetAngle()-angularDisplacement);
-			// g[*vIt].endPose.p.x-=xdistance;
-			// g[*vIt].endPose.p.y-=ydistance;
-			// g[*vIt].endPose.p.x= g[*vIt].endPose.p.x* cos(angularDisplacement)+ g[*vIt].endPose.p.y*sin(angularDisplacement);
-			// g[*vIt].endPose.p.y= g[*vIt].endPose.p.y* cos(angularDisplacement)- g[*vIt].endPose.p.x*sin(angularDisplacement);
 			applyAffineTrans(deltaPose, g[*vIt].endPose);
 			if (g[*vIt].disturbance.getAffIndex()!=NONE){
-				// g[*vIt].disturbance.pose().q.Set(g[*vIt].disturbance.pose().q.GetAngle()-angularDisplacement);
-				// //float d_x= d_distance*cos(g[*vIt].disturbance.pose().q.GetAngle())-xdistance;
-				// float d_y= d_distance*sin(g[*vIt].disturbance.pose().q.GetAngle())-ydistance;
-				// g[*vIt].disturbance.pose().p.Set(d_x, d_y);
 				applyAffineTrans(deltaPose, g[*vIt].disturbance.bf.pose);
-
-			}
-		
+			}		
 		}
 	}
-
-	// if (fabs(error)>TRACKING_ERROR_TOLERANCE){
-	// 	deltaPose=b2Transform(b2Vec2(cos(rot.GetAngle())*error,
-	// 					getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-	// 					rot);
-	// }
 	applyAffineTrans(deltaPose, controlGoal.start);
 	if(controlGoal.getAffIndex()!=NONE){
-		// //controlGoal.disturbance.subtractPose(deltaPose);
-		// controlGoal.disturbance.pose().q.Set(controlGoal.disturbance.pose().q.GetAngle()-angularDisplacement);
-		// float goal_distance=controlGoal.disturbance.pose().p.Length()- linearDisplacement;
-		// float goal_x= goal_distance*cos(controlGoal.disturbance.pose().q.GetAngle());
-		// float goal_y= goal_distance*sin(controlGoal.disturbance.pose().q.GetAngle());
-		// controlGoal.disturbance.pose().p.Set(goal_x, goal_y);
 		applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);
 	}
-	//controlGoal.start-=deltaPose;
-
-
-
 }

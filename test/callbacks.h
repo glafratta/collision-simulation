@@ -134,6 +134,7 @@ public:
             printf("not runing\n");
             return;
         }
+        printf("graph size = %i\n", c->transitionSystem.m_vertices.size());
         ExecutionError ee =c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
         c->getTask()->correct(action, c->getTask()->motorStep);
@@ -161,7 +162,7 @@ public:
 	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
         L=c->getTask()->getAction().getLWheelSpeed();
         R= c->getTask()->getAction().getRWheelSpeed();
-        printf("\n L=%f, R=%f\n", L, R);
+        printf("\n og step=%i, L=%f, R=%f\n", ogStep, L, R);
     }
 };
 

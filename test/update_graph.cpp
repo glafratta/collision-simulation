@@ -54,7 +54,7 @@ int main(int argc, char** argv){
     do {
     cb.step();
     }while(conf.getTask()->direction!=STOP & conf.getTask()->motorStep>=0);
-    debug::graph_file(2, conf.transitionSystem, conf.controlGoal.disturbance);
+    debug::graph_file(2, conf.transitionSystem, conf.controlGoal.disturbance, conf.planVertices, conf.currentVertex);
     Disturbance target2(PURSUE, conf.controlGoal.start.p, conf.controlGoal.start.q.GetAngle());    
     conf.controlGoal= Task(target2, DEFAULT);
     conf.Spawner();
@@ -66,7 +66,7 @@ int main(int argc, char** argv){
     do {
     cb.step();
     }while(conf.getTask()->direction!=STOP & conf.getTask()->motorStep>=0);
-    debug::graph_file(3, conf.transitionSystem, conf.controlGoal.disturbance);
+    debug::graph_file(3, conf.transitionSystem, conf.controlGoal.disturbance, conf.planVertices, conf.currentVertex);
 
 
 }

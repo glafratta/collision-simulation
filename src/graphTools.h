@@ -30,7 +30,7 @@ typedef std::vector <bool> MatchVector;
 struct Edge{
 	Direction direction=DEFAULT;
 	float probability=1.0;
-	int step=0;
+	int step=-1;
 	int it_observed=-1; //last iteration where this edge was observed
 
 	Edge()=default;

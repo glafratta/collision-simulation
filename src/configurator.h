@@ -87,6 +87,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	currentVertex=movingVertex;
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	transitionSystem[movingEdge].direction=STOP;
+	currentTask.action.setVelocities(0,0);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
 
