@@ -742,7 +742,6 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(), Edge(t.direction));
 		//sk.first.direction=t.direction;
-	//	printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
 	//	printf("to it %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
@@ -813,6 +812,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		gt::adjustProbability(g, ep.first);
 	//	printf("adjust prov, it %i,is it target null=%i p size =%i, result=%i\n", it,ep.first.m_target!=TransitionSystem::null_vertex(), p.size(), result);
 		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
+		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
 //	printf("checked\n");
 	return result;
