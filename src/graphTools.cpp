@@ -175,12 +175,15 @@ DistanceVector StateMatcher::getDistance(State s1, State s2){
 	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
 	result[3]= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	result[4]=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	float candidate_angle=s2.endPose.q.GetAngle();
-	if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){
-		candidate_angle+=2*M_PI;
-	}
-	else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
-		candidate_angle-=2*M_PI;
+	float candidate_angle=s2.endPose.q.GetAngle(); 
+	if (fabs(s1.endPose.q.GetAngle())> 3*M_PI_4 || fabs(candidate_angle)> 3*M_PI_4){
+		if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){
+			candidate_angle+=2*M_PI;
+		}
+		else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
+			candidate_angle-=2*M_PI;
+		}
+
 	}
 	result[5]=s1.endPose.q.GetAngle()-candidate_angle;
 	return result;
