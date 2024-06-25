@@ -989,7 +989,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		//was e.m_target
 	}
 	else{
-		adjustStepDistance(e_start.m_source,g, t, step, e.m_target);
+		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,e.m_target));
 	}
 	return result;
 }
@@ -1330,10 +1330,10 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 
 
-void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, vertexDescriptor tgt){
+void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, std::pair<bool,vertexDescriptor> tgt){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
-	if(!ep.second & tgt!=TransitionSystem::null_vertex()){
-		step = (g[v].endPose.p- g[tgt].endPose.p).Length();
+	if(!ep.second & tgt.first){
+		step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
 		return; //check until needs to be checked
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
