@@ -882,7 +882,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//sk.first.direction=t.direction;
 		printf("from %i", ep.first.m_target);
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
-		printf("to it %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
+		printf("to it %i, edge %i ->%i, stepDistance %f\n", it, ep.first.m_source, ep.first.m_target, stepDistance);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
