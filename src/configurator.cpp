@@ -1287,7 +1287,8 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 			}
 	}
 	result.second=best.second;
-	printf("been=%i, vertex=%i\n", result.first, result.second);
+	printf("goal =%f, %f, %f", target.pose().p.x, target.pose().p.y, target.pose().q.GetAngle());
+	printf("been=%i, vertex=%i, pose: %f, %f, %f\n", result.first, result.second, g[result.second].endPose.p.x,g[result.second].endPose.p.y, g[result.second].endPose.q.GetAngle() );
 	return result; //if been there, do not explore, extract a plan then check it
 }
 
