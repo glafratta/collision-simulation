@@ -961,7 +961,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
 	if (g[e.m_target].disturbance.isValid()){
-		step=b2Vec2(g[e.m_target].endPose.p-g[e.m_target].disturbance.pose().p).Length();
+		step=b2Vec2(g[e.m_source].endPose.p-g[e.m_target].disturbance.pose().p).Length();
+		//was e.m_target
 	}
 	else{
 		adjustStepDistance(e.m_source,g, t, step);
