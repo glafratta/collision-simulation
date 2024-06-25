@@ -36,12 +36,12 @@ public:
         R=.5;
         break;
         case Direction::LEFT:
-        L = -0.2537;
-        R=0.2537;
+        L = -0.218182;
+        R=0.218182;
         break;
         case Direction::RIGHT:
-        L=0.2537;
-        R = - 0.2537;
+        L=0.218182;//0.2537;
+        R = - 0.218182;
         break;
         case Direction::BACK:
         L = -0.5;
@@ -58,7 +58,7 @@ public:
     }
 
 void setVelocities(float l, float r){
-    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION; //instant velocity, determines angle increment in willcollide
+    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(l+r)/2;
     recordedSpeed=linearSpeed;
