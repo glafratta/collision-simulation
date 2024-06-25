@@ -113,9 +113,16 @@ void step( AlphaBot &motors){
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 		printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
+		FILE * f = fopen(c->statFile, "a+");
+		fprintf(f, "!");
+		fclose(f);
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-    motors.setRightWheelSpeed(c->getTask()->getAction().getRWheelSpeed()*0.95); //temporary fix because motors on despacito are the wrong way around
+	float R= c->getTask()->getAction().getRWheelSpeed();
+	if (c->getTask()->direction==DEFAULT){
+		R*=0.95;
+	}
+    motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(c->getTask()->getAction().getLWheelSpeed());
 	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
