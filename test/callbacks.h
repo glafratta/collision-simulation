@@ -160,7 +160,7 @@ public:
             }
         	FILE * f = fopen(c->statFile, "a+");
             fprintf(f, "!");
-            fclose(f)l
+            fclose(f);
 
 	    }
 	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
