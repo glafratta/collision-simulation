@@ -614,9 +614,9 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
-					printf("from index %i ", pend.base()-1);
+					printf("from index %i ", *(pend.base()-1));
 					pend++;
-					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *pend.base()-1);
+					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *(pend.base()-1));
 				}
 				else{
 					path++; //go back a previously explored path
