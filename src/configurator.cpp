@@ -608,9 +608,10 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second ){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
-			printf("src = %i possible paths:%i\n", src, paths.size());
+			printf("src = %i possible paths:%i, path length=%i\n", src, paths.size(), path->size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
+			printf("edge %i->%i\n", end, add);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
@@ -625,9 +626,17 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				}
 			}
 			else if (edge.second & pend.base()!=path->rbegin().base()){  //if there is an edge with the end of current path
-				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
-				path=paths.rbegin(); 
-				printf("new path based on previous path\n");
+				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
+					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
+						path=_p;
+						printf("using existing\n");
+					}
+					else{
+						paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
+						path=paths.rbegin();				
+						printf("new path based on previous path\n");
+					}
+				}
 				break;
 			}
 			else{
