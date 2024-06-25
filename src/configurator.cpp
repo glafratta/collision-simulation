@@ -607,11 +607,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		add.push_back(src);
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
-		while (!edge.second ){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
+		while (!edge.second & !add.empty()){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
 			printf("src = %i possible paths:%i, path length=%i\n", src, paths.size(), path->size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
-			printf("edge %i->%i\n", end, add);
+			printf("edge %i->%i\n", end, add[0]);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
