@@ -608,7 +608,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
-			printf("src = %i possible paths:%i, path length=%i\n", src, paths.size(), path->size());
+			printf("src = %i possible paths:%i, path length=%i, add length=%i\n", src, paths.size(), path->size(), add.size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
 			printf("edge %i->%i", end, add[0]);
@@ -641,11 +641,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				}
 				break;
 			}
-			else{
-				printf("edge exist=%i, index is end %i ", edge.second, pend.base()!=path->rbegin().base());
-				printf("doing nothing\n");
-				break;
-			}
+			// else{
+			// 	printf("edge exist=%i, index is end %i ", edge.second, pend.base()==path->rbegin().base());
+			// 	printf("doing nothing\n");
+			// 	break;
+			// }
 			if ( path==paths.rend()) { //if there are no other paths
 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
 				path=paths.rbegin();
