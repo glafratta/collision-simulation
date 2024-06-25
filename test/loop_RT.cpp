@@ -40,6 +40,7 @@ int main(int argc, char** argv){
     bool debug=1;
     Configurator conf(controlGoal, debug);
     conf.simulationStep=0.5;
+    conf.setBenchmarking(1);
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
     DataInterface2 di2(&ci);

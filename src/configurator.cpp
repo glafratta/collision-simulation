@@ -121,6 +121,7 @@ bool Configurator::Spawner(){
 	//Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
+	bool explored=0;
 	if (planning){ //|| !planError.m_vertices.empty())
 		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
 		transitionSystem[movingVertex].disturbance=transitionSystem[currentVertex].disturbance;
@@ -176,6 +177,7 @@ bool Configurator::Spawner(){
 			planVertices= planner(transitionSystem, src);
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
+			explored=1;
 		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 			//boost::print_graph(transitionSystem);
 		}
@@ -196,6 +198,9 @@ bool Configurator::Spawner(){
 	printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
+		if (explored){
+			fprintf(f, "*");
+		}
 		fprintf(f,"%i\t%i\t%f\n", worldBuilder.getBodies(), transitionSystem.m_vertices.size(), duration);
 		fclose(f);
 	}
@@ -1128,7 +1133,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	else {
 		ve=currentVertex;
 	}
-	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended; (target.getAffIndex()!=PURSUE || fin) & currentVertex){
+	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended; (target.getAffIndex()!=PURSUE || fin) & g[movingEdge].direction!=STOP){
 		printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 		return result;
 	}

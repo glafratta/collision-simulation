@@ -158,6 +158,10 @@ public:
             if (c->getTask()->direction==STOP){
                 printf("but stopping");
             }
+        	FILE * f = fopen(c->statFile, "a+");
+            fprintf(f, "!");
+            fclose(f)l
+
 	    }
 	    c->planVertices =c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
         L=c->getTask()->getAction().getLWheelSpeed();
