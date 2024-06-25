@@ -626,16 +626,18 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				}
 			}
 			else if (edge.second & pend.base()!=path->rbegin().base()){  //if there is an edge with the end of current path
+				bool found=0;
 				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
 					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
 						path=_p;
 						printf("using existing\n");
+						found=1;
 					}
-					else{
-						paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
-						path=paths.rbegin();				
-						printf("new path based on previous path\n");
-					}
+				}
+				if (!found){
+				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
+				path=paths.rbegin();				
+				printf("new path based on previous path\n");
 				}
 				break;
 			}
@@ -685,6 +687,119 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	return plan;
 }
 
+// std::vector <vertexDescriptor> Configurator::planner2( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been){
+// 	std::vector <vertexDescriptor> plan;
+// 	std::vector<std::vector<vertexDescriptor>> paths;
+// 	paths.push_back(std::vector<vertexDescriptor>()={src});
+// 	std::vector <Frontier> frontier_v;
+// 	bool run=true;
+// 	std::vector <Frontier> priorityQueue;
+// 	if (currentVertex==movingVertex){
+// 		//printf("current %i =moving%i! return\n", currentVertex, movingVertex);
+// 		return plan;
+// 	}
+// 	int no_out=0;
+
+// 	std::vector <vertexDescriptor> add;
+// 	std::vector<std::vector<vertexDescriptor>>::iterator path= paths.begin();
+// 	vertexDescriptor path_end=src;
+// 	do{
+// 		//find frontier (STRAIGHT)
+// 		//printf("start\n");
+// 		frontier_v=frontierVertices(src, g, DEFAULT, been);
+// 		if (src==currentVertex){
+// 		//	printf("planning from src =%i, out vertices n%i\n", src, frontier_v.size());
+// 		}
+// 		for (Frontier f: frontier_v){ //add to priority queue
+// 			planPriority(g, f.first);
+// 			addToPriorityQueue(f, priorityQueue, g);
+// 		}
+// 		if (priorityQueue.empty()){
+// 		//	printf("emtpy pq\n");
+// 			break;
+// 		}
+// 		src=priorityQueue.begin()->first;
+// 		add=std::vector <vertexDescriptor>(priorityQueue.begin()->second.begin(), priorityQueue.begin()->second.end());
+// 		add.push_back(src);
+// 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
+// 		std::vector<vertexDescriptor>::iterator v_index=(path->end()-1); //pend
+// 		while (!edge.second){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
+// 			printf("src = %i possible paths:%i, path length=%i\n", src, paths.size(), path->size());
+// 			//vertexDescriptor end=*(p;
+// 			edge= boost::edge(*v_index,add[0], g);
+// 			printf("edge %i->%i\n", *v_index, add[0]);
+// 			if (!add.empty()&!edge.second & path!=paths.end()){ //if this path does not have an edge and there are 
+// 													//other possible paths, go to previous paths
+// 				if (v_index !=path->rend().base()){ //if the current vertex is not the root of the path
+// 					printf("from index %i ", *(v_index));
+// 					v_index--;
+// 					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *(pend.base()-1));
+// 				}
+// 				else{
+// 					path++; //go back a previously explored path
+// 					pend=(*path).rbegin(); 
+// 					printf("checking previous path\n");
+// 				}
+// 			}
+// 			else if (edge.second & pend.base()!=path->rbegin().base()){  //if there is an edge with the end of current path
+// 				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
+// 					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
+// 						path=_p;
+// 						printf("using existing\n");
+// 					}
+// 					else{
+// 						paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
+// 						path=paths.rbegin();				
+// 						printf("new path based on previous path\n");
+// 					}
+// 				}
+// 				break;
+// 			}
+// 			else{
+// 				printf("doing nothing\n");
+// 				break;
+// 			}
+// 			if ( path==paths.rend()) { //if there are no other paths
+// 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
+// 				path=paths.rbegin();
+// 				printf("new empty path\n");
+// 				break;
+// 			}	
+// 		}
+// 		priorityQueue.erase(priorityQueue.begin());
+// 		for (vertexDescriptor c:add){
+// 			g[c].label=VERTEX_LABEL::UNLABELED;
+// 			path->push_back(c);	
+// 			path_end=c;			
+// 		}
+// 		// printf("planning, path size= %i\n",path->size() );
+// 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
+// 		// printf("conf running=%i\n", running);
+		
+// 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
+// 	//printf("exited while\n");
+// 	auto vs=boost::vertices(g);
+// 	float final_phi=10000;
+// 	for (std::vector<vertexDescriptor> p: paths){
+// 		vertexDescriptor end_plan= *(p.rbegin().base()-1);
+// 		if (end_plan==goal){
+// 			plan=std::vector(p.begin()+1, p.end());
+// 			break;
+// 		}
+// 		else if (g[end_plan].phi<final_phi){
+// 			plan=std::vector(p.begin()+1, p.end());
+// 			final_phi=g[end_plan].phi;
+// 		}
+// 	}
+// 	// for (auto vi=vs.first; vi!=vs.second; vi++){
+// 	// 	if (g[*vi].label!=UNLABELED){
+// 	// 		boost::clear_vertex(*vi, g);
+// 	// 	}
+// 	// }
+// 	printf("PLANNED!\n");
+// 	printPlan();
+// 	return plan;
+// }
 
 
 // std::vector <vertexDescriptor> Configurator::planner_old(TransitionSystem& g, vertexDescriptor src, vertexDescriptor match, bool been){
