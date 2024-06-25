@@ -1332,7 +1332,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, vertexDescriptor tgt){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
-	if(!ep.second){
+	if(!ep.second & tgt!=TransitionSystem::null_vertex()){
 		step = (g[v].endPose.p- g[tgt].endPose.p).Length();
 		return; //check until needs to be checked
 	}
