@@ -147,13 +147,13 @@ public:
             printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());
         }
         if (er.ended &( c->getTask()->motorStep<1 & c->transitionSystem[c->movingEdge].direction!=STOP && c->planVertices.empty() && c->getIteration()>1)){ //& c->getTask()->motorStep<1
-           if (!er.ended){
-                printf("task step = %i\n", c->getTask()->motorStep);
-           }
+        //    if (!er.ended){
+        //         printf("task step = %i\n", c->getTask()->motorStep);
+        //    }
             Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
 		    c->controlGoal = Task(new_goal, UNDEFINED);
             b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-            printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
+           // printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
             printf("GOAL REACHED ");
             if (c->getTask()->direction==STOP){
                 printf("but stopping");

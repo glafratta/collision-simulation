@@ -122,6 +122,10 @@ void setBenchmarking(bool b){
 	printf("set\n");
 }
 
+bool is_benchmarking(){
+	return benchmark;
+}
+
 bool Spawner(); 
 
 int getIteration(){
