@@ -611,7 +611,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			printf("src = %i possible paths:%i, path length=%i\n", src, paths.size(), path->size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
-			printf("edge %i->%i\n", end, add[0]);
+			printf("edge %i->%i", end, add[0]);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
@@ -642,6 +642,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				break;
 			}
 			else{
+				printf("edge exist=%i, index is end %i ", edge.second, pend.base()!=path->rbegin().base());
 				printf("doing nothing\n");
 				break;
 			}
@@ -661,7 +662,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("planning, path size= %i\n",path->size() );
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
-		
+		printf("exited inner while\n");
 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
 	//printf("exited while\n");
 	auto vs=boost::vertices(g);
