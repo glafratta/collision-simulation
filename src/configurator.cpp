@@ -571,7 +571,7 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});
@@ -582,6 +582,8 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 		//printf("current %i =moving%i! return\n", currentVertex, movingVertex);
 		return plan;
 	}
+	int no_out=0;
+
 	std::vector <vertexDescriptor> add;
 	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
 	vertexDescriptor path_end=src;
@@ -612,8 +614,9 @@ std::vector <vertexDescriptor> Configurator::planner(TransitionSystem& g, vertex
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
+					printf("from index %i ", pend.base()-1);
 					pend++;
-					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *pend.base());
+					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *pend.base()-1);
 				}
 				else{
 					path++; //go back a previously explored path
