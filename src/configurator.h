@@ -160,7 +160,7 @@ void updateGraph(TransitionSystem&, ExecutionError error);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
-void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&);
+void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&, vertexDescriptor);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
