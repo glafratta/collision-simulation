@@ -910,6 +910,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			// prev_edge.second.m_target=v1;
 		}
 		if (!ismatch){
+			result=false;
+			break;
 			printf("state end: x=%f, y=%f, theta=%f, d valid=%i", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle(), sk.first.disturbance.getAffIndex());
 			if (sk.first.disturbance.isValid()){
 				printf(" d pos: x=%f, y=%f, theta=%f, hl =%f, hw=%f\n", sk.first.disturbance.pose().p.x, sk.first.disturbance.pose().p.y, sk.first.disturbance.pose().q.GetAngle(), sk.first.disturbance.bodyFeatures().halfLength, sk.first.disturbance.bodyFeatures().halfWidth);
@@ -923,7 +925,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			std::pair<bool, vertexDescriptor> match = findExactMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
 			g[prev_edge.second.m_source].options.push_back(t.direction);
 			if (!match.first){
-				ep =addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
+				ep=addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
 				printf("added edge %i -> %i in check plan, dir %i\n",prev_edge.second.m_source, v1, g[ep.first].direction);
 				// printf("dist valid = %i, end %f, %f, %f\n", g[v1].disturbance.isValid(), g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());			
 			}
@@ -944,6 +946,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				}
 			}
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
+			printf("set v\n");
 			if (sk.first.outcome==simResult::crashed){
 				p.clear();
 				printf("plan crashes at %i\n", v1);
