@@ -961,6 +961,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
 	edgeDescriptor e_start=e;
+//adjust here
 	do{
 		i++;
 		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
@@ -1332,7 +1333,7 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, std::pair<bool,vertexDescriptor> tgt){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
-	if(!ep.second & tgt.first){
+	if(!ep.second & tgt.first){ //no tgt
 		step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
 		return; //check until needs to be checked
 	}
