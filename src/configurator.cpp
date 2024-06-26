@@ -882,7 +882,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//sk.first.direction=t.direction;
 		printf("from %i", ep.first.m_target);
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
-		printf("to it %i, edge %i ->%i, stepDistance %f\n", it, ep.first.m_source, ep.first.m_target, stepDistance);
+		printf("to it %i, edge %i ->%i, stepDistance %f, direction = %i\n", it, ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
@@ -993,6 +993,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	else{
 		adjustStepDistance(v_start,g, t, step, std::pair(true,v_tgt));
+		printf("v_tgt=%i\n", v_tgt);
 	}
 	return result;
 }
@@ -1335,10 +1336,10 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, std::pair<bool,vertexDescriptor> tgt){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
+	if (tgt.first){
+		step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
+	}
 	if(!ep.second){ //no tgt
-		if (tgt.first){
-			step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
-		}
 		return; //check until needs to be checked
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
