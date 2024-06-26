@@ -961,7 +961,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
-	vertexDescriptor v_start=e.m_source, v_tgt= e.m_target;
+	vertexDescriptor v_start=e.m_source, v_tgt= e.m_target, v_tgt_og= v_tgt;
 //adjust here
 	do{
 		i++;
@@ -987,7 +987,8 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
-	if (g[v_start].disturbance.isValid()){
+	if (g[v_tgt_og].disturbance.isValid()){
+		printf("v=%i\n", v_start);
 		step=b2Vec2(g[v_start].endPose.p-g[v_start].disturbance.pose().p).Length();
 		//was e.m_target
 	}
