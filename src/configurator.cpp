@@ -966,9 +966,9 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
 	edgeDescriptor e_start=e;
-	if (e_start==movingEdge){
-		e_start=currentEdge;
-	}
+	// if (e_start==movingEdge){
+	// 	e_start=currentEdge;
+	// }
 	vertexDescriptor v_tgt= e.m_target;
 //adjust here
 	do{
