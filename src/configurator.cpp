@@ -25,7 +25,7 @@ void debug::graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescri
 		}
 		fprintf(f,"%i -> ", *vi);
 		for (auto ei=es.first; ei!=es.second; ei++){
-			fprintf(f, "%i ", (*ei).m_target);
+			fprintf(f, "%i (%f) ", (*ei).m_target, g[(*ei)].probability);
 		}
 		fprintf(f, "\t(x=%.3f, y= %.3f, theta= %.3f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
 	}
@@ -991,7 +991,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		//was e.m_target
 	}
 	else{
-		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,e.m_target));
+		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,e.m_source));
 	}
 	return result;
 }
