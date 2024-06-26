@@ -203,8 +203,8 @@ float StateMatcher::sumVector(DistanceVector vec){
 bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 	float coefficient=1.0;
 	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)*1.2;// /.9
-		coefficient*=scale;
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
+		coefficient*=scale*1.2;
 	}
     bool result =false;
 	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);
