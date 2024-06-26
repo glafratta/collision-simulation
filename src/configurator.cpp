@@ -938,7 +938,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
 			if (sk.first.outcome==simResult::crashed){
 				p.clear();
-				printf("plan crashes\n");
+				printf("plan crashes at %i\n", v1);
 				result=false;
 			}
 		}
