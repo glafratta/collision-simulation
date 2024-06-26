@@ -961,7 +961,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
-	vertexDescriptor v_start=e.m_source, v_tgt= e.m_target, v_tgt_og= v_tgt;
+	edgeDescriptor e_start=e;
+	vertexDescriptor v_tgt= e.m_target;
 //adjust here
 	do{
 		i++;
@@ -982,18 +983,20 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 					break;
 				}
 			}
-		result=g[e.m_source].endPose;
+		result=g[e.m_source].endPose; 
 
 
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
-	if (g[v_tgt_og].disturbance.isValid()){
-		printf("v=%i\n", v_start);
-		step=b2Vec2(g[v_start].endPose.p-g[v_start].disturbance.pose().p).Length();
+	if (g[e_start.m_target].disturbance.isValid()){
+		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_source].disturbance.pose().p).Length();
 		//was e.m_target
 	}
 	else{
-		adjustStepDistance(v_start,g, t, step, std::pair(true,v_tgt));
+		if (g[e_start].direction==DEFAULT){
+			step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
+		}
+		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
 		printf("v_tgt=%i\n", v_tgt);
 	}
 	return result;
@@ -1337,9 +1340,9 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 
 void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, Task * t, float& step, std::pair<bool,vertexDescriptor> tgt){
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
-	if (tgt.first & !g[v].disturbance.isValid()){
-		step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
-	}
+	// if (tgt.first & !g[v].disturbance.isValid()){
+	// 	step = (g[v].endPose.p- g[tgt.second].endPose.p).Length();
+	// }
 	if(!ep.second){ //no tgt	
 		return; //check until needs to be checked
 	}
