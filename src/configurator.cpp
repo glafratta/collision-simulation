@@ -999,6 +999,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	if (g[e_start.m_target].disturbance.getAffIndex()!=NONE){
+		printf("targ=%i, d index=%i", e_start.m_target, g[e_start.m_target].disturbance.getAffIndex());
 		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_target].disturbance.pose().p).Length();
 		//was e.m_target
 	}
