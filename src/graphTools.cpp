@@ -203,7 +203,7 @@ float StateMatcher::sumVector(DistanceVector vec){
 bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 	float coefficient=1.0;
 	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/.9;
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)*1.2;// /.9
 		coefficient*=scale;
 	}
     bool result =false;
