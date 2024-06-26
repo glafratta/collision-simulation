@@ -940,6 +940,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				p.clear();
 				printf("plan crashes at %i\n", v1);
 				result=false;
+				break;
 			}
 		}
 		else{
