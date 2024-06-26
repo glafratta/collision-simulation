@@ -995,7 +995,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
-	if (g[e_start.m_source].disturbance.isValid()){
+	if (g[e_start.m_source].disturbance.getAffIndex()!=NONE){
 		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_source].disturbance.pose().p).Length();
 		//was e.m_target
 	}
@@ -1677,7 +1677,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 
 		boost::clear_vertex(movingVertex, transitionSystem);
 	//	printf("changed current %i + cleared 0\n", currentVertex);
-		transitionSystem[movingVertex].disturbance= transitionSystem[currentVertex].disturbance;
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
