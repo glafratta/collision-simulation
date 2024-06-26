@@ -1677,6 +1677,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 
 		boost::clear_vertex(movingVertex, transitionSystem);
 	//	printf("changed current %i + cleared 0\n", currentVertex);
+		transitionSystem[movingVertex].disturbance= transitionSystem[currentVertex].disturbance;
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
