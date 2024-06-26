@@ -961,7 +961,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 
 b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, Task* t, float& step, std::vector <vertexDescriptor> plan){ 
 	b2Transform result;
-	edgeDescriptor e_start=e;
+	vertexDescriptor v_start=e.m_source, v_tgt= e.m_target;
 //adjust here
 	do{
 		i++;
@@ -978,6 +978,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				}
 				if ((*ei).m_target == plan[i]){
 					e= (*ei);
+					v_tgt=e.m_source;
 					break;
 				}
 			}
@@ -986,12 +987,12 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 
 		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
-	if (g[e_start.m_target].disturbance.isValid()){
-		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_target].disturbance.pose().p).Length();
+	if (g[v_start].disturbance.isValid()){
+		step=b2Vec2(g[v_start].endPose.p-g[v_start].disturbance.pose().p).Length();
 		//was e.m_target
 	}
 	else{
-		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,e.m_source));
+		adjustStepDistance(v_start,g, t, step, std::pair(true,v_tgt));
 	}
 	return result;
 }
