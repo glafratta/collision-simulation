@@ -127,9 +127,6 @@ void step( AlphaBot &motors){
 		R*=1.25;
 		L*=1.25;
 	}
-	else{
-		
-	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
 	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
