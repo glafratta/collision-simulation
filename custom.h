@@ -123,9 +123,9 @@ void step( AlphaBot &motors){
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	float R= c->getTask()->getAction().getRWheelSpeed();
 	float L=c->getTask()->getAction().getLWheelSpeed()*1.05;
-	if (c->getTask()->direction!=DEFAULT){
-		// R*=1.25;
-		// L*=1.25;
+	if (c->getTask()->direction==RIGHT){
+		R*=1.25;
+		L*=1.25;
 	}
 	else{
 		
