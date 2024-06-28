@@ -982,6 +982,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		i++;
 		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
+			g[e].it_observed=iteration;
 			if (es.first==es.second){
 				vertexDescriptor new_src=e.m_target;
 				e.m_source=new_src;
@@ -1340,7 +1341,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 		float sum=matcher.sumVector(difference);
 		auto in_edges = gt::inEdges(g, *vi);
 		auto most_likely_edge=gt::getMostLikely(g, in_edges, iteration);
-		printf("got likely edge, %i, tot edges =%i\n", most_likely_edge.first, in_edges.size());
+		printf("got likely edge of %i, %i, tot edges =%i\n",*vi, most_likely_edge.first, in_edges.size());
 		float prob= 0;
 		if (most_likely_edge.first){
 			prob=g[most_likely_edge.second].weighted_probability(iteration);
@@ -1356,7 +1357,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 			}
 	}
 	result.second=best.second;
-	printf("goal =%f, %f, %f", target.pose().p.x, target.pose().p.y, target.pose().q.GetAngle());
+	//printf("goal =%f, %f, %f", target.pose().p.x, target.pose().p.y, target.pose().q.GetAngle());
 	printf("been=%i, vertex=%i, pose: %f, %f, %f\n", result.first, result.second, g[result.second].endPose.p.x,g[result.second].endPose.p.y, g[result.second].endPose.q.GetAngle() );
 	return result; //if been there, do not explore, extract a plan then check it
 }
