@@ -5,7 +5,7 @@ void forget(Configurator *c){}
 
 Disturbance set_target(int& run, b2Transform start){
 	Disturbance result;
-	if (run%2!=0){
+	if (run%2==0){
 		result=Disturbance(PURSUE, start.p, start.q.GetAngle());
 		run++;
 	}
