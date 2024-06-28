@@ -1344,12 +1344,14 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 		float prob= 0;
 		if (most_likely_edge.first){
 			prob=g[most_likely_edge.second].weighted_probability(iteration);
+			printf("set prob %f\n", prob);
 		}
 		if (abs(difference[0])<matcher.error.dPosition
 			& abs(difference[1])<matcher.error.dPosition
 			& abs(difference[2])<matcher.error.angle & (sum<best.first || (sum==best.first & prob>best_prob))){
 				best.first=sum;
 				best.second=*vi;
+				best_prob=prob;
 				result.first=true;
 			}
 	}
