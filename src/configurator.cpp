@@ -1341,7 +1341,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 		float sum=matcher.sumVector(difference);
 		auto in_edges = gt::inEdges(g, *vi);
 		auto most_likely_edge=gt::getMostLikely(g, in_edges, iteration);
-		printf("got likely edge of %i, %i, tot edges =%i\n",*vi, most_likely_edge.first, in_edges.size());
+		printf("got likely edge of %i, %i, %i -> %i tot edges =%i\n",*vi, most_likely_edge.first, most_likely_edge.second.m_source, most_likely_edge.second.m_target, in_edges.size());
 		float prob= 0;
 		if (most_likely_edge.first){
 			prob=g[most_likely_edge.second].weighted_probability(iteration);
