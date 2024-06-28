@@ -92,7 +92,7 @@ std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, vertexDescriptor v,
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei)].direction == d){
+		if (g[(*ei)].direction == d || d==UNDEFINED){
 			result.push_back(*ei);
 		}
 	}

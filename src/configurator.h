@@ -8,7 +8,6 @@
 #include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
-
 //FOR DEBUG
 namespace debug{
 	
@@ -270,7 +269,7 @@ void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, ve
 
 // std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 																		//and straight lines
-std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance);
+std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance target=Disturbance());
 
 
 

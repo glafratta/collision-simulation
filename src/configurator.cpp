@@ -1161,6 +1161,7 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	Task temp(controlGoal.disturbance, DEFAULT, state.endPose); //reflex to disturbance
 	//switch (numberOfM){
 	//	case (THREE_M):{
+	srand(unsigned(time(NULL)));
 	if (state.outcome != simResult::successful){ //accounts for simulation also being safe for now
 		if (d ==DEFAULT ||d==STOP){
 			if (state.nodesInSameSpot<maxNodesOnSpot){
@@ -1170,7 +1171,13 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 					state.options.push_back(getOppositeDirection(temp.direction).second);
 				}
 				else{
-					state.options = {LEFT, RIGHT};
+					int random= rand();
+					if (random%2==0){
+						state.options = {LEFT, RIGHT};
+					}
+					else{
+						state.options = {RIGHT, LEFT};
+					}
 				}
 			}
 			}
@@ -1189,7 +1196,13 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 				state.options.push_back(DEFAULT);
 			}
 			else{
+				int random= rand();
+				if (random%2==0){
 					state.options = {DEFAULT, LEFT, RIGHT};
+				}
+				else{
+					state.options = {DEFAULT, RIGHT, LEFT};
+				}
 			}
 
 		}
@@ -1293,22 +1306,46 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	else {
 		ve=currentVertex;
 	}
-	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended; (target.getAffIndex()!=PURSUE || fin) & g[movingEdge].direction!=STOP){
+	if (bool fin=controlGoal.checkEnded(g[ve], UNDEFINED, true).ended; fin & g[movingEdge].direction!=STOP){
 		printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 		return result;
 	}
+
 	std::pair <float, vertexDescriptor> best(10000, TransitionSystem::null_vertex());
+	float best_prob=0;
 	auto vs=boost::vertices(g);
 	for (auto vi=vs.first; vi!=vs.second; vi++ ){
 		//b2Transform difference= g[*vi].endPose-target.disturbance.pose();
-		DistanceVector difference={g[*vi].endPose.p.x-target.pose().p.x,
-									g[*vi].endPose.p.y-target.pose().p.y,
-									g[*vi].endPose.q.GetAngle()-target.pose().q.GetAngle()
-									};
+		DistanceVector difference;
+		if (target.getAffIndex()==PURSUE){
+			difference={g[*vi].endPose.p.x-target.pose().p.x,
+										g[*vi].endPose.p.y-target.pose().p.y,
+										g[*vi].endPose.q.GetAngle()-target.pose().q.GetAngle()
+										};
+		}
+		else if (target.getAffIndex()==NONE){
+			//b2Transform reference;
+			b2Vec2 reference = g[movingVertex].endPose.p-controlGoal.start.p;
+			//reference.q.Set(reference.q.GetAngle()- g[movingVertex].endPose.q.GetAngle());
+			float remaining= BOX2DRANGE-SignedVectorLength(reference);
+			b2Transform virtual_target;
+			virtual_target.p.x=remaining *cos(g[*vi].endPose.q.GetAngle());
+			virtual_target.p.y=remaining*sin(g[*vi].endPose.q.GetAngle());
+			virtual_target.q.Set((g[*vi].endPose.q.GetAngle()));
+			difference={g[*vi].endPose.p.x-virtual_target.p.x,
+										g[*vi].endPose.p.y-virtual_target.p.y,
+										g[*vi].endPose.q.GetAngle()-virtual_target.q.GetAngle()
+										};
+		}
 		float sum=matcher.sumVector(difference);
+		auto most_likely_edge=gt::getMostLikely(g, gt::inEdges(g, *vi), iteration);
+		float prob= 0;
+		if (most_likely_edge.first){
+			prob=g[most_likely_edge.second].weighted_probability(iteration);
+		}
 		if (abs(difference[0])<matcher.error.dPosition
 			& abs(difference[1])<matcher.error.dPosition
-			& abs(difference[2])<matcher.error.angle & sum<best.first){
+			& abs(difference[2])<matcher.error.angle & (sum<best.first || (sum==best.first & prob>best_prob))){
 				best.first=sum;
 				best.second=*vi;
 				result.first=true;

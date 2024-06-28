@@ -1,6 +1,7 @@
 
 #include "custom.h"
 
+void forget(Configurator *c){}
 
 int main(int argc, char** argv) {
 	A1Lidar lidar;

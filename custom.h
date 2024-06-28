@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+void forget(Configurator*);
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
@@ -118,11 +119,12 @@ void step( AlphaBot &motors){
 			fprintf(f, "!");
 			fclose(f);			
 		}
+		forget(c);
 
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-	float R= c->getTask()->getAction().getRWheelSpeed();
-	float L=c->getTask()->getAction().getLWheelSpeed()*1.05;
+	R= c->getTask()->getAction().getRWheelSpeed();
+	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
 	if (c->getTask()->direction==RIGHT){
 		R*=1.20;
 		L*=1.20;
