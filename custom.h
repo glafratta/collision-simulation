@@ -14,7 +14,7 @@
 
 void forget(Configurator*);
 
-Disturbance set_target(int, b2Transform);
+Disturbance set_target(int&, b2Transform);
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
@@ -137,7 +137,6 @@ void step( AlphaBot &motors){
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	run++;
 	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
 };
