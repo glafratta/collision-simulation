@@ -3,6 +3,14 @@
 
 void forget(Configurator *c){}
 
+Disturbance set_target(int run, b2Transform start){
+	Disturbance result;
+	if (run%2!=0){
+		result=Disturbance(PURSUE, start.p, start.q.GetAngle());
+	}
+	return result;
+}
+
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;

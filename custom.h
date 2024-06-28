@@ -14,7 +14,7 @@
 
 void forget(Configurator*);
 
-Disturbance set_target(int);
+Disturbance set_target(int, b2Transform);
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
@@ -112,10 +112,10 @@ void step( AlphaBot &motors){
 	EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		printf("goal reached\n");
-		Disturbance new_goal;
-		if (run%2!=0){
-			Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
-		}
+		Disturbance new_goal=set_target(run, c->controlGoal.start);
+		// if (run%2!=0){
+		// 	Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
+		// }
 	//	printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
