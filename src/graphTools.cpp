@@ -68,7 +68,6 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		g[e.m_target].phi=sk.first.phi;
 	}
 	g[e].it_observed=it;
-	//adjustProbability(g, e);
 }
 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){

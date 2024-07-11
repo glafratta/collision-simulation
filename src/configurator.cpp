@@ -267,6 +267,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	// std::vector <Pointf> vec= set2vec(ci->data);
 	//std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
 	// pcProc.findOrientation(nb);
+	//set d orientation
 	
 	// cv::Rect2f rect =worldBuilder.getRect(nb);
 	// result.collision.setAsBox(rect.width/2, rect.height/2);
@@ -1343,7 +1344,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 		auto most_likely_edge=gt::getMostLikely(g, in_edges, iteration);
 		printf("got likely edge of %i, %i, %i -> %i tot edges =%i\n",*vi, most_likely_edge.first, most_likely_edge.second.m_source, most_likely_edge.second.m_target, in_edges.size());
 		float prob= 0;
-		if (most_likely_edge.first){
+		if (most_likely_edge.first ){
 			prob=g[most_likely_edge.second].weighted_probability(iteration);
 			printf("set prob for %i:  %f\n", *vi, prob);
 		}

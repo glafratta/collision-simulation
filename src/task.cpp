@@ -205,8 +205,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 				}
 			}
 
-			bool finishedLeft=robotAngle>=angleL;
-			bool finishedRight=robotAngle<=angleR;
+			bool finishedLeft=robotAngle>=angleL-(action.getOmega()*HZ)/2;
+			bool finishedRight=robotAngle<=angleR+(action.getOmega()*HZ)/2;
 			if (finishedLeft|| finishedRight){
 				if (disturbance.getAffIndex()==AVOID){
 					disturbance.invalidate();
