@@ -33,13 +33,13 @@ bool Measurement::operator>=(Measurement &m2){
     return r;
 }
 
-float Measurement::getError(Measurement m2){
-    float result =0;
-    if (m2.isValid() & this->isValid()){
-        result= this->get()-m2.get();
-    }
-    return result;
-}
+// float Measurement::getError(Measurement m2){
+//     float result =0;
+//     if (m2.isValid() & this->isValid()){
+//         result= this->get()-m2.get();
+//     }
+//     return result;
+// }
 
 float Measurement::getStandardError(Measurement m2, float max){ 
     float result =0;
@@ -53,34 +53,27 @@ float Measurement::getStandardError(Measurement m2, float max){
     return result;
 }
 
-float EndCriteria::getError(EndCriteria ec){ //not normalised
-    float result =0;
-    result = angle.getError(ec.angle) + distance.getError(ec.distance);
-    return result;
-}
+// float EndCriteria::getError(EndCriteria ec){ //not normalised
+//     float result =0;
+//     result = angle.getError(ec.angle) + distance.getError(ec.distance);
+//     return result;
+// }
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;
-    result = weights[0]*fabs(angle.getStandardError(a, MAX_ANGLE_ERROR))+weights[1]*fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR)); //max =2;
+    float a_error=fabs(angle.getStandardError(a, MAX_ANGLE_ERROR));
+    float d_error=fabs(distance.getStandardError(d, MAX_DISTANCE_ERROR));
+    result = a_error +d_error; //max =2;
     return result/2; //return normalise
 }
 
-float EndCriteria::getStandardError(EndCriteria ec){ //standard error
-    float result =0;
-    result = getStandardError(ec.angle, ec.distance);
-    return result;
-}
 
 float EndCriteria::getStandardError(Angle a, Distance d, State n){
     float result =0;
-    float outcomeError=0;
-    if (n.filled){
-        switch (n.outcome){
-            case simResult::crashed: outcomeError+=2; break; //the max error is 3 (1 from norm angle and distance, 2 from outcome)
-            default:break;
-        }
+    result = getStandardError(a, d); //+ weights[2]*outcomeError;
+    if (n.filled & n.outcome== simResult::crashed){
+        result+=2;
     }
-    result = getStandardError(a, d) + weights[2]*outcomeError;
     return result/3; //normalised to max value it can take
 }
 
@@ -95,11 +88,3 @@ float SignedVectorLength(b2Vec2 v){
 bool EndCriteria::hasEnd(){
     return angle.isValid() || distance.isValid();
 }
-
-float EndedResult::evaluationFunction(std::vector <vertexDescriptor> plan, vertexDescriptor v){ //h(n) = error, cost is the n of D
-	float planPriority=0.0;
-    if (!plan.empty() & u_long(v)>=0){
-        planPriority=1.0;
-    } 
-    return abs(estimatedCost) +abs(cost)+planPriority;
-	}

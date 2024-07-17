@@ -3,26 +3,22 @@
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 
-
 class Task{
 public:
     friend class Configurator;
-    float accumulatedError=0;
     char planFile[250]; //for debug
+    bool debug_k=false; //delete this it's for debugging on the bhenchod pi
     b2Transform start;
     bool change =0;
-    float pGain=0.1;
     EndCriteria endCriteria; //end criteria other than task encounters a disturbance
     Direction direction= DEFAULT;
-    bool discrete=0;
     int motorStep=0;
-    bool check=0;
-protected:
-    b2Vec2 RecordedVelocity ={0.0f, 0.0f};
-public:
+    int stepError=0;
+//delet
+
 struct Action{
 private:
-    float linearSpeed=.0625; //used to calculate instantaneous velocity using omega
+    float linearSpeed=MAX_SPEED/2; //used to calculate instantaneous velocity using omega
     float recordedSpeed=linearSpeed;
     float omega=0; //initial angular velocity is 0
     float recordedOmega = omega;
@@ -40,34 +36,34 @@ public:
         R=.5;
         break;
         case Direction::LEFT:
-        L = -0.5;
-        R=0.5;
+        L = -0.218182;
+        R=0.218182;
         break;
         case Direction::RIGHT:
-        L=0.5;
-        R = - 0.5;
+        L=0.218182;//0.2537;
+        R = - 0.218182;
         break;
         case Direction::BACK:
         L = -0.5;
         R = -0.5;
         break;
-        case Direction::STOP:
+        default:
         L=0;
         R=0;
-        direction=Direction::DEFAULT;
-        break;
-        default:
-        throw std::invalid_argument("not a valid direction for M");
+       // direction=Direction::DEFAULT;
         break;
     }
     //kinematic model internal to action so it can be versatile for use in real P and simulated P
-    omega = (MAX_SPEED*(R-L)/BETWEEN_WHEELS)*TURN_FRICTION; //instant velocity, determines angle increment in willcollide
-    recordedOmega = omega;
-    linearSpeed = MAX_SPEED*(L+R)/2;
-    recordedSpeed=linearSpeed;
-    valid=1;
+    setVelocities(L, R);
     }
 
+void setVelocities(float l, float r){
+    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+    recordedOmega = omega;
+    linearSpeed = MAX_SPEED*(l+r)/2;
+    recordedSpeed=linearSpeed;
+    valid=1;
+}
 
     b2Vec2 getLinearVelocity(){
         b2Vec2 velocity;
@@ -101,6 +97,11 @@ public:
     return omega;
     }
 
+    float getOmega(float l, float r){
+        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION;
+        return result;
+    }
+
     void setOmega(float o){
         omega =o;
     }
@@ -125,6 +126,11 @@ public:
         return recordedOmega;
     }
     //friend class Configurator;
+    void setRec(float _speed, float _omega){
+        recordedSpeed=_speed;
+        recordedOmega=_omega;
+    }
+
 };
 
 
@@ -149,9 +155,84 @@ class Listener : public b2ContactListener {
 		}
         
 	};
-private:
-Action action;
+
+
+struct Correct{
+    
+    Correct(){}
+
+    void operator()( Action&, int);
+
+    float errorCalc(Action, double);
+
+    float getError(){
+        return p();
+    }
+
+    float Ki(){
+        return ki;
+    }
+
+    float Kp(){
+        return kp;
+    }
+    float Kd(){
+        return kd;
+    }
+
+    float get_i(){
+        return i;
+    }
+
+    float get_d(){
+        return d;
+    }
+
+    float update(float);
+
+    void reset(){
+        p_buffer=std::vector <float>(bufferSize,0);
+        i=0;
+        d=0;
+        mf.buffer=std::vector<float>(mf.kernelSize,0);
+    }
+
+    float kp=0.075;    
+    float kd=0, ki=0;
+    private:
+
+
+    float p(){
+        float sum=0;
+        for (int j=0;j<p_buffer.size(); j++){
+            sum+=p_buffer[j];
+        }
+        return sum;
+    }
+    int correction_rate=2; //Hz
+    int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
+    std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
+    float i=0, d=0;
+    float tolerance_upper=0.01, tolerance_lower=-0.01;
+
+    struct MedianFilter{
+        int kernelSize=3;
+        std::vector<float>buffer=std::vector<float>(kernelSize,0);
+
+        float get_median(){
+            std::vector <float> tmp=buffer;
+            std::sort(tmp.begin(), tmp.end());
+            return tmp[int(kernelSize/2)];
+        }
+    }mf;
+    
+
+}correct;
+
 public:
+friend Task::Correct;    
+Action action;
+
 Disturbance disturbance;
 
 Task::Action getAction(){
@@ -169,9 +250,9 @@ void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
 void setErrorWeights();
 
-EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)));
+EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))));
 
-EndedResult checkEnded(State);
+EndedResult checkEnded(State, Direction dir=UNDEFINED, bool relax=false, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)))); //usually used to check against control goal
 
 Task(){
     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
@@ -180,62 +261,25 @@ Task(){
     printf("default constructro\n");
 }
 
+Task(Direction d){
+    direction=d;
+    action.init(direction);
+}
+
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
     direction = H(disturbance, d, topDown);  
-    //action = Action(direction);
     action.init(direction);
     setEndCriteria();
+    //DELETE!
+    // if (ob.getAffIndex()==PURSUE){
+    //     debug_k=true;
+    // }
 }
-
-// void init(){
-//     start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
-//     direction = DEFAULT;
-//     action.init(direction);
-//    // printf("default init \n");
-//    // RecordedVelocity = action.getLinearVelocity();
-// }
-
-// void init(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool T){
-//     start = _start;
-//     disturbance = ob;
-//     direction = H(disturbance, d);  
-//     //action = Action(direction);
-//     action.init(direction);
-//    // RecordedVelocity = action.getLinearVelocity();
-//     setEndCriteria();
-//    // step = action.motorStep();
-//    // printf("step =%i\n", step);
-
-// }
-
-void setRecordedVelocity(b2Vec2 vel){
-    RecordedVelocity = vel;
-    
-} //useful to get the speed.
-
-
-b2Vec2 getRecordedVelocity(){
-    return RecordedVelocity;
-}
-
-
-void trackDisturbance(Disturbance &, float, b2Transform, b2Transform= b2Transform(b2Vec2(0,0), b2Rot(0)));
-
-void trackDisturbance(Disturbance &, Action);
-
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 
-//enum controlResult{DONE =0, CONTINUE =1};
-
-void controller(float timeElapsed=0.2);
-
-std::pair<bool, b2Vec2> findNeighbourPoint(b2World &, b2Vec2, float radius = 0.02); //finds if there are bodies close to a point. Used for 
-                                                                                    //finding a line passing through those points
-
-float findOrientation(b2Vec2, b2Vec2); //finds slope of line passign through two points
 
 };
 
