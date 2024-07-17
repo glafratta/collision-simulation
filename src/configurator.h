@@ -147,8 +147,9 @@ Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-std::vector <vertexDescriptor> splitNode(vertexDescriptor v, TransitionSystem& g, Direction d, b2Transform start);
+void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::vector<vertexDescriptor>&, TransitionSystem&);
 
+std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, const Direction&, b2Transform);
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
@@ -263,10 +264,9 @@ void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIG
 
 void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
 
-void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, std::vector <vertexDescriptor>&);
+void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, const std::vector <vertexDescriptor>&);
 
 void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, vertexDescriptor goal=TransitionSystem::null_vertex());
-
 
 // std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
 

@@ -398,7 +398,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=g[currentEdge].direction;
-	std::vector <vertexDescriptor> priorityQueue = {bestNext};
+	std::vector <vertexDescriptor> priorityQueue = {bestNext}, evaluationQueue=priorityQueue;
 	std::vector <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
@@ -408,9 +408,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		closed.push_back(*priorityQueue.begin());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
-		if (er.ended){
-		//	printf("ended %i\n", v);
-		}
 		applyTransitionMatrix(g, v, direction, er.ended, v);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
@@ -427,7 +424,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
-			//	setStateLabel(sk.first, v0, t.direction); //new
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
@@ -465,28 +461,82 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					gt::adjustProbability(g, edge.first);
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
-				g[v1].phi=evaluationFunction(er);
-				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
+				//g[v1].phi=evaluationFunction(er);
+				//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
-				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
+				//pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 			
 			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
-			addToPriorityQueue(v1, priorityQueue, g, closed);
+			//addToPriorityQueue(v1, priorityQueue, g, closed);
+			evaluationQueue.push_back(v1);
 			}
 		}
+		backtrack();
 		bestNext=priorityQueue[0];
-		if (controlGoal.getAffIndex()==PURSUE){
-			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
-		}
 		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
 	}while(g[bestNext].options.size()>0);
 	printf("finished exploring\n");
 	return toRemove;
 }
 
+std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, const Direction &d, b2Transform start){
+	std::vector <vertexDescriptor> split = {v};
+	if (d ==RIGHT || d==LEFT){
+		return split;
+	}
+	if (g[v].outcome != simResult::crashed){
+		return split;
+	}
+	vertexDescriptor v1=v;
+	float nNodes = g[v].endPose.p.Length()/simulationStep;
+	b2Transform endPose = g[v].endPose;
+	int i=0;
+	while(nNodes>0){
+		g[v].endPose = start;
+		g[v].options = {d};
+		if(nNodes >1){
+			// g[v].endPose.p = start.p+ b2Vec2(DISCRETE_RANGE*endPose.q.c, DISCRETE_RANGE*endPose.q.s);
+			// g[v].endPose.q = start.q;
+			// start = g[v].endPose;
+			start.p =start.p+ b2Vec2(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
+			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+			split.push_back(v1);
+		}
+		else if (nNodes<1){
+			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+			g[v1].endPose = endPose;
+			split.push_back(v1);
+		}
+		//g[v1].disturbance = g[v].disturbance;
+		g[v1].outcome = g[v].outcome;
+		v=v1;
+		nNodes-=1;
+	}
+	return split;
+}
 
+
+void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::vector<vertexDescriptor>& closed, TransitionSystem&g){
+		for (vertexDescriptor v:evaluation_q){
+			std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
+			edgeDescriptor e= gt::visitedEdge(ie, g);
+			b2Transform start=g[e.m_source].endPose;
+			std::vector <vertexDescriptor> split = splitTask(v, g, g[e].direction, start);
+			vertexDescriptor src=e.m_source;
+			for (vertexDescriptor split_v:split){
+				if (!g[split_v].visited()){
+					EndedResult local_er=estimateCost(g[split_v],start, g[e].direction);
+					g[split_v].phi=evaluationFunction(local_er);
+					applyTransitionMatrix(g, split_v, g[e].direction, local_er.ended,src);
+					addToPriorityQueue(split_v, priority_q, g, closed);
+					src=split_v;
+				}
+			}
+		}
+		evaluation_q.clear();
+}
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
@@ -1271,7 +1321,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 //     }
 // }
 
-void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g, std::vector <vertexDescriptor>& closed){
+void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g, const std::vector <vertexDescriptor>& closed){
 	for (auto i =queue.begin(); i!=queue.end(); i++){
 		bool expanded=0;
 		for (vertexDescriptor c: closed){
@@ -1286,6 +1336,7 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDesc
 	}
 	queue.push_back(v);
 }
+
 
 void Configurator::addToPriorityQueue(Frontier f, std::vector<Frontier>& queue, TransitionSystem &g, vertexDescriptor goal){
 	for (auto i =queue.begin(); i!=queue.end(); i++){

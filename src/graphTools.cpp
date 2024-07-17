@@ -87,7 +87,7 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 	return result;
 }
 
-std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, vertexDescriptor v, Direction d){
+std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, const vertexDescriptor& v, const Direction &d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
@@ -130,7 +130,7 @@ Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, 
 	return result;
 
 }
-edgeDescriptor gt::visitedEdge(std::vector <edgeDescriptor> es, TransitionSystem& g){
+edgeDescriptor gt::visitedEdge(const std::vector <edgeDescriptor> &es, TransitionSystem& g){
 	for (edgeDescriptor e:es){
 		if (g[e.m_source].visited() & g[e.m_target].visited()){
 			return e;
