@@ -397,7 +397,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		printf("goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
-	//Direction direction= t.direction;
 	Direction direction=g[currentEdge].direction;
 	std::vector <vertexDescriptor> priorityQueue = {bestNext};
 	std::vector <vertexDescriptor> closed;
@@ -425,7 +424,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			bool topDown=1;
 			changeStart(start, v0, g);
 				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
-				float _simulationStep=simulationStep;
+				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
 			//	setStateLabel(sk.first, v0, t.direction); //new
