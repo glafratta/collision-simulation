@@ -10,7 +10,7 @@ find_package(PkgConfig)
 
 find_package(Threads)
 
-
+include(CTest)
 
 #pkg_check_modules(clock REQUIRED IMPORTED_TARGET libCLoCK)
 
@@ -22,12 +22,15 @@ add_executable(loop_RT callbacks.h loop_RT.cpp)
 add_executable(loop_sim callbacks.h loop_sim.cpp)
 add_executable(testLoop callbacks.h testLoop.cpp)
 add_executable(update_graph callbacks.h update_graph.cpp)
+#add_executable(split_task split_task.cpp)
 target_link_libraries(target_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 target_link_libraries(targetless_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 target_link_libraries(loop_RT CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 target_link_libraries(loop_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 target_link_libraries(testLoop CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 target_link_libraries(update_graph CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+#target_link_libraries(split_task CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+#add_test(NAME split_task COMMAND split_task)
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	find_package(iir)
 	pkg_check_modules(LIBCAMERA REQUIRED IMPORTED_TARGET libcamera)

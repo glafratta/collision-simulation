@@ -4,16 +4,13 @@
 #include <thread>
 #include <filesystem>
 #include <ncurses.h>
-#include <fstream>
-#include "worldbuilder.h"
+// #include <fstream>
+// #include "worldbuilder.h"
+#include "debug.h"
 #include <algorithm>
 #include <sys/stat.h>
 //FOR DEBUG
-namespace debug{
-	
-template <class T>
-void graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor>, vertexDescriptor);
-}
+
 //
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};

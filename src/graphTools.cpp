@@ -105,7 +105,7 @@ std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, const vertexDescrip
 
 std::pair< bool, edgeDescriptor> gt::getMostLikely(TransitionSystem& g, std::vector <edgeDescriptor> oe, int it){
 	std::pair< bool, edgeDescriptor> mostLikely(false, edgeDescriptor());
-	float prob=0;
+	float prob=-1;
 	for (edgeDescriptor e:oe){
 		if (g[e].weighted_probability(it)>prob){
 			mostLikely.second=e;
@@ -130,12 +130,16 @@ Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, 
 	return result;
 
 }
-edgeDescriptor gt::visitedEdge(const std::vector <edgeDescriptor> &es, TransitionSystem& g){
+std::pair <bool,edgeDescriptor>  gt::visitedEdge(const std::vector <edgeDescriptor> &es, TransitionSystem& g, vertexDescriptor cv){
+	std::pair <bool,edgeDescriptor> result(false, edgeDescriptor());
 	for (edgeDescriptor e:es){
-		if (g[e.m_source].visited() & g[e.m_target].visited()){
-			return e;
+		if ((g[e.m_source].visited() & g[e.m_target].visited()) || e.m_source==0 || (e.m_source==cv & cv !=TransitionSystem::null_vertex()) ){
+			result.first=true;
+			result.second=e;
+			return result;
 		}
 	}
+	return result;
 }
 
 
