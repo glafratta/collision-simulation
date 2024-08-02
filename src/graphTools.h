@@ -18,6 +18,7 @@
 #include <utility>
 #include "disturbance.h"
 
+const float NAIVE_PHI=10.0;
 // enum M_CODES {THREE_M=3, FOUR_M=4};
 
 // enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
@@ -56,7 +57,7 @@ struct State{
 	bool filled =0;
 	int nObs=0;
 	State* ID=this;
-	float phi=10.0; //arbitrarily large phi
+	float phi=NAIVE_PHI; //arbitrarily large phi
 	VERTEX_LABEL label=VERTEX_LABEL::UNLABELED;
 	//Direction direction=DEFAULT;
 
@@ -263,6 +264,13 @@ struct StateMatcher{
 	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;
 };
 
-
-
+template <class I>
+bool check_vector_for(const std::vector <I>& vector, const I& item){
+	for (I _item:vector){
+		if (_item==item){
+			return true;
+		}
+	}
+	return false;
+}
 #endif

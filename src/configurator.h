@@ -146,7 +146,7 @@ simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRA
 
 void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::vector<vertexDescriptor>&, TransitionSystem&);
 
-std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, const Direction&, b2Transform);
+std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, const Direction&, b2Transform, vertexDescriptor src=TransitionSystem::null_vertex());
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vector<vertexDescriptor>*propagated=NULL, std::vector<vertexDescriptor>*closed=NULL);
 
@@ -207,12 +207,14 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		result = add_edge(src, v1, g);
 		g[result.first] =edge;
 		g[result.first].direction=g[src].options[0];
+		g[result.first].it_observed=iteration;
 		if (!topDown){
 			g[src].options.erase(g[src].options.begin());
 		}
 		if (!g[v1].filled){
 			g[v1].disturbance = obs;
 		}
+		
 		//adjustProbability(g, result.first); //for now predictions and observations carry the same weight
 	}
 	return result;

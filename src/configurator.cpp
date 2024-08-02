@@ -363,11 +363,11 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // }
 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
-	if (controlGoal.disturbance.isValid()){
-		b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-		printf("goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
-		printf("goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
-}
+	// if (controlGoal.disturbance.isValid()){
+	// 	b2Vec2 vec = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
+	// 	printf("goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
+	// 	printf("goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
+// }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=g[currentEdge].direction;
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue;
@@ -455,16 +455,20 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	return toRemove;
 }
 
-std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, const Direction &d, b2Transform start){
-	std::vector <vertexDescriptor> split = {v};
+std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, const Direction &d, b2Transform start, vertexDescriptor src){
+	std::vector <vertexDescriptor> split={v};
 	if (d ==RIGHT || d==LEFT){
 		return split;
 	}
 	if (g[v].outcome != simResult::crashed){
 		return split;
 	}
+	if (src!=TransitionSystem::null_vertex()){
+		split.insert(split.begin(), src);
+		g[src].outcome=simResult::safeForNow;
+	}
 	vertexDescriptor v1=v;
-	float nNodes = g[v].endPose.p.Length()/simulationStep;
+	float nNodes = g[v].endPose.p.Length()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
 	while(nNodes>1){
 		if(nNodes >1){
@@ -472,15 +476,18 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 			g[v].options = {d};
 			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 			g[v].endPose = start;
+			g[v].phi=NAIVE_PHI;
 			// g[v].endPose = start;
 			g[v].outcome=simResult::safeForNow;
-			nNodes--;
 			split.push_back(v1);
+			nNodes--;
 		}
 		if (nNodes<=1){
 			g[v1].endPose = endPose;
 			g[v1].outcome=simResult::crashed;
+			g[v1].phi=og_phi;
 		}
+
 		v=v1;
 	}
 	return split;
@@ -495,16 +502,16 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 				ep=gt::getMostLikely(g, ie, iteration);
 			}
 			b2Transform start=g[ep.second.m_source].endPose;
-			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, start);
 			vertexDescriptor src=ep.second.m_source;
+			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, start, src);
 			for (vertexDescriptor split_v:split){
-				//if (!g[split_v].visited()){
+				if (!g[split_v].visited()){
 					EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
 					g[split_v].phi=evaluationFunction(local_er);
 					applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
 					addToPriorityQueue(split_v, priority_q, g, closed);
 					src=split_v;
-				//}
+				}
 			}
 		}
 		evaluation_q.clear();
@@ -1311,12 +1318,18 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 // }
 
 void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g, const std::vector <vertexDescriptor>& closed){
+	if (g[v].outcome==simResult::crashed){
+		return;
+	}
 	for (auto i =queue.begin(); i!=queue.end(); i++){
 		bool expanded=0;
-		for (vertexDescriptor c: closed){
-			if (v==c){
-				expanded=true;
-			}
+		// for (vertexDescriptor c: closed){
+		// 	if (v==c){
+		// 		expanded=true;
+		// 	}
+		// }
+		if (check_vector_for(closed, v)){
+			expanded=true;
 		}
 		if (g[v].phi <abs(g[*i].phi) & !expanded){
 			queue.insert(i, v);
