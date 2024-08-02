@@ -148,7 +148,7 @@ void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&,
 
 std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, const Direction&, b2Transform);
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&);
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vector<vertexDescriptor>*propagated=NULL, std::vector<vertexDescriptor>*closed=NULL);
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 

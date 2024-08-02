@@ -6,7 +6,7 @@ std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer c){
 
 
 int desired_split_size(b2Vec2 pos, float simulationStep){
-    return int(pos.Length()/(simulationStep+0.00001))+2;
+    return int(pos.Length()/(simulationStep+0.00001))+1;
 }
 
 int main(int argc, char** argv){

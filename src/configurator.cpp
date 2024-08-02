@@ -388,6 +388,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				options.erase(options.begin());
 				v0=v0_exp; //node being expanded
 				v1 =v0; //frontier
+				std::vector <vertexDescriptor> propagated;
 			do {
 			std::pair <State, Edge> sk(State(), Edge(g[v0].options[0]));
 			bool topDown=1;
@@ -434,15 +435,16 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
 				g[v1].phi=evaluationFunction(er);
-				//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
+				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g, &propagated, &closed)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
-				//pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
+				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 			
 			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
 			//addToPriorityQueue(v1, priorityQueue, g, closed);
 			evaluationQueue.push_back(v1);
+			//evaluationQueue.insert(evaluationQueue.end(), closed.begin(), propagated.end());			
 			}
 		}
 		backtrack(evaluationQueue, priorityQueue, closed, g);
@@ -462,16 +464,17 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		return split;
 	}
 	vertexDescriptor v1=v;
-	float nNodes = 1+g[v].endPose.p.Length()/simulationStep;
+	float nNodes = g[v].endPose.p.Length()/simulationStep;
 	b2Transform endPose = g[v].endPose;
-	while(nNodes>0){
+	while(nNodes>1){
 		if(nNodes >1){
+			start.p =start.p+ b2Vec2(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
 			g[v].options = {d};
 			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 			g[v].endPose = start;
-			start.p =start.p+ b2Vec2(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
 			// g[v].endPose = start;
 			g[v].outcome=simResult::safeForNow;
+			nNodes--;
 			split.push_back(v1);
 		}
 		if (nNodes<=1){
@@ -479,7 +482,6 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 			g[v1].outcome=simResult::crashed;
 		}
 		v=v1;
-		nNodes--;
 	}
 	return split;
 }
@@ -496,23 +498,24 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, start);
 			vertexDescriptor src=ep.second.m_source;
 			for (vertexDescriptor split_v:split){
-				if (!g[split_v].visited()){
+				//if (!g[split_v].visited()){
 					EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
 					g[split_v].phi=evaluationFunction(local_er);
 					applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
 					addToPriorityQueue(split_v, priority_q, g, closed);
 					src=split_v;
-				}
+				//}
 			}
 		}
 		evaluation_q.clear();
 }
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::vector <vertexDescriptor>*closed){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
 	if (g[v1].outcome == simResult::successful ){
 		return deletion;
 	}
+	vertexDescriptor p=TransitionSystem::null_vertex();
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].disturbance;
 	while (ep.second){
@@ -527,7 +530,18 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 			if ( match.first){
 				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
 				deletion.push_back(pair);			//first is eliminated, the second is its match
+				p=(pair.second);
+	
+			}
+			else{
+				p=(ep.first.m_target);
+			}
+			for (auto vi=closed->begin(); vi!=closed->end(); vi++){
+				if (*vi==p){
+					closed->erase(vi);
 				}
+			}
+			propagated->push_back(p);
 		}
 		ep.second= boost::in_degree(ep.first.m_source, g)>0;
 		if (!ep.second){
