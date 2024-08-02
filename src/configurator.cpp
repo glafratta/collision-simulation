@@ -470,13 +470,16 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 	vertexDescriptor v1=v;
 	float nNodes = g[v].endPose.p.Length()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
+	Action a;
+	a.init(d);
 	while(nNodes>1){
 		if(nNodes >1){
 			start.p =start.p+ b2Vec2(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
 			g[v].options = {d};
-			addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
+			auto ep =addVertex(v, v1,g, g[v].disturbance); //passing on the disturbance
 			g[v].endPose = start;
 			g[v].phi=NAIVE_PHI;
+			g[ep.first].step= gt::distanceToSimStep(start.p.Length(), a.getLinearSpeed());
 			// g[v].endPose = start;
 			g[v].outcome=simResult::safeForNow;
 			split.push_back(v1);
@@ -505,13 +508,11 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			vertexDescriptor src=ep.second.m_source;
 			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, start, src);
 			for (vertexDescriptor split_v:split){
-				if (!g[split_v].visited()){
 					EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
 					g[split_v].phi=evaluationFunction(local_er);
 					applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
 					addToPriorityQueue(split_v, priority_q, g, closed);
 					src=split_v;
-				}
 			}
 		}
 		evaluation_q.clear();

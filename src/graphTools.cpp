@@ -31,6 +31,12 @@ int gt::simToMotorStep(int simStep){
 	return int(result);
 }
 
+int gt::distanceToSimStep(float d, float dv){
+	float time=d/dv;
+	int sim_step=time*HZ;
+	return sim_step;
+}
+
 // simResult State::getSimResult(){
 // 	simResult result;
 // 	result.collision= disturbance;
