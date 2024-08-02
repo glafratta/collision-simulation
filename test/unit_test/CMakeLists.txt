@@ -36,6 +36,8 @@ add_test(NAME backtrack COMMAND backtrack 0.6 0 0)
 
 add_test(NAME explorer_no COMMAND explorer)
 add_test(NAME explorer_cds COMMAND explorer ../cul_de_sac/ 0)
+add_test(NAME explorer_target COMMAND explorer ../251023/_TAGET/ 1)
+
 
 add_test(NAME transition COMMAND transitionMatrix)
 add_test(NAME transition_n_L_ok COMMAND transitionMatrix 0 l k)
