@@ -197,8 +197,8 @@ namespace gt{
 
 	int simToMotorStep(int);
 
-	int distanceToSimStep(float, float){
-
+	int distanceToSimStep(float, float);
+	
 	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int); //returns disturbance rror based on expected vs observed D
 
 	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int);
