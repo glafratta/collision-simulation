@@ -455,7 +455,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	return toRemove;
 }
 
-std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, const Direction &d, b2Transform start, vertexDescriptor src){
+std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, b2Transform start, vertexDescriptor src){
 	std::vector <vertexDescriptor> split={v};
 	if (d ==RIGHT || d==LEFT){
 		return split;
