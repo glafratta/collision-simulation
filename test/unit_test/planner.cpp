@@ -21,10 +21,7 @@ int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
     bool debug=0;
     Disturbance target1;
-    std::vector <Direction> solution;
-    if (argc <2){
-        return 1;
-    }
+    std::vector <Direction> solution={DEFAULT};
     if (argc>2){
         if (atoi(argv[2])==1){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);  
@@ -50,9 +47,10 @@ int main(int argc, char** argv){
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-    std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.movingVertex);
-    if (getPlan(conf.transitionSystem, plan, conf.currentVertex)!=solution){
-        return 2;
+    std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
+    std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
+    if (plan_d!=solution){
+        return 1;
     }
     return 0;
 }

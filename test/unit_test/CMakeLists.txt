@@ -59,9 +59,9 @@ add_test(NAME transition_y_stop_safe COMMAND transitionMatrix y s s)
 
 add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
 
-add_test(NAME planner_no COMMAND explorer)
-add_test(NAME planner_cds COMMAND explorer ../cul_de_sac/ 0)
-add_test(NAME planner_target COMMAND explorer ../251023/_TAGET/ 1)
+add_test(NAME planner_no COMMAND planner)
+add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
+add_test(NAME planner_target COMMAND planner ../251023/_TAGET/ 1)
 
 
 

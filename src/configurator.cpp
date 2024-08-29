@@ -201,8 +201,13 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	return result;
 }
 Disturbance Configurator::getDisturbance(TransitionSystem&g, vertexDescriptor v){
-	if (!g[v].disturbance.isValid()){
+	std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
+	if (!g[v].disturbance.isValid() & oe.empty()){
 		return controlGoal.disturbance;
+	}
+	else if (!oe.empty()){
+		std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
+		return g[e.second.m_target].disturbance;
 	}
 	return g[v].disturbance;
 }
@@ -1116,13 +1121,10 @@ void Configurator::printPlan(std::vector <vertexDescriptor>* p){
 	}
 	std::vector <vertexDescriptor> plan= *p;
 	vertexDescriptor pre=currentVertex;
-	printf("current=%i\t", pre);
+	//printf("current=%i\t", pre);
 	for (vertexDescriptor v: plan){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
-		//auto a=dirmap.find(transitionSystem[edge.first].direction);
 		if (!edge.second){
-			//throw std::exception();
-			//auto a=dirmap.find(transitionSystem[edge.first].direction);
 			printf("no edge: %i-> %i", edge.first.m_source, edge.first.m_target);
 		}
 		else{
