@@ -202,12 +202,14 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 }
 Disturbance Configurator::getDisturbance(TransitionSystem&g, vertexDescriptor v){
 	std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
-	if (!g[v].disturbance.isValid() & oe.empty()){
-		return controlGoal.disturbance;
-	}
-	else if (!oe.empty()){
-		std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
-		return g[e.second.m_target].disturbance;
+	if (!g[v].disturbance.isValid() ){
+		if (oe.empty()){
+			return controlGoal.disturbance;
+		}
+		else {
+			std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
+			return g[e.second.m_target].disturbance;
+		}
 	}
 	return g[v].disturbance;
 }
