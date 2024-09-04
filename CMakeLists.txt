@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(CloCK LANGUAGES CXX)
 
+include(CTest)
 set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -14,6 +15,9 @@ find_package(box2d REQUIRED)
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
+
+add_subdirectory(test/unit_test "${CMAKE_CURRENT_BINARY_DIR}/test/unit_test")
+
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   find_package(iir)
@@ -36,3 +40,5 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_compile_options(-Wall -pedantic)
+
+enable_testing()

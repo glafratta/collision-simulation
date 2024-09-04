@@ -8,6 +8,7 @@
 #include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
+#include "debug.h"
 //FOR DEBUG
 namespace debug{
 	
