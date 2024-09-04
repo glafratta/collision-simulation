@@ -197,6 +197,7 @@ std::pair <bool, cv::Vec4f> PointCloudProc::findOrientationCV(std::vector<Pointf
 }
 
 std::vector<Pointf> PointCloudProc::setDisturbanceOrientation(Disturbance& d, CoordinateContainer data){
+	//NEEDS TO BE SET at higher level than simulation (checking or exploring level, state matching level)
 	std::vector <Pointf> v;
 	if (!data.empty()){
 		v=set2vec(data);

@@ -9,6 +9,79 @@
 // const int cutoff_frequency=4; //HZ
 // const int band_width=0.5;
 
+struct Correct{
+    
+    Correct(){}
+
+    void operator()( Action&, int);
+
+    float errorCalc(Action, double);
+
+    float getError(){
+        return p();
+    }
+
+    float Ki(){
+        return ki;
+    }
+
+    float Kp(){
+        return kp;
+    }
+    float Kd(){
+        return kd;
+    }
+
+    float get_i(){
+        return i;
+    }
+
+    float get_d(){
+        return d;
+    }
+
+    float update(float);
+
+    void reset(){
+        p_buffer=std::vector <float>(bufferSize,0);
+        i=0;
+        d=0;
+        mf.buffer=std::vector<float>(mf.kernelSize,0);
+    }
+
+    float kp=0.075;    
+    float kd=0, ki=0;
+    private:
+
+
+    float p(){
+        float sum=0;
+        for (int j=0;j<p_buffer.size(); j++){
+            sum+=p_buffer[j];
+        }
+        return sum;
+    }
+    int correction_rate=2; //Hz
+    int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
+    std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
+    float i=0, d=0;
+    float tolerance_upper=0.01, tolerance_lower=-0.01;
+
+    struct MedianFilter{
+        int kernelSize=3;
+        std::vector<float>buffer=std::vector<float>(kernelSize,0);
+
+        float get_median(){
+            std::vector <float> tmp=buffer;
+            std::sort(tmp.begin(), tmp.end());
+            return tmp[int(kernelSize/2)];
+        }
+    }mf;
+    
+
+};
+
+
 class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback updates the plan
     unsigned int m_step=0;
     char a='0';

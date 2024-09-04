@@ -12,6 +12,9 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+void forget(Configurator*);
+
+Disturbance set_target(int&, b2Transform);
 
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     std::vector <BodyFeatures> result;
@@ -76,6 +79,7 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
 public:
 int ogStep=0;
 Configurator * c;
+int run=0;
 
 MotorCallback(Configurator *conf): c(conf){
 }
@@ -108,7 +112,10 @@ void step( AlphaBot &motors){
 	EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		printf("goal reached\n");
-		Disturbance new_goal=Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
+		Disturbance new_goal=set_target(run, c->controlGoal.start);
+		// if (run%2!=0){
+		// 	Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
+		// }
 	//	printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
@@ -118,14 +125,19 @@ void step( AlphaBot &motors){
 			fprintf(f, "!");
 			fclose(f);			
 		}
+		forget(c);
 
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
-	float R= c->getTask()->getAction().getRWheelSpeed();
-	float L=c->getTask()->getAction().getLWheelSpeed()*1.05;
-	if (c->getTask()->direction!=DEFAULT){
-		R*=1.25;
-		L*=1.25;
+	R= c->getTask()->getAction().getRWheelSpeed();
+	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
+	if (c->getTask()->direction==LEFT){
+		R*=1.20;
+		L*=1.20;
+	}
+	else if (c->getTask()->direction==RIGHT){
+		R*=1.27;
+		L*=1.27;
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);

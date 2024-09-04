@@ -68,7 +68,6 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 		g[e.m_target].phi=sk.first.phi;
 	}
 	g[e].it_observed=it;
-	//adjustProbability(g, e);
 }
 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
@@ -92,8 +91,13 @@ std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, vertexDescriptor v,
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei)].direction == d){
-			result.push_back(*ei);
+		if ((*ei).m_source==22 || (*ei).m_target==0){
+			printf("");
+		}
+		if (g[(*ei)].direction == d || d==UNDEFINED){
+			if ((*ei).m_source!=v){
+				result.push_back(*ei);
+			}
 		}
 	}
 	return result;
@@ -203,8 +207,8 @@ float StateMatcher::sumVector(DistanceVector vec){
 bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
 	float coefficient=1.0;
 	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/.9;
-		coefficient*=scale;
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
+		coefficient*=scale*1.2; //it's a bit high but need for debugging
 	}
     bool result =false;
 	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);

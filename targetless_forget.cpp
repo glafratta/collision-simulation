@@ -1,11 +1,13 @@
 
 #include "custom.h"
 
-void forget(Configurator *c){}
+void forget(Configurator *c){
+	c->transitionSystem.clear();
+}
 
-Disturbance set_target(int& run, b2Transform start){
+Disturbance set_target(int &run, b2Transform start){
 	Disturbance result;
-	if (run%2==0){
+	if (run%2!=0){
 		result=Disturbance(PURSUE, start.p, start.q.GetAngle());
 		run++;
 	}
