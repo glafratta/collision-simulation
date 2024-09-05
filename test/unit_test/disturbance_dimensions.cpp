@@ -14,7 +14,7 @@ int main(int argc, char** argv){
     feature.second.halfLength=round(feature.second.halfLength*1000)/1000;
     feature.second.halfWidth=round(feature.second.halfWidth*1000)/1000;
 
-    if (feature.second.halfLength -0.05>0.001){
+    if (fabs(feature.second.halfLength -0.05)>0.001){
         throw std::logic_error("wrong half length\n");
     }
     if (feature.second.halfWidth==0){
@@ -26,5 +26,6 @@ int main(int argc, char** argv){
     if (!feature.first){
         throw std::logic_error("feature does not exist\n");
     }
+    printf("w=%f, l=%f\n", feature.second.halfWidth, feature.second.halfLength);
     return 0;
 }

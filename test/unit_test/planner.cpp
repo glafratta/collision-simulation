@@ -48,6 +48,7 @@ int main(int argc, char** argv){
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
+    conf.printPlan(&plan);
     std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
     if (plan_d!=solution){
         return 1;
