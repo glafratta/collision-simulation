@@ -20,7 +20,9 @@ class WorldBuilder{
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::pair<bool, b2Vec2> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction );
+
+    void buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength); //returns bottom and top of bounding box
 

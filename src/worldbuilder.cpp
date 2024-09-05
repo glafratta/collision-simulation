@@ -29,7 +29,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb){//gets bounding box of points
-    float  h=fabs(0.0005*2), w=fabs(0.0005*2) ;
+    float  h=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
     // b2Transform pose;
@@ -44,9 +44,11 @@ std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb)
 	std::vector<Pointf>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
 	std::vector<Pointf>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
 	std::vector<Pointf>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
-    if (minx!=maxx & miny!=maxy){
-        h=fabs((*maxy).y-(*miny).y);
+    if (minx->x!=maxx->x){
         w= fabs((*maxx).x-(*minx).x);
+    }
+    if (miny->y!=maxy->y){
+        h=fabs((*maxy).y-(*miny).y);
     }
     x_glob= ((*maxx).x+(*minx).x)/2;
     y_glob= ((*maxy).y+(*miny).y)/2;
@@ -138,30 +140,38 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-  std::pair<bool, b2Vec2> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance){
-    std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
-    float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
+std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength){
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
     features =processData(salient.first);
-    if (occluded(current, disturbance)){
-        salient.first.emplace(getPointf(disturbance.getPosition()));
-        features.push_back(disturbance.bodyFeatures());
-    }
+    return features;
+}
+
+
+
+  void WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance){
+  //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
+    float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
+    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength);
+    // if (occluded(current, disturbance)){
+    //     salient.first.emplace(getPointf(disturbance.getPosition()));
+    //     features.push_back(disturbance.bodyFeatures());
+    // }
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
-	FILE *f;
+	FILE *file;
 	if (debug){
-		f = fopen(bodyFile, "a+");
+		file = fopen(bodyFile, "a+");
 		for (b2Body * b = world.GetBodyList(); b!=NULL; b= b->GetNext()){
-			fprintf(f, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
+			fprintf(file, "%f\t%f\n", b->GetPosition().x, b->GetPosition().y);
 		}
-		fclose(f);
+		fclose(file);
 	}
-    result.first = salient.second;
-    return result;
+    //result.first = salient.second;
+    return features;
+   // return result;
 }
 
 bool WorldBuilder::checkDisturbance(Pointf p, bool& obStillThere, Task * curr, float range){

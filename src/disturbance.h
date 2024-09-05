@@ -90,7 +90,12 @@ public:
         }
         bf.pose.Set(p,a);
         valid =1;
-    }    
+    }   
+
+    Disturbance(BodyFeatures _bf): bf(_bf){
+        valid=1;
+        affordanceIndex=AVOID;
+    } 
 
     float getAngle(b2Transform);
 
