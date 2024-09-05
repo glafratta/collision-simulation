@@ -23,9 +23,13 @@
 // enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-typedef std::vector <float> DistanceVector;
+//typedef std::vector <float> DistanceVector;
+//0: D_x, 1: D_y, 2: D_aff, 3: p_x, 4: p_y, 5:p_angle
 
-typedef std::vector <bool> MatchVector;
+
+//typedef std::vector <bool> MatchVector;
+
+float angle_subtract(float a1, float a2);
 
 struct Edge{
 	Direction direction=DEFAULT;
@@ -71,6 +75,37 @@ struct State{
 
 	void resetVisited(){
 		phi=10.0;
+	}
+
+};
+
+struct StateDifference{
+	b2Vec2 r_position=b2Vec2();
+	float r_angle=0;
+	u_int D_type=0;
+	b2Vec2 D_position=b2Vec2();
+	float D_angle=0;
+	float D_width=0;
+	float D_length=0;
+
+	StateDifference()=default;
+
+	StateDifference(State s1, State s2){
+	D_position.x= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
+	D_position.y= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
+	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
+	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+	D_angle=angle_subtract(s1.disturbance.pose().q.GetAngle(), s2.disturbance.pose().q.GetAngle());
+	D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
+	D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
+	}
+
+	float sum();
+
+	float sum_r(){
+		return r_position.x+r_position.y+r_angle;
 	}
 
 };
@@ -223,7 +258,8 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 
 
 struct StateMatcher{
-        std::vector <float> weights; //disturbance, position vector, angle
+		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1};
+        //std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
 		
@@ -232,33 +268,95 @@ struct StateMatcher{
 			const float angle= M_PI/6;
 			const float dPosition= 0.065;//0.065; 
 			const float affordance =0;
+			const float D_dimensions=0.03;
 		}error;
 
 		float mu=0.001;
 	    StateMatcher(){}
 
-		void initOnes(){
-			for (auto i=weights.begin(); i!= weights.end(); i++){
-				*i=1.0;
+		// void initOnes(){
+		// 	for (auto i=weights.begin(); i!= weights.end(); i++){
+		// 		*i=1.0;
+		// 	}
+		// }
+
+	//StateDifference get_state_difference(State, State );
+
+		struct StateMatch{
+
+			bool exact(){
+				return r_position && r_angle && d_position && d_angle && d_shape && d_type;
 			}
-		}
 
-		DistanceVector getDistance(State, State);  //DO NOT TRY TO LEARN DISTRIBUTION
+			bool pose(){
+				return r_position && r_angle;
+			}
 
-		float sumVector(DistanceVector);
+			bool disturbance_exact(){
+				return d_position && d_angle && d_type && d_shape;
+			}
 
-		bool isPerfectMatch(DistanceVector, float endDistance=0); // is this the same state?
+			// bool disturbance(){
+			// 	return d_shape && d_type;
+			// }
 
-		bool isPerfectMatch(State, State, State* src=NULL); //first state: state to find a match for, second state: candidate match
+			StateMatch (const StateDifference& sd, StateMatcher::Error error, float coefficient=0){
+				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
+				r_angle=fabs(sd.r_angle)<error.angle;
+				d_type=sd.D_type==0;
+				d_position= sd.D_position.Length()<(error.dPosition*coefficient);
+				d_angle=fabs(sd.D_angle)<error.angle;
+				bool below_threshold_w=fabs(sd.D_width)<error.D_dimensions;
+				bool below_threshold_l=fabs(sd.D_length)<error.D_dimensions;
+				d_shape= below_threshold_l & below_threshold_w;
 
-		std::pair<bool, vertexDescriptor> isPerfectMatch(TransitionSystem, vertexDescriptor, Direction, State); //find match amoung vertex out edges
+			}
+
+			StateMatcher::MATCH_TYPE what(){
+				if (exact()){ //match position and disturbance
+					return _TRUE;
+				}
+				else if (pose()){
+					return POSE;
+				}
+				else if (disturbance_exact()){
+					return DISTURBANCE;
+				}
+				else{
+					return _FALSE;
+				}
+			}
+
+			private:
+			bool r_position=0;
+			bool r_angle=0;
+			bool d_position=0;
+			bool d_angle=0;
+			bool d_shape=0;
+			bool d_type=0;
+		};
 		
-		void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
+		//float sumVector(DistanceVector);
+
+		//float get_angle_difference(float, float); //adjusts for differences in angle direction
+
+		//FUZZY LOGIC FUNCTIONS USED TO CLASSIFY MATCH
+
+
+
+		MATCH_TYPE isMatch(StateDifference, float endDistance=0); //endDistance=endpose
+
+		MATCH_TYPE isMatch(State, State, State* src=NULL); //first state: state to find a match for, second state: candidate match
+
+		std::pair<MATCH_TYPE, vertexDescriptor> isMatch(TransitionSystem, vertexDescriptor, Direction, State); //find match amoung vertex out edges
+		
+		//void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
 		//std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
 
-		std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
+		//std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
 	private:
+
 
 	const float COEFFICIENT_INCREASE_THRESHOLD=0.0;
 };

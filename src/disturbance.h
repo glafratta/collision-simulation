@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 class Configurator;
+//class StateMatcher;
 
 class BodyFeatures{
     public:
@@ -33,6 +34,7 @@ class BodyFeatures{
 
 struct Disturbance{ //this generates error
 friend Configurator;
+friend struct StateMatcher;
 private:
     AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
