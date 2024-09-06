@@ -20,7 +20,7 @@ class WorldBuilder{
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction );
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float);
 
     void buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
 

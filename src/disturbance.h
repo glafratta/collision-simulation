@@ -54,13 +54,10 @@ private:
     }
 }
 protected:
-    BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
 public:
+    BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
 
-    //b2Transform pose = {b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)};
-    
-   // bool safeForNow=1;
     Disturbance(){};
     Disturbance(AffordanceIndex i){
         if (i>affordances.size()-1){

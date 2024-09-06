@@ -171,9 +171,9 @@ std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Dir
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED); //matches to most likely
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //matches to most likely
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED); //has a safety to prevent matching a vertex with self
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 
 //std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
@@ -195,7 +195,7 @@ void resetPhi(TransitionSystem&g);
 
 void printPlan(std::vector <vertexDescriptor>* p=NULL);
 
-void applyAffineTrans(const b2Transform&, b2Transform&);
+void applyAffineTrans(const b2Transform& , const Task& );
 
 
 

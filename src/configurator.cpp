@@ -132,20 +132,24 @@ bool Configurator::Spawner(){
 		//have I seen this envronment configuration before?
 		vertexDescriptor ve=TransitionSystem::null_vertex(), src;
 		if (!planVertices.empty()){
-			ve= *(planVertices.rbegin().base()-1);
+			//ve= *(planVertices.rbegin().base()-1);
 			src=movingVertex;
 		}
 		else {
-			ve=currentVertex;
-			src=ve;
+			//ve=currentVertex;
+			src=currentVertex;
 		}
 		std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
-		if (bool fin=controlGoal.checkEnded(transitionSystem[ve], UNDEFINED, true).ended; !fin || transitionSystem[movingEdge].direction==STOP){
+		//was ve instead of src
+		std::vector <vertexDescriptor> options_src;
+		if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentVertex!=movingVertex){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
-				Disturbance scenario(b_features[0]); //assumes 1 item length
+				State s_temp;
+				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				findMatch(s_temp,transitionSystem, g[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			been= been_there(transitionSystem, where); 
@@ -156,7 +160,12 @@ bool Configurator::Spawner(){
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
 		if (been.first){
 		//	printf("provisional plan\n");
-			plan_provisional=planner(transitionSystem, src, been.second, been.first);
+			for (auto o:options_src){
+				plan_provisional=planner(transitionSystem, o, been.second, been.first);
+				if (*(plan_provisional.rbegin().base()-1) ==been.second){
+					break;
+				}
+			}
 		}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
@@ -437,73 +446,73 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				v0=v0_exp; //node being expanded
 				v1 =v0; //frontier
 			do {
-			std::pair <State, Edge> sk(State(), Edge(g[v0].options[0]));
-			bool topDown=1;
 			changeStart(start, v0, g);
-				t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
-				float _simulationStep=simulationStep;
-				adjustStepDistance(v0, g, &t, _simulationStep);
-				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
+			std::pair <State, Edge> sk(State(start), Edge(g[v0].options[0]));
+			bool topDown=1;
+			t = Task(getDisturbance(g, v0), g[v0].options[0], start, topDown);
+			float _simulationStep=simulationStep;
+			adjustStepDistance(v0, g, &t, _simulationStep);
+			worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
 			//	setStateLabel(sk.first, v0, t.direction); //new
-				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
-				gt::fill(sim, &sk.first, &sk.second); //find simulation result
-				sk.second.direction=t.direction;
-				er  = estimateCost(sk.first, g[v0].endPose, sk.second.direction);
-				State * source=NULL;
-				StateMatcher::MATCH_TYPE vm= matcher.isMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
+			simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
+			gt::fill(sim, &sk.first, &sk.second); //find simulation result
+			sk.second.direction=t.direction;
+			er  = estimateCost(sk.first, g[v0].endPose, sk.second.direction);
+			State * source=NULL;
+			StateMatcher::MATCH_TYPE vm= matcher.isMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
 																				//v=0 and currentEdge =src will match so we try to prevent
-																				//changing the movign vertex which is by default the origin
-				if (v0==movingVertex & vm==StateMatcher::_TRUE){
-					source= g[currentEdge.m_source].ID;
-				}
-				else{
-					source=g[v0].ID;
-				}
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction);			
-				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
-				if (match.first==StateMatcher::MATCH_TYPE::_TRUE){
-					g[v0].options.erase(g[v0].options.begin());
-					v1=match.second; //frontier
-					if ((v0!=v1)){
-						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
-						edge.second=true; //just means that the edge is valid
-						g[edge.first]=sk.second;//t.direction;
-					}
-					else{
-						printf("same vertex %i\n", v1);
-					}
-				}
-				else if (match.first==StateMatcher::DISTURBANCE){
-					 
-				}
-				else{
-					edge= addVertex(v0, v1,g, Disturbance(),sk.second);
-					g[edge.first.m_target].label=sk.first.label; //new edge, valid
-				}
-				if(edge.second){
-					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
-					gt::adjustProbability(g, edge.first);
-				}
-				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
-				g[v1].phi=evaluationFunction(er);
-				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
-				v0_exp=v0;
-				options=g[v0_exp].options;
-				v0=v1;			
-				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
-			
-			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
-			addToPriorityQueue(v1, priorityQueue, g, closed);
+																		//changing the movign vertex which is by default the origin
+			if (v0==movingVertex & vm==StateMatcher::_TRUE){
+				source= g[currentEdge.m_source].ID;
 			}
+			else{
+				source=g[v0].ID;
+			}
+			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction);			
+			std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+			if (match.first==StateMatcher::MATCH_TYPE::_TRUE){
+				g[v0].options.erase(g[v0].options.begin());
+				v1=match.second; //frontier
+				if ((v0!=v1)){
+					edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
+					edge.second=true; //just means that the edge is valid
+					g[edge.first]=sk.second;//t.direction;
+				}
+				else{
+					printf("same vertex %i\n", v1);
+				}
+			}
+			else if (match.first==StateMatcher::DISTURBANCE){
+					
+			}
+			else{
+				edge= addVertex(v0, v1,g, Disturbance(),sk.second);
+				g[edge.first.m_target].label=sk.first.label; //new edge, valid
+			}
+			if(edge.second){
+				gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
+				gt::adjustProbability(g, edge.first);
+			}
+			applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
+			g[v1].phi=evaluationFunction(er);
+			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
+			v0_exp=v0;
+			options=g[v0_exp].options;
+			v0=v1;			
+			pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
+		
+		}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
+		addToPriorityQueue(v1, priorityQueue, g, closed);
 		}
-		bestNext=priorityQueue[0];
+	}
+	bestNext=priorityQueue[0];
 		if (controlGoal.getAffIndex()==PURSUE){
 			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
-		}
-		direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
-	}while(g[bestNext].options.size()>0);
-	printf("finished exploring\n");
-	return toRemove;
+	}
+	direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
+}while(g[bestNext].options.size()>0);
+printf("finished exploring\n");
+return toRemove;
 }
 
 
@@ -898,7 +907,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
-		std::pair <State, Edge> sk(State(), Edge(t.direction));
+		std::pair <State, Edge> sk(State(start), Edge(t.direction));
 		//sk.first.direction=t.direction;
 		printf("from %i", ep.first.m_target);
 		vertexDescriptor src=ep.first.m_target;
@@ -1113,15 +1122,6 @@ void Configurator::printPlan(std::vector <vertexDescriptor>* p){
 	printf("\n");
 }
 
-void Configurator::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
-	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
-	float og_x= pose.p.x, og_y=pose.p.y;
-	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
-	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
-	pose.p.x-=deltaPose.p.x;
-	pose.p.y-=deltaPose.p.y;
-}
-
 
 
 void Configurator::start(){
@@ -1330,6 +1330,7 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 		//b2Transform difference= g[*vi].endPose-target.disturbance.pose();
 		StateDifference sd;
 		if (target.getAffIndex()==PURSUE){
+			//smallest difference to target position
 			sd.r_position.x= g[*vi].endPose.p.x-target.pose().p.x;
 			sd.r_position.y =g[*vi].endPose.p.y-target.pose().p.y;
 			sd.r_angle =g[*vi].endPose.q.GetAngle()-target.pose().q.GetAngle();
@@ -1572,24 +1573,36 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 // 	return result;
 // }
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir){
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor> * others){
 	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::MATCH_TYPE::_FALSE, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	float prob=0;
+	//need to find best match too
+	std::set <std::pair <vertexDescriptor, float>, ComparePair>others_set;
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
-		if ( v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
+		StateDifference sd;
+		if (auto m= matcher.isMatch(s, g[v], src, &sd); matcher.match_equal(m, match_type) && v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
+			if (others !=NULL){
+				others_set.emplace(std::pair< vertexDescriptor, float>(result.second, sd.sum());
+			}
 			if (most_likely.first && g[most_likely.second].probability>prob){
-				result.first=matcher.isMatch(s, g[v], src);
+				result.first= m;
 				result.second=v;
 				prob=g[most_likely.second].probability;
-
+				
 			}
 		}
+	}
+	if (others==NULL){
+		return result;
+	}
+	for (auto vp:others_set){
+		others->push_back(vp.first);
 	}
 	return result;
 }
@@ -1609,7 +1622,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 // 	return result;
 // }
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(vertexDescriptor v, TransitionSystem& g, Direction dir){
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(vertexDescriptor v, TransitionSystem& g, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor>* others){
 	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::_FALSE, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	//float prob=0;
@@ -1621,7 +1634,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 			//if (dir!=Direction::UNDEFINED){
 			Tmatch= !ie.empty()||dir==Direction::UNDEFINED;
 			//}
-			if (*vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>=ie.size()){ //
+			if (StateMatcher::MATCH_TYPE m=matcher.isMatch(g[v], g[*vi]); matcher.match_equal(m, match_type) && *vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>=ie.size()){ //
 			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
 			//if (!most_likely.first){
 			//}
@@ -1631,6 +1644,9 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 				result.second=*vi;
 				//prob=g[most_likely.second].probability;
 				nObs=g[v].nObs;
+				if (NULL!=others){
+					others->push_back(result.first);
+				}
 			}
 		}
 		}
@@ -1782,6 +1798,13 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
+void Configurator::applyAffineTrans(const b2Transform& deltaPose, const Task& task){
+	applyAffineTrans(deltaPose, task.start);
+	if (task.disturbance.getAffIndex()!=NONE){
+		applyAffineTrans(deltaPose, task.disturbance.bf.pose);
+	}
+}
+
 void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	//b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
 	// b2Transform deltaPose;
@@ -1804,10 +1827,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	//printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-			applyAffineTrans(deltaPose, g[*vIt].endPose);
-			if (g[*vIt].disturbance.getAffIndex()!=NONE){
-				applyAffineTrans(deltaPose, g[*vIt].disturbance.bf.pose);
-			}		
+			applyAffineTrans(deltaPose, g[*vIt]);
 		}
 	}
 	applyAffineTrans(deltaPose, controlGoal.start);

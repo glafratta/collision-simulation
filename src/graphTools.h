@@ -18,6 +18,7 @@
 #include <utility>
 #include "disturbance.h"
 
+class Task;
 // enum M_CODES {THREE_M=3, FOUR_M=4};
 
 // enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
@@ -30,6 +31,19 @@ enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 //typedef std::vector <bool> MatchVector;
 
 float angle_subtract(float a1, float a2);
+
+void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
+
+void applyAffineTrans(const b2Transform&, State& );
+
+struct ComparePair{
+	ComparePair()=default;
+
+	template <class V>
+	bool operator()(const std::pair<V, float> & p1, const std::pair<V, float> &p2){
+		return p1.second<p2.second;
+	}
+};
 
 struct Edge{
 	Direction direction=DEFAULT;
@@ -53,7 +67,7 @@ struct Edge{
 
 struct State{
 	Disturbance disturbance; //disturbance encounters
-	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
+	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
 	simResult::resultType outcome;
 	std::vector <Direction> options;
 	int nodesInSameSpot =0;
@@ -67,6 +81,8 @@ struct State{
 	
 	State()=default;
 
+	State(const b2Transform &_start): start(_start){}
+
 	//State(Direction d): direction(d){}
 
 	bool visited(){
@@ -76,6 +92,8 @@ struct State{
 	void resetVisited(){
 		phi=10.0;
 	}
+
+	b2Transform from_disturbance();
 
 };
 
@@ -90,23 +108,27 @@ struct StateDifference{
 
 	StateDifference()=default;
 
-	StateDifference(State s1, State s2){
-	D_position.x= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
-	D_position.y= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
-	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
-	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
-	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
-	D_angle=angle_subtract(s1.disturbance.pose().q.GetAngle(), s2.disturbance.pose().q.GetAngle());
-	D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
-	D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
+	StateDifference( State& s1, State& s2){
+		init(s1, s2);
 	}
+
+	// StateDifference(State s1, State s2, const b2Transform& o1, const b2Transform& o2){
+	// 	//adjsuting s1 to match up
+	// 	b2Transform deltaPose;
+	// 	deltaPose.p.x=s2.endPose.p.x-(s1.endPose.p.x);
+	// 	deltaPose.p.y=s2.endPose.p.y-(s1.endPose.p.y);
+	// 	deltaPose.q.Set(angle_subtract(s2.endPose.q.GetAngle(), s1.endPose.q.GetAngle()));
+	// 	applyAffineTrans(deltaPose, s1);
+	// 	init(s1, s2);
+	// }
 
 	float sum();
 
 	float sum_r(){
 		return r_position.x+r_position.y+r_angle;
 	}
+
+	void init(State& s1, State& s2);
 
 };
 
@@ -115,6 +137,9 @@ typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
+Transform operator+( Transform const &, Transform const &);
+Transform operator-( Transform const &, Transform const &);
+
 
 typedef std::pair<bool, float> orientation;
 orientation subtract(orientation, orientation);
@@ -257,12 +282,13 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> Filt
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
 
 
-struct StateMatcher{
-		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1};
+class StateMatcher{
+	public:
+		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4};
         //std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
-		
+
 		struct Error{
 			const float endPosition=0.05;//0.05;
 			const float angle= M_PI/6;
@@ -272,8 +298,7 @@ struct StateMatcher{
 		}error;
 
 		float mu=0.001;
-	    StateMatcher(){}
-
+	    StateMatcher()=default;
 		// void initOnes(){
 		// 	for (auto i=weights.begin(); i!= weights.end(); i++){
 		// 		*i=1.0;
@@ -342,13 +367,13 @@ struct StateMatcher{
 
 		//FUZZY LOGIC FUNCTIONS USED TO CLASSIFY MATCH
 
-
+		bool match_equal(const MATCH_TYPE&, const MATCH_TYPE&);
 
 		MATCH_TYPE isMatch(StateDifference, float endDistance=0); //endDistance=endpose
 
-		MATCH_TYPE isMatch(State, State, State* src=NULL); //first state: state to find a match for, second state: candidate match
+		MATCH_TYPE isMatch(State, State, State* src=NULL, StateDifference * _sd=NULL); //first state: state to find a match for, second state: candidate match
 
-		std::pair<MATCH_TYPE, vertexDescriptor> isMatch(TransitionSystem, vertexDescriptor, Direction, State); //find match amoung vertex out edges
+		std::pair<MATCH_TYPE, vertexDescriptor> match_vertex(TransitionSystem, vertexDescriptor, Direction, State, StateMatcher::MATCH_TYPE mt=StateMatcher::_TRUE); //find match amoung vertex out edges
 		
 		//void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
 
