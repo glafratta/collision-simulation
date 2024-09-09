@@ -139,18 +139,18 @@ class Listener : public b2ContactListener {
   int iteration=1;
     public:
     Listener(){}
-    std::vector <b2Vec2> collisions;
+    std::vector <b2Body*> collisions;
     
 		void BeginContact(b2Contact * contact) {
 			b2BodyUserData bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
 			if (bodyData.pointer) {
                 b2Body * other = contact->GetFixtureB()->GetBody();
-                collisions.push_back(other->GetPosition());
+                collisions.push_back(other);
 			}
 			bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
 			if (bodyData.pointer) {
                 b2Body * other = contact->GetFixtureA()->GetBody();
-                collisions.push_back(other->GetPosition());
+                collisions.push_back(other);
                 }       
 		}
         

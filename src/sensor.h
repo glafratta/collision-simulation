@@ -7,7 +7,8 @@
 class ConfiguratorInterface;
 class Configurator;
 
-
+template <class C>
+std::vector <C> arrayToVec(C*, int);
 
 class Pointf: public cv::Point2f{
 	public: 

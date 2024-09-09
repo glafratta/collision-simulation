@@ -1,7 +1,7 @@
 #ifndef DISTURBANCE_H
 #define DISTURBANCE_H
 #include "settings.h"
-//#include "measurement.h"
+#include "sensor.h"
 #include "robot.h"
 //#include "opencv2/opencv.hpp"
 #include <stdexcept>
@@ -93,6 +93,24 @@ public:
         valid=1;
         affordanceIndex=AVOID;
     } 
+
+    Disturbance(b2Body* b){
+        bf.pose=b->GetTransform();
+        b2Fixture* fixture =b->GetFixtureList();
+        bf.shape=(fixture->GetShape()->GetType());
+        if (bf.shape==b2Shape::e_polygon){
+            b2PolygonShape * poly=(b2PolygonShape*)fixture->GetShape();
+            std::vector<b2Vec2> vertices=arrayToVec(poly->m_vertices, poly->m_count);
+            CompareX compareX;
+            CompareY compareY;
+            float minx=(std::min_element(vertices.begin(), vertices.end(), compareX)).base()->x;
+            float miny=(std::min_element(vertices.begin(), vertices.end(), compareY)).base()->y;
+            float maxx=(std::max_element(vertices.begin(), vertices.end(), compareX)).base()->x;
+            float maxy=(std::max_element(vertices.begin(), vertices.end(), compareY)).base()->y;
+            bf.halfLength=(fabs(maxx-minx))/2;
+            bf.halfWidth=(fabs(maxy-miny))/2;
+        }
+    }
 
     float getAngle(b2Transform);
 

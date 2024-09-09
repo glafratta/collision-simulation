@@ -46,6 +46,7 @@ void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	applyAffineTrans(deltaPose, state.endPose);
+	applyAffineTrans(deltaPose, state.start);
 	if (state.disturbance.getAffIndex()!=NONE){
 		applyAffineTrans(deltaPose, state.disturbance.bf.pose);
 	}
@@ -117,6 +118,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	}
 	g[e.m_target].options = sk.first.options;
 	g[e.m_target].nObs++;
+	g[e.m_target].start=sk.first.start;
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
