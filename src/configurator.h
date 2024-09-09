@@ -156,7 +156,7 @@ void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tr
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
-void updateGraph(TransitionSystem&, ExecutionError error);
+void updateGraph(TransitionSystem&, ExecutionError error, b2Transform * _disp=NULL);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
@@ -195,7 +195,7 @@ void resetPhi(TransitionSystem&g);
 
 void printPlan(std::vector <vertexDescriptor>* p=NULL);
 
-void applyAffineTrans(const b2Transform& , const Task& );
+void applyAffineTrans(const b2Transform& , Task& );
 
 
 

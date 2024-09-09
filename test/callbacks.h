@@ -101,13 +101,9 @@ char * folder;
         float x2, y2;
       //  Pointf  p1, p2_1;
 		while (file>>x2>>y2){
-         //   x = round(x*1000)/1000;
-			//y = round(y*1000)/1000;
             x2 = round(x2*100)/100;
 			y2 = round(y2*100)/100;
-           // Pointf  p(x,y);
             Pointf  p2(x2,y2);
-           // ci->data.insert(p);
             ci->data2fp.insert(p2);
 		}
 		file.close();

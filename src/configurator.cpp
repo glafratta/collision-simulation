@@ -149,7 +149,7 @@ bool Configurator::Spawner(){
 			if (!b_features.empty()){
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
-				findMatch(s_temp,transitionSystem, g[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
+				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			been= been_there(transitionSystem, where); 
@@ -172,7 +172,8 @@ bool Configurator::Spawner(){
 		//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() || plan_works){	//		
 			planVertices=plan_provisional;
-			//printf("going with old plan\n");
+			b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[planVertices[0]].start;
+			updateGraph(transitionSystem, ExecutionError(),& deltaPose);
 		}
 		//if plan fails or not there, 
 		else{
@@ -1578,7 +1579,8 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 	auto vs= boost::vertices(g);
 	float prob=0;
 	//need to find best match too
-	std::set <std::pair <vertexDescriptor, float>, ComparePair>others_set;
+	ComparePair comparePair;
+	std::set <std::pair <vertexDescriptor, float>, ComparePair>others_set(comparePair);
 	for (auto vi=vs.first; vi!= vs.second; vi++){
 		vertexDescriptor v=*vi;
 		bool Tmatch=true;
@@ -1587,8 +1589,8 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		StateDifference sd;
 		if (auto m= matcher.isMatch(s, g[v], src, &sd); matcher.match_equal(m, match_type) && v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
-			if (others !=NULL){
-				others_set.emplace(std::pair< vertexDescriptor, float>(result.second, sd.sum());
+			if (NULL!=others){
+				others_set.emplace(std::pair< vertexDescriptor, float>(v, sd.sum()));
 			}
 			if (most_likely.first && g[most_likely.second].probability>prob){
 				result.first= m;
@@ -1798,40 +1800,36 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-void Configurator::applyAffineTrans(const b2Transform& deltaPose, const Task& task){
-	applyAffineTrans(deltaPose, task.start);
+void Configurator::applyAffineTrans(const b2Transform& deltaPose, Task& task){
+	math::applyAffineTrans(deltaPose, task.start);
 	if (task.disturbance.getAffIndex()!=NONE){
-		applyAffineTrans(deltaPose, task.disturbance.bf.pose);
+		math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
 	}
 }
 
-void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
-	//b2Rot rot(getTask()->getAction().getOmega()*MOTOR_CALLBACK);
-	// b2Transform deltaPose;
-	// //if (fabs(error)<TRACKING_ERROR_TOLERANCE){
-	// float xdistance=getTask()->getAction().getLinearVelocity().x*MOTOR_CALLBACK+error.r();
-	// b2Rot angularDisplacement(getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta());
-	// deltaPose=b2Transform(b2Vec2(xdistance,
-	// 				getTask()->getAction().getLinearVelocity().y*MOTOR_CALLBACK), 
-	// 				angularDisplacement); //og rot
-	// //}
+void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Transform * _disp){
+	b2Transform deltaPose;
 	auto vPair =boost::vertices(g);
+	if (NULL==_disp){
 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	b2Transform deltaPose=b2Transform(b2Vec2(xdistance,
+	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
-	float linearDisplacement = SignedVectorLength(deltaPose.p);
+	}
+	else{
+		deltaPose=*_disp;
+	}
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
-	//printf("ang disp:%f, deltax=%f, deltay %f, linear disp%f\n", angularDisplacement, xdistance, ydistance, linearDisplacement );
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
 		if (*vIt!=movingVertex){
-			applyAffineTrans(deltaPose, g[*vIt]);
+			math::applyAffineTrans(deltaPose, g[*vIt]);
 		}
 	}
-	applyAffineTrans(deltaPose, controlGoal.start);
-	if(controlGoal.getAffIndex()!=NONE){
-		applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);
-	}
+	// math::applyAffineTrans(deltaPose, controlGoal.start);
+	// if(controlGoal.getAffIndex()!=NONE){
+	// 	math::applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);
+	// }
+	applyAffineTrans(deltaPose, controlGoal);
 }

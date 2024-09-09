@@ -32,15 +32,11 @@ enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
 float angle_subtract(float a1, float a2);
 
-void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
-
-void applyAffineTrans(const b2Transform&, State& );
-
 struct ComparePair{
 	ComparePair()=default;
 
 	template <class V>
-	bool operator()(const std::pair<V, float> & p1, const std::pair<V, float> &p2){
+	bool operator()(const std::pair<V, float> & p1, const std::pair<V, float> &p2) const{
 		return p1.second<p2.second;
 	}
 };
@@ -97,6 +93,14 @@ struct State{
 
 };
 
+namespace math {
+	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
+
+	void applyAffineTrans(const b2Transform&, State& );
+};
+
+
+
 struct StateDifference{
 	b2Vec2 r_position=b2Vec2();
 	float r_angle=0;
@@ -122,10 +126,20 @@ struct StateDifference{
 	// 	init(s1, s2);
 	// }
 
-	float sum();
+	float sum(){
+		return sum_r()+sum_d_pos()+sum_d_shape();
+	}
 
 	float sum_r(){
-		return r_position.x+r_position.y+r_angle;
+		return fabs(r_position.x)+fabs(r_position.y)+fabs(r_angle);
+	}
+
+	float sum_d_pos(){
+		return fabs(D_position.x)+fabs(D_position.y)+D_angle;
+	}
+
+	float sum_d_shape(){
+		return fabs(D_width)+fabs(D_length);
 	}
 
 	void init(State& s1, State& s2);
@@ -137,6 +151,7 @@ typedef b2Transform Transform;
 bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
+void operator+=(Transform &, Transform const&);
 Transform operator+( Transform const &, Transform const &);
 Transform operator-( Transform const &, Transform const &);
 
@@ -310,7 +325,7 @@ class StateMatcher{
 		struct StateMatch{
 
 			bool exact(){
-				return r_position && r_angle && d_position && d_angle && d_shape && d_type;
+				return pose() && disturbance_exact();
 			}
 
 			bool pose(){

@@ -22,7 +22,7 @@ class WorldBuilder{
 
     std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float);
 
-    void buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
+    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength); //returns bottom and top of bounding box
 

@@ -27,6 +27,10 @@ add_executable(disturbance_dimensions ../callbacks.h disturbance_dimensions.cpp)
 target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 add_executable(planner ../callbacks.h planner.cpp)
 target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+add_executable(match ../callbacks.h match.cpp)
+target_link_libraries(match CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+add_executable(find_match ../callbacks.h find_match_s.cpp)
+target_link_libraries(find_match CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 
 
 # add_test(NAME split_task COMMAND split_task 0.6 0 0)
@@ -63,7 +67,17 @@ add_test(NAME planner_no COMMAND planner)
 add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
 add_test(NAME planner_target COMMAND planner ../251023_TAGET/ 1)
 
+add_test(NAME match_false COMMAND match)
+add_test(NAME match_true_exact COMMAND match 1)
+add_test(NAME match_pose COMMAND match 3 )
+add_test(NAME match_disturbance_exact COMMAND match 2 0)
+add_test(NAME match_disturbance_ratio COMMAND match 2 1)
+add_test(NAME match_disturbance_position COMMAND match 2 2)
+set_property(TEST match_disturbance_position PROPERTY WILL_FAIL true)
+add_test(NAME match_disturbance_shape COMMAND match 2 3)
+set_property(TEST match_disturbance_shape PROPERTY WILL_FAIL true)
 
+add_test(NAME find_match COMMAND find_match ../251023_TAGET/ 1)
 
 
 set(CMAKE_BUILD_TYPE Debug)

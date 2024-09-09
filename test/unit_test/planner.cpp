@@ -28,7 +28,7 @@ int main(int argc, char** argv){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);  
             solution={DEFAULT, DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
             simStep=ROBOT_HALFLENGTH*2;
-            solution2=solution;
+            solution={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
         }
         else{
             solution={LEFT, DEFAULT, DEFAULT};

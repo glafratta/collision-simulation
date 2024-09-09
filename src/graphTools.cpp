@@ -17,6 +17,11 @@ b2Transform State::from_disturbance(){
 	return disturbance.pose()-start;
 }
 
+// State State::operator=(const State& s){
+// 	*this=State(s);
+// }
+
+
 float angle_subtract(float a1, float a2){
 	float result = 0;
 	if (fabs(a1)> 3*M_PI_4 || fabs(a2)> 3*M_PI_4){
@@ -30,7 +35,7 @@ float angle_subtract(float a1, float a2){
 	result=a1-a2;
 }
 
-void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
+void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
 	float og_x= pose.p.x, og_y=pose.p.y;
 	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
@@ -39,7 +44,7 @@ void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.p.y-=deltaPose.p.y;
 }
 
-void applyAffineTrans(const b2Transform& deltaPose, State& state){
+void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	applyAffineTrans(deltaPose, state.endPose);
 	if (state.disturbance.getAffIndex()!=NONE){
 		applyAffineTrans(deltaPose, state.disturbance.bf.pose);
@@ -218,26 +223,26 @@ std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescript
 	return result;
 }
 
-bool StateMatcher::match_equal(const MATCH_TYPE& m1, const MATCH_TYPE& m2){
+bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired){
 	bool result=false;
-	switch (m2){ //the desired match
+	switch (desired){ //the desired match
 		case ANY:
-			if (m1!=_FALSE){
+			if (candidate!=_FALSE){
 				result=true;
 			}
 			break;
 		case POSE:
-			if (m1==_TRUE){
+			if (candidate==_TRUE || candidate == POSE){
 				result=true;
 			}
 			break;
 		case DISTURBANCE:
-			if (m1==_TRUE){
+			if (candidate==_TRUE || candidate ==DISTURBANCE){
 				result=true;
 			}
 			break;
 		default:
-			result =int(m1)==int(m2);
+			result =int(candidate)==int(desired);
 		break;
 	}
 	return result;
@@ -308,11 +313,11 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(State s, State candidate, State *
 	StateDifference sd(s, candidate);
 	float stray=0;
 	if (src!=NULL & s.label!=UNDEFINED){
-		float ds= (src->endPose.p -candidate.endPose.p).Length(); //how far is the candidate? determines level of precision
-		b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
+		//float ds= (src->endPose.p -candidate.endPose.p).Length(); //how far is the candidate? determines level of precision
+		//b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
 		stray=(s.endPose.p-src->endPose.p).Length();
 	}
-	if ((stray<error.endPosition|| s.label==candidate.label)){
+	if ((stray>error.endPosition && s.label==candidate.label)){ //
 		sd.r_position.x=10000; // now pose will not be matched
 		sd.r_position.y=10000;
 		sd.r_angle=M_PI;
@@ -375,6 +380,12 @@ void operator-=(Transform & t1, Transform const&t2){
 	t1.p.x-=t2.p.x;
 	t1.p.y-=t2.p.y;
 	t1.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+}
+
+void operator+=(Transform & t1, Transform const&t2){
+	t1.p.x+=t2.p.x;
+	t1.p.y+=t2.p.y;
+	t1.q.Set(t1.q.GetAngle()+t2.q.GetAngle());
 }
 
 Transform operator+(Transform const & t1, Transform const&t2){
