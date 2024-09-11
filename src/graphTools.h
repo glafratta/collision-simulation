@@ -19,16 +19,9 @@
 #include "disturbance.h"
 
 class Task;
-// enum M_CODES {THREE_M=3, FOUR_M=4};
-
-// enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-//typedef std::vector <float> DistanceVector;
-//0: D_x, 1: D_y, 2: D_aff, 3: p_x, 4: p_y, 5:p_angle
-
-
-//typedef std::vector <bool> MatchVector;
+const float D_DIMENSIONS_MARGIN=0.03;
 
 float angle_subtract(float a1, float a2);
 
@@ -104,7 +97,7 @@ namespace math {
 struct StateDifference{
 	b2Vec2 r_position=b2Vec2();
 	float r_angle=0;
-	u_int D_type=0;
+	int D_type=0;
 	b2Vec2 D_position=b2Vec2();
 	float D_angle=0;
 	float D_width=0;
@@ -115,16 +108,6 @@ struct StateDifference{
 	StateDifference( State& s1, State& s2){
 		init(s1, s2);
 	}
-
-	// StateDifference(State s1, State s2, const b2Transform& o1, const b2Transform& o2){
-	// 	//adjsuting s1 to match up
-	// 	b2Transform deltaPose;
-	// 	deltaPose.p.x=s2.endPose.p.x-(s1.endPose.p.x);
-	// 	deltaPose.p.y=s2.endPose.p.y-(s1.endPose.p.y);
-	// 	deltaPose.q.Set(angle_subtract(s2.endPose.q.GetAngle(), s1.endPose.q.GetAngle()));
-	// 	applyAffineTrans(deltaPose, s1);
-	// 	init(s1, s2);
-	// }
 
 	float sum(){
 		return sum_r()+sum_d_pos()+sum_d_shape();
@@ -140,6 +123,10 @@ struct StateDifference{
 
 	float sum_d_shape(){
 		return fabs(D_width)+fabs(D_length);
+	}
+
+	float sum_d(){
+		return sum_d_pos()+sum_d_shape();
 	}
 
 	void init(State& s1, State& s2);
@@ -309,7 +296,7 @@ class StateMatcher{
 			const float angle= M_PI/6;
 			const float dPosition= 0.065;//0.065; 
 			const float affordance =0;
-			const float D_dimensions=0.03;
+			const float D_dimensions=D_DIMENSIONS_MARGIN;
 		}error;
 
 		float mu=0.001;
@@ -340,7 +327,7 @@ class StateMatcher{
 			// 	return d_shape && d_type;
 			// }
 
-			StateMatch (const StateDifference& sd, StateMatcher::Error error, float coefficient=0){
+			StateMatch (const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
 				r_angle=fabs(sd.r_angle)<error.angle;
 				d_type=sd.D_type==0;
@@ -395,6 +382,8 @@ class StateMatcher{
 		//std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
 
 		//std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
+
+		float get_coefficient(const float &);
 	private:
 
 

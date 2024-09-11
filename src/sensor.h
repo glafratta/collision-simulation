@@ -7,9 +7,6 @@
 class ConfiguratorInterface;
 class Configurator;
 
-template <class C>
-std::vector <C> arrayToVec(C*, int);
-
 class Pointf: public cv::Point2f{
 	public: 
 
@@ -47,20 +44,6 @@ bool operator <(Pointf const &, Pointf const&);
 bool operator >(const Pointf&,  const Pointf&);
 
 typedef std::set<Pointf> CoordinateContainer;
-
-struct CompareY{
-	template <typename T>
-    bool operator() ( T a, T b ){ //
-        return a.y <=b.y;
-	}
-}; 
-
-struct CompareX{
-	bool operator()(cv::Point2f a, cv::Point2f b){
-		return a.x<=b.x;
-	}
-};
-
 
 
 b2Vec2 getb2Vec2(cv::Point2f );

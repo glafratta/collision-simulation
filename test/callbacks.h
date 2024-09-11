@@ -166,26 +166,13 @@ public:
     }
 };
 
-// std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-//     int count =0;
-// 	//buildType =2;
-//     std::vector <BodyFeatures> result;
-//     for (Pointf p: points){
-//         if (count%2==0){
-//             BodyFeatures feature;
-//             feature.pose.p = getb2Vec2(p); 
-//             result.push_back(feature);  
-//         }
-//         count++;
-//     }
-//     return result;
-// }
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
     std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
     if (feature.first){
+        feature.second.pose.q.Set(start.q.GetAngle());
         result.push_back(feature.second);
     }
     return result;

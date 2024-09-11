@@ -1,10 +1,33 @@
 #ifndef DISTURBANCE_H
 #define DISTURBANCE_H
 #include "settings.h"
-#include "sensor.h"
 #include "robot.h"
-//#include "opencv2/opencv.hpp"
+#include <algorithm>
 #include <stdexcept>
+
+struct CompareY{
+	template <typename T>
+    bool operator() ( T a, T b ){ //
+        return a.y <=b.y;
+	}
+}; 
+
+struct CompareX{
+    template <typename T>
+	bool operator()(T a, T b){
+		return a.x<=b.x;
+	}
+};
+
+template <typename C>
+std::vector <C> arrayToVec(C* c, int ct){
+	std::vector <C> result;
+	for (int i=0; i<ct; i++){
+		result.push_back(*c);
+		c++;
+	}
+	return result;
+}
 
 class Configurator;
 //class StateMatcher;
@@ -36,7 +59,7 @@ struct Disturbance{ //this generates error
 friend Configurator;
 friend struct StateMatcher;
 private:
-    AffordanceIndex affordanceIndex = 0; //not using the enum because in the future we might want to add more affordances
+    AffordanceIndex affordanceIndex = NONE; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
     bool rotation_valid=0;    
 
@@ -90,14 +113,15 @@ public:
     }   
 
     Disturbance(BodyFeatures _bf): bf(_bf){
-        valid=1;
-        affordanceIndex=AVOID;
+       // valid=1;
+        affordanceIndex=1;
     } 
 
     Disturbance(b2Body* b){
-        bf.pose=b->GetTransform();
+        bf.pose=b->GetTransform(); //global
         b2Fixture* fixture =b->GetFixtureList();
         bf.shape=(fixture->GetShape()->GetType());
+        valid=1;
         if (bf.shape==b2Shape::e_polygon){
             b2PolygonShape * poly=(b2PolygonShape*)fixture->GetShape();
             std::vector<b2Vec2> vertices=arrayToVec(poly->m_vertices, poly->m_count);
@@ -107,9 +131,10 @@ public:
             float miny=(std::min_element(vertices.begin(), vertices.end(), compareY)).base()->y;
             float maxx=(std::max_element(vertices.begin(), vertices.end(), compareX)).base()->x;
             float maxy=(std::max_element(vertices.begin(), vertices.end(), compareY)).base()->y;
-            bf.halfLength=(fabs(maxx-minx))/2;
-            bf.halfWidth=(fabs(maxy-miny))/2;
+            bf.halfLength=(fabs(maxy-miny))/2; //local coordinates
+            bf.halfWidth=(fabs(maxx-minx))/2;
         }
+        affordanceIndex=1;
     }
 
     float getAngle(b2Transform);

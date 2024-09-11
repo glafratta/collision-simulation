@@ -53,18 +53,42 @@ void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 }
 
 
-void StateDifference::init(State& s1, State& s2){
+void StateDifference::init(State& s1, State& s2){ //observed, desired
+	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+	if (s1.disturbance.getAffIndex()==NONE && s2.disturbance.getAffIndex()==NONE){
+		return;
+	}
+	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex();
+	if (D_type!=0){
+		// if (s2.disturbance.getAffIndex()==PURSUE){
+		// 	D_position.x= s1.endPose.p.x-s2.disturbance.bf.pose.p.x; //endpose x
+		// 	D_position.y=s1.endPose.p.y-s2.disturbance.bf.pose.p.y; //endpose y
+		// 	D_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.disturbance.bf.pose.q.GetAngle());
+		// 	D_type=0;
+		// 	return;
+		// }
+		D_position.x=10000;
+		D_position.y=10000;
+		D_angle=M_PI;
+		D_width=10000;
+		D_length=10000;
+		return;
+	}
 	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
 	D_position.x= d1.p.x - d2.p.x; //disturbance x
 	D_position.y= d1.p.y - d2.p.y; //disturbance y
 	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
-	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
-	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
+	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
+	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;
+	// 		D_length=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfLength)*2;
+	// 		return;
+	// }
 	D_angle=angle_subtract(d1.q.GetAngle(), d2.q.GetAngle());
 	D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
 	D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
-
 	}
 
 
@@ -287,26 +311,8 @@ bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& de
 
 
 StateMatcher::MATCH_TYPE StateMatcher::isMatch(StateDifference sd, float endDistance){
-	float coefficient=1.0;
-	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
-		coefficient*=scale*1.2; //it's a bit high but need for debugging
-	}
-   // MATCH_TYPE result =_FALSE;
-	//bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);
-	//bool angleMatch = fabs(vec[5])<error.angle;
-	//bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<(error.dPosition*coefficient);
-	//bool affordanceMatch = vec[2]==error.affordance;
+	float coefficient=get_coefficient(endDistance);
 	StateMatcher::StateMatch match(sd, error, coefficient);
-    // if (match.exact()){ //match position and disturbance
-    //     result=_TRUE;
-    // }
-	// else if (match.pose()){
-	// 	result=POSE;
-	// }
-	// else if (match.disturbance_exact()){
-	// 	result=DISTURBANCE;
-	// }
     return match.what();
 }
 
@@ -315,8 +321,6 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(State s, State candidate, State *
 	StateDifference sd(s, candidate);
 	float stray=0;
 	if (src!=NULL & s.label!=UNDEFINED){
-		//float ds= (src->endPose.p -candidate.endPose.p).Length(); //how far is the candidate? determines level of precision
-		//b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
 		stray=(s.endPose.p-src->endPose.p).Length();
 	}
 	if ((stray>error.endPosition && s.label==candidate.label)){ //
@@ -344,6 +348,15 @@ std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> StateMatcher::match_vertex
 		}
 	}
     return result;
+}
+
+float StateMatcher::get_coefficient(const float & endDistance){
+	float coefficient=1.0;
+	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
+		coefficient*=scale*1.2; //it's a bit high but need for debugging
+	}
+	return coefficient;
 }
 
 

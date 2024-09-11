@@ -5,16 +5,17 @@
 #include <filesystem>
 #include <ncurses.h>
 #include <fstream>
-#include "worldbuilder.h"
+//#include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include "debug.h"
+
 //FOR DEBUG
-namespace debug{
+//namespace debug{
 	
-template <class T>
-void graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor>, vertexDescriptor);
-}
+// template <class T>
+// void graph_file(int it, T& g, Disturbance goal, std::vector <vertexDescriptor>, vertexDescriptor);
+// }
 //
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};

@@ -152,21 +152,22 @@ bool Configurator::Spawner(){
 				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
-			been= been_there(transitionSystem, where); 
+			//been= been_there(transitionSystem, where); 
 		}
-		printf("checked been = %i\n", been.first);
+		//printf("checked been = %i\n", been.first);
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
-		if (been.first){
+	//	if (been.first){
 		//	printf("provisional plan\n");
 			for (auto o:options_src){
-				plan_provisional=planner(transitionSystem, o, been.second, been.first);
-				if (*(plan_provisional.rbegin().base()-1) ==been.second){
+				plan_provisional=planner(transitionSystem, o); //been.second, been.first
+				vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
+				if (controlGoal.checkEnded(transitionSystem[end]).ended){
 					break;
 				}
 			}
-		}
+	//	}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
 		//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
@@ -424,7 +425,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	//Direction direction= t.direction;
-	Direction direction=g[currentEdge].direction;
+	Direction direction=currentTask.direction;
 	std::vector <vertexDescriptor> priorityQueue = {bestNext};
 	std::vector <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
@@ -1328,34 +1329,34 @@ std::pair <bool, vertexDescriptor> Configurator::been_there(TransitionSystem & g
 	float best_prob=0;
 	auto vs=boost::vertices(g);
 	for (auto vi=vs.first; vi!=vs.second; vi++ ){
-		//b2Transform difference= g[*vi].endPose-target.disturbance.pose();
-		StateDifference sd;
-		if (target.getAffIndex()==PURSUE){
-			//smallest difference to target position
-			sd.r_position.x= g[*vi].endPose.p.x-target.pose().p.x;
-			sd.r_position.y =g[*vi].endPose.p.y-target.pose().p.y;
-			sd.r_angle =g[*vi].endPose.q.GetAngle()-target.pose().q.GetAngle();
-		}
-		else{
+		// if (target.getAffIndex()==PURSUE){
+		// 	//smallest difference to target position
+		// 	// sd.D_position.x= g[*vi].endPose.p.x-target.pose().p.x;
+		// 	// sd.D_position.y =g[*vi].endPose.p.y-target.pose().p.y;
+		// 	// sd.D_angle = angle_subtract(g[*vi].endPose.q.GetAngle(), target.pose().q.GetAngle());
+		// }
+		if (target.getAffIndex()==NONE){
 			//b2Transform reference;
 			b2Vec2 reference = g[movingVertex].endPose.p-controlGoal.start.p;
 			//reference.q.Set(reference.q.GetAngle()- g[movingVertex].endPose.q.GetAngle());
 			float remaining= BOX2DRANGE-SignedVectorLength(reference);
-			b2Transform virtual_target;
-			virtual_target.p.x=remaining *cos(g[*vi].endPose.q.GetAngle());
-			virtual_target.p.y=remaining*sin(g[*vi].endPose.q.GetAngle());
-			virtual_target.q.Set((g[*vi].endPose.q.GetAngle()));
-			sd.r_position.x=g[*vi].endPose.p.x-virtual_target.p.x;
-			sd.r_position.y =g[*vi].endPose.p.y-virtual_target.p.y;
-			sd.r_angle =g[*vi].endPose.q.GetAngle()-virtual_target.q.GetAngle();
+			target.bf.pose.p.x=remaining *cos(g[*vi].endPose.q.GetAngle());
+			target.bf.pose.p.y=remaining*sin(g[*vi].endPose.q.GetAngle());
+			target.bf.pose.q.Set((g[*vi].endPose.q.GetAngle()));
+			// sd.r_position.x=g[*vi].endPose.p.x-target_pose.p.x;
+			// sd.r_position.y =g[*vi].endPose.p.y-target_pose.p.y;
+			// sd.r_angle =g[*vi].endPose.q.GetAngle()-target_pose.q.GetAngle();
 		}
-		float sum=sd.sum_r();
+		State s_target;
+		s_target.disturbance=target;
+		StateDifference sd(g[*vi], s_target);
+		float sum=sd.sum_d_pos();
 		auto in_edges = gt::inEdges(g, *vi);
 		auto most_likely_edge=gt::getMostLikely(g, in_edges, iteration);
 		printf("got likely edge of %i, %i, %i -> %i tot edges =%i\n",*vi, most_likely_edge.first, most_likely_edge.second.m_source, most_likely_edge.second.m_target, in_edges.size());
 		float prob= 0;
 		if (most_likely_edge.first ){
-			prob=g[most_likely_edge.second].weighted_probability(iteration);
+			prob=g[most_likely_edge.second].probability;//.weighted_probability(iteration);
 			printf("set prob for %i:  %f\n", *vi, prob);
 		}
 		if (StateMatcher::StateMatch sm(sd, matcher.error); sm.disturbance_exact() & (sum<best.first || (sum==best.first & prob>best_prob))){
@@ -1586,8 +1587,9 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
-		StateDifference sd;
-		if (auto m= matcher.isMatch(s, g[v], src, &sd); matcher.match_equal(m, match_type) && v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
+		StateDifference sd(s, g[v]);
+		auto m= matcher.isMatch(s, g[v], src, &sd);
+		if ( matcher.match_equal(m, match_type) && v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
 			if (NULL!=others){
 				others_set.emplace(std::pair< vertexDescriptor, float>(v, sd.sum()));

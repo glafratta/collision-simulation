@@ -1,15 +1,5 @@
 #include "sensor.h"
 
-template <class C>
-std::vector <C> arrayToVec(C* c, int ct){
-	std::vector <C> result;
-	for (int i=0; i<ct; i++){
-		result.push_back(*c);
-		c++;
-	}
-	return result;
-}
-
 bool Pointf::isin(Pointf tl, Pointf br){
 	bool result= this->x>tl.x & this->x<br.x & this->y>br.y& this->y<tl.y;
 	return result;

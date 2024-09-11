@@ -3,8 +3,15 @@
 int main(int argc, char** argv){
     bool debug=0;
     Disturbance target1;
+    vertexDescriptor solution=TransitionSystem::null_vertex();
     if (argc>2){
-        if (atoi(argv[2])==1){
+        solution=vertexDescriptor(atoi(argv[2]));
+    }
+    else{
+        throw;
+    }
+    if (argc>3){
+        if (atoi(argv[3])==1){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);    
         }
     }
@@ -25,24 +32,24 @@ int main(int argc, char** argv){
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     std::vector <vertexDescriptor> options_src;
-    std::vector <vertexDescriptor>* options_ptr=&options_src;
     State state_tmp;
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
     conf.updateGraph(conf.transitionSystem, ExecutionError(), &shift);
+    
     if (argc>4){
-        di.folder=argv[3];
         di.iteration=atoi(argv[4]);
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
-    std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(ci.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
-    state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
-    conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, options_ptr);
-
+    std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
+    if (!b_features.empty()){
+        state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+    }
+    conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
     if (options_src.empty()){
         return 1;
     }
-    if (options_src[0]!=2){
+    if (options_src[0]!=solution){
         return 1;
     }
     return 0;

@@ -42,8 +42,8 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			theta += action.getOmega()/HZ; //= omega *t
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				Disturbance collision = Disturbance(1, listener.collisions[index]);
-				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
+				Disturbance collision = Disturbance(listener.collisions[index]);
+				//b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
 				stepb2d=0;
 				break;
@@ -152,7 +152,6 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	switch(disturbance.getAffIndex()){
 		case PURSUE:{
 			endCriteria.angle=Angle(0);
-			//endCriteria.angle.setValid(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
@@ -264,6 +263,20 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	r = checkEnded(n.endPose, dir, relax, use_start);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
+}
+
+EndCriteria Task::getEndCriteria(const Disturbance &d){
+	EndCriteria endCriteria;
+	switch(disturbance.getAffIndex()){
+	case PURSUE:{
+		endCriteria.angle=Angle(0);
+		endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
+	}
+	break;
+	default:
+	endCriteria.distance = BOX2DRANGE;
+	break;
+}
 }
 
 

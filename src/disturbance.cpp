@@ -11,6 +11,16 @@
 //         angleToRobot = acos(cosA);
 //     }
 
+// template <typename C>
+// std::vector <C> arrayToVec(C* c, int ct){
+// 	std::vector <C> result;
+// 	for (int i=0; i<ct; i++){
+// 		result.push_back(*c);
+// 		c++;
+// 	}
+// 	return result;
+// }
+
 float Disturbance::getAngle(b2Transform t){ //gets the angle of an Disturbance wrt to another Disturbance (robot)
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2
         float angle;

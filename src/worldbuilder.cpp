@@ -1,12 +1,12 @@
 #include "worldbuilder.h"
 
 std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength){
-    float halfWindowWidth=0.1;
+    float halfWindowWidth=0.15; //wa .1
     std::pair <Pointf, Pointf>result;
     if (d !=DEFAULT & d!=BACK){
         boxLength =ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X; //og 16 cm
         result.first =Pointf(start.p.x-boxLength, start.p.y-boxLength);
-        result.first =Pointf(start.p.x+boxLength, start.p.y+boxLength);
+        result.second =Pointf(start.p.x+boxLength, start.p.y+boxLength);
     }
     else{
         Pointf positionVector, radiusVector, maxFromStart, top, bottom; 
@@ -29,7 +29,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb){//gets bounding box of points
-    float  h=(0.0005*2), w=(0.0005*2) ;
+    float  l=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
     // b2Transform pose;
@@ -48,14 +48,11 @@ std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb)
         w= fabs((*maxx).x-(*minx).x);
     }
     if (miny->y!=maxy->y){
-        h=fabs((*maxy).y-(*miny).y);
+        l=fabs((*maxy).y-(*miny).y);
     }
     x_glob= ((*maxx).x+(*minx).x)/2;
     y_glob= ((*maxy).y+(*miny).y)/2;
-    // x_loc= x_glob -(*maxx).x;
-    // y_loc=y_glob +(*miny).y;
-    // rect=cv::Rect2f(x_loc, y_loc, w, h);
-    result.second.halfLength=h/2;
+    result.second.halfLength=l/2;
     result.second.halfWidth=w/2;
     result.second.pose.p=b2Vec2(x_glob, y_glob);
     result.first=true;
@@ -73,7 +70,7 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
             b2PolygonShape fixture; 
             fixtureDef.shape = &fixture;             
             fixture.SetAsBox(features.halfWidth, features.halfLength); 
-	        body->CreateFixture(fixtureDef.shape, features.shift);
+            body->CreateFixture(fixtureDef.shape, features.shift);
             break;
         }
         case b2Shape::e_edge:{ //straight edge
@@ -144,7 +141,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
-    features =processData(salient.first);
+    features =processData(salient.first, start);
     return features;
 }
 

@@ -21,24 +21,28 @@ int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
     bool debug=0;
     Disturbance target1;
-    std::vector <Direction> solution={DEFAULT, DEFAULT}, solution2=solution;
+    std::vector <Direction> solution={DEFAULT, DEFAULT}, solution2=solution, solution3=solution;
     float simStep=0.5;
     if (argc>2){
         if (atoi(argv[2])==1){
+            debug=1;
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);  
             solution={DEFAULT, DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
             simStep=ROBOT_HALFLENGTH*2;
             solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
+            solution3={LEFT, DEFAULT, RIGHT,  DEFAULT,  DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
         }
         else{
             solution={LEFT, DEFAULT, DEFAULT};
             solution2={RIGHT, DEFAULT, DEFAULT};
+            solution3=solution;
         }
     }
     Task goal(target1,DEFAULT);
     Configurator conf(goal);
     conf.setSimulationStep(simStep);
     ConfiguratorInterface ci;
+    conf.debugOn=debug;
     conf.registerInterface(&ci);
     DataInterface di(&ci);
     if (argc>1){
@@ -53,8 +57,8 @@ int main(int argc, char** argv){
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
     std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
-    if (plan_d!=solution & plan_d !=solution2){
-        conf.printPlan(&plan);
+    conf.printPlan(&plan);
+    if (plan_d!=solution & plan_d !=solution2 &plan_d!=solution3){
         return 1;
     }
     return 0;

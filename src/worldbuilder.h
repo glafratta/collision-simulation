@@ -3,7 +3,6 @@
 #include "sensor.h"
 
 
-
 class WorldBuilder{
     int bodies=0;
     public:
@@ -16,7 +15,7 @@ class WorldBuilder{
                                                                                                                                         //std::pair<points, obstaclestillthere>
     void makeBody(b2World&, BodyFeatures);
 
-    std::vector <BodyFeatures> processData(CoordinateContainer);
+    std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
