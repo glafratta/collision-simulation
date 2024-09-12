@@ -16,7 +16,7 @@ find_package(Threads)
 
 
 message("making simulation test cases")
-add_executable(targetless_sim callbacks.h targetless.cpp)
+add_executable(targetless_sim callbacks.h targetless_sim.cpp)
 add_executable(target_sim callbacks.h target_sim.cpp)
 add_executable(loop_RT callbacks.h loop_RT.cpp)
 add_executable(loop_sim callbacks.h loop_sim.cpp)
