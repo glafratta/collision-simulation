@@ -14,7 +14,7 @@ Disturbance set_target(int &run, b2Transform start){
 	return result;
 }
 void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
-	
+
 }
 
 int main(int argc, char** argv) {
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	configurator.planning=1;
 	char name[60];
 	sprintf("targetless_forget_%s", get_Foldername());
-	configurator.setBenchmarking(1), name;
+	configurator.setBenchmarking(1, name);
 
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
