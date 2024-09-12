@@ -1,4 +1,7 @@
 #include "custom.h"
+void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
+
+}
 
 int main(int argc, char** argv) {
 	A1Lidar lidar;
