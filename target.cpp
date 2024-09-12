@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 	}
-	configurator.simulationStep = atof(.27);
+	configurator.setSimulationStep(.27);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);
