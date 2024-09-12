@@ -31,6 +31,16 @@ class FakeLidar: public CppTimer{
 };
 
 
+void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
+
+}
+
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
 
 int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps

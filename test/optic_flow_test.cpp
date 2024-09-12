@@ -22,6 +22,17 @@ public:
     }
 };
 
+
+void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
+
+}
+
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
 float Configurator::taskRotationError(){
     float error=0, theta_left=0, theta_right=0; //difference in rotation between left and right visual field
     //get Left

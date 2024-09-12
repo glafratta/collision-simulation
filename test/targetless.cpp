@@ -1,4 +1,16 @@
 #include "callbacks.h"
+
+
+void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
+
+}
+
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
 int main(int argc, char** argv) {
     //BENCHMARK
 //	auto begin = std::chrono::high_resolution_clock::now();
