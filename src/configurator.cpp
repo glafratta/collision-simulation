@@ -128,7 +128,7 @@ bool Configurator::Spawner(){
 	// 		//been= been_there(transitionSystem, where); 
 	// 	}
 	// 	//printf("checked been = %i\n", been.first);
-	// 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);

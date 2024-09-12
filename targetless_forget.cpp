@@ -2,7 +2,7 @@
 #include "custom.h"
 
 void forget(Configurator *c){
-	c->transitionSystem.clear();
+	//c->transitionSystem.clear();
 }
 
 Disturbance set_target(int &run, b2Transform start){
@@ -12,6 +12,9 @@ Disturbance set_target(int &run, b2Transform start){
 		run++;
 	}
 	return result;
+}
+void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
+	
 }
 
 int main(int argc, char** argv) {

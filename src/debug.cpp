@@ -1,4 +1,4 @@
-// #include "debug.h"
+ #include "debug.h"
 
 // template <class T>
 // void debug::graph_file(const int& it,const T& g, const Disturbance& goal, const std::vector <vertexDescriptor> &plan, const vertexDescriptor& c){
@@ -47,3 +47,8 @@
 // 	}
 //     os.flush();
 // }
+
+b2Vec2 GetWorldPoints(b2Body* b, b2Vec2 v){
+	b2Vec2 wp=b->GetWorldPoint(v);
+	printf("x=%f, y=%f\t", wp.x, wp.y);
+}
