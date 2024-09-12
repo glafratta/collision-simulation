@@ -31,9 +31,6 @@ class FakeLidar: public CppTimer{
 };
 
 
-void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
-
-}
 
 Disturbance set_target(int& run, b2Transform start){
 
