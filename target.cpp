@@ -49,6 +49,9 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.planning =1;
+	char name[60];
+	sprintf("target_%s", get_Foldername());
+	configurator.setBenchmarking(1, name);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
