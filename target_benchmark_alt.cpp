@@ -29,6 +29,9 @@ std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points)
 void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& world, std::vector<vertexDescriptor> &plan_provisional){
 
 }
+Disturbance set_target(int& run, b2Transform start){
+
+}
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;

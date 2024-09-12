@@ -6,6 +6,10 @@ void Configurator::done_that(vertexDescriptor& src, bool& plan_works, b2World& w
 
 }
 
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
 int main(int argc, char** argv) {
 	A1Lidar lidar;
 	AlphaBot motors;

@@ -11,6 +11,10 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
 std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
     int count =0;
 	buildType=2;
