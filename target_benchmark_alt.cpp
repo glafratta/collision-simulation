@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
 	configurator.graphConstruction = A_STAR;
 	char name[60];
 	sprintf("target_alt_%s", get_Foldername());
-	configurator.setBenchmarking(1), name;
+	configurator.setBenchmarking(1, name);
 	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);

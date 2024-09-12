@@ -30,15 +30,17 @@ void forget(Configurator*);
 
 Disturbance set_target(int&, b2Transform);
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
     std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
     if (feature.first){
+        feature.second.pose.q.Set(start.q.GetAngle());
         result.push_back(feature.second);
     }
     return result;
 }
+
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
