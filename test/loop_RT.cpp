@@ -43,7 +43,6 @@ char* get_Foldername(){
     char name[60];
 	sprintf(name, "RT_loop_%02i%02i%02i_%02i%02i.txt",d,m,y,h,min);
     return name;
-
 }
 
 

@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 		configurator.debugOn= atoi(argv[1]);
 	}
 	if (argc>2){
-		configurator.simulationStep = atof(argv[2]);
+		configurator.setSimulationStep(.50);
 	}
 	printf("CHASING A TARGET\n");
 	LidarInterface dataInterface(&configuratorInterface);

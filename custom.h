@@ -12,6 +12,20 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+char* get_Foldername(){
+    time_t now =time(0);
+	tm *ltm = localtime(&now);
+	int y,m,d, h, min;
+	y=ltm->tm_year-100;
+	m = ltm->tm_mon +1;
+	d=ltm->tm_mday;
+	h= ltm->tm_hour;
+	min = ltm->tm_min;
+    char name[60];
+	sprintf(name, "%02i%02i%02i_%02i%02i.txt",d,m,y,h,min);
+    return name;
+}
+
 void forget(Configurator*);
 
 Disturbance set_target(int&, b2Transform);

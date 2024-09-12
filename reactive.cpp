@@ -12,9 +12,7 @@ int main(int argc, char** argv) {
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 	}
-	if (argc>2){
-		configurator.simulationStep = atof(argv[2]);
-	}
+	configurator.setSimulationStep(.5);
 	configurator.worldBuilder.simulationStep = configurator.simulationStep;
 	printf("REACTIVE NAVIGATION\n");
 	LidarInterface dataInterface(&configuratorInterface);

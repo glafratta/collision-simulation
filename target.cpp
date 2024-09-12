@@ -15,9 +15,7 @@ int main(int argc, char** argv) {
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 	}
-	if (argc>2){
-		configurator.simulationStep = atof(argv[2]);
-	}
+	configurator.simulationStep = atof(.27);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);

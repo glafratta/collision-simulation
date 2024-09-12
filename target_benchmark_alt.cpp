@@ -144,16 +144,16 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.numberOfM = THREE_M;
 	configurator.graphConstruction = A_STAR;
-	configurator.setBenchmarking(1);
+	char name[60];
+	sprintf("target_alt_%s", get_Foldername());
+	configurator.setBenchmarking(1), name;
 	configurator.planning =1;
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 		configurator.worldBuilder.debug = atoi(argv[1]);
 	}
-	if (argc>2){
-		configurator.setSimulationStep(atof(argv[2]));
-	}
+	configurator.setSimulationStep(.27);
 	printf("debug on = %i, planning on = %i\n", configurator.debugOn, configurator.planning);
 	printf("box2drange = %f\n", BOX2DRANGE);
 	LidarInterface dataInterface(&configuratorInterface);

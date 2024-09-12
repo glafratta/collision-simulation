@@ -21,16 +21,16 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.planning=1;
-	configurator.setBenchmarking(1);
+	char name[60];
+	sprintf("targetless_forget_%s", get_Foldername());
+	configurator.setBenchmarking(1), name;
+
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
 		printf("debug = %i\n", atoi(argv[1]));
 	}
-	if (argc>2){
-		configurator.simulationStep = atof(argv[2]);
-	}
-	printf("TARGETLESS PLANNING, hz=%f, turn f=%f yallaaaaa", HZ, TURN_FRICTION);
+	configurator.setSimulationStep(.5);
 	LidarInterface dataInterface(&configuratorInterface);
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);
