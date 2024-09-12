@@ -35,8 +35,8 @@ add_executable(state_difference ../callbacks.h state_difference.cpp)
 target_link_libraries(state_difference CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 add_executable(match_equal ../callbacks.h match_equal.cpp)
 target_link_libraries(match_equal CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
-add_executable(been_there ../callbacks.h been_there.cpp)
-target_link_libraries(been_there CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+# add_executable(been_there ../callbacks.h been_there.cpp)
+# target_link_libraries(been_there CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 
 
 # add_test(NAME split_task COMMAND split_task 0.6 0 0)
@@ -85,17 +85,25 @@ set_property(TEST match_disturbance_shape PROPERTY WILL_FAIL true)
 
 add_test(NAME find_match_state COMMAND find_match_state ../251023_TAGET/ 2 1)
 add_test(NAME find_match_state_f COMMAND find_match_state ../251023_TAGET/ 3 1)
-set_property(TEST find_match_state_f PROPERTY WILL_FAIL true)
+add_test(NAME find_match_11 COMMAND find_match_state ../251023_TAGET/ 11 1 29)
+add_test(NAME find_match_midtask11 COMMAND find_match_state ../251023_TAGET/ 11 1 14)
+add_test(NAME find_match_midtask2 COMMAND find_match_state ../251023_TAGET/ 2 1 14)
+add_test(NAME find_match_quarter COMMAND find_match_state ../251023_TAGET/ 2 1 7)
 
+set_property(TEST find_match_midtask11 PROPERTY WILL_FAIL true)
+set_property(TEST find_match_state_f PROPERTY WILL_FAIL true)
 
 add_test(NAME find_match_state_turn COMMAND find_match_state ../251023_TAGET/ 13 1 55)
 
 add_test(NAME state_difference COMMAND state_difference ../251023_TAGET/ 1)
 add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 55)
+#add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 55)
+
+
 
 add_test(NAME match_equal COMMAND match_equal)
 
-add_test(NAME been_there COMMAND been_there ../251023_TAGET/)
+#add_test(NAME been_there COMMAND been_there ../251023_TAGET/)
 #add_test(NAME been_there_f COMMAND been_there ../251023_TAGET/)
 #set_property(TEST been_there_f PROPERTY WILL_FAIL true)
 

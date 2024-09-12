@@ -80,7 +80,6 @@ bool Configurator::Spawner(){
 	auto now =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>diff= now - previousTimeScan; //in seconds
 	timeElapsed=float(diff.count())/1000; //express in seconds
-	//totalTime += timeElapsed; //for debugging
 	previousTimeScan=now; //update the time of sampling
 
 	if (timerOff){
@@ -91,34 +90,6 @@ bool Configurator::Spawner(){
 	b2Vec2 gravity = {0.0, 0.0};
 	b2World world= b2World(gravity);
 	char name[256];
-
-	//CALCULATE VELOCITY 
-//	taskRotationError(); //to remove
-	// b2Transform velocity;
-	//  if (currentTask.action.getOmega()==0){
-	// 	float dataRange=0.25;
-	//  	velocity= sensorProc->affineTransEstimate(std::vector <Pointf>(data.begin(), data.end()), currentTask.action, timeElapsed, dataRange);
-	// 	//GetRealVelocity(current, previous); //closed loop, sensor feedback for velocity
-	//  }
-	// else{
-	// 	velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
-	// }
-	// currentTask.action.setRecSpeed(SignedVectorLength(velocity.p));
-	// currentTask.action.setRecOmega(velocity.q.GetAngle());
-	//float rotation_Error=taskRotationError();
-	//IF WE  ALREADY ARE IN AN OBSTACLE-AVOIDING STATE, ROUGHLY ESTIMATE WHERE THE OBSTACLE IS NOW
-	//bool isObstacleStillThrere = worldBuilder.buildWorld(world, currentBox2D, currentTask.start, currentTask.direction, &currentTask).first;
-	
-	
-	// if (controlGoal.change){
-	// 	Disturbance loopD(PURSUE, -(ogGoal.p));
-	// 	controlGoal=Task(loopD,DEFAULT);
-	// }
-
-
-	//CHECK IF WITH THE CURRENT currentTask THE ROBOT WILL CRASH
-	// simResult result;
-	//Direction dir;
 
 	auto startTime =std::chrono::high_resolution_clock::now();
 	bool explored=0;
@@ -149,6 +120,7 @@ bool Configurator::Spawner(){
 			if (!b_features.empty()){
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
@@ -160,16 +132,18 @@ bool Configurator::Spawner(){
 		std::vector <vertexDescriptor> plan_provisional=planVertices;
 	//	if (been.first){
 		//	printf("provisional plan\n");
-			for (auto o:options_src){
-				plan_provisional=planner(transitionSystem, o); //been.second, been.first
-				vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
-				if (controlGoal.checkEnded(transitionSystem[end]).ended){
-					break;
-				}
+		bool plan_works=false;
+		for (auto o:options_src){
+			plan_provisional=planner(transitionSystem, o); //been.second, been.first
+			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
+			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
+				plan_works=true;
+				break;
 			}
+		}
 	//	}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
-		bool plan_works=checkPlan(world, plan_provisional, transitionSystem);
+		
 		//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 		if (!plan_provisional.empty() || plan_works){	//		
 			planVertices=plan_provisional;
@@ -182,7 +156,7 @@ bool Configurator::Spawner(){
 			planVertices.clear();
 			boost::clear_vertex(movingVertex, transitionSystem);
 			if (!plan_works){
-				dummy_vertex(currentVertex);//currentEdge.m_source
+				//dummy_vertex(currentVertex);//currentEdge.m_source
 			}
 			currentTask.change=1;
 			// if (!planVertices.empty()){
@@ -222,7 +196,7 @@ bool Configurator::Spawner(){
 	auto endTime =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
  	duration=abs(float(d.count())/1000); //express in seconds
-	printf("took %f seconds\n", duration);
+	//printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
 		if (explored){
@@ -232,7 +206,7 @@ bool Configurator::Spawner(){
 		fclose(f);
 	}
 	worldBuilder.resetBodies();
-	printf("end explor\n");
+	//printf("end explor\n");
 	return 1;
 }
 
@@ -1575,10 +1549,10 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 // 	return result;
 // }
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor> * others){
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor> * others, bool relax){
 	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::MATCH_TYPE::_FALSE, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
-	float prob=0;
+	float prob=0, sum=10000;
 	//need to find best match too
 	ComparePair comparePair;
 	std::set <std::pair <vertexDescriptor, float>, ComparePair>others_set(comparePair);
@@ -1588,14 +1562,32 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		StateDifference sd(s, g[v]);
-		auto m= matcher.isMatch(s, g[v], src, &sd);
-		if ( matcher.match_equal(m, match_type) && v!=movingVertex &Tmatch & boost::in_degree(v, g)>0){ 
+		bool condition=0;
+		StateMatcher::MATCH_TYPE m;
+		float sum_tmp=sd.get_sum(match_type);
+		if (!relax){
+			m= matcher.isMatch(s, g[v], src, &sd);
+			condition=matcher.match_equal(m, match_type);
+		}
+		else{
+			condition= sum_tmp<sum;
+		}
+		if ( condition&& v!=movingVertex && boost::in_degree(v, g)>0 &&Tmatch ){ 
+			sum=sum_tmp;
 			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
 			if (NULL!=others){
-				others_set.emplace(std::pair< vertexDescriptor, float>(v, sd.sum()));
+				others_set.emplace(std::pair< vertexDescriptor, float>(v, sum));
 			}
-			if (most_likely.first && g[most_likely.second].probability>prob){
-				result.first= m;
+			if (g[most_likely.second].it_observed<1){
+				
+			}
+			else if (most_likely.first &&g[most_likely.second].probability>prob){
+				if (!relax){
+					result.first= m;
+				}
+				else{
+					result.first=match_type;
+				}
 				result.second=v;
 				prob=g[most_likely.second].probability;
 				

@@ -31,6 +31,20 @@ class FakeLidar: public CppTimer{
     }
 };
 
+char* get_Foldername(){
+    time_t now =time(0);
+	tm *ltm = localtime(&now);
+	int y,m,d, h, min;
+	y=ltm->tm_year-100;
+	m = ltm->tm_mon +1;
+	d=ltm->tm_mday;
+	h= ltm->tm_hour;
+	min = ltm->tm_min;
+    char name[60];
+	sprintf(name, "RT_loop_%02i%02i%02i_%02i%02i.txt",d,m,y,h,min);
+    return name;
+
+}
 
 
 int main(int argc, char** argv){
@@ -40,7 +54,7 @@ int main(int argc, char** argv){
     bool debug=1;
     Configurator conf(controlGoal, debug);
     conf.simulationStep=0.5;
-    conf.setBenchmarking(1);
+    conf.setBenchmarking(1, get_Foldername());
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
     DataInterface2 di2(&ci);

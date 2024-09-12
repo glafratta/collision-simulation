@@ -52,6 +52,20 @@ void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	}
 }
 
+float StateDifference::get_sum(int mt){
+	if (mt==0 || mt==4){
+		return 10000;
+	}
+	else if (mt==1){
+		return sum();
+	}
+	else if (mt==2){
+		return sum_d();
+	}
+	else if (mt==3){
+		return sum_r();
+	}
+}
 
 void StateDifference::init(State& s1, State& s2){ //observed, desired
 	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x

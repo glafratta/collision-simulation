@@ -92,18 +92,23 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
 
-void setBenchmarking(bool b){
+void setBenchmarking(bool b, char * new_folder){
 	benchmark =b;
 		if (benchmark){
 		char dirName[50];
 		sprintf(dirName, "benchmark");
 		if (!opendir(dirName)){
 			mkdir(dirName, 0777);
-			printf("made stats directory\n");
+		}
+		char new_path[60];
+		sprintf(new_path, "%s/%s", dirName, new_folder);
+		if (!opendir(new_path)){
+			mkdir("", 0777);
 		}
 		else{
-			printf("opened stats directory\n");
+			throw std::invalid_argument("dir name not available");
 		}
+
 		//TODAYS DATE AND TIME
 		time_t now =time(0);
 		tm *ltm = localtime(&now);
@@ -172,7 +177,7 @@ std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Dir
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //matches to most likely
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0); //matches to most likely
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 

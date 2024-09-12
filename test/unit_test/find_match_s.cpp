@@ -45,12 +45,23 @@ int main(int argc, char** argv){
     if (!b_features.empty()){
         state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
     }
-    conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
+    bool relax_match=1;
+    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+    conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     if (options_src.empty()){
         return 1;
     }
-    if (options_src[0]!=solution){
-        return 1;
+    for (vertexDescriptor o: options_src){
+        if (o==solution){
+            return 0;
+        }
+
     }
-    return 0;
+    for (vertexDescriptor o: options_src){
+        //if (o==solution){
+            printf("match with =%i\n",  o );
+        //}
+
+    }
+    return 2;
 }

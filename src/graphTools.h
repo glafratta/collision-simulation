@@ -128,6 +128,8 @@ struct StateDifference{
 	float sum_d(){
 		return sum_d_pos()+sum_d_shape();
 	}
+	
+	float get_sum(int);
 
 	void init(State& s1, State& s2);
 

@@ -84,39 +84,22 @@ int run=0;
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	//c->printPlan();
 	printf("graph size=%i\n", c->transitionSystem.m_vertices.size());
 	if (c->getIteration() <=0){
 		return;
 	}
-	//if (c->planVertices.empty() & c->planning){
 	if (!c->running){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-    //ExecutionError ee =
-//	printf("not tracked\n");
+
 	c->trackTaskExecution(*c->getTask());
-//	printf("tracked\n");
-    // if (c->getTask()->motorStep>0){
-    //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
-    // }
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
-	//printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
-	// printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
-	// if (c->controlGoal.disturbance.isValid()){
-	// 	printf("control goal disturbance: %f, %f, %f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y, c->controlGoal.disturbance.pose().q.GetAngle());
-    //     printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());	
-	// }
 	bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
 	EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		printf("goal reached\n");
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
-		// if (run%2!=0){
-		// 	Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
-		// }
-	//	printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 		printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
@@ -169,12 +152,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		if (cb->c->getTask()==NULL){
 			printf("null task\n");
 		}
-		//cv::Mat frame_cropped=frame(cv::Range(0, frame.width()), cv::Range(f	rame.height()*2/3, frame.height()));
         float error=0;
-	//	if (cb->c->getTask()->motorStep%reset_hz==0){
-			//imgProc.reset();
-			//cb->c->getTask()->correct.reset();
-	//	}
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         signal= signal+optic_flow[0];
