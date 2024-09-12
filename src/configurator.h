@@ -203,8 +203,6 @@ void printPlan(std::vector <vertexDescriptor>* p=NULL);
 
 void applyAffineTrans(const b2Transform& , Task& );
 
-
-
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
 	result.second=false;
@@ -293,6 +291,7 @@ void setSimulationStep(float f){
 	worldBuilder.simulationStep=f;
 }
 
+void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
 
 

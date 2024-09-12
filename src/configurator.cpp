@@ -110,37 +110,38 @@ bool Configurator::Spawner(){
 			//ve=currentVertex;
 			src=currentVertex;
 		}
-		std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
-		//was ve instead of src
-		std::vector <vertexDescriptor> options_src;
-		if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentVertex!=movingVertex){
-		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
-			Disturbance where=controlGoal.disturbance;
-			if (!b_features.empty()){
-				State s_temp;
-				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
-				bool closest_match=1;
-				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
-				//FIND STATE WHICH matches the relationship with the disturbance
-			}
-			//been= been_there(transitionSystem, where); 
-		}
-		//printf("checked been = %i\n", been.first);
-		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-
-		std::vector <vertexDescriptor> plan_provisional=planVertices;
-	//	if (been.first){
-		//	printf("provisional plan\n");
 		bool plan_works=false;
-		for (auto o:options_src){
-			plan_provisional=planner(transitionSystem, o); //been.second, been.first
-			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
-			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
-				plan_works=true;
-				break;
-			}
-		}
+	// 	//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
+	// 	//was ve instead of src
+	// 	std::vector <vertexDescriptor> options_src;
+	// 	if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentVertex!=movingVertex){
+	// 	//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
+	// 		std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
+	// 		//Disturbance where=controlGoal.disturbance;
+	// 		if (!b_features.empty()){
+	// 			State s_temp;
+	// 			s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+	// 			bool closest_match=1;
+	// 			findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
+	// 			//FIND STATE WHICH matches the relationship with the disturbance
+	// 		}
+	// 		//been= been_there(transitionSystem, where); 
+	// 	}
+	// 	//printf("checked been = %i\n", been.first);
+	// 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+
+	std::vector <vertexDescriptor> plan_provisional=planVertices;
+	done_that(src, plan_works, world, plan_provisional);
+	// //	if (been.first){
+	// 	//	printf("provisional plan\n");
+	// 	for (auto o:options_src){
+	// 		plan_provisional=planner(transitionSystem, o); //been.second, been.first
+	// 		vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
+	// 		if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
+	// 			plan_works=true;
+	// 			break;
+	// 		}
+	// 	}
 	//	}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		
@@ -1827,3 +1828,5 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 	// }
 	applyAffineTrans(deltaPose, controlGoal);
 }
+
+
