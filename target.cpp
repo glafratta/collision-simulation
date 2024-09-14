@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.planning =1;
 	char name[60];
-	sprintf("target_%s", get_Foldername());
+	sprintf("Dmatch_%s", get_Foldername());
 	configurator.setBenchmarking(1, name);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
