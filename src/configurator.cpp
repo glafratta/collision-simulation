@@ -614,21 +614,21 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
-			printf("src = %i possible paths:%i, path length=%i, add length=%i, frontier l=%i\n", src, paths.size(), path->size(), add.size(), frontier_v.size());
+			//printf("src = %i possible paths:%i, path length=%i, add length=%i, frontier l=%i\n", src, paths.size(), path->size(), add.size(), frontier_v.size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
-			printf("edge %i->%i", end, add[0]);
+			//printf("edge %i->%i", end, add[0]);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
-					printf("from index %i ", *(pend.base()-1));
+				//	printf("from index %i ", *(pend.base()-1));
 					pend++;
-					printf("going back in current path, path size = %i, current index =%i\n", path->size(), *(pend.base()-1));
+					//printf("going back in current path, path size = %i, current index =%i\n", path->size(), *(pend.base()-1));
 				}
 				else{
 					path++; //go back a previously explored path
 					pend=(*path).rbegin(); 
-					printf("checking previous path\n");
+				//	printf("checking previous path\n");
 				}
 			}
 			else if (edge.second & pend.base()!=path->rbegin().base()){  //if there is an edge with the end of current path
@@ -636,14 +636,14 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
 					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
 						path=_p;
-						printf("using existing\n");
+						//printf("using existing\n");
 						found=1;
 					}
 				}
 				if (!found){
 				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
 				path=paths.rbegin();				
-				printf("new path based on previous path\n");
+				//printf("new path based on previous path\n");
 				}
 				break;
 			}
@@ -668,7 +668,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("planning, path size= %i\n",path->size() );
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
-		printf("exited inner while\n");
+		//printf("exited inner while\n");
 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
 	//printf("exited while\n");
 	auto vs=boost::vertices(g);
