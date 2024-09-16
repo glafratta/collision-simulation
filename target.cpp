@@ -49,14 +49,17 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//std::vector <vertexDescriptor> plan_provisional=planVertices;
 	//	if (been.first){
 		//	printf("provisional plan\n");
+		printf("options=%i\n", options_src.size());
 		for (auto o:options_src){
 			printf("FOUND MATCH WITH %i!", int(o));
 			plan_provisional=planner(transitionSystem, o); //been.second, been.first
 			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
 			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
+				src=plan_provisional[0];
 				plan_works=true;
-				break;
+				return;
 			}
+			plan_provisional.clear();
 		}
 
 }

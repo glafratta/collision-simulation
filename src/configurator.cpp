@@ -101,7 +101,7 @@ bool Configurator::Spawner(){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		//have I seen this envronment configuration before?
-		vertexDescriptor ve=TransitionSystem::null_vertex(), src;
+		//vertexDescriptor ve=TransitionSystem::null_vertex(), src;
 		if (!planVertices.empty()){
 			//ve= *(planVertices.rbegin().base()-1);
 			src=movingVertex;
@@ -111,25 +111,7 @@ bool Configurator::Spawner(){
 			src=currentVertex;
 		}
 		bool plan_works=false;
-	// 	//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
-	// 	//was ve instead of src
-	// 	std::vector <vertexDescriptor> options_src;
-	// 	if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentVertex!=movingVertex){
-	// 	//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
-	// 		std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
-	// 		//Disturbance where=controlGoal.disturbance;
-	// 		if (!b_features.empty()){
-	// 			State s_temp;
-	// 			s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
-	// 			bool closest_match=1;
-	// 			findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
-	// 			//FIND STATE WHICH matches the relationship with the disturbance
-	// 		}
-	// 		//been= been_there(transitionSystem, where); 
-	// 	}
-	// 	//printf("checked been = %i\n", been.first);
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);
 	// //	if (been.first){
@@ -146,20 +128,13 @@ bool Configurator::Spawner(){
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		
 	printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
-	if (plan_works){	//		
-		planVertices=plan_provisional;
-		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[planVertices[0]].start;
-		//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
-		applyAffineTrans(deltaPose, transitionSystem);
-	}
-	//if plan fails or not there, 
-	else{
+	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
 		planVertices.clear();
 		boost::clear_vertex(movingVertex, transitionSystem);
-		if (!plan_works){
-			//dummy_vertex(currentVertex);//currentEdge.m_source
-		}
+		// if (!plan_works){
+		// 	//dummy_vertex(currentVertex);//currentEdge.m_source
+		// }
 		currentTask.change=1;
 		// if (!planVertices.empty()){
 		// 	src=movingVertex;
@@ -185,6 +160,16 @@ bool Configurator::Spawner(){
 	//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 		//boost::print_graph(transitionSystem);
 	}
+	else if (planVertices.empty()&&currentTask.motorStep==0){
+		//reset to new src
+		planVertices=plan_provisional;
+		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[src].start;
+		//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
+		applyAffineTrans(deltaPose, transitionSystem);
+	}
+	//if plan fails or not there, 
+	
+
 	// if (debugOn){
 	// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
 	// }
