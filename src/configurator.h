@@ -104,7 +104,7 @@ void setBenchmarking(bool b, char * new_folder){
 		char new_path[60];
 		sprintf(new_path, "%s/%s", dirName, new_folder);
 		if (!opendir(new_path)){
-			mkdir(new_path, 0777); ""
+			mkdir(new_path, 0777); //""
 		}
 		else{
 			throw std::invalid_argument("dir name not available");
