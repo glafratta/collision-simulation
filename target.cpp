@@ -11,7 +11,6 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
-				printf("FOUND MATCH!");
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
@@ -27,6 +26,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 	//	if (been.first){
 		//	printf("provisional plan\n");
 		for (auto o:options_src){
+			printf("FOUND MATCH WITH %i!", int(o));
 			plan_provisional=planner(transitionSystem, o); //been.second, been.first
 			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
 			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
