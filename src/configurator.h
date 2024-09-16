@@ -107,7 +107,6 @@ void setBenchmarking(bool b, char * new_folder){
 		if (!opendir(new_path)){
 			mkdir(new_path, 0777); //""
 		}
-
 		//TODAYS DATE AND TIME
 		time_t now =time(0);
 		tm *ltm = localtime(&now);
