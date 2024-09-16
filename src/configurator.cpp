@@ -1815,32 +1815,16 @@ void Configurator::applyAffineTrans(const b2Transform& deltaPose, TransitionSyst
 }
 }
 
-void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Transform * _disp){
+void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	b2Transform deltaPose;
-	//auto vPair =boost::vertices(g);
-	if (NULL==_disp){
 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
-	}
-	else{
-		deltaPose=*_disp;
-	}
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
-	// auto vPair =boost::vertices(g);
-	// for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
-	// 	if (*vIt!=movingVertex){
-	// 		math::applyAffineTrans(deltaPose, g[*vIt]);
-	// 	}
-	// }
 	applyAffineTrans(deltaPose, g);
-	// math::applyAffineTrans(deltaPose, controlGoal.start);
-	// if(controlGoal.getAffIndex()!=NONE){
-	// 	math::applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);
-	// }
 	applyAffineTrans(deltaPose, controlGoal);
 }
 
