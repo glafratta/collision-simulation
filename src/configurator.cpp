@@ -145,48 +145,49 @@ bool Configurator::Spawner(){
 	//	}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		
-		//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
-		if (!plan_provisional.empty() || plan_works){	//		
-			planVertices=plan_provisional;
-			b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[planVertices[0]].start;
-			updateGraph(transitionSystem, ExecutionError(),& deltaPose);
+	//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
+	if (!plan_provisional.empty() && plan_works){	//		
+		planVertices=plan_provisional;
+		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[planVertices[0]].start;
+		//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
+		applyAffineTrans(deltaPose, transitionSystem);
+	}
+	//if plan fails or not there, 
+	else{
+		is_not_v not_cv(currentVertex);
+		planVertices.clear();
+		boost::clear_vertex(movingVertex, transitionSystem);
+		if (!plan_works){
+			//dummy_vertex(currentVertex);//currentEdge.m_source
 		}
-		//if plan fails or not there, 
-		else{
-			is_not_v not_cv(currentVertex);
-			planVertices.clear();
-			boost::clear_vertex(movingVertex, transitionSystem);
-			if (!plan_works){
-				//dummy_vertex(currentVertex);//currentEdge.m_source
-			}
-			currentTask.change=1;
-			// if (!planVertices.empty()){
-			// 	src=movingVertex;
-			// }
-			// else{
-			// 	src=currentVertex;
-			// }
-			src=currentVertex;
-			resetPhi(transitionSystem);
-			toRemove=explorer(src, transitionSystem, currentTask, world);
-			clearFromMap(toRemove, transitionSystem, errorMap);
-			Connected connected(&transitionSystem);
-			FilteredTS fts(transitionSystem, boost::keep_all(), connected);
-			TransitionSystem tmp;
-			boost::copy_graph(fts, tmp);
-			transitionSystem.clear();
-			transitionSystem.swap(tmp);
-			planVertices= planner(transitionSystem, src);
-			printPlan();
-			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
-			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
-			explored=1;
-		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
-			//boost::print_graph(transitionSystem);
-		}
-		// if (debugOn){
-		// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
+		currentTask.change=1;
+		// if (!planVertices.empty()){
+		// 	src=movingVertex;
 		// }
+		// else{
+		// 	src=currentVertex;
+		// }
+		src=currentVertex;
+		resetPhi(transitionSystem);
+		toRemove=explorer(src, transitionSystem, currentTask, world);
+		clearFromMap(toRemove, transitionSystem, errorMap);
+		Connected connected(&transitionSystem);
+		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
+		TransitionSystem tmp;
+		boost::copy_graph(fts, tmp);
+		transitionSystem.clear();
+		transitionSystem.swap(tmp);
+		planVertices= planner(transitionSystem, src);
+		printPlan();
+		debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
+		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
+		explored=1;
+	//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
+		//boost::print_graph(transitionSystem);
+	}
+	// if (debugOn){
+	// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
+	// }
 
 	}
 	else if (!planning){
@@ -1805,9 +1806,18 @@ void Configurator::applyAffineTrans(const b2Transform& deltaPose, Task& task){
 	}
 }
 
+void Configurator::applyAffineTrans(const b2Transform& deltaPose, TransitionSystem& g){
+	auto vPair =boost::vertices(g);
+	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
+	if (*vIt!=movingVertex){
+		math::applyAffineTrans(deltaPose, g[*vIt]);
+	}
+}
+}
+
 void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Transform * _disp){
 	b2Transform deltaPose;
-	auto vPair =boost::vertices(g);
+	//auto vPair =boost::vertices(g);
 	if (NULL==_disp){
 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
@@ -1820,11 +1830,13 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error, b2Trans
 		deltaPose=*_disp;
 	}
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
-	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
-		if (*vIt!=movingVertex){
-			math::applyAffineTrans(deltaPose, g[*vIt]);
-		}
-	}
+	// auto vPair =boost::vertices(g);
+	// for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
+	// 	if (*vIt!=movingVertex){
+	// 		math::applyAffineTrans(deltaPose, g[*vIt]);
+	// 	}
+	// }
+	applyAffineTrans(deltaPose, g);
 	// math::applyAffineTrans(deltaPose, controlGoal.start);
 	// if(controlGoal.getAffIndex()!=NONE){
 	// 	math::applyAffineTrans(deltaPose, controlGoal.disturbance.bf.pose);

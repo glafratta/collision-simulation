@@ -23,8 +23,11 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			}
 			//been= been_there(transitionSystem, where); 
 		}
+		else{
+			plan_works=true;//temporary to simplify things
+		}
 		//printf("checked been = %i\n", been.first);
-		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+		//std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 
 		//std::vector <vertexDescriptor> plan_provisional=planVertices;
 	//	if (been.first){
