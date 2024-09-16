@@ -90,8 +90,13 @@ char * folder;
         printf("%s\n", filePath);
         FILE *f;
         if (!(f=fopen(filePath, "r"))){
-            ci->stop=1;
-            return false;
+            if (iteration>1){
+                iteration=1;
+            }
+            else{
+                ci->stop=1;
+                return false;
+            }
         }
         else {
             fclose(f);
