@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
-char* get_Foldername(){
+void get_Foldername(char* str_ptr){
     time_t now =time(0);
 	tm *ltm = localtime(&now);
 	int y,m,d, h, min;
@@ -23,8 +23,7 @@ char* get_Foldername(){
 	min = ltm->tm_min;
     char name[60];
 	sprintf(name, "%02i%02i%02i_%02i%02i",d,m,y,h,min);
-    char* result=name;
-	return result;
+    *str_pts=name;
 }
 
 void forget(Configurator*);
