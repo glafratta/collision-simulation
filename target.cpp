@@ -11,7 +11,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		if ( !fin && planVertices.empty()&& currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
+			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
 			printf("built world, b_feaures=%i\n", b_features.size());
 			if (b_features.size()>0){
@@ -29,7 +29,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				simResult fake_result;
 				fake_result.endPose=b2Transform(b2Vec2(BOX2DRANGE, 0), b2Rot(0));
 				fake_result.step=100;
-				gt::fill(fake_result, &transitionSystem[new_v]);
+				printf("made fake result\n");
+				gt::fill(fake_result, transitionSystem[new_v].ID);
+				printf("filled\n");
 				transitionSystem[e.first].direction=DEFAULT;
 				transitionSystem[e.first].it_observed=iteration;
 				//transitionSystem[e.first].step=100;
