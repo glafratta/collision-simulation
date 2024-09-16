@@ -23,7 +23,7 @@ void get_Foldername(char* str_ptr){
 	min = ltm->tm_min;
     char name[60];
 	sprintf(name, "%02i%02i%02i_%02i%02i",d,m,y,h,min);
-    *str_ptr=name;
+    str_ptr=name;
 }
 
 void forget(Configurator*);
