@@ -11,7 +11,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
-				printf("FOUND MATCH!")
+				printf("FOUND MATCH!");
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
