@@ -1,7 +1,7 @@
 #include "worldbuilder.h"
 
 std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength, float halfWindowWidth){
-    float halfWindowWidth=0.15; //wa .1
+    //float halfWindowWidth=0.15; //wa .1
     std::pair <Pointf, Pointf>result;
     if (d ==LEFT || d==RIGHT){
         boxLength =ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X; //og 16 cm
