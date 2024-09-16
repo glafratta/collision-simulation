@@ -7,7 +7,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//was ve instead of src
 		std::vector <vertexDescriptor> options_src;
 		bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended;
-		printf("finished=%i\n", fin);
+		printf("finished=%i, plan=%i, step=%i\n", fin, !plan.empty(), currentTask.motorStep);
 		if ( !fin && planVertices.empty()&& currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");

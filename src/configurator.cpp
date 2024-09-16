@@ -145,7 +145,7 @@ bool Configurator::Spawner(){
 	//	}
 		//printf("plan provisional size = %i\n", plan_provisional.size());
 		
-	//printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
+	printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 	if (!plan_provisional.empty() && plan_works){	//		
 		planVertices=plan_provisional;
 		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[planVertices[0]].start;
