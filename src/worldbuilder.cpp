@@ -1,6 +1,6 @@
 #include "worldbuilder.h"
 
-std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength){
+std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength, float halfWindowWidth){
     float halfWindowWidth=0.15; //wa .1
     std::pair <Pointf, Pointf>result;
     if (d ==LEFT || d==RIGHT){
