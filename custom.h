@@ -133,8 +133,8 @@ void step( AlphaBot &motors){
 		L*=1.25;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=0.95;
-		L*=0.95;
+		R*=1.1;
+		L*=1.1;
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
