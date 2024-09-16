@@ -13,7 +13,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			printf("NOW CHECKING FOR MATCHES\n");
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
-			printf("built world\n");
+			printf("built world, b_feaures=%i\n", b_features.size());
 			if (b_features.size()>0){
 				printf("there is disturbance\n");
 				State s_temp;
