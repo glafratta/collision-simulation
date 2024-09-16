@@ -177,6 +177,7 @@ bool Configurator::Spawner(){
 			transitionSystem.clear();
 			transitionSystem.swap(tmp);
 			planVertices= planner(transitionSystem, src);
+			printPlan();
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 			explored=1;
@@ -184,7 +185,6 @@ bool Configurator::Spawner(){
 			//boost::print_graph(transitionSystem);
 		}
 		// if (debugOn){
-		// 	printPlan();
 		// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
 		// }
 

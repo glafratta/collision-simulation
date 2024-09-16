@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.planning=1;
 	char name[60];
-	sprintf(name, "targetless_forget");
-	get_Foldername(name);
+	//sprintf(name, "targetless_forget");
+	get_Foldername("targetless_forget",name);
 	configurator.setBenchmarking(1, name);
 
 	if (argc>1){

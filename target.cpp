@@ -6,7 +6,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
 		//was ve instead of src
 		std::vector <vertexDescriptor> options_src;
-		if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentTask.motorStep==0){
+		bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended;
+		printf("finished=%i\n", fin);
+		if ( fin && currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
@@ -52,8 +54,8 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.planning =1;
 	char name[60];
-	sprintf(name, "Dmatch_target");
-	get_Foldername(name);
+	//sprintf(name, "Dmatch_target");
+	get_Foldername("Dmatch_target",name);
 	printf("foldername = %s\n", name);
 	configurator.setBenchmarking(1, name);
 	if (argc>1){
