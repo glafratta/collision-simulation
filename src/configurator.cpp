@@ -101,7 +101,7 @@ bool Configurator::Spawner(){
 			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
 		}
 		//have I seen this envronment configuration before?
-		//vertexDescriptor ve=TransitionSystem::null_vertex(), src;
+		vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
 		if (!planVertices.empty()){
 			//ve= *(planVertices.rbegin().base()-1);
 			src=movingVertex;
