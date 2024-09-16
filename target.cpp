@@ -27,7 +27,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				vertexDescriptor new_v;
 				auto e=addVertex(currentVertex, new_v, transitionSystem, Disturbance());
 				simResult fake_result;
-				fake_result.endPose(b2Transform(b2Vec2(BOX2DRANGE, 0), b2Rot(0)));
+				fake_result.endPose=b2Transform(b2Vec2(BOX2DRANGE, 0), b2Rot(0));
 				fake_result.step=100;
 				gt::fill(fake_result, &transitionSystem[new_v]);
 				transitionSystem[e.first].direction=DEFAULT;
