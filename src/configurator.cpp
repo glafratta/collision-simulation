@@ -1185,7 +1185,7 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	else { //will only enter if successful
 		if (d== LEFT || d == RIGHT){
 			state.options = {DEFAULT};
-			if (src==currentVertex & controlGoal.getAffIndex()==PURSUE){
+			if (src==currentVertex && controlGoal.getAffIndex()==PURSUE && SignedVectorLength(controlGoal.disturbance.pose().p)<0){
 				state.options.push_back(d);
 			}
 		}

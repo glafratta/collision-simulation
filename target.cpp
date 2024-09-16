@@ -8,6 +8,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		std::vector <vertexDescriptor> options_src;
 		if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin && currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
+			printf("NOW CHECKING FOR MATCHES\n");
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
