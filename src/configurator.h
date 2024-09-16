@@ -102,9 +102,9 @@ void setBenchmarking(bool b, char * new_folder){
 			mkdir(dirName, 0777);
 		}
 		char new_path[60];
-		sprintf(new_path, "%s/%s", dirName, *new_folder);
+		sprintf(new_path, "%s/%s", dirName, new_folder);
 		if (!opendir(new_path)){
-			mkdir("", 0777);
+			mkdir(new_path, 0777); ""
 		}
 		else{
 			throw std::invalid_argument("dir name not available");
@@ -120,7 +120,7 @@ void setBenchmarking(bool b, char * new_folder){
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",new_path, d,m,y,h,min);
-		//sprintf(statFile,"stat");
+		sprintf(statFile,"stat");
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		printf("open\n");
