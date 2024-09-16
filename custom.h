@@ -22,8 +22,9 @@ char* get_Foldername(){
 	h= ltm->tm_hour;
 	min = ltm->tm_min;
     char name[60];
-	sprintf(name, "%02i%02i%02i_%02i%02i.txt",d,m,y,h,min);
-    return name;
+	sprintf(name, "%02i%02i%02i_%02i%02i",d,m,y,h,min);
+    char* result=name;
+	return result;
 }
 
 void forget(Configurator*);

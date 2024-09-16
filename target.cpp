@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 	configurator.planning =1;
 	char name[60];
 	sprintf(name, "Dmatch_%s", get_Foldername());
-	printf("foldername = %s", name);
+	printf("foldername = %s\n", name);
 	configurator.setBenchmarking(1, name);
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
