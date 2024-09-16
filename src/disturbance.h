@@ -220,9 +220,9 @@ public:
 
 struct simResult{
     enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
-    resultType resultCode= successful;
+    resultType resultCode= resultType::successful;
     Disturbance collision;
-    bool valid = 0;
+    //bool valid = 0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     int step=0;
 
@@ -230,11 +230,11 @@ struct simResult{
     simResult(){}
 
     simResult(resultType code): resultCode(code){
-        valid =1;
+     //   valid =1;
     }
 
     simResult(resultType code, Disturbance obst): resultCode(code), collision(obst){
-        valid =1;
+       // valid =1;
     }
 };
 

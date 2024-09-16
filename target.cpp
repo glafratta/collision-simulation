@@ -13,20 +13,26 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			printf("NOW CHECKING FOR MATCHES\n");
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
-			if (!b_features.empty()){
+			printf("built world\n");
+			if (b_features.size()>0){
 				printf("there is disturbance\n");
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
+				printf("looked for matches\n");
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			else{
 				vertexDescriptor new_v;
 				auto e=addVertex(currentVertex, new_v, transitionSystem, Disturbance());
+				simResult fake_result;
+				fake_result.endPose(b2Transform(b2Vec2(BOX2DRANGE, 0), bRot(0)));
+				fake_result.step=100;
+				gt::fill(, &transitionSystem[new_v]);
 				transitionSystem[e.first].direction=DEFAULT;
 				transitionSystem[e.first].it_observed=iteration;
-				transitionSystem[e.first].step=100;
+				//transitionSystem[e.first].step=100;
 				plan_provisional={new_v};
 				plan_works=true;
 			}
