@@ -21,6 +21,15 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
+			else{
+				vertexDescriptor new_v;
+				auto e=addVertex(currentVertex, new_v, transitionSystem, Disturbance());
+				transitionSystem[e.first].direction=DEFAULT;
+				transitionSystem[e.first].it_observed=iteration;
+				transitionSystem[e.first].step=100;
+				plan_provisional={new_v};
+				plan_works=true;
+			}
 			//been= been_there(transitionSystem, where); 
 		}
 		else{
