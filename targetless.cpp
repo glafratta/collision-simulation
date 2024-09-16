@@ -24,7 +24,9 @@ int main(int argc, char** argv) {
     Configurator configurator(controlGoal);
 	configurator.planning=1;
 	char name[60];
-	sprintf("targetless_%s", get_Foldername());
+	char* date;
+	get_Foldername(date);
+	sprintf(name, "Dmatch_%s", date);
 	configurator.setBenchmarking(1, name);
 
 	if (argc>1){
