@@ -18,6 +18,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				printf("there is disturbance\n");
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				debug::print_pose(s_temp.disturbance.pose());
 				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				printf("looked for matches\n");

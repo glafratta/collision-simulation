@@ -52,3 +52,7 @@ b2Vec2 GetWorldPoints(b2Body* b, b2Vec2 v){
 	b2Vec2 wp=b->GetWorldPoint(v);
 	printf("x=%f, y=%f\t", wp.x, wp.y);
 }
+
+void debug::print_pose(const b2Transform& p){
+	printf("x=%f, y=%f, theta=%f\n", p.p.x, p.p.y, p.q.GetAngle());
+}
