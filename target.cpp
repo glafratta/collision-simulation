@@ -8,12 +8,13 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		std::vector <vertexDescriptor> options_src;
 		bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended;
 		printf("finished=%i\n", fin);
-		if ( fin && currentTask.motorStep==0){
+		if ( !fin && plan.empty()&& currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
+				printf("there is disturbance\n");
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
@@ -55,9 +56,9 @@ int main(int argc, char** argv) {
 	configurator.planning =1;
 	char name[60];
 	//sprintf(name, "Dmatch_target");
-	get_Foldername("Dmatch_target",name);
-	printf("foldername = %s\n", name);
-	configurator.setBenchmarking(1, name);
+	//get_Foldername(,name);
+	//printf("foldername = %s\n", name);
+	configurator.setBenchmarking(1, "Dmatch_target");
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
