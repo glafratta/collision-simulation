@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
-char[50] get_Foldername(){
+char get_Foldername(){
     time_t now =time(0);
 	tm *ltm = localtime(&now);
 	int y,m,d, h, min;
