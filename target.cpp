@@ -29,7 +29,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				simResult fake_result;
 				fake_result.endPose(b2Transform(b2Vec2(BOX2DRANGE, 0), b2Rot(0)));
 				fake_result.step=100;
-				gt::fill(, &transitionSystem[new_v]);
+				gt::fill(fake_result, &transitionSystem[new_v]);
 				transitionSystem[e.first].direction=DEFAULT;
 				transitionSystem[e.first].it_observed=iteration;
 				//transitionSystem[e.first].step=100;
