@@ -28,6 +28,8 @@ class WorldBuilder{
 
     std::vector <BodyFeatures> processData( CoordinateContainer, const b2Transform&);
 
+    std::vector <BodyFeatures> processData_kmeans( CoordinateContainer, const b2Transform&);
+
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
     std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15);

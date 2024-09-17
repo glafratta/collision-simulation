@@ -74,6 +74,23 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vect
     return result;
 }
 
+std::vector <BodyFeatures> WorldBuilder::processData_kmeans( CoordinateContainer pts, const b2Transform& start){
+    std::vector <BodyFeatures> result;
+    std::vector <cv::Point2f> points, centers;
+    for (Pointf p:pts){
+        points.push_back(cv::Point2f(float(p.x), float(p.y)));
+    }
+    //std::vector <cv::Point2f> centers;
+    std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
+    for (int c=0; c<clusters.size(); c++){
+        if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
+            feature.second.pose.q.Set(start.q.GetAngle());
+            result.push_back(feature.second);
+        }
+    }
+    return result;
+
+}
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2Body * body;
