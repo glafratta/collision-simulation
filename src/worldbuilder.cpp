@@ -80,7 +80,6 @@ std::vector <BodyFeatures> WorldBuilder::processData_kmeans( CoordinateContainer
     for (Pointf p:pts){
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
-    //std::vector <cv::Point2f> centers;
     std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
     for (int c=0; c<clusters.size(); c++){
         if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
