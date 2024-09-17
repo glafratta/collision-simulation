@@ -1,21 +1,29 @@
-#include "../../src/worldbuilder.h"
+#include "worldbuilder.h"
 #include <fstream>
 
 std::vector <BodyFeatures> WorldBuilder::processData( CoordinateContainer pts, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
     for (Pointf p:pts){
-        points.push_back(cv::Point2f((p.x), (p.y)));
+        points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
     //std::vector <cv::Point2f> centers;
-    //std::vector<std::vector<cv::Point2f>> clusters=
-    feature_clusters(points, centers);
-    // for (int c=0; c<clusters.size(); c++){
-    //     if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
-    //         feature.second.pose.q.Set(start.q.GetAngle());
-    //         result.push_back(feature.second);
-    //     }
-    // }
+    std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
+    for (int i=0;i<clusters.size(); i++){
+        char filename[50];
+        sprintf(filename, "/tmp/cluster%04i.txt", i+1);
+        FILE * f=fopen(filename, "w+");
+        for (int j=0; j<clusters[i].size(); j++){
+            fprintf(f, "%f\t%f\n", clusters[i][j].x, clusters[i][j].y);
+        }
+        fclose(f);
+    }
+    for (int c=0; c<clusters.size(); c++){
+        if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
+            feature.second.pose.q.Set(start.q.GetAngle());
+            result.push_back(feature.second);
+        }
+    }
     return result;
 
 }

@@ -60,15 +60,17 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
 // }
 
 std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
+    
     const int MAX_CLUSTERS=3, attempts =3, flags=cv::KMEANS_PP_CENTERS;
     cv::Mat bestLabels;
     cv::TermCriteria termCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0);
     cv::kmeans(points, MAX_CLUSTERS, bestLabels, termCriteria, attempts, flags, centers);
     std::vector <std::vector<cv::Point2f>>result(centers.size());
-    // for (int i=0; i<bestLabels.size(); i++){ //bestlabel[i] gives the index
-    //         int index=bestLabels[i];
-    //         result[index].push_back(points[i]);
-    // }
+
+    for (int i=0; i<bestLabels.rows; i++){ //bestlabel[i] gives the index
+            auto index=bestLabels.at<int>(i, 0);
+            result[index].push_back(points[i]);
+    }
     return result;
 }
 

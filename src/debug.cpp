@@ -56,3 +56,7 @@ b2Vec2 GetWorldPoints(b2Body* b, b2Vec2 v){
 void debug::print_pose(const b2Transform& p){
 	printf("x=%f, y=%f, theta=%f\n", p.p.x, p.p.y, p.q.GetAngle());
 }
+
+void debug::print_matrix(cv::Mat m){
+	std::cout << "M = " << std::endl << " "  << m << std::endl << std::endl;
+}
