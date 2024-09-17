@@ -21,7 +21,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				debug::print_pose(s_temp.disturbance.pose());
 				printf("half w=%f, half length=%f", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
 				if (transitionSystem.m_vertices.size()>3){
-					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.halfLength);
+					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.bf.halfLength);
 					debug::print_pose(transitionSystem[2].endPose);
 				}
 				bool closest_match=1;
