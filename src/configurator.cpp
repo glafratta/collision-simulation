@@ -132,9 +132,9 @@ bool Configurator::Spawner(){
 		is_not_v not_cv(currentVertex);
 		planVertices.clear();
 		boost::clear_vertex(movingVertex, transitionSystem);
-		// if (!plan_works){
-		// 	//dummy_vertex(currentVertex);//currentEdge.m_source
-		// }
+		if (transitionSystem.m_vertices.size()==1){
+			dummy_vertex(currentVertex);//currentEdge.m_source
+		}
 		currentTask.change=1;
 		// if (!planVertices.empty()){
 		// 	src=movingVertex;
@@ -1714,9 +1714,9 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	}
 	if (planning){
 		if (pv.empty()){
-			if (currentVertex!=movingVertex){
+			//if (currentVertex!=movingVertex){
 				currentTask.action.setVelocities(0, 0); //stop if dont know what to do
-			}
+			//}
 			//printf("no plan, bas\n");
 			return pv;
 		}

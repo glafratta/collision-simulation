@@ -19,7 +19,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				debug::print_pose(s_temp.disturbance.pose());
-				printf("half w=%f, half length=%f", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
+				printf("half w=%f, half length=%f\n", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
 				if (transitionSystem.m_vertices.size()>3){
 					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.bf.halfLength);
 					debug::print_pose(transitionSystem[2].endPose);
@@ -72,6 +72,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 
 
 Disturbance set_target(int& run, b2Transform start){
+	return Disturbance(PURSUE, b2Vec(1.0, 0), b2Rot(0));
 
 }
 
