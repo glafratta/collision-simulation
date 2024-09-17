@@ -172,7 +172,7 @@ public:
 };
 
 
-std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
+std::vector <BodyFeatures> WorldBuilder::processData( CoordinateContainer points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
     std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);

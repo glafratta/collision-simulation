@@ -28,35 +28,50 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     return result;
     }
 
-std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb){//gets bounding box of points
-    float  l=(0.0005*2), w=(0.0005*2) ;
-    float x_glob=0.0f, y_glob=0.0f;
-    // cv::Rect2f rect(x_loc,y_loc,w, h);
-    // b2Transform pose;
-    std::pair <bool, BodyFeatures> result(0, BodyFeatures());
-    if (nb.empty()){
-        return result;
-    }
-    CompareX compareX;
-    CompareY compareY;
-    //Pointf maxx, minx, miny, maxy;
-	std::vector<Pointf>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
-	std::vector<Pointf>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
-	std::vector<Pointf>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
-	std::vector<Pointf>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
-    if (minx->x!=maxx->x){
-        w= fabs((*maxx).x-(*minx).x);
-    }
-    if (miny->y!=maxy->y){
-        l=fabs((*maxy).y-(*miny).y);
-    }
-    x_glob= ((*maxx).x+(*minx).x)/2;
-    y_glob= ((*maxy).y+(*miny).y)/2;
-    result.second.halfLength=l/2;
-    result.second.halfWidth=w/2;
-    result.second.pose.p=b2Vec2(x_glob, y_glob);
-    result.first=true;
+// template <typename Pt>
+// std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pt>nb){//gets bounding box of points
+//     float  l=(0.0005*2), w=(0.0005*2) ;
+//     float x_glob=0.0f, y_glob=0.0f;
+//     // cv::Rect2f rect(x_loc,y_loc,w, h);
+//     // b2Transform pose;
+//     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
+//     if (nb.empty()){
+//         return result;
+//     }
+//     CompareX compareX;
+//     CompareY compareY;
+//     //Pointf maxx, minx, miny, maxy;
+// 	typename std::vector<Pt>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
+// 	typename std::vector<Pt>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
+// 	typename std::vector<Pt>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
+// 	typename std::vector<Pt>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
+//     if (minx->x!=maxx->x){
+//         w= fabs((*maxx).x-(*minx).x);
+//     }
+//     if (miny->y!=maxy->y){
+//         l=fabs((*maxy).y-(*miny).y);
+//     }
+//     x_glob= ((*maxx).x+(*minx).x)/2;
+//     y_glob= ((*maxy).y+(*miny).y)/2;
+//     result.second.halfLength=l/2;
+//     result.second.halfWidth=w/2;
+//     result.second.pose.p=b2Vec2(x_glob, y_glob);
+//     result.first=true;
+// }
+
+std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
+    const int MAX_CLUSTERS=3, attempts =3, flags=cv::KMEANS_PP_CENTERS;
+    cv::Mat bestLabels;
+    cv::TermCriteria termCriteria(cv::TermCriteria::EPS+cv::TermCriteria::COUNT, 10, 1.0);
+    cv::kmeans(points, MAX_CLUSTERS, bestLabels, termCriteria, attempts, flags, centers);
+    std::vector <std::vector<cv::Point2f>>result(centers.size());
+    // for (int i=0; i<bestLabels.size(); i++){ //bestlabel[i] gives the index
+    //         int index=bestLabels[i];
+    //         result[index].push_back(points[i]);
+    // }
+    return result;
 }
+
 
 void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2Body * body;

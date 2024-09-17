@@ -446,7 +446,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 			}
 			else if (match.first==StateMatcher::DISTURBANCE){
-					
+					printf("SIMILAR to %i\n", match.second);
 			}
 			else{
 				edge= addVertex(v0, v1,g, Disturbance(),sk.second);
@@ -571,7 +571,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	bool run=true;
 	std::vector <Frontier> priorityQueue;
 	if (currentVertex==movingVertex){
-		//printf("current %i =moving%i! return\n", currentVertex, movingVertex);
+		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
 		return plan;
 	}
 	int no_out=0;
@@ -654,7 +654,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("planning, path size= %i\n",path->size() );
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
-		//printf("exited inner while\n");
+		printf("exited inner while\n");
 	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
 	//printf("exited while\n");
 	auto vs=boost::vertices(g);

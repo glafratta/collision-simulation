@@ -24,6 +24,13 @@ class Pointf: public cv::Point2f{
 			return result;
 	}
 
+	Pointf operator-(const Pointf p){
+			Pointf result;
+			result.x = x - p.x;
+			result.y = y- p.y;
+			return result;
+	}
+
 	bool isin(Pointf, Pointf);
 
 };
@@ -48,7 +55,8 @@ typedef std::set<Pointf> CoordinateContainer;
 
 b2Vec2 getb2Vec2(cv::Point2f );
 
-Pointf getPointf(b2Vec2);
+template <typename T>
+Pointf getPointf(T);
 
 // template <typename T>
 // cv::Point2f getPoint2f(T);
@@ -57,6 +65,15 @@ Pointf Polar2f(float, float);
 
 template <typename T>
 std::vector<T> set2vec(std::set<T>);
+
+template <typename T>
+std::vector<cv::Point2f> set2vec2f(std::set<T> s){
+    std::vector <cv::Point2f> vec;
+    for (T t:s){
+        vec.push_back(cv::Point2f(t.x, t.y));
+    }
+    return vec;
+}
 
 // template <typename T>
 // std::vector<cv::Point2f> set2vec_cv(std::set<T>);

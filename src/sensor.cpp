@@ -32,7 +32,8 @@ b2Vec2 getb2Vec2(cv::Point2f p){
 
 }
 
-Pointf getPointf(b2Vec2 v){
+template <typename T>
+Pointf getPointf(T v){
 	return Pointf(v.x, v.y);
 }
 
@@ -56,6 +57,15 @@ std::vector<T> set2vec(std::set<T> s){
     }
     return vec;
 }
+
+// template <typename T>
+// std::vector<cv::Point2f> set2vec2f(std::set<T> s){
+//     std::vector <cv::Point2f> vec;
+//     for (T t:s){
+//         vec.emplace_back(cv::Point2f(t.x, t.y));
+//     }
+//     return vec;
+// }
 
 // template <typename T>
 // std::vector<cv::Point2f> set2vec_cv(std::set<T> s){
