@@ -170,17 +170,22 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
     return result;
 }
 
-std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth){
+std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, bool kmeans){
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, halfWindowWidth);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
-    features =processData(salient.first, start);
+    if (!kmeans){
+        features =processData(salient.first, start);
+    }
+    else{
+        features=processData_kmeans(salient.first, start);
+    }
     return features;
 }
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans=0){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth);

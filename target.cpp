@@ -11,7 +11,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		if ( !fin && planVertices.empty()&& currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE);
+			bool using_kmeans=1;
+			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
 			//Disturbance where=controlGoal.disturbance;
 			printf("built world, b_feaures=%i\n", b_features.size());
 			if (b_features.size()>0){

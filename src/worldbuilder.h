@@ -32,9 +32,9 @@ class WorldBuilder{
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15);
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, bool kmeans=0);
 
-    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15);
+    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, bool kmeans=0);
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
 
