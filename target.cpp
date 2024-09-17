@@ -19,6 +19,11 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				State s_temp;
 				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
 				debug::print_pose(s_temp.disturbance.pose());
+				printf("half w=%f, half length=%f", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
+				if (transitionSystem.m_vertices.size()>3){
+					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.halfLength);
+					debug::print_pose(transitionSystem[2].endPose);
+				}
 				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				printf("looked for matches\n");
