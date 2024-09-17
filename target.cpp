@@ -72,7 +72,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 
 
 Disturbance set_target(int& run, b2Transform start){
-	return Disturbance(PURSUE, b2Vec(1.0, 0), b2Rot(0));
+	return Disturbance(PURSUE, b2Vec2(1.0, 0), b2Rot(0));
 
 }
 
