@@ -1584,6 +1584,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 	if (others==NULL){
 		return result;
 	}
+	printf("others not null\n");
 	for (auto vp:others_set){
 		others->push_back(vp.first);
 	}
