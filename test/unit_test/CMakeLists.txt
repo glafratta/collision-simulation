@@ -17,8 +17,8 @@ set(CTEST_OUTPUT_ON_FAILURE 1)
 
 add_executable(processData_k ../../src/worldbuilder.h ../../src/worldbuilder.cpp processData_k.cpp)
 add_executable(feature_clusters ../../src/worldbuilder.h ../../src/worldbuilder.cpp feature_clusters.cpp)
-target_link_libraries(processData_k CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
-target_link_libraries(feature_clusters CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+target_link_libraries(processData_k CloCK ${OpenCV_LIBS} box2d rt)
+target_link_libraries(feature_clusters CloCK ${OpenCV_LIBS} box2d rt)
 
 
 # add_executable(split_task split_task.cpp)
