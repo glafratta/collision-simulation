@@ -8,9 +8,9 @@ class WorldBuilder{
         struct CompareCluster{
         CompareCluster()=default;
 
-        bool operator()(const cv::Point2f & p1, const cv::Point2f & p2){ //distances of centre from start
+        bool operator()(const BodyFeatures & b1, const BodyFeatures & b2){ //distances of centre from start
             bool result=false;
-            if (fabs(atan2(p1.y, p1.x))< fabs(atan2(p2.y, p2.x)) && length(p1)<= length(p2)){
+            if (fabs(atan2(b1.pose.p.y, b1.pose.p.x))< fabs(atan2(b2.pose.p.y, b2.pose.p.x)) && b1.pose.p.Length()<= b2.pose.p.Length()){
                 result=true;
             }
             return result;
