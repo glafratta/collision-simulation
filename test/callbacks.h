@@ -1,9 +1,8 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
-
+#include "CppTimer.h"
 #include <thread>
 #include "configurator.h"
-#include "CppTimer.h"
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
