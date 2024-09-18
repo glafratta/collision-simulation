@@ -38,7 +38,7 @@ class WorldBuilder{
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
 
-    template <typename Pt>
+    template <class Pt>
     std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pt>nb){//gets bounding box of points
     float  l=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;

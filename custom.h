@@ -1,4 +1,5 @@
 #include "configurator.h"
+#include "worldbuilder.cpp"
 #include "libcam2opencv.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
