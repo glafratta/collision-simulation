@@ -62,7 +62,16 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		for (auto o:options_src){
 			printf("FOUND MATCH WITH %i!", int(o));
 			plan_provisional=planner(transitionSystem, o); //been.second, been.first
-			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
+			if (plan_provisional.empty()){
+				printf("no plan tho\n");
+				return;
+			}
+			auto vi= plan_provisional.end().base()-1;
+			if (vi==plan_provisional.end()){
+				printf("pointing to nothing\n");
+			}
+			vertexDescriptor end =*(vi);
+
 			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
 				src=plan_provisional[0];
 				plan_works=true;
