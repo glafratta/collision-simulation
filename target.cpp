@@ -66,8 +66,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				printf("no plan tho\n");
 				return;
 			}
-			auto vi= plan_provisional.end().base()-1;
-			if (vi==plan_provisional.end()){
+			auto vi= (plan_provisional.end()-1);
+			if (&vi==NULL){
 				printf("pointing to nothing\n");
 			}
 			vertexDescriptor end =*(vi);
