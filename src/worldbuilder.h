@@ -67,6 +67,7 @@ class WorldBuilder{
     result.second.halfWidth=w/2;
     result.second.pose.p=b2Vec2(x_glob, y_glob);
     result.first=true;
+    return result;
 }
     std::vector <std::vector<cv::Point2f>> feature_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
 
