@@ -1559,6 +1559,9 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		else{
 			condition= sum_tmp<sum;
 		}
+		if (v==2){
+			printf("v2 sum = %f, condition=%i, relax=%i, Tmatch=%i", sum_tmp, condition, relax, Tmatch);
+		}
 		if ( condition&& v!=movingVertex && boost::in_degree(v, g)>0 &&Tmatch ){ 
 			sum=sum_tmp;
 			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
