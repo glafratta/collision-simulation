@@ -37,13 +37,13 @@ add_executable(find_match_state ../callbacks.h find_match_s.cpp)
 add_executable(state_difference ../callbacks.h state_difference.cpp)
 add_executable(match_equal ../callbacks.h match_equal.cpp)
 
-target_link_libraries(explorer CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(disturbance_dimensions PUBLIC CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(match CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(find_match_state CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(state_difference CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(match_equal CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(explorer LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(disturbance_dimensions LINK_INTERFACE_LIBRARIES  CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(planner LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(match LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(find_match_state LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(state_difference LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(match_equal LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
 
 
 

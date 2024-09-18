@@ -18,7 +18,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			if (b_features.size()>0){
 				printf("there is disturbance\n");
 				State s_temp;
-				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				WorldBuilder::CompareCluster compareCluster;
+				BodyFeatures closest_D= std::min(b_features.begin(), b_features.end, compareCluster);
+				s_temp.disturbance= Disturbance(closest_D); //assumes 1 item length
 				debug::print_pose(s_temp.disturbance.pose());
 				printf("half w=%f, half length=%f\n", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
 				if (transitionSystem.m_vertices.size()>3){
