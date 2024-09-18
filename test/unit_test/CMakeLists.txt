@@ -36,14 +36,17 @@ add_executable(match ../callbacks.h match.cpp)
 add_executable(find_match_state ../callbacks.h find_match_s.cpp)
 add_executable(state_difference ../callbacks.h state_difference.cpp)
 add_executable(match_equal ../callbacks.h match_equal.cpp)
+add_executable(replanner ../callbacks.h replanner.cpp)
 
-target_link_libraries(explorer LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(disturbance_dimensions LINK_INTERFACE_LIBRARIES  CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(planner LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(match LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(find_match_state LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(state_difference LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(match_equal LINK_INTERFACE_LIBRARIES CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+
+target_link_libraries(explorer CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(match CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(find_match_state CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(state_difference CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(match_equal CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+target_link_libraries(replanner CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
 
 
 
@@ -121,6 +124,8 @@ add_test(NAME feature_clusters COMMAND feature_clusters ../170924_1321_badrun/ 0
 #add_test(NAME been_there COMMAND been_there ../251023_TAGET/)
 #add_test(NAME been_there_f COMMAND been_there ../251023_TAGET/)
 #set_property(TEST been_there_f PROPERTY WILL_FAIL true)
+
+add_test(NAME replanner COMMAND replanner ../251023_TAGET/ 2 1)
 
 
 set(CMAKE_BUILD_TYPE Debug)

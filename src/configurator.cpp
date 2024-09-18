@@ -572,7 +572,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	std::vector <Frontier> priorityQueue;
 	if (currentVertex==movingVertex){
 		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
-		return plan;
+		//return plan;
 	}
 	int no_out=0;
 
