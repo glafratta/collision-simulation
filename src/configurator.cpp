@@ -1561,14 +1561,14 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		}
 		if ( condition&& v!=movingVertex && boost::in_degree(v, g)>0 &&Tmatch ){ 
 			sum=sum_tmp;
-			std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
-			if (NULL!=others){
-				others_set.emplace(std::pair< vertexDescriptor, float>(v, sum));
-			}
-			if (g[most_likely.second].it_observed<1){
+			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie, iteration);
+			// if (NULL!=others){
+			// 	others_set.emplace(std::pair< vertexDescriptor, float>(v, sum));
+			// }
+			// if (g[most_likely.second].it_observed<1){
 				
-			}
-			else if (most_likely.first &&g[most_likely.second].probability>prob){
+			// }
+			// else if (most_likely.first ){ //&&g[most_likely.second].probability>prob
 				if (!relax){
 					result.first= m;
 				}
@@ -1576,9 +1576,9 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 					result.first=match_type;
 				}
 				result.second=v;
-				prob=g[most_likely.second].probability;
+				//prob=g[most_likely.second].probability;
 				
-			}
+			//}
 		}
 	}
 	if (others==NULL){
