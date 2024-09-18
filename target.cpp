@@ -19,7 +19,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				printf("there is disturbance\n");
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
-				BodyFeatures closest_D= std::min_element(b_features.begin(), b_features.end, compareCluster).base();
+				BodyFeatures closest_D= std::min_element(b_features.begin(), b_features.end(), compareCluster).base();
 				s_temp.disturbance= Disturbance(closest_D); //assumes 1 item length
 				debug::print_pose(s_temp.disturbance.pose());
 				printf("half w=%f, half length=%f\n", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
