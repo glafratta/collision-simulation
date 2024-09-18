@@ -1,6 +1,6 @@
 #include "worldbuilder.h"
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points, const b2Transform& start){
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     return result;
 
