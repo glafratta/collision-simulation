@@ -13,9 +13,9 @@ struct Correct{
     
     Correct(){}
 
-    void operator()( Action&, int);
+    void operator()( Task::Action&, int);
 
-    float errorCalc(Action, double);
+    float errorCalc(Task::Action, double);
 
     float getError(){
         return p();
