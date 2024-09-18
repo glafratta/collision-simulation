@@ -185,7 +185,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans=0){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth);
