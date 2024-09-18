@@ -27,9 +27,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.bf.halfLength);
 					debug::print_pose(transitionSystem[2].endPose);
 				}
-				bool closest_match=1;
+				bool closest_match=true;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, closest_match);
-				printf("looked for matches\n");
+				printf("looked for matches, closest =%i\n", closest_match);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			else{
