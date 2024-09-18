@@ -26,9 +26,9 @@ class WorldBuilder{
                                                                                                                                         //std::pair<points, obstaclestillthere>
     void makeBody(b2World&, BodyFeatures);
 
-    std::vector <BodyFeatures> processData( CoordinateContainer, const b2Transform&);
+    std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
 
-    std::vector <BodyFeatures> processData_kmeans( CoordinateContainer, const b2Transform&);
+    std::vector <BodyFeatures> processData_kmeans(CoordinateContainer, const b2Transform&);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
