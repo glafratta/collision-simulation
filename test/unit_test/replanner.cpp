@@ -1,0 +1,78 @@
+#include "../callbacks.h"
+
+int main(int argc, char** argv){
+    bool debug=0;
+    Disturbance target1;
+    vertexDescriptor solution=TransitionSystem::null_vertex();
+    if (argc>2){
+        solution=vertexDescriptor(atoi(argv[2]));
+    }
+    else{
+        throw;
+    }
+    if (argc>3){
+        if (atoi(argv[3])==1){
+            target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);    
+        }
+    }
+    Task goal(target1,DEFAULT);
+    Configurator conf(goal);
+    conf.simulationStep=0.27;
+    ConfiguratorInterface ci;
+    conf.registerInterface(&ci);
+    DataInterface di(&ci);
+    if (argc>1){
+        di.folder=argv[1];
+        di.newScanAvail();          
+    }
+    conf.data2fp = ci.data2fp;
+    conf.addIteration();
+    b2World world(b2Vec2(0,0));
+    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+    conf.dummy_vertex(conf.currentVertex);
+    conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
+    std::vector<vertexDescriptor>plan_og= conf.planner(conf.transitionSystem, conf.currentVertex);
+    printf("OG PLAN: ");
+    conf.printPlan(&plan_og);
+    conf.currentVertex=*(plan_og.end()-1);
+    std::vector <vertexDescriptor> options_src;
+    State state_tmp;
+    b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
+    conf.applyAffineTrans(shift, conf.transitionSystem);    
+    if (argc>4){
+        di.iteration=atoi(argv[4]);
+        di.newScanAvail();          
+        conf.data2fp = ci.data2fp;
+    }
+    std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
+    if (!b_features.empty()){
+        state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+    }
+    bool relax_match=1, plan_works=false;
+    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+    conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
+    std::vector<vertexDescriptor> plan_provisional;
+    for (vertexDescriptor o: options_src){
+        plan_provisional=conf.planner(conf.transitionSystem, o); //been.second, been.first
+        if (plan_provisional.empty()){
+            return 2;
+        }
+        auto vi= (plan_provisional.end()-1);
+        vertexDescriptor end =*(vi);
+
+        if (conf.controlGoal.checkEnded(conf.transitionSystem[end]).ended && conf.checkPlan(world, plan_provisional, conf.transitionSystem)){
+            if (plan_works){
+                break;
+            }
+        }
+        plan_provisional.clear();
+    }
+    
+    if (plan_provisional!=plan_og){
+        printf("PROVISIONAL: ");
+        conf.printPlan(&plan_provisional);
+
+        return 1;
+    }
+    return 0;
+}
