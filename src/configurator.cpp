@@ -908,7 +908,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			// prev_edge.second.m_source=movingVertex;
 			// prev_edge.second.m_target=v1;
 		}
-		if (is_match!=StateMatcher::_TRUE){
+		if (is_match!=StateMatcher::DISTURBANCE){
 			result=false;
 			break;
 			// printf("state end: x=%f, y=%f, theta=%f, d valid=%i", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle(), sk.first.disturbance.getAffIndex());
