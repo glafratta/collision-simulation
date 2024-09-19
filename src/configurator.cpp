@@ -563,7 +563,7 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* t){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});
@@ -573,6 +573,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	if (currentVertex==movingVertex){
 		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
 		//return plan;
+	}
+	Task overarching_goal;
+	if (NULL==t){
+		overarching_goal=controlGoal;
+	}
+	else{
+		overarching_goal=*t;
 	}
 	int no_out=0;
 
@@ -629,15 +636,9 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				if (!found){
 				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
 				path=paths.rbegin();				
-				//printf("new path based on previous path\n");
 				}
 				break;
 			}
-			// else{
-			// 	printf("edge exist=%i, index is end %i ", edge.second, pend.base()==path->rbegin().base());
-			// 	printf("doing nothing\n");
-			// 	break;
-			// }
 			if ( path==paths.rend()) { //if there are no other paths
 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
 				path=paths.rbegin();
@@ -655,7 +656,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
 		printf("exited inner while\n");
-	}while(!priorityQueue.empty() & (path_end!=goal &!controlGoal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
+	}while(!priorityQueue.empty() & (path_end!=goal &!overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
 	//printf("exited while\n");
 	auto vs=boost::vertices(g);
 	float final_phi=10000;

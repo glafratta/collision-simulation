@@ -31,10 +31,10 @@ int main(int argc, char** argv){
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-    std::vector<vertexDescriptor>plan_og= conf.planner(conf.transitionSystem, conf.currentVertex);
+    conf.planVertices= conf.planner(conf.transitionSystem, conf.currentVertex);
     printf("OG PLAN: ");
-    conf.printPlan(&plan_og);
-    conf.currentVertex=*(plan_og.end()-1);
+    conf.printPlan(&conf.planVertices);
+    conf.currentVertex=*(conf.planVertices.end()-1);
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
@@ -53,10 +53,16 @@ int main(int argc, char** argv){
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     std::vector<vertexDescriptor> plan_provisional;
     for (vertexDescriptor o: options_src){
-        plan_provisional=conf.planner(conf.transitionSystem, o); //been.second, been.first
-        if (plan_provisional.empty()){
-            return 2;
+        b2Transform o_shift= conf.transitionSystem[o].endPose;
+
+        Task controlGoal_tmp= conf.controlGoal;
+        conf.applyAffineTrans(o_shift, controlGoal_tmp);
+        auto srcs= gt::inEdges(conf.transitionSystem, o);
+        vertexDescriptor o_src=o;
+        if(!srcs.empty()){
+            o_src= srcs[0].m_source;
         }
+        plan_provisional=conf.planner(conf.transitionSystem, o_src); //been.second, been.first
         auto vi= (plan_provisional.end()-1);
         vertexDescriptor end =*(vi);
 
@@ -68,7 +74,7 @@ int main(int argc, char** argv){
         plan_provisional.clear();
     }
     
-    if (plan_provisional!=plan_og){
+    if (plan_provisional!=conf.planVertices){
         printf("PROVISIONAL: ");
         conf.printPlan(&plan_provisional);
 
