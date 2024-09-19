@@ -236,7 +236,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, Task* t=NULL) ;
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, const Task* t=NULL) ;
 
 std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
