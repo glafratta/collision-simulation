@@ -891,10 +891,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			sk.first.outcome=simResult::successful;
 		}
 		start = sk.first.endPose;
-		// DistanceVector distance = matcher.getDistance(g[planVertices[it]], s);
-		// if (!matcher.isPerfectMatch(distance)){
 		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(g[ep.first.m_source], sk.first);
-	//	printf("sk dist = %i, exp vertex dist=%i\n", sk.first.disturbance.getAffIndex(), g[ep.first.m_source].disturbance.getAffIndex());			
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
 		//vertexDescriptor v0;

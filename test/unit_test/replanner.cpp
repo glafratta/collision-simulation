@@ -20,6 +20,7 @@ int main(int argc, char** argv){
     conf.simulationStep=0.27;
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
+    conf.setBenchmarking(true, "simulation_benchmarking");
     DataInterface di(&ci);
     if (argc>1){
         di.folder=argv[1];
@@ -48,7 +49,7 @@ int main(int argc, char** argv){
     if (!b_features.empty()){
         state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
     }
-    bool relax_match=1, plan_works=false;
+    bool relax_match=1, plan_works=true;
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     std::vector<vertexDescriptor> plan_provisional;
@@ -66,8 +67,10 @@ int main(int argc, char** argv){
         auto vi= (plan_provisional.end()-1);
         vertexDescriptor end =*(vi);
         bool ctrl_finished = controlGoal_tmp.checkEnded(conf.transitionSystem[end]).ended;
-        plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[*plan_provisional.begin()].start,o_src);
+        conf.addIteration();
         if (ctrl_finished){
+            
+          //  plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
             if (plan_works){
                 break;
             }
