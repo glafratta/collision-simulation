@@ -50,10 +50,11 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//std::vector <vertexDescriptor> plan_provisional=planVertices;
 	//	if (been.first){
 		//	printf("provisional plan\n");
-		printf("options=%i\n", options_src.size());
+		//printf("options=%i\n", options_src.size());
 		for (auto o:options_src){
 			recall_plan_from(o, transitionSystem, plan_provisional, plan_works);
 		}
+
 
 }
 

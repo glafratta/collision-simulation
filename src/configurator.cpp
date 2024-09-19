@@ -110,23 +110,10 @@ bool Configurator::Spawner(){
 			//ve=currentVertex;
 			src=currentVertex;
 		}
-		bool plan_works=false;
+	bool plan_works=true;
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);
-	// //	if (been.first){
-	// 	//	printf("provisional plan\n");
-	// 	for (auto o:options_src){
-	// 		plan_provisional=planner(transitionSystem, o); //been.second, been.first
-	// 		vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
-	// 		if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
-	// 			plan_works=true;
-	// 			break;
-	// 		}
-	// 	}
-	//	}
-		//printf("plan provisional size = %i\n", plan_provisional.size());
-		
 	printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
