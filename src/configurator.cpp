@@ -111,6 +111,9 @@ bool Configurator::Spawner(){
 			src=currentVertex;
 		}
 	bool plan_works=true;
+	if (transitionSystem.m_vertices.size()<2){
+		plan_works=false;
+	}
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);
