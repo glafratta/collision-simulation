@@ -1483,23 +1483,32 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 	}
 	}
 
-	// if(v==currentVertex & result.empty() 
-	// 		& es.first!=es.second & ep.second){
-	// 		v=ep.first.m_source;
-	// 	}
-	// 	else if (result.empty()&connecting.empty()){
-	// 		break;
-	// 	}
-	// 	if (!connecting.empty()){
-	// 		v=connecting[0];
-	// 		connecting.erase(connecting.begin());
-	// 	}
-	// 	else{
-	// 		break;
-	// 	}
-	// }while (true);
 	return result;
 }
+
+void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, std::vector <vertexDescriptor>& plan_provisional, bool & plan_works){
+    auto srcs= gt::inEdges(g, v);
+    vertexDescriptor src=v;
+    if(!srcs.empty()){
+		src= srcs[0].m_source;
+	}
+	b2Transform o_shift= -g[src].endPose;
+	Task controlGoal_adjusted= controlGoal;
+	applyAffineTrans(o_shift, controlGoal_adjusted);
+	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted); //been.second, been.first
+	auto vi= (plan_provisional.end()-1);
+	vertexDescriptor end =*(vi);
+	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
+	if (ctrl_finished){
+		//  plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
+		if (plan_works){
+			return;
+		}
+	}
+	plan_provisional.clear();
+
+}
+
 
 
 

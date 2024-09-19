@@ -13,20 +13,12 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			printf("NOW CHECKING FOR MATCHES\n");
 			bool using_kmeans=1;
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
-			//Disturbance where=controlGoal.disturbance;
-//			printf("built world, b_feaures=%i\n", b_features.size());
 			if (b_features.size()>0){
-//				printf("there is disturbance\n");
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
 				BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
 				s_temp.disturbance= Disturbance(closest_D); //assumes 1 item length
 				debug::print_pose(s_temp.disturbance.pose());
-//				printf("half w=%f, half length=%f\n", s_temp.disturbance.bf.halfWidth, s_temp.disturbance.bf.halfLength);
-				if (transitionSystem.m_vertices.size()>3){
-//					printf("v2 hw=%f, hl=%f, ", transitionSystem[2].disturbance.bf.halfWidth, transitionSystem[2].disturbance.bf.halfLength);
-					debug::print_pose(transitionSystem[2].endPose);
-				}
 				bool closest_match=true;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, closest_match);
 				printf("looked for matches, closest =%i\n", closest_match);
@@ -60,24 +52,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//	printf("provisional plan\n");
 		printf("options=%i\n", options_src.size());
 		for (auto o:options_src){
-			printf("FOUND MATCH WITH %i!", int(o));
-			plan_provisional=planner(transitionSystem, o); //been.second, been.first
-			if (plan_provisional.empty()){
-				printf("no plan tho\n");
-				return;
-			}
-			auto vi= (plan_provisional.end()-1);
-			if (&vi==NULL){
-				printf("pointing to nothing\n");
-			}
-			vertexDescriptor end =*(vi);
-
-			if (controlGoal.checkEnded(transitionSystem[end]).ended ){ //&& checkPlan(world, plan_provisional, transitionSystem)
-				src=plan_provisional[0];
-				plan_works=true;
-				return;
-			}
-			plan_provisional.clear();
+			recall_plan_from(o, transitionSystem, plan_provisional, plan_works);
 		}
 
 }

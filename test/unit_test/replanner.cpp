@@ -54,28 +54,29 @@ int main(int argc, char** argv){
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     std::vector<vertexDescriptor> plan_provisional;
     for (vertexDescriptor o: options_src){
-        auto srcs= gt::inEdges(conf.transitionSystem, o);
-        vertexDescriptor o_src=o;
-        if(!srcs.empty()){
-            o_src= srcs[0].m_source;
-        }
-        b2Transform o_shift= -conf.transitionSystem[o_src].endPose;
-        Task controlGoal_tmp= conf.controlGoal;
-        conf.applyAffineTrans(o_shift, controlGoal_tmp);
+        // auto srcs= gt::inEdges(conf.transitionSystem, o);
+        // vertexDescriptor o_src=o;
+        // if(!srcs.empty()){
+        //     o_src= srcs[0].m_source;
+        // }
+        // b2Transform o_shift= -conf.transitionSystem[o_src].endPose;
+        // Task controlGoal_tmp= conf.controlGoal;
+        // conf.applyAffineTrans(o_shift, controlGoal_tmp);
 
-        plan_provisional=conf.planner(conf.transitionSystem, o_src, TransitionSystem::null_vertex(), false, &controlGoal_tmp); //been.second, been.first
-        auto vi= (plan_provisional.end()-1);
-        vertexDescriptor end =*(vi);
-        bool ctrl_finished = controlGoal_tmp.checkEnded(conf.transitionSystem[end]).ended;
-        conf.addIteration();
-        if (ctrl_finished){
+        // plan_provisional=conf.planner(conf.transitionSystem, o_src, TransitionSystem::null_vertex(), false, &controlGoal_tmp); //been.second, been.first
+        // auto vi= (plan_provisional.end()-1);
+        // vertexDescriptor end =*(vi);
+        // bool ctrl_finished = controlGoal_tmp.checkEnded(conf.transitionSystem[end]).ended;
+        // conf.addIteration();
+        // if (ctrl_finished){
             
-          //  plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
-            if (plan_works){
-                break;
-            }
-        }
-        plan_provisional.clear();
+        //   //  plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
+        //     if (plan_works){
+        //         break;
+        //     }
+        // }
+        // plan_provisional.clear();
+        conf.recall_plan_from(o, conf.transitionSystem, plan_provisional, plan_works);
     }
     
     if (plan_provisional!=conf.planVertices){
