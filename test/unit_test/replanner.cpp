@@ -58,15 +58,16 @@ int main(int argc, char** argv){
         if(!srcs.empty()){
             o_src= srcs[0].m_source;
         }
-        b2Transform o_shift= conf.transitionSystem[o_src].endPose;
+        b2Transform o_shift= -conf.transitionSystem[o_src].endPose;
         Task controlGoal_tmp= conf.controlGoal;
         conf.applyAffineTrans(o_shift, controlGoal_tmp);
 
         plan_provisional=conf.planner(conf.transitionSystem, o_src, TransitionSystem::null_vertex(), false, &controlGoal_tmp); //been.second, been.first
         auto vi= (plan_provisional.end()-1);
         vertexDescriptor end =*(vi);
-
-        if (conf.controlGoal.checkEnded(conf.transitionSystem[end]).ended && conf.checkPlan(world, plan_provisional, conf.transitionSystem)){
+        bool ctrl_finished = controlGoal_tmp.checkEnded(conf.transitionSystem[end]).ended;
+        plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[*plan_provisional.begin()].start,o_src);
+        if (ctrl_finished){
             if (plan_works){
                 break;
             }

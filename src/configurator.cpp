@@ -563,7 +563,7 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* t){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});
@@ -575,11 +575,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		//return plan;
 	}
 	Task overarching_goal;
-	if (NULL==t){
+	if (NULL==custom_ctrl_goal){
 		overarching_goal=controlGoal;
 	}
 	else{
-		overarching_goal=*t;
+		overarching_goal=*custom_ctrl_goal;
 	}
 	int no_out=0;
 
@@ -656,6 +656,10 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
 		printf("exited inner while\n");
+		// bool fin = overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
+		// if (fin){
+		// 	goal=path_end;
+		// }
 	}while(!priorityQueue.empty() & (path_end!=goal &!overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
 	//printf("exited while\n");
 	auto vs=boost::vertices(g);
@@ -677,7 +681,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	// 	}
 	// }
 	printf("PLANNED!\n");
-	printPlan();
+	//printPlan();
 	return plan;
 }
 
@@ -847,17 +851,15 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 // 	return plan;
 // }
 
-bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start){
+bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start, vertexDescriptor custom_start){
 	b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 	printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 	bool result=true;
 	int it=-1;//this represents currentv
-	auto ep=boost::edge(movingVertex, currentVertex, g);	
-	//printf("0->current=%i exists=%i\n", currentVertex, ep.second);
-	printPlan();
+	//printPlan();
 	std::vector <vertexDescriptor> vpt=p;
-	printPlan(&vpt);
+	//printPlan(&vpt);
 	if (p.empty() && currentTask.motorStep==0){
 	//	printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
@@ -867,6 +869,10 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			p.erase(p.begin());
 		}		
 	}	
+	if (custom_start==TransitionSystem::null_vertex()){
+		custom_start=movingVertex;
+	}
+	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
 		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;

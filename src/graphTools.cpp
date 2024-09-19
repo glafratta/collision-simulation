@@ -434,4 +434,12 @@ Transform operator-(Transform const & t1, Transform const&t2){
 
 }
 
+Transform operator-(Transform const & t){
+	b2Transform result;
+	result.p.x=-(t.p.x);
+	result.p.y=-(t.p.y);
+	result.q.Set(-t.q.GetAngle());
+	return result;
+
+}
 
