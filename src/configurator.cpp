@@ -1720,7 +1720,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		if (pv.empty()){
 			//if (currentVertex!=movingVertex){
 				printf("I DON'T KNOW WHAT TO DO NOW\n");
-				currentTask.action.setVelocities(0, 0); //stop if dont know what to do
+				currentTask=Task(STOP);
 			//}
 			//printf("no plan, bas\n");
 			return pv;
