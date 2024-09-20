@@ -49,7 +49,7 @@ int main(int argc, char** argv){
     if (!b_features.empty()){
         state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
     }
-    bool relax_match=1, plan_works=true;
+    bool relax_match=1, plan_works=false;
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     std::vector<vertexDescriptor> plan_provisional;

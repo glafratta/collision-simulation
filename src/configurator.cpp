@@ -843,15 +843,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 
 bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start, vertexDescriptor custom_start){
 	b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-	printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
-	printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
+	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
+	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 	bool result=true;
 	int it=-1;//this represents currentv
 	//printPlan();
 	std::vector <vertexDescriptor> vpt=p;
-	//printPlan(&vpt);
 	if (p.empty() && currentTask.motorStep==0){
-	//	printf("plan empty=%i, motor step=%i\n", p.empty(), currentTask.motorStep);
 		return false;
 	}
 	if (p.size()>0){
@@ -864,11 +862,13 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	}
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
-		Task t= Task(g[ep.first.m_source].disturbance, g[ep.first].direction, start, true);
+		b2Transform shift=g[movingVertex].endPose-g[ep.first].endPose;
+		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
+		applyAffineTrans(d_adjusted);
+		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(start), Edge(t.direction));
-		//sk.first.direction=t.direction;
 		printf("from %i", ep.first.m_target);
 		vertexDescriptor src=ep.first.m_target;
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
@@ -876,82 +876,30 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		if ((g[src].endPose.p -sk.first.endPose.p).Length()> (g[src].endPose.p-endPose.p).Length()){
-			sk.first.endPose=endPose;
+		b2Transform expected_deltaPose=(g[src].endPose.p-endPose);
+		if ((g[src].endPose.p -sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
+			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
 		}
 		start = sk.first.endPose;
 		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(g[ep.first.m_source], sk.first);
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
-		//vertexDescriptor v0;
 		if (!prev_edge.first){
-			//v0=prev_edge.second.m_source;
 			auto _moving=boost::add_edge(movingVertex, v1, g);
 			prev_edge.second=_moving.first;
-			if (_moving.second){
-			//	printf("new edge added moving\n");
-			}
-			// prev_edge.second.m_source=movingVertex;
-			// prev_edge.second.m_target=v1;
 		}
 		if (is_match!=StateMatcher::DISTURBANCE){
 			result=false;
 			break;
-			// printf("state end: x=%f, y=%f, theta=%f, d valid=%i", sk.first.endPose.p.x, sk.first.endPose.p.y, sk.first.endPose.q.GetAngle(), sk.first.disturbance.getAffIndex());
-			// if (sk.first.disturbance.isValid()){
-			// 	printf(" d pos: x=%f, y=%f, theta=%f, hl =%f, hw=%f\n", sk.first.disturbance.pose().p.x, sk.first.disturbance.pose().p.y, sk.first.disturbance.pose().q.GetAngle(), sk.first.disturbance.bodyFeatures().halfLength, sk.first.disturbance.bodyFeatures().halfWidth);
-			// }
-			// printf("\nNO MATCH with %i: x=%f, y=%f, theta=%f, d valid=%i\n", v1, g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle(), g[v1].disturbance.getAffIndex());
-			// if (g[v1].disturbance.isValid()){
-			// 	printf(" d pos: x=%f, y=%f, theta=%f\n", g[v1].disturbance.pose().p.x, g[v1].disturbance.pose().p.y, g[v1].disturbance.pose().q.GetAngle());
-			// }
-			
-			// //printf("simulation duration step=%i, started from %f, %f, %f\n", sk.second.step, g[prev_edge.second.m_source].endPose.p.x, g[prev_edge.second.m_source].endPose.p.y,g[prev_edge.second.m_source].endPose.q.GetAngle());
-			// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match = findMatch(sk.first, g, g[prev_edge.second.m_source].ID, sk.second.direction);
-			// g[prev_edge.second.m_source].options.push_back(t.direction);
-			// if (match.first!=StateMatcher::_TRUE){
-			// 	ep=addVertex(prev_edge.second.m_source, v1,g, Disturbance(), g[ep.first], 1);
-			// 	printf("added edge %i -> %i in check plan, dir %i\n",prev_edge.second.m_source, v1, g[ep.first].direction);
-			// 	// printf("dist valid = %i, end %f, %f, %f\n", g[v1].disturbance.isValid(), g[v1].endPose.p.x, g[v1].endPose.p.y, g[v1].endPose.q.GetAngle());			
-			// }
-			// else{
-			// 	printf("instead matched with %i:  x=%f, y=%f, theta=%f\n", match.second, g[match.second].endPose.p.x, g[match.second].endPose.p.y, g[match.second].endPose.q.GetAngle());
-			// 	gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
-			// 	p[it]=match.second;
-			// 	if (ep.first.m_target!=TransitionSystem::null_vertex()){
-			// 		ep=boost::edge(match.second, ep.first.m_target, g);
-			// 		if (!ep.second){
-			// 			ep=gt::add_edge(prev_edge.second.m_source, match.second, g, iteration);
-			// 		}
-			// 	}
-			// 	else{
-			// 	//	printf("target=%i\n", ep.first.m_target);
-			// 		//ep.first.m_source=match.second;
-			// 		ep.first= boost::edge(match.second, ep.first.m_target, g).first;
-			// 	}
-			// }
-			// gt::set(ep.first, sk, g, it==currentVertex, errorMap, iteration);
-			// printf("set v\n");
-			// if (sk.first.outcome==simResult::crashed){
-			// 	p.clear();
-			// 	printf("plan crashes at %i\n", v1);
-			// 	result=false;
-			// 	break;
-			// }
 		}
 		else{
-			//printf("updatign existing\n");
 			gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
 		}
 		propagateD(v1,prev_edge.second.m_source, g);
-	//	printf("propagated\n");
 		gt::adjustProbability(g, ep.first);
-	//	printf("adjust prov, it %i,is it target null=%i p size =%i, result=%i\n", it,ep.first.m_target!=TransitionSystem::null_vertex(), p.size(), result);
-		// t= Task(g[ep.first.m_source].disturbance, g[ep.first.m_target].direction, start, true);
 		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
 	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
-//	printf("checked\n");
 	return result;
 }
 
@@ -1490,7 +1438,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	vertexDescriptor end =*(vi);
 	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
 	if (ctrl_finished){
-		//  plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
+		plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
 		if (plan_works){
 			return;
 		}
@@ -1794,9 +1742,10 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
 
 void Configurator::applyAffineTrans(const b2Transform& deltaPose, Task& task){
 	math::applyAffineTrans(deltaPose, task.start);
-	if (task.disturbance.getAffIndex()!=NONE){
-		math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
-	}
+	// if (task.disturbance.getAffIndex()!=NONE){
+	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
+	// }
+	applyAffineTrans(deltaPose, task.disturbance);
 }
 
 void Configurator::applyAffineTrans(const b2Transform& deltaPose, TransitionSystem& g){
@@ -1807,6 +1756,13 @@ void Configurator::applyAffineTrans(const b2Transform& deltaPose, TransitionSyst
 	}
 }
 }
+
+void Configurator::applyAffineTrans(const b2Transform& deltaPose, Disturbance& d){
+	if (d.getAffIndex()!=NONE){
+		math::applyAffineTrans(deltaPose, d.bf.pose);
+	}
+}
+
 
 void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	b2Transform deltaPose;
