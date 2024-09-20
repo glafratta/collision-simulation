@@ -1438,7 +1438,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	vertexDescriptor end =*(vi);
 	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
 	if (ctrl_finished){
-		plan_works= conf.checkPlan(world, plan_provisional, conf.transitionSystem,  conf.transitionSystem[conf.movingVertex].start,o_src);
+		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,o_src);
 		if (plan_works){
 			return;
 		}
