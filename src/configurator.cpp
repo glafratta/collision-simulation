@@ -859,6 +859,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	}	
 	if (custom_start==TransitionSystem::null_vertex()){
 		custom_start=movingVertex;
+		it=-1;
 	}
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
@@ -876,20 +877,21 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(g[t_start_v].start-endPose);
+		b2Transform expected_deltaPose=(g[ep.first.m_source].start-endPose);
 		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
 		}
 		start = sk.first.endPose;
-		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(g[ep.first.m_source], sk.first);
+		StateDifference sd;
+		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(g[ep.first.m_source], sk.first, NULL, &sd);
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
 		if (!prev_edge.first){
 			auto _moving=boost::add_edge(movingVertex, v1, g);
 			prev_edge.second=_moving.first;
 		}
-		if (is_match!=StateMatcher::DISTURBANCE){
+		if (StateMatcher::match_equal(is_match, StateMatcher::DISTURBANCE)){
 			result=false;
 			break;
 		}
