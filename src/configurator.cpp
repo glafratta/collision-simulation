@@ -864,7 +864,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first].endPose;
 		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
-		applyAffineTrans(d_adjusted);
+		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
@@ -876,7 +876,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(g[src].endPose.p-endPose);
+		b2Transform expected_deltaPose=(g[src].endPose-endPose);
 		if ((g[src].endPose.p -sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
