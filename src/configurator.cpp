@@ -846,7 +846,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 	bool result=true;
-	int it=-1;//this represents currentv
+	int it=0;//this represents currentv
 	//printPlan();
 	std::vector <vertexDescriptor> vpt=p;
 	if (p.empty() && currentTask.motorStep==0){
@@ -870,14 +870,14 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(start), Edge(t.direction));
 		printf("from %i", ep.first.m_target);
-		vertexDescriptor src=ep.first.m_target;
+		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
 		printf("to it %i, edge %i ->%i, stepDistance %f, direction = %i\n", it, ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(g[src].endPose-endPose);
-		if ((g[src].endPose.p -sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
+		b2Transform expected_deltaPose=(g[t_start_v].start-endPose);
+		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
 		}
