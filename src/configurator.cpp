@@ -862,7 +862,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	}
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
-		b2Transform shift=g[movingVertex].endPose-g[ep.first].endPose;
+		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
