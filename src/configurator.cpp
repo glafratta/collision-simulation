@@ -891,7 +891,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			auto _moving=boost::add_edge(movingVertex, v1, g);
 			prev_edge.second=_moving.first;
 		}
-		if (matcher.match_equal(is_match, StateMatcher::DISTURBANCE)){
+		if (!matcher.match_equal(is_match, StateMatcher::DISTURBANCE)){
 			result=false;
 			break;
 		}
