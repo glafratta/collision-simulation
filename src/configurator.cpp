@@ -879,7 +879,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 									// simulation result step, so this needs to be adjusted
 		b2Transform expected_deltaPose=(g[ep.first.m_source].start-endPose);
 		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
-			sk.first.disturbance=d_adjusted;
+			Disturbance d_adjusted_2=g[ep.first.m_source].disturbance;
+			sk.first.disturbance=d_adjusted_2;
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
 		}
