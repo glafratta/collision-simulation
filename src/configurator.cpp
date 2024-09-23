@@ -645,7 +645,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("planning, path size= %i\n",path->size() );
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
-		printf("exited inner while\n");
+		//printf("exited inner while\n");
 		// bool fin = overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
 		// if (fin){
 		// 	goal=path_end;
@@ -864,6 +864,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
+		printf("start= \t");
+		debug::print_pose(start);
 		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
@@ -872,14 +874,16 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		std::pair <State, Edge> sk(State(start), Edge(t.direction));
 		printf("from %i", ep.first.m_target);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
-		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
-		printf("to it %i, edge %i ->%i, stepDistance %f, direction = %i\n", it, ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
+		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
+		printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
 		b2Transform expected_deltaPose=(endPose-g[ep.first.m_source].start);
 		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
+			b2Transform shift_2=g[movingVertex].endPose-g[ep.first.m_source].endPose;
 			Disturbance d_adjusted_2=g[ep.first.m_source].disturbance;
+			applyAffineTrans(shift_2, d_adjusted_2);
 			sk.first.disturbance=d_adjusted_2;
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
@@ -903,12 +907,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			printf(", w=%f, l=%f\n", sk.first.disturbance.bf.halfWidth, sk.first.disturbance.bf.halfLength);
 			break;
 		}
-		else{
-			gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
-		}
+		// else{
+		// 	gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
+		// }
 		propagateD(v1,prev_edge.second.m_source, g);
 		gt::adjustProbability(g, ep.first);
-		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
+		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
 	return result;
 }
@@ -925,6 +929,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 //adjust here
 	do{
 		i++;
+		printf("index=%i\n", i);
 		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			g[e].it_observed=iteration;
@@ -944,9 +949,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				}
 			}
 		result=g[e.m_source].endPose; 
-
-
-		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
+		}while (g[e].direction==t->direction && i<planVertices.size()&& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	if (g[e_start.m_target].disturbance.getAffIndex()!=NONE){
 		printf("targ=%i, d index=%i, d hl=%f, d hw=%f\n", e_start.m_target, g[e_start.m_target].disturbance.getAffIndex(), g[e_start.m_target].disturbance.bodyFeatures().halfLength, g[e_start.m_target].disturbance.bodyFeatures().halfWidth);

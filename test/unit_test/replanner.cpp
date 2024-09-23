@@ -35,6 +35,7 @@ int main(int argc, char** argv){
     conf.planVertices= conf.planner(conf.transitionSystem, conf.currentVertex);
     printf("OG PLAN: ");
     conf.printPlan(&conf.planVertices);
+    conf.addIteration();
     conf.currentVertex=*(conf.planVertices.end()-1);
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
