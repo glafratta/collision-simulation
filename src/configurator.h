@@ -117,7 +117,7 @@ void setBenchmarking(bool b, char * new_folder){
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",new_path, d,m,y,h,min);
-		sprintf(statFile,"stat");
+		//sprintf(statFile,"stat");
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		printf("open\n");
@@ -172,7 +172,7 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
-void recall_plan_from(const vertexDescriptor&, TransitionSystem &, std::vector <vertexDescriptor>&, bool&);
+void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, std::vector <vertexDescriptor>&, bool&);
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
@@ -203,6 +203,8 @@ void printPlan(std::vector <vertexDescriptor>* p=NULL);
 void applyAffineTrans(const b2Transform& , Task& );
 
 void applyAffineTrans(const b2Transform&, TransitionSystem&);
+
+void applyAffineTrans(const b2Transform&, Disturbance&);
 
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
