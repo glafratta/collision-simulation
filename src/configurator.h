@@ -117,7 +117,6 @@ void setBenchmarking(bool b, char * new_folder){
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
 		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",new_path, d,m,y,h,min);
-		//sprintf(statFile,"stat");
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		printf("open\n");

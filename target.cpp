@@ -52,7 +52,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//	printf("provisional plan\n");
 		//printf("options=%i\n", options_src.size());
 		for (auto o:options_src){
-			recall_plan_from(o, transitionSystem, plan_provisional, plan_works);
+			recall_plan_from(o, transitionSystem, world, plan_provisional, plan_works);
 		}
 
 
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
 	//sprintf(name, "Dmatch_target");
 	//get_Foldername(,name);
 	//printf("foldername = %s\n", name);
-	configurator.setBenchmarking(1, "Dmatch_target");
+	configurator.setBenchmarking(1, "Dmatch_target_check");
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
