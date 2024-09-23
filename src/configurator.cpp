@@ -877,7 +877,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(g[ep.first.m_source].start-endPose);
+		b2Transform expected_deltaPose=(endPose-g[ep.first.m_source].start);
 		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
 			Disturbance d_adjusted_2=g[ep.first.m_source].disturbance;
 			sk.first.disturbance=d_adjusted_2;
@@ -1020,7 +1020,7 @@ void Configurator::printPlan(std::vector <vertexDescriptor>* p){
 		if (!edge.second){
 			//throw std::exception();
 			//auto a=dirmap.find(transitionSystem[edge.first].direction);
-			printf("no edge: %i-> %i", edge.first.m_source, edge.first.m_target);
+			printf("no edge: %i-> %i\t", edge.first.m_source, edge.first.m_target);
 		}
 		else{
 			auto a=dirmap.find(transitionSystem[edge.first].direction);
