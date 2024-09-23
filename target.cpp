@@ -44,13 +44,6 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		else{
 			plan_works=true;//temporary to simplify things
 		}
-		//printf("checked been = %i\n", been.first);
-		//std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-
-		//std::vector <vertexDescriptor> plan_provisional=planVertices;
-	//	if (been.first){
-		//	printf("provisional plan\n");
-		//printf("options=%i\n", options_src.size());
 		for (auto o:options_src){
 			recall_plan_from(o, transitionSystem, world, plan_provisional, plan_works);
 		}

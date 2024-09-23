@@ -895,6 +895,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		}
 		if (!matcher.match_equal(is_match, StateMatcher::DISTURBANCE)){
 			result=false;
+			printf("expected D:");
+			debug::print_pose(g[ep.first.m_source].disturbance.bf.pose);
+			printf(", w=%f, l=%f\n", g[ep.first.m_source].disturbance.bf.halfWidth, g[ep.first.m_source].disturbance.bf.halfLength);
+			printf("observed D:");
+			debug::print_pose(sk.first.disturbance.bf.pose);
+			printf(", w=%f, l=%f\n", sk.first.disturbance.bf.halfWidth, sk.first.disturbance.bf.halfLength);
 			break;
 		}
 		else{
