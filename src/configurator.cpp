@@ -117,7 +117,7 @@ bool Configurator::Spawner(){
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);
-	printf("plan provisional size = %i, plan_works=%i", plan_provisional.size(), plan_works);
+	printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
 		planVertices.clear();
@@ -852,6 +852,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	if (p.empty() && currentTask.motorStep==0){
 		return false;
 	}
+	printf("CHECKING\n");
 	if (p.size()>0){
 		if (p[0]==currentVertex){
 			p.erase(p.begin());
@@ -1456,6 +1457,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	vertexDescriptor end =*(vi);
 	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
 	if (ctrl_finished){
+		printf("plan reaches goal\n");
 		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
 		if (plan_works){
 			return;
