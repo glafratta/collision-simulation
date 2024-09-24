@@ -1,7 +1,7 @@
 #include "../callbacks.h"
 
 int main(int argc, char** argv){
-    bool debug=0;
+    bool debug=1;
     Disturbance target1;
     vertexDescriptor solution=TransitionSystem::null_vertex();
     if (argc>2){
