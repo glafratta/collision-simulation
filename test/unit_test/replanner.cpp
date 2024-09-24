@@ -37,7 +37,8 @@ int main(int argc, char** argv){
     conf.printPlan(&conf.planVertices);
     conf.addIteration();
     conf.currentVertex=*(conf.planVertices.end()-1);
-    conf.currentEdge=boost::edge(*(conf.planVertices.end()-2), conf.currentVertex, conf.transitionSystem);
+    vertexDescriptor prev=*(conf.planVertices.end()-2);
+    conf.currentEdge=boost::edge(prev, conf.currentVertex, conf.transitionSystem);
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
