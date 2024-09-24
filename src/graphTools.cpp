@@ -282,7 +282,7 @@ bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& de
 			}
 			break;
 		case D_POSE:
-			if (candidate==_TRUE || candidate==D_POSE || candidate==D_POSE){
+			if (candidate==_TRUE || candidate==DISTURBANCE || candidate==D_POSE){
 				result=true;
 			}
 			break;
