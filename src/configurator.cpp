@@ -865,7 +865,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
-		printf("start= \t");
+		//printf("start= \t");
 		debug::print_pose(start);
 		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
 		applyAffineTrans(shift, d_adjusted);
@@ -873,10 +873,10 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance);
 		std::pair <State, Edge> sk(State(start), Edge(t.direction));
-		printf("from %i", ep.first.m_target);
+		//printf("from %i", ep.first.m_target);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
-		printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
+		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
@@ -902,13 +902,15 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		}
 		if (!matcher.match_equal(is_match, StateMatcher::D_POSE)){
 			result=false;
-			printf("expected D:");
+			printf("MISMATCH!!! with v %i expected D:", ep.first.m_source);
 			debug::print_pose(g[ep.first.m_source].disturbance.bf.pose);
+			printf("start:");
+			debug::print_pose(g[t_start_v].start);
 			printf(", w=%f, l=%f\n", g[ep.first.m_source].disturbance.bf.halfWidth, g[ep.first.m_source].disturbance.bf.halfLength);
 			printf("observed D:");
 			debug::print_pose(sk.first.disturbance.bf.pose);
 			printf(", w=%f, l=%f\n", sk.first.disturbance.bf.halfWidth, sk.first.disturbance.bf.halfLength);
-			break;
+			return result;
 		}
 		// else{
 		// 	gt::update(prev_edge.second, sk, g,true, errorMap, iteration);

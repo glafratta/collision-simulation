@@ -21,7 +21,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				debug::print_pose(s_temp.disturbance.pose());
 				bool closest_match=true;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, closest_match);
-				printf("looked for matches, closest =%i\n", closest_match);
+				printf("looked for matches, potential: %i, closest =%i\n", options_src.size(), closest_match);
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			else{
@@ -46,6 +46,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		}
 		for (auto o:options_src){
 			recall_plan_from(o, transitionSystem, world, plan_provisional, plan_works);
+			if (plan_works){
+				break;
+			}
 		}
 
 
