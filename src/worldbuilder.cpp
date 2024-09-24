@@ -173,6 +173,9 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
 
 std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, bool kmeans){
     std::vector <BodyFeatures> features;
+    if (current.empty()){
+        return features;
+    }
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, halfWindowWidth);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
     if (!kmeans){
