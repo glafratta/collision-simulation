@@ -21,7 +21,7 @@
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-const float D_DIMENSIONS_MARGIN=0.03;
+const float D_DIMENSIONS_MARGIN=0.05;
 
 float angle_subtract(float a1, float a2);
 
@@ -330,15 +330,15 @@ class StateMatcher{
 			// 	return d_shape && d_type;
 			// }
 
-			StateMatch (const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
+			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
 				r_angle=fabs(sd.r_angle)<error.angle;
 				d_type=sd.D_type==0;
 				d_position= sd.D_position.Length()<(error.dPosition*coefficient);
 				d_angle=fabs(sd.D_angle)<error.angle;
-				bool below_threshold_w=fabs(sd.D_width)<error.D_dimensions;
-				bool below_threshold_l=fabs(sd.D_length)<error.D_dimensions;
-				d_shape= below_threshold_l & below_threshold_w;
+				bool below_threshold_w=fabs(sd.D_width)<(error.D_dimensions*coefficient);
+				bool below_threshold_l=fabs(sd.D_length)<(error.D_dimensions*coefficient);
+				d_shape= below_threshold_l && below_threshold_w;
 
 			}
 
