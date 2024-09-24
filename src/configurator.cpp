@@ -1422,7 +1422,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 }
 
 void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, b2World &world,  std::vector <vertexDescriptor>& plan_provisional, bool & plan_works){
-    printf("recalling\n");
+   // printf("recalling\n");
 	auto srcs= gt::inEdges(g, v);
     vertexDescriptor src=v;
     if(!srcs.empty()){

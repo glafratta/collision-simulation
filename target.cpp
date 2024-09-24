@@ -45,6 +45,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			plan_works=true;//temporary to simplify things
 		}
 		for (auto o:options_src){
+			printf("recall from %i\n", o);
 			recall_plan_from(o, transitionSystem, world, plan_provisional, plan_works);
 			if (plan_works){
 				break;
