@@ -1454,11 +1454,13 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	Task controlGoal_adjusted= controlGoal;
 	applyAffineTrans(o_shift, controlGoal_adjusted);
 	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted); //been.second, been.first
+	printf("provisional plan from v%i\n", v);
+	printPlan(&plan_provisional);
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
 	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
 	printf("adjusted goal:\t");
-	debug::print_pose(controlGoal.disturbance.pose());
+	debug::print_pose(controlGoal_adjusted.disturbance.pose());
 	printf("end pose of plan:\t");
 	debug::print_pose(g[end].endPose);
 	if (ctrl_finished){
