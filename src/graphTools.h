@@ -289,7 +289,7 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 
 class StateMatcher{
 	public:
-		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4};
+		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6};
         //std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
@@ -326,6 +326,13 @@ class StateMatcher{
 				return d_position && d_angle && d_type && d_shape;
 			}
 
+			bool disturbance_pose(){
+				return d_position && d_type && d_angle;
+			}
+
+			bool disturbance_shape(){
+				return d_type && d_shape;
+			}
 			// bool disturbance(){
 			// 	return d_shape && d_type;
 			// }
@@ -351,6 +358,12 @@ class StateMatcher{
 				}
 				else if (disturbance_exact()){
 					return DISTURBANCE;
+				}
+				else if (disturbance_pose()){
+					return D_POSE;
+				}
+				else if (disturbance_shape()){
+					return D_SHAPE;
 				}
 				else{
 					return _FALSE;
