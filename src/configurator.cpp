@@ -881,7 +881,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
-		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
+		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length())&&sk.first.disturbance.affordanceIndex!=g[ep.first.m_source].disturbance.affordanceIndex){
 			b2Transform shift_2=sk.first.start-g[t_start_v].start;
 			Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].disturbance);
 			applyAffineTrans(shift_2, d_adjusted_2);
