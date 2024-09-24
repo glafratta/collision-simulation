@@ -645,7 +645,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		// printf("planning, path size= %i\n",path->size() );
 		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
 		// printf("conf running=%i\n", running);
-		printf("exited inner while\n");
+		//printf("exited inner while\n");
 		// bool fin = overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
 		// if (fin){
 		// 	goal=path_end;
@@ -846,7 +846,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 	bool result=true;
-	int it=0;//this represents currentv
+	int it=0, end_it=p.size();//this represents currentv
 	//printPlan();
 	std::vector <vertexDescriptor> vpt=p;
 	if (p.empty() && currentTask.motorStep==0){
@@ -860,10 +860,13 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	if (custom_start==TransitionSystem::null_vertex()){
 		custom_start=movingVertex;
 		it=-1;
+		end_it=p.size()-1;
 	}
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
+		printf("start= \t");
+		debug::print_pose(start);
 		Disturbance d_adjusted=g[ep.first.m_source].disturbance;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
@@ -872,15 +875,19 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		std::pair <State, Edge> sk(State(start), Edge(t.direction));
 		printf("from %i", ep.first.m_target);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
-		b2Transform endPose=skip(ep.first,g,it, &t, stepDistance, p);
-		printf("to it %i, edge %i ->%i, stepDistance %f, direction = %i\n", it, ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
+		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
+		printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(endPose-g[ep.first.m_source].start);
-		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
-			Disturbance d_adjusted_2=g[ep.first.m_source].disturbance;
-			sk.first.disturbance=d_adjusted_2;
+		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
+		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length())){
+			if (sk.first.disturbance.affordanceIndex!=g[ep.first.m_source].disturbance.affordanceIndex){
+				b2Transform shift_2=sk.first.start-g[t_start_v].start;
+				Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].disturbance);
+				applyAffineTrans(shift_2, d_adjusted_2);
+				sk.first.disturbance=d_adjusted_2;
+			}
 			sk.first.endPose=sk.first.start+expected_deltaPose;
 			sk.first.outcome=simResult::successful;
 		}
@@ -893,7 +900,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			auto _moving=boost::add_edge(movingVertex, v1, g);
 			prev_edge.second=_moving.first;
 		}
-		if (!matcher.match_equal(is_match, StateMatcher::DISTURBANCE)){
+		if (!matcher.match_equal(is_match, StateMatcher::D_POSE)){
 			result=false;
 			printf("expected D:");
 			debug::print_pose(g[ep.first.m_source].disturbance.bf.pose);
@@ -903,13 +910,13 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			printf(", w=%f, l=%f\n", sk.first.disturbance.bf.halfWidth, sk.first.disturbance.bf.halfLength);
 			break;
 		}
-		else{
-			gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
-		}
-		propagateD(v1,prev_edge.second.m_source, g);
-		gt::adjustProbability(g, ep.first);
-		printf("skipping from %i, edge %i ->%i", it, ep.first.m_source, ep.first.m_target);
-	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
+		// else{
+		// 	gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
+		// }
+		//propagateD(v1,prev_edge.second.m_source, g);
+		//gt::adjustProbability(g, ep.first);
+		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
+	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <end_it & result );
 	return result;
 }
 
@@ -925,6 +932,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 //adjust here
 	do{
 		i++;
+		printf("index=%i\n", i);
 		//printf("iterator = %i, e src= %i, e trgt= %i\n", i, e.m_source, e.m_target);
 			auto es = boost::out_edges(e.m_target, g);
 			g[e].it_observed=iteration;
@@ -944,9 +952,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				}
 			}
 		result=g[e.m_source].endPose; 
-
-
-		}while (g[e].direction==t->direction & i<planVertices.size()& g[e].direction==DEFAULT);
+		}while (g[e].direction==t->direction && i<planVertices.size()&& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	if (g[e_start.m_target].disturbance.getAffIndex()!=NONE){
 		printf("targ=%i, d index=%i, d hl=%f, d hw=%f\n", e_start.m_target, g[e_start.m_target].disturbance.getAffIndex(), g[e_start.m_target].disturbance.bodyFeatures().halfLength, g[e_start.m_target].disturbance.bodyFeatures().halfWidth);

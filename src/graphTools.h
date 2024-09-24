@@ -21,7 +21,7 @@
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-const float D_DIMENSIONS_MARGIN=0.03;
+const float D_DIMENSIONS_MARGIN=0.05;
 
 float angle_subtract(float a1, float a2);
 
@@ -289,7 +289,7 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 
 class StateMatcher{
 	public:
-		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4};
+		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6};
         //std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
@@ -326,19 +326,26 @@ class StateMatcher{
 				return d_position && d_angle && d_type && d_shape;
 			}
 
+			bool disturbance_pose(){
+				return d_position && d_type && d_angle;
+			}
+
+			bool disturbance_shape(){
+				return d_type && d_shape;
+			}
 			// bool disturbance(){
 			// 	return d_shape && d_type;
 			// }
 
-			StateMatch (const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
+			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
 				r_angle=fabs(sd.r_angle)<error.angle;
 				d_type=sd.D_type==0;
 				d_position= sd.D_position.Length()<(error.dPosition*coefficient);
 				d_angle=fabs(sd.D_angle)<error.angle;
-				bool below_threshold_w=fabs(sd.D_width)<error.D_dimensions;
-				bool below_threshold_l=fabs(sd.D_length)<error.D_dimensions;
-				d_shape= below_threshold_l & below_threshold_w;
+				bool below_threshold_w=fabs(sd.D_width)<(error.D_dimensions*coefficient);
+				bool below_threshold_l=fabs(sd.D_length)<(error.D_dimensions*coefficient);
+				d_shape= below_threshold_l && below_threshold_w;
 
 			}
 
@@ -351,6 +358,12 @@ class StateMatcher{
 				}
 				else if (disturbance_exact()){
 					return DISTURBANCE;
+				}
+				else if (disturbance_pose()){
+					return D_POSE;
+				}
+				else if (disturbance_shape()){
+					return D_SHAPE;
 				}
 				else{
 					return _FALSE;

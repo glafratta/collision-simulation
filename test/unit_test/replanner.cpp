@@ -1,7 +1,7 @@
 #include "../callbacks.h"
 
 int main(int argc, char** argv){
-    bool debug=0;
+    bool debug=1;
     Disturbance target1;
     vertexDescriptor solution=TransitionSystem::null_vertex();
     if (argc>2){
@@ -35,7 +35,10 @@ int main(int argc, char** argv){
     conf.planVertices= conf.planner(conf.transitionSystem, conf.currentVertex);
     printf("OG PLAN: ");
     conf.printPlan(&conf.planVertices);
+    conf.addIteration();
     conf.currentVertex=*(conf.planVertices.end()-1);
+    vertexDescriptor prev=*(conf.planVertices.end()-2);
+    conf.currentEdge=boost::edge(prev, conf.currentVertex, conf.transitionSystem).first;
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
