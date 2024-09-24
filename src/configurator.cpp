@@ -553,12 +553,12 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal, bool *finished){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});
 	std::vector <Frontier> frontier_v;
-	bool run=true;
+	bool run=true, _finished=false;
 	std::vector <Frontier> priorityQueue;
 	if (currentVertex==movingVertex){
 		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
@@ -572,23 +572,18 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		overarching_goal=*custom_ctrl_goal;
 	}
 	int no_out=0;
-
 	std::vector <vertexDescriptor> add;
 	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
 	vertexDescriptor path_end=src;
 	do{
-		//find frontier (STRAIGHT)
-		//printf("start\n");
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
 		if (src==currentVertex){
-		//	printf("planning from src =%i, out vertices n%i\n", src, frontier_v.size());
 		}
 		for (Frontier f: frontier_v){ //add to priority queue
 			planPriority(g, f.first);
 			addToPriorityQueue(f, priorityQueue, g);
 		}
 		if (priorityQueue.empty()){
-		//	printf("emtpy pq\n");
 			break;
 		}
 		src=priorityQueue.begin()->first;
@@ -597,21 +592,16 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		std::pair<edgeDescriptor, bool> edge(edgeDescriptor(), false);
 		std::vector<vertexDescriptor>::reverse_iterator pend=(path->rbegin());
 		while (!edge.second){//|| ((*(pend.base()-1)!=goal &goal!=TransitionSystem::null_vertex())&!controlGoal.checkEnded(g[*(pend.base()-1)]).ended)
-			//printf("src = %i possible paths:%i, path length=%i, add length=%i, frontier l=%i\n", src, paths.size(), path->size(), add.size(), frontier_v.size());
 			vertexDescriptor end=*(pend.base()-1);
 			edge= boost::edge(end,add[0], g);
-			//printf("edge %i->%i", end, add[0]);
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
-				//	printf("from index %i ", *(pend.base()-1));
 					pend++;
-					//printf("going back in current path, path size = %i, current index =%i\n", path->size(), *(pend.base()-1));
 				}
 				else{
 					path++; //go back a previously explored path
 					pend=(*path).rbegin(); 
-				//	printf("checking previous path\n");
 				}
 			}
 			else if (edge.second & pend.base()!=path->rbegin().base()){  //if there is an edge with the end of current path
@@ -619,7 +609,6 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
 					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
 						path=_p;
-						//printf("using existing\n");
 						found=1;
 					}
 				}
@@ -642,16 +631,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			path->push_back(c);	
 			path_end=c;			
 		}
-		// printf("planning, path size= %i\n",path->size() );
-		// printf("pq empty=%i, path end=%i, ended=%i\n", priorityQueue.empty(), path_end, controlGoal.checkEnded(g[path_end].endPose).ended);
-		// printf("conf running=%i\n", running);
-		//printf("exited inner while\n");
-		// bool fin = overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
-		// if (fin){
-		// 	goal=path_end;
-		// }
-	}while(!priorityQueue.empty() & (path_end!=goal &!overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended));
-	//printf("exited while\n");
+		_finished=overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
+		if (NULL!=finished){
+			*finished=_finished;
+		}
+	}while(!priorityQueue.empty() & (path_end!=goal &!finished));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
@@ -665,13 +649,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			final_phi=g[end_plan].phi;
 		}
 	}
-	// for (auto vi=vs.first; vi!=vs.second; vi++){
-	// 	if (g[*vi].label!=UNLABELED){
-	// 		boost::clear_vertex(*vi, g);
-	// 	}
-	// }
 	printf("PLANNED!\n");
-	//printPlan();
 	return plan;
 }
 
@@ -1451,14 +1429,17 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 		src= srcs[0].m_source;
 	}
 	b2Transform o_shift= -g[src].endPose;
+	printf("shift\n");
+	debug::print_pose(o_shift);
 	Task controlGoal_adjusted= controlGoal;
 	applyAffineTrans(o_shift, controlGoal_adjusted);
-	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted); //been.second, been.first
+	bool ctrl_finished=false;
+	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted, &ctrl_finished); //been.second, been.first
 	printf("provisional plan from v%i\n", v);
 	printPlan(&plan_provisional);
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
-	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
+	//= controlGoal_adjusted.checkEnded(g[end], UNDEFINED, true).ended;
 	printf("adjusted goal:\t");
 	debug::print_pose(controlGoal_adjusted.disturbance.pose());
 	printf("end pose of plan:\t");
