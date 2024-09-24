@@ -1444,7 +1444,8 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 }
 
 void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, b2World &world,  std::vector <vertexDescriptor>& plan_provisional, bool & plan_works){
-    auto srcs= gt::inEdges(g, v);
+    printf("recalling\n");
+	auto srcs= gt::inEdges(g, v);
     vertexDescriptor src=v;
     if(!srcs.empty()){
 		src= srcs[0].m_source;
@@ -1456,6 +1457,10 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
 	bool ctrl_finished = controlGoal_adjusted.checkEnded(g[end]).ended;
+	printf("adjusted goal:\t");
+	debug::print_pose(controlGoal.disturbance.pose());
+	printf("end pose of plan:\t");
+	debug::print_pose(g[end].endPose);
 	if (ctrl_finished){
 		printf("plan reaches goal\n");
 		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
