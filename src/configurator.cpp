@@ -846,7 +846,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
 	bool result=true;
-	int it=0;//this represents currentv
+	int it=0, end_it=p.size();//this represents currentv
 	//printPlan();
 	std::vector <vertexDescriptor> vpt=p;
 	if (p.empty() && currentTask.motorStep==0){
@@ -860,6 +860,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	if (custom_start==TransitionSystem::null_vertex()){
 		custom_start=movingVertex;
 		it=-1;
+		end_it=p.size()-1;
 	}
 	auto ep=boost::edge(custom_start, *p.begin(), g);	
 	do {
@@ -879,10 +880,10 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		simResult sr=t.willCollide(world, iteration, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
-		b2Transform expected_deltaPose=(endPose-g[ep.first.m_source].start);
+		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
 		if ((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()){
-			b2Transform shift_2=g[movingVertex].endPose-g[ep.first.m_source].endPose;
-			Disturbance d_adjusted_2=g[ep.first.m_source].disturbance;
+			b2Transform shift_2=sk.first.start-g[t_start_v].start;
+			Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].disturbance);
 			applyAffineTrans(shift_2, d_adjusted_2);
 			sk.first.disturbance=d_adjusted_2;
 			sk.first.endPose=sk.first.start+expected_deltaPose;
@@ -910,10 +911,10 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		// else{
 		// 	gt::update(prev_edge.second, sk, g,true, errorMap, iteration);
 		// }
-		propagateD(v1,prev_edge.second.m_source, g);
-		gt::adjustProbability(g, ep.first);
+		//propagateD(v1,prev_edge.second.m_source, g);
+		//gt::adjustProbability(g, ep.first);
 		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
-	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <int(p.size()-1) & result );
+	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <end_it & result );
 	return result;
 }
 
