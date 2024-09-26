@@ -1428,7 +1428,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
     if(!srcs.empty()){
 		src= srcs[0].m_source;
 	}
-	b2Transform o_shift= -g[src].endPose;
+	b2Transform o_shift= -g[v].start;
 	printf("shift\n");
 	debug::print_pose(o_shift);
 	Task controlGoal_adjusted= controlGoal;
