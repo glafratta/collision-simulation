@@ -87,7 +87,7 @@ add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
 
 add_test(NAME planner_no COMMAND planner)
 add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
-add_test(NAME planner_target COMMAND planner ../251023_TAGET/ 1)
+add_test(NAME planner_target COMMAND planner ../170924_1321_badrun/ 1)
 
 add_test(NAME match_false COMMAND match)
 add_test(NAME match_true_exact COMMAND match 1)

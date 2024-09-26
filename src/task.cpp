@@ -35,7 +35,12 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep){
+			bool out_ty= robot.body->GetTransform().p.y>=BOX2DRANGE;
+			bool out_by= robot.body->GetTransform().p.y<=-BOX2DRANGE;
+			bool out_tx= robot.body->GetTransform().p.x>=BOX2DRANGE;
+			bool out_bx= robot.body->GetTransform().p.x<=-BOX2DRANGE;
+			bool out= out_bx||out_by||out_tx|| out_ty;
+			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep||out){
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
@@ -178,17 +183,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	Distance d;
 	//printf("check ended\n");
 	b2Vec2 distance=this_start.p-robotTransform.p;
-	float x1=0, x2=0, y1=0, y2=0;
-	x1=this_start.p.x+BOX2DRANGE;
-	x2=this_start.p.x-BOX2DRANGE;
-	y1=this_start.p.y+BOX2DRANGE;
-	y2=this_start.p.y-BOX2DRANGE;
-	bool out_ty= robotTransform.p.y>=std::max(y1, y2);
-	bool out_by= robotTransform.p.y<=std::min(y1, y2);
-	bool out_tx= robotTransform.p.x>=std::max(x1, x2);
-	bool out_bx= robotTransform.p.x<=std::min(x1, x2);
-	bool out= out_bx||out_by||out_tx|| out_ty;
-	if (round(distance.Length()*100)/100>=BOX2DRANGE || out){ //if length reached or turn
+	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
 		if (debug_k){
 		//	printf("distance of %f exceeds range, ended\n", distance.Length());
 		}
