@@ -189,7 +189,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 		}
 		r.ended =true;
 	}
-	if (disturbance.isValid()&& !r.ended){
+	if (disturbance.isValid()){
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
 		if (action.getOmega()!=0){			
