@@ -178,13 +178,23 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	Distance d;
 	//printf("check ended\n");
 	b2Vec2 distance=this_start.p-robotTransform.p;
-	if (round(distance.Length()*100)/100>=BOX2DRANGE || round(fabs(robotTransform.p.x)*100)/100 >=fabs(this_start.p.x)+BOX2DRANGE || round(fabs(robotTransform.p.y)*100)/100 >=this_start.p.y+ BOX2DRANGE){ //if length reached or turn
+	float x1=0, x2=0, y1=0, y2=0;
+	x1=this_start.p.x+BOX2DRANGE;
+	x2=this_start.p.x-BOX2DRANGE;
+	y1=this_start.p.y+BOX2DRANGE;
+	y2=this_start.p.y-BOX2DRANGE;
+	bool out_ty= robotTransform.p.y>=std::max(y1, y2);
+	bool out_by= robotTransform.p.y<=std::min(y1, y2);
+	bool out_tx= robotTransform.p.x>=std::max(x1, x2);
+	bool out_bx= robotTransform.p.x<=std::min(x1, x2);
+	bool out= out_bx||out_by||out_tx|| out_ty;
+	if (round(distance.Length()*100)/100>=BOX2DRANGE || out){ //if length reached or turn
 		if (debug_k){
 		//	printf("distance of %f exceeds range, ended\n", distance.Length());
 		}
 		r.ended =true;
 	}
-	if (disturbance.isValid()){
+	if (disturbance.isValid()&& !r.ended){
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
 		if (action.getOmega()!=0){			
