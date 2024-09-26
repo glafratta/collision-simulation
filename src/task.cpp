@@ -178,7 +178,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	Distance d;
 	//printf("check ended\n");
 	b2Vec2 distance=this_start.p-robotTransform.p;
-	if (round(distance.Length()*100)/100>=BOX2DRANGE || round(fabs(robotTransform.p.x)*100)/100 >=BOX2DRANGE || round(fabs(robotTransform.p.y)*100)/100 >=BOX2DRANGE){ //if length reached or turn
+	if (round(distance.Length()*100)/100>=BOX2DRANGE || round(fabs(robotTransform.p.x)*100)/100 >=fabs(this_start.p.x)+BOX2DRANGE || round(fabs(robotTransform.p.y)*100)/100 >=this_start.p.y+ BOX2DRANGE){ //if length reached or turn
 		if (debug_k){
 		//	printf("distance of %f exceeds range, ended\n", distance.Length());
 		}
