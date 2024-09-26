@@ -125,7 +125,7 @@ add_test(NAME feature_clusters COMMAND feature_clusters ../170924_1321_badrun/ 0
 #add_test(NAME been_there_f COMMAND been_there ../251023_TAGET/)
 #set_property(TEST been_there_f PROPERTY WILL_FAIL true)
 
-add_test(NAME replanner COMMAND replanner ../251023_TAGET/ 2 1)
+add_test(NAME replanner COMMAND replanner 170924_1321_badrun/ 2 1)
 
 
 set(CMAKE_BUILD_TYPE Debug)
