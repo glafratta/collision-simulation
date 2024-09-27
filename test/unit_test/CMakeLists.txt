@@ -11,16 +11,12 @@ find_package(PkgConfig)
 find_package(Threads)
 
 include(CTest)
-<<<<<<< HEAD
-=======
 
 INCLUDE_DIRECTORIES("/usr/local/include/")
->>>>>>> checkPlan
 enable_testing()
 
 set(CTEST_OUTPUT_ON_FAILURE 1)
 
-<<<<<<< HEAD
 add_executable(split_task split_task.cpp)
 target_link_libraries(split_task CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 add_executable(backtrack backtrack.cpp)
@@ -44,11 +40,6 @@ add_test(NAME split_task_0_nodes COMMAND split_task 0.18 0 0)
 
 add_test(NAME backtrack COMMAND backtrack 0.6 0 0)
 
-add_test(NAME explorer_no COMMAND explorer)
-add_test(NAME explorer_cds COMMAND explorer ../cul_de_sac/ 0)
-add_test(NAME explorer_target COMMAND explorer ../251023/_TAGET/ 1)
-
-
 add_test(NAME transition COMMAND transitionMatrix)
 add_test(NAME transition_n_L_ok COMMAND transitionMatrix 0 l k)
 add_test(NAME transition_n_un_ok COMMAND transitionMatrix 0 u)
@@ -62,22 +53,21 @@ add_test(NAME transition_y_D_safe COMMAND transitionMatrix y d s)
 add_test(NAME transition_y_stop_crash COMMAND transitionMatrix y s c)
 add_test(NAME transition_y_stop_ok COMMAND transitionMatrix y s k)
 add_test(NAME transition_y_stop_safe COMMAND transitionMatrix y s s)
-=======
 add_executable(processData_k ../../src/worldbuilder.h ../../src/worldbuilder.cpp processData_k.cpp)
 add_executable(feature_clusters ../../src/worldbuilder.h ../../src/worldbuilder.cpp feature_clusters.cpp)
 target_link_libraries(processData_k CloCK ${OpenCV_LIBS} box2d rt)
 target_link_libraries(feature_clusters CloCK ${OpenCV_LIBS} box2d rt)
 
 
-# add_executable(split_task split_task.cpp)
-# target_link_libraries(split_task CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
-# add_executable(backtrack backtrack.cpp)
-# target_link_libraries(backtrack CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
-add_executable(explorer ../callbacks.h explorer.cpp )
-# add_executable(transitionMatrix ../callbacks.h transitionMatrix.cpp)
-# target_link_libraries(transitionMatrix CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
-add_executable(disturbance_dimensions ../callbacks.h disturbance_dimensions.cpp)
-add_executable(planner ../callbacks.h planner.cpp)
+# # add_executable(split_task split_task.cpp)
+# # target_link_libraries(split_task CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+# # add_executable(backtrack backtrack.cpp)
+# # target_link_libraries(backtrack CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+# add_executable(explorer ../callbacks.h explorer.cpp )
+# # add_executable(transitionMatrix ../callbacks.h transitionMatrix.cpp)
+# # target_link_libraries(transitionMatrix CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+# add_executable(disturbance_dimensions ../callbacks.h disturbance_dimensions.cpp)
+# add_executable(planner ../callbacks.h planner.cpp)
 add_executable(match ../callbacks.h match.cpp)
 add_executable(find_match_state ../callbacks.h find_match_s.cpp)
 add_executable(state_difference ../callbacks.h state_difference.cpp)
@@ -85,9 +75,9 @@ add_executable(match_equal ../callbacks.h match_equal.cpp)
 add_executable(replanner ../callbacks.h replanner.cpp)
 
 
-target_link_libraries(explorer CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
-target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+#target_link_libraries(explorer CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+#target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
+#target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
 target_link_libraries(match CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
 target_link_libraries(find_match_state CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
 target_link_libraries(state_difference CloCK ${OpenCV_LIBS} box2d pthread cpptimer rt)
@@ -128,17 +118,11 @@ add_test(NAME explorer_target COMMAND explorer ../251023_TAGET/ 1)
 # add_test(NAME transition_y_stop_crash COMMAND transitionMatrix y s c)
 # add_test(NAME transition_y_stop_ok COMMAND transitionMatrix y s k)
 # add_test(NAME transition_y_stop_safe COMMAND transitionMatrix y s s)
->>>>>>> checkPlan
 
 add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
 
 add_test(NAME planner_no COMMAND planner)
 add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
-<<<<<<< HEAD
-add_test(NAME planner_target COMMAND planner ../251023/_TAGET/ 1)
-
-
-=======
 add_test(NAME planner_target COMMAND planner ../170924_1321_badrun/ 1)
 
 add_test(NAME match_false COMMAND match)
@@ -178,7 +162,6 @@ add_test(NAME feature_clusters COMMAND feature_clusters ../170924_1321_badrun/ 0
 #set_property(TEST been_there_f PROPERTY WILL_FAIL true)
 
 add_test(NAME replanner COMMAND replanner 170924_1321_badrun/ 2 1)
->>>>>>> checkPlan
 
 
 set(CMAKE_BUILD_TYPE Debug)

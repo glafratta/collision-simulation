@@ -1,6 +1,12 @@
 #include "configurator.h"
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer c){
+
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer &, const b2Transform&){
+    std::vector <BodyFeatures> result;
+    return result;
+}
+
+void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
 
 }
 
@@ -16,11 +22,11 @@ int main(int argc, char** argv){
 
     b2Vec2 pos(atof(argv[1]), atof(argv[2]));
     b2Rot rot(atof(argv[3]));
-    b2Transform pos2, pos3;
+    b2Transform pos2, pos3, t1= b2Transform(b2Vec2(0,0),b2Rot(M_PI_2)), t2=b2Transform(b2Vec2(0,0),b2Rot(-M_PI_2));
     Task goal=Task();
     Configurator conf(goal);
-    conf.applyAffineTrans(b2Transform(b2Vec2(0,0),b2Rot(M_PI_2)), pos2);
-    conf.applyAffineTrans(b2Transform(b2Vec2(0,0),b2Rot(-M_PI_2)), pos3);
+    math::applyAffineTrans(t1, pos2);
+    math::applyAffineTrans(t2, pos3);
     conf.simulationStep=std::max(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH)*2;
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
