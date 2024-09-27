@@ -28,7 +28,6 @@ int main(int argc, char** argv){
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-    // std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.movingVertex);
     debug::print_graph(conf.transitionSystem, target1, std::vector<vertexDescriptor>(), conf.currentVertex );
     // for (vertexDescriptor v:plan){
     //     printf("v=%i x=%f y=%f theta=%f\n");

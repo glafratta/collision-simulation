@@ -55,10 +55,10 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!current){
 		g[e].step = sk.second.step;
 	}
-	else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
-		result.setR(g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x);
-		errorMap.insert_or_assign(g[e.m_target].ID, result);
-	}
+	// else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
+	// 	result.setR(g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x);
+	// 	errorMap.insert_or_assign(g[e.m_target].ID, result);
+	// }
 	// else if ((g[e.m_target].direction==LEFT || g[e.m_target].direction==RIGHT )& g[e.m_target].disturbance.isValid()){
 	// 	orientation o=subtract(g[e.m_target].disturbance.getOrientation(),sk.first.disturbance.getOrientation());
 	// 	result.setTheta(o.second);

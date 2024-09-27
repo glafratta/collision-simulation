@@ -29,7 +29,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb){//gets bounding box of points
-    float  h=fabs(0.0005*2), w=fabs(0.0005*2) ;
+    float  h=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
     // b2Transform pose;
@@ -44,9 +44,11 @@ std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pointf>nb)
 	std::vector<Pointf>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
 	std::vector<Pointf>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
 	std::vector<Pointf>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
-    if (minx!=maxx & miny!=maxy){
-        h=fabs((*maxy).y-(*miny).y);
+    if (minx->x!=maxx->x){
         w= fabs((*maxx).x-(*minx).x);
+    }
+    if (miny->y!=maxy->y){
+        h=fabs((*maxy).y-(*miny).y);
     }
     x_glob= ((*maxx).x+(*minx).x)/2;
     y_glob= ((*maxy).y+(*miny).y)/2;

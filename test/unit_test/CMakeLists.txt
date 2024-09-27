@@ -23,6 +23,10 @@ add_executable(explorer explorer.cpp ../callbacks.h)
 target_link_libraries(explorer CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 add_executable(transitionMatrix ../callbacks.h transitionMatrix.cpp)
 target_link_libraries(transitionMatrix CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+add_executable(disturbance_dimensions ../callbacks.h disturbance_dimensions.cpp)
+target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+add_executable(planner ../callbacks.h planner.cpp)
+target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 
 
 add_test(NAME split_task COMMAND split_task 0.6 0 0)
@@ -36,6 +40,8 @@ add_test(NAME backtrack COMMAND backtrack 0.6 0 0)
 
 add_test(NAME explorer_no COMMAND explorer)
 add_test(NAME explorer_cds COMMAND explorer ../cul_de_sac/ 0)
+add_test(NAME explorer_target COMMAND explorer ../251023/_TAGET/ 1)
+
 
 add_test(NAME transition COMMAND transitionMatrix)
 add_test(NAME transition_n_L_ok COMMAND transitionMatrix 0 l k)
@@ -51,9 +57,11 @@ add_test(NAME transition_y_stop_crash COMMAND transitionMatrix y s c)
 add_test(NAME transition_y_stop_ok COMMAND transitionMatrix y s k)
 add_test(NAME transition_y_stop_safe COMMAND transitionMatrix y s s)
 
+add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
 
-
-
+add_test(NAME planner_no COMMAND planner)
+add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
+add_test(NAME planner_target COMMAND planner ../251023/_TAGET/ 1)
 
 
 
