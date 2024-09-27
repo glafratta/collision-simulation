@@ -1,9 +1,8 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
-
+#include "CppTimer.h"
 #include <thread>
 #include "configurator.h"
-#include "CppTimer.h"
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
@@ -90,8 +89,13 @@ char * folder;
         printf("%s\n", filePath);
         FILE *f;
         if (!(f=fopen(filePath, "r"))){
-            ci->stop=1;
-            return false;
+            if (iteration>1){
+                iteration=1;
+            }
+            else{
+                ci->stop=1;
+                return false;
+            }
         }
         else {
             fclose(f);
@@ -101,13 +105,9 @@ char * folder;
         float x2, y2;
       //  Pointf  p1, p2_1;
 		while (file>>x2>>y2){
-         //   x = round(x*1000)/1000;
-			//y = round(y*1000)/1000;
             x2 = round(x2*100)/100;
 			y2 = round(y2*100)/100;
-           // Pointf  p(x,y);
             Pointf  p2(x2,y2);
-           // ci->data.insert(p);
             ci->data2fp.insert(p2);
 		}
 		file.close();
@@ -170,26 +170,13 @@ public:
     }
 };
 
-// std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
-//     int count =0;
-// 	//buildType =2;
-//     std::vector <BodyFeatures> result;
-//     for (Pointf p: points){
-//         if (count%2==0){
-//             BodyFeatures feature;
-//             feature.pose.p = getb2Vec2(p); 
-//             result.push_back(feature);  
-//         }
-//         count++;
-//     }
-//     return result;
-// }
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
     std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
     if (feature.first){
+        feature.second.pose.q.Set(start.q.GetAngle());
         result.push_back(feature.second);
     }
     return result;
@@ -217,6 +204,40 @@ class TimerDI: public CppTimer{
         }
     }
 };
+
+void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
+		//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
+		//was ve instead of src
+		std::vector <vertexDescriptor> options_src;
+        //IF THE CURRENT PLAN HAS EXECUTED
+		//if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin ){ //&& currentVertex!=movingVertex
+		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
+			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
+			//Disturbance where=controlGoal.disturbance;
+			if (!b_features.empty()){
+				State s_temp;
+				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				bool closest_match=1;
+				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
+				//FIND STATE WHICH matches the relationship with the disturbance
+			}
+			//been= been_there(transitionSystem, where); 
+		//}
+		//printf("checked been = %i\n", been.first);
+
+		//std::vector <vertexDescriptor> plan_provisional=planVertices;
+	//	if (been.first){
+		//	printf("provisional plan\n");
+		for (auto o:options_src){
+			plan_provisional=planner(transitionSystem, o); //been.second, been.first
+			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
+			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
+				plan_works=true;
+				break;
+			}
+		}
+
+}
 
 // float Configurator::taskRotationError(){
 //     printf("previous coord=%i\n", pcProc.previous.size());

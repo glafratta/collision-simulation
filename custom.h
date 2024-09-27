@@ -3,7 +3,7 @@
 #include "a1lidarrpi.h"
 #include "alphabot.h"
 #include "Iir.h"
-#include "CppTimer.h"
+//#include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <bits/stdc++.h>
@@ -12,19 +12,33 @@
 #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
+void get_Foldername(char* custom, char name[60]){
+    time_t now =time(0);
+	tm *ltm = localtime(&now);
+	int y,m,d, h, min;
+	y=ltm->tm_year-100;
+	m = ltm->tm_mon +1;
+	d=ltm->tm_mday;
+	h= ltm->tm_hour;
+	min = ltm->tm_min;
+	sprintf(name, "%s_%02i%02i%02i_%02i%02i",custom, d,m,y,h,min);
+}
+
 void forget(Configurator*);
 
 Disturbance set_target(int&, b2Transform);
 
-std::vector <BodyFeatures> WorldBuilder::processData(CoordinateContainer points){
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
     std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
     if (feature.first){
+        feature.second.pose.q.Set(start.q.GetAngle());
         result.push_back(feature.second);
     }
     return result;
 }
+
 
 class LidarInterface : public A1Lidar::DataInterface{
 ConfiguratorInterface * ci;
@@ -84,39 +98,22 @@ int run=0;
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	//c->printPlan();
 	printf("graph size=%i\n", c->transitionSystem.m_vertices.size());
 	if (c->getIteration() <=0){
 		return;
 	}
-	//if (c->planVertices.empty() & c->planning){
 	if (!c->running){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-    //ExecutionError ee =
-//	printf("not tracked\n");
+
 	c->trackTaskExecution(*c->getTask());
-//	printf("tracked\n");
-    // if (c->getTask()->motorStep>0){
-    //     c->getTask()->correct(c->getTask()->action, c->getTask()->motorStep);
-    // }
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
-	//printf("current vertex end x=%f, y=%f, theta=%f\n", c->transitionSystem[c->currentVertex].endPose.p.x, c->transitionSystem[c->currentVertex].endPose.p.y, c->transitionSystem[c->currentVertex].endPose.q.GetAngle());
-	// printf("control goal start: %f, %f, %f\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle());
-	// if (c->controlGoal.disturbance.isValid()){
-	// 	printf("control goal disturbance: %f, %f, %f\n", c->controlGoal.disturbance.pose().p.x, c->controlGoal.disturbance.pose().p.y, c->controlGoal.disturbance.pose().q.GetAngle());
-    //     printf("distance from goal=%f\n", c->controlGoal.disturbance.getPosition().Length());	
-	// }
-	bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
-	EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
+	//bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
+	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		printf("goal reached\n");
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
-		// if (run%2!=0){
-		// 	Disturbance(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());
-		// }
-	//	printf("new goal position= %f, %f, %f, valid =%i\n", new_goal.pose().p.x, new_goal.pose().p.y, new_goal.pose().q.GetAngle(), new_goal.isValid());
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 		printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
@@ -132,16 +129,20 @@ void step( AlphaBot &motors){
 	R= c->getTask()->getAction().getRWheelSpeed();
 	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
 	if (c->getTask()->direction==LEFT){
-		R*=1.20;
-		L*=1.20;
+		R*=1.23;
+		L*=1.23;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=1.27;
-		L*=1.27;
+		R*=1.17;
+		L*=1.17;
+	}
+	else if (c->getTask()->direction==DEFAULT){
+		R*=1.1;
+		L*=1.1;
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
+	//printf("og step: %i ,R=%f\tL=%f, vertex=%i\n", ogStep, c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed(), c->currentVertex);
 }
 };
 
@@ -169,12 +170,7 @@ struct CameraCallback: Libcam2OpenCV::Callback {
 		if (cb->c->getTask()==NULL){
 			printf("null task\n");
 		}
-		//cv::Mat frame_cropped=frame(cv::Range(0, frame.width()), cv::Range(f	rame.height()*2/3, frame.height()));
         float error=0;
-	//	if (cb->c->getTask()->motorStep%reset_hz==0){
-			//imgProc.reset();
-			//cb->c->getTask()->correct.reset();
-	//	}
         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
         cv::Vec2d  optic_flow_filtered=optic_flow;
         signal= signal+optic_flow[0];

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // #include "debug.h"
+=======
+ #include "debug.h"
+>>>>>>> checkPlan
 
 // template <class T>
 // void debug::graph_file(const int& it,const T& g, const Disturbance& goal, const std::vector <vertexDescriptor> &plan, const vertexDescriptor& c){
@@ -47,3 +51,19 @@
 // 	}
 //     os.flush();
 // }
+<<<<<<< HEAD
+=======
+
+b2Vec2 GetWorldPoints(b2Body* b, b2Vec2 v){
+	b2Vec2 wp=b->GetWorldPoint(v);
+	printf("x=%f, y=%f\t", wp.x, wp.y);
+}
+
+void debug::print_pose(const b2Transform& p){
+	printf("x=%f, y=%f, theta=%f\n", p.p.x, p.p.y, p.q.GetAngle());
+}
+
+void debug::print_matrix(cv::Mat m){
+	std::cout << "M = " << std::endl << " "  << m << std::endl << std::endl;
+}
+>>>>>>> checkPlan

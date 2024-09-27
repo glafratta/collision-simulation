@@ -29,11 +29,18 @@ public:
 };
 
 
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
+
 int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
 	Disturbance target(PURSUE, b2Vec2(BOX2DRANGE, 0));    
     Task controlGoal;
-    bool debug=0;
+    bool debug=1;
     Configurator conf(controlGoal, debug);
     conf.simulationStep=0.5;
     ConfiguratorInterface ci;

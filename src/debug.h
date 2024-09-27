@@ -58,5 +58,14 @@ void graph_file(const int &it, const T &g, const Disturbance &goal, std::vector<
 	}
 	fclose(f);
 }
+b2Vec2 GetWorldPoints(b2Body*, b2Vec2 );
+
+void print_pose(const b2Transform& p);
+
+void print_matrix(cv::Mat);
+
 }
+
+
+
 #endif

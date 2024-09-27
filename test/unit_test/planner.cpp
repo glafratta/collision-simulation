@@ -21,6 +21,7 @@ int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
     bool debug=0;
     Disturbance target1;
+<<<<<<< HEAD
     std::vector <Direction> solution={DEFAULT}, solution2;
     float simStep=0.5;
     if (argc>2){
@@ -33,13 +34,36 @@ int main(int argc, char** argv){
             solution={LEFT, DEFAULT};
             solution2={RIGHT, DEFAULT};
             //step=0.5;
+=======
+    std::vector <Direction> solution={DEFAULT, DEFAULT}, solution2=solution, solution3=solution;
+    float simStep=0.5;
+    if (argc>2){
+        if (atoi(argv[2])==1){
+            debug=1;
+            target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);  
+            solution={DEFAULT, DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
+            simStep=ROBOT_HALFLENGTH*2;
+            solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
+            solution3={LEFT, DEFAULT, RIGHT,  DEFAULT,  DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
+        }
+        else{
+            solution={LEFT, DEFAULT, DEFAULT};
+            solution2={RIGHT, DEFAULT, DEFAULT};
+            solution3=solution;
+>>>>>>> checkPlan
         }
     }
     Task goal(target1,DEFAULT);
     Configurator conf(goal);
+<<<<<<< HEAD
     //conf.setSimulationStep(simStep);
     conf.simulationStep= simStep;
     ConfiguratorInterface ci;
+=======
+    conf.setSimulationStep(simStep);
+    ConfiguratorInterface ci;
+    conf.debugOn=debug;
+>>>>>>> checkPlan
     conf.registerInterface(&ci);
     DataInterface di(&ci);
     if (argc>1){
@@ -53,9 +77,15 @@ int main(int argc, char** argv){
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
+<<<<<<< HEAD
     conf.printPlan(&plan);
     std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
     if (plan_d!=solution && plan_d !=solution2){
+=======
+    std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
+    conf.printPlan(&plan);
+    if (plan_d!=solution & plan_d !=solution2 &plan_d!=solution3){
+>>>>>>> checkPlan
         return 1;
     }
     return 0;

@@ -57,6 +57,7 @@ public:
 		body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
+		//locally x is length, y is width
 		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE);
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;

@@ -13,6 +13,98 @@ orientation subtract(orientation o1, orientation o2){
 	return result;
 }
 
+b2Transform State::from_disturbance(){
+	return disturbance.pose()-start;
+}
+
+// State State::operator=(const State& s){
+// 	*this=State(s);
+// }
+
+
+float angle_subtract(float a1, float a2){
+	float result = 0;
+	if (fabs(a1)> 3*M_PI_4 || fabs(a2)> 3*M_PI_4){
+		if (a1<0 & a2>0){ 
+			a2-=2*M_PI;
+		}
+		else if(a2<0 & a1>0){
+			a2+=2*M_PI;
+		}
+	}
+	result=a1-a2;
+}
+
+void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
+	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
+	float og_x= pose.p.x, og_y=pose.p.y;
+	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
+	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
+	pose.p.x-=deltaPose.p.x;
+	pose.p.y-=deltaPose.p.y;
+}
+
+void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
+	applyAffineTrans(deltaPose, state.endPose);
+	applyAffineTrans(deltaPose, state.start);
+	if (state.disturbance.getAffIndex()!=NONE){
+		applyAffineTrans(deltaPose, state.disturbance.bf.pose);
+	}
+}
+
+float StateDifference::get_sum(int mt){
+	if (mt==0 || mt==4){
+		return 10000;
+	}
+	else if (mt==1){
+		return sum();
+	}
+	else if (mt==2){
+		return sum_d();
+	}
+	else if (mt==3){
+		return sum_r();
+	}
+}
+
+void StateDifference::init(State& s1, State& s2){ //observed, desired
+	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+	if (s1.disturbance.getAffIndex()==NONE && s2.disturbance.getAffIndex()==NONE){
+		return;
+	}
+	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex();
+	if (D_type!=0){
+		// if (s2.disturbance.getAffIndex()==PURSUE){
+		// 	D_position.x= s1.endPose.p.x-s2.disturbance.bf.pose.p.x; //endpose x
+		// 	D_position.y=s1.endPose.p.y-s2.disturbance.bf.pose.p.y; //endpose y
+		// 	D_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.disturbance.bf.pose.q.GetAngle());
+		// 	D_type=0;
+		// 	return;
+		// }
+		D_position.x=10000;
+		D_position.y=10000;
+		D_angle=M_PI;
+		D_width=10000;
+		D_length=10000;
+		return;
+	}
+	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
+	D_position.x= d1.p.x - d2.p.x; //disturbance x
+	D_position.y= d1.p.y - d2.p.y; //disturbance y
+	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
+	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
+	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
+	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;
+	// 		D_length=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfLength)*2;
+	// 		return;
+	// }
+	D_angle=angle_subtract(d1.q.GetAngle(), d2.q.GetAngle());
+	D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
+	D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
+	}
+
 
 void gt::fill(simResult sr, State* s, Edge* e){
 	if (NULL!=s){
@@ -70,6 +162,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	}
 	g[e.m_target].options = sk.first.options;
 	g[e.m_target].nObs++;
+	g[e.m_target].start=sk.first.start;
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
@@ -97,9 +190,9 @@ std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, const vertexDescrip
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if ((*ei).m_source==22 || (*ei).m_target==0){
-			printf("");
-		}
+		// if ((*ei).m_source==22 || (*ei).m_target==0){
+		// 	printf("");
+		// }
 		if (g[(*ei)].direction == d || d==UNDEFINED){
 			if ((*ei).m_source!=v){
 				result.push_back(*ei);
@@ -180,75 +273,105 @@ std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescript
 	return result;
 }
 
-
-DistanceVector StateMatcher::getDistance(State s1, State s2){
-	DistanceVector result(6);
-
-	result[0]= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
-	result[1]= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
-	result[2]= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
-	result[3]= s1.endPose.p.x-s2.endPose.p.x; //endpose x
-	result[4]=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	// float diff_angle=s1.endPose.q.GetAngle()-s2.endPose.q.GetAngle(); //endpose angle
-	// float diff_cos=cos(diff_angle);
-	// float diff_sin=sin(diff_angle);
-	float candidate_angle=s2.endPose.q.GetAngle();
-	if (fabs(s1.endPose.q.GetAngle())> 3*M_PI_4 || fabs(candidate_angle)> 3*M_PI_4){
-		if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){
-			candidate_angle-=2*M_PI;
-		}
-		else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
-			candidate_angle+=2*M_PI;
-		}
-	}
-	result[5]=s1.endPose.q.GetAngle()-candidate_angle;
-	return result;
-}
-
-
-float StateMatcher::sumVector(DistanceVector vec){
-	float result=0;
-	for (float i:vec){
-		result+=abs(i);
+bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired){
+	bool result=false;
+	switch (desired){ //the desired match
+		case ANY:
+			if (candidate!=_FALSE){
+				result=true;
+			}
+			break;
+		case POSE:
+			if (candidate==_TRUE || candidate == POSE){
+				result=true;
+			}
+			break;
+		case DISTURBANCE:
+			if (candidate==_TRUE || candidate ==DISTURBANCE){
+				result=true;
+			}
+			break;
+		case D_POSE:
+			if (candidate==_TRUE || candidate==DISTURBANCE || candidate==D_POSE){
+				result=true;
+			}
+			break;
+		default:
+			result =int(candidate)==int(desired);
+		break;
 	}
 	return result;
 }
 
-bool StateMatcher::isPerfectMatch(DistanceVector vec, float endDistance){
-	float coefficient=1.0;
-	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
-		coefficient*=scale*1.2; //it's a bit high but need for debugging
-	}
-    bool result =false;
-	bool positionMatch = b2Vec2(vec[3], vec[4]).Length()<(error.endPosition*coefficient);
-	bool angleMatch = fabs(vec[5])<error.angle;
-	bool disturbanceMatch =b2Vec2(vec[0], vec[1]).Length()<(error.dPosition*coefficient);
-	bool affordanceMatch = vec[2]==error.affordance;
-    if (positionMatch &&  disturbanceMatch&& affordanceMatch &&angleMatch){ //match position and disturbance
-        result=true;
-    }
-    return result;
+// StateDifference StateMatcher::get_state_difference(State s1, State s2){
+// 	StateDifference result;
+// 	result.D_position.x= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
+// 	result.D_position.y= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
+// 	result.D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
+// 	result.r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+// 	result.r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+// 	//adjusting for angles with different signs close to pi
+// 	// float candidate_angle=s2.endPose.q.GetAngle();
+// 	// if (fabs(s1.endPose.q.GetAngle())> 3*M_PI_4 || fabs(candidate_angle)> 3*M_PI_4){
+// 	// 	if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){ 
+// 	// 		candidate_angle-=2*M_PI;
+// 	// 	}
+// 	// 	else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
+// 	// 		candidate_angle+=2*M_PI;
+// 	// 	}
+// 	// }
+// 	// result.ppse.q.=s1.endPose.q.GetAngle()-candidate_angle;
+// 	result.r_angle= get_angle_difference(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+// 	result.D_angle=get_angle_difference(s1.disturbance.pose().q.GetAngle(), s2.disturbance.pose().q.GetAngle());
+// 	result.D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
+// 	result.D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
+// 	return result;
+// }
+
+
+// float StateMatcher::sumVector(DistanceVector vec){
+// 	float result=0;
+// 	for (float i:vec){
+// 		result+=abs(i);
+// 	}
+// 	return result;
+// }
+
+
+
+StateMatcher::MATCH_TYPE StateMatcher::isMatch(StateDifference sd, float endDistance){
+	float coefficient=get_coefficient(endDistance);
+	StateMatcher::StateMatch match(sd, error, coefficient);
+    return match.what();
 }
 
-bool StateMatcher::isPerfectMatch(State s, State candidate, State *src){
-	DistanceVector  distance = getDistance(s, candidate);
+StateMatcher::MATCH_TYPE StateMatcher::isMatch(State s, State candidate, State *src, StateDifference*_sd){
+	//src is the source of candidate
+	StateDifference sd(s, candidate);
 	float stray=0;
 	if (src!=NULL & s.label!=UNDEFINED){
-		float ds= (src->endPose.p -candidate.endPose.p).Length();
-		b2Vec2 ref(src->endPose.p.x+ds*cos(src->endPose.q.GetAngle()), src->endPose.p.y+ ds*sin(src->endPose.q.GetAngle()));
 		stray=(s.endPose.p-src->endPose.p).Length();
 	}
-    return isPerfectMatch(distance, s.endPose.p.Length()) & (stray<error.endPosition|| s.label==candidate.label);
+	if ((stray>error.endPosition && s.label==candidate.label)){ //
+		sd.r_position.x=10000; // now pose will not be matched
+		sd.r_position.y=10000;
+		sd.r_angle=M_PI;
+	}
+	if (NULL!=_sd){
+		*_sd=sd;
+	}
+    return isMatch(sd, s.endPose.p.Length()) ;
 }
 
 
-std::pair<bool, vertexDescriptor> StateMatcher::isPerfectMatch(TransitionSystem g, vertexDescriptor src, Direction d, State s){
-    std::pair<bool, vertexDescriptor> result(false, TransitionSystem::null_vertex());
+std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> StateMatcher::match_vertex(TransitionSystem g, vertexDescriptor src, Direction d, State s, StateMatcher::MATCH_TYPE mt){
+    std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::MATCH_TYPE::_FALSE, TransitionSystem::null_vertex());
 	auto edges= boost::out_edges(src, g);
 	for (auto ei=edges.first; ei!=edges.second; ++ei){
-		if (g[(*ei)].direction==d & isPerfectMatch(s, g[ei.dereference().m_source])){
-			result.first=true;
+		//MATCH_TYPE match = isMatch(s, g[ei.dereference().m_source]);
+		MATCH_TYPE match = isMatch(s, g[ei.dereference().m_target]);
+		if (g[(*ei)].direction && match_equal(match, mt)){
+			result.first=match;
 			result.second=(*ei).m_target;
 			break;
 		}
@@ -256,28 +379,37 @@ std::pair<bool, vertexDescriptor> StateMatcher::isPerfectMatch(TransitionSystem 
     return result;
 }
 
-
-void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
-	for (int i=0; i<weights.size();i++){
-		//float weight= weights[i];
-		weights[i]+=mu*E[i]*dE[i];
+float StateMatcher::get_coefficient(const float & endDistance){
+	float coefficient=1.0;
+	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
+		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
+		coefficient*=scale*1.2; //it's a bit high but need for debugging
 	}
+	return coefficient;
 }
 
-std::pair <bool, vertexDescriptor> StateMatcher::soft_match(TransitionSystem& g, b2Transform pose){
-	std::pair <bool, vertexDescriptor> result;
-	auto es= boost::edges(g);
-	for (auto ei=es.first; ei!=es.second; ei++){
-		float x=g[(*ei).m_target].endPose.p.x- pose.p.x;
-		float y=g[(*ei).m_target].endPose.p.y- pose.p.y;
-		float theta=g[(*ei).m_target].endPose.q.GetAngle()- pose.q.GetAngle();
 
-		if (fabs(x)<error.endPosition & fabs(y)<error.endPosition & fabs(theta)<error.angle){
+// void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
+// 	for (int i=0; i<weights.size();i++){
+// 		//float weight= weights[i];
+// 		weights[i]+=mu*E[i]*dE[i];
+// 	}
+// }
 
-		}
-	}
-	return result;
-}
+// std::pair <bool, vertexDescriptor> StateMatcher::soft_match(TransitionSystem& g, b2Transform pose){
+// 	std::pair <bool, vertexDescriptor> result;
+// 	auto es= boost::edges(g);
+// 	for (auto ei=es.first; ei!=es.second; ei++){
+// 		float x=g[(*ei).m_target].endPose.p.x- pose.p.x;
+// 		float y=g[(*ei).m_target].endPose.p.y- pose.p.y;
+// 		float theta=g[(*ei).m_target].endPose.q.GetAngle()- pose.q.GetAngle();
+
+// 		if (fabs(x)<error.endPosition & fabs(y)<error.endPosition & fabs(theta)<error.angle){
+
+// 		}
+// 	}
+// 	return result;
+// }
 
 
 bool operator!=(Transform const &t1, Transform const& t2){
@@ -292,5 +424,37 @@ void operator-=(Transform & t1, Transform const&t2){
 	t1.p.x-=t2.p.x;
 	t1.p.y-=t2.p.y;
 	t1.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+}
+
+void operator+=(Transform & t1, Transform const&t2){
+	t1.p.x+=t2.p.x;
+	t1.p.y+=t2.p.y;
+	t1.q.Set(t1.q.GetAngle()+t2.q.GetAngle());
+}
+
+Transform operator+(Transform const & t1, Transform const&t2){
+	b2Transform result;
+	result.p.x=t1.p.x+t2.p.x;
+	result.p.y=t1.p.y+t2.p.y;
+	result.q.Set(t1.q.GetAngle()+t2.q.GetAngle());
+	return result;
+}
+
+Transform operator-(Transform const & t1, Transform const&t2){
+	b2Transform result;
+	result.p.x=t1.p.x-t2.p.x;
+	result.p.y=t1.p.y-t2.p.y;
+	result.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+	return result;
+
+}
+
+Transform operator-(Transform const & t){
+	b2Transform result;
+	result.p.x=-(t.p.x);
+	result.p.y=-(t.p.y);
+	result.q.Set(-t.q.GetAngle());
+	return result;
+
 }
 

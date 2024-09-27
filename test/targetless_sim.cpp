@@ -1,4 +1,12 @@
 #include "callbacks.h"
+
+
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
 int main(int argc, char** argv) {
     //BENCHMARK
 //	auto begin = std::chrono::high_resolution_clock::now();

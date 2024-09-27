@@ -2,11 +2,21 @@
 #define WORLDBUILDER_H
 #include "sensor.h"
 
-
-
 class WorldBuilder{
     int bodies=0;
     public:
+        struct CompareCluster{
+        CompareCluster()=default;
+
+        bool operator()(const BodyFeatures & b1, const BodyFeatures & b2){ //distances of centre from start
+            bool result=false;
+            if (fabs(atan2(b1.pose.p.y, b1.pose.p.x))< fabs(atan2(b2.pose.p.y, b2.pose.p.x)) && b1.pose.p.Length()<= b2.pose.p.Length()){
+                result=true;
+            }
+            return result;
+        }
+    };
+
     int iteration=0;
     bool debug =0;
     char bodyFile[100];
@@ -16,15 +26,50 @@ class WorldBuilder{
                                                                                                                                         //std::pair<points, obstaclestillthere>
     void makeBody(b2World&, BodyFeatures);
 
-    std::vector <BodyFeatures> processData(CoordinateContainer);
+    std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
+
+    std::vector <BodyFeatures> processData_kmeans(CoordinateContainer, const b2Transform&);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::pair<bool, b2Vec2> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance());
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, bool kmeans=0);
 
-    std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength); //returns bottom and top of bounding box
+    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, bool kmeans=0);
 
-    std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pointf>);//gets bounding box of points
+    std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
+
+    template <class Pt>
+    std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pt>nb){//gets bounding box of points
+    float  l=(0.0005*2), w=(0.0005*2) ;
+    float x_glob=0.0f, y_glob=0.0f;
+    // cv::Rect2f rect(x_loc,y_loc,w, h);
+    // b2Transform pose;
+    std::pair <bool, BodyFeatures> result(0, BodyFeatures());
+    if (nb.empty()){
+        return result;
+    }
+    CompareX compareX;
+    CompareY compareY;
+    //Pointf maxx, minx, miny, maxy;
+	typename std::vector<Pt>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
+	typename std::vector<Pt>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
+	typename std::vector<Pt>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
+	typename std::vector<Pt>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
+    if (minx->x!=maxx->x){
+        w= fabs((*maxx).x-(*minx).x);
+    }
+    if (miny->y!=maxy->y){
+        l=fabs((*maxy).y-(*miny).y);
+    }
+    x_glob= ((*maxx).x+(*minx).x)/2;
+    y_glob= ((*maxy).y+(*miny).y)/2;
+    result.second.halfLength=l/2;
+    result.second.halfWidth=w/2;
+    result.second.pose.p=b2Vec2(x_glob, y_glob);
+    result.first=true;
+    return result;
+}
+    std::vector <std::vector<cv::Point2f>> feature_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
 
     b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 

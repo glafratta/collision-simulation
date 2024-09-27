@@ -35,15 +35,20 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep){
+			bool out_ty= robot.body->GetTransform().p.y>=BOX2DRANGE;
+			bool out_by= robot.body->GetTransform().p.y<=-BOX2DRANGE;
+			bool out_tx= robot.body->GetTransform().p.x>=BOX2DRANGE;
+			bool out_bx= robot.body->GetTransform().p.x<=-BOX2DRANGE;
+			bool out= out_bx||out_by||out_tx|| out_ty;
+			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep||out){
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
-				Disturbance collision = Disturbance(1, listener.collisions[index]);
-				b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
+				Disturbance collision = Disturbance(listener.collisions[index]);
+				//b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
 				stepb2d=0;
 				break;
@@ -152,7 +157,6 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	switch(disturbance.getAffIndex()){
 		case PURSUE:{
 			endCriteria.angle=Angle(0);
-			//endCriteria.angle.setValid(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
@@ -188,8 +192,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	if (disturbance.isValid()){
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
-		if (action.getOmega()!=0){
-			//const float END_ANGLE_TOLERANCE= action.getOmega()/HZ;
+		if (action.getOmega()!=0){			
 			float angleL = start.q.GetAngle()+SAFE_ANGLE;
 			float angleR = start.q.GetAngle()-SAFE_ANGLE;
 			float robotAngle=robotTransform.q.GetAngle();
@@ -265,6 +268,20 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	r = checkEnded(n.endPose, dir, relax, use_start);
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
+}
+
+EndCriteria Task::getEndCriteria(const Disturbance &d){
+	EndCriteria endCriteria;
+	switch(disturbance.getAffIndex()){
+	case PURSUE:{
+		endCriteria.angle=Angle(0);
+		endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
+	}
+	break;
+	default:
+	endCriteria.distance = BOX2DRANGE;
+	break;
+}
 }
 
 

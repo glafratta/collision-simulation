@@ -2,6 +2,12 @@
 
 //argv: 1. directory to open 2. timeoff (0=timeron) 3. planning on 4. debug on
 
+Disturbance set_target(int& run, b2Transform start){
+
+}
+
+void forget(Configurator* c){}
+
 int main(int argc, char** argv) {
 //HOW MANY FILES IN DIRECTORY
     DIR *dp;

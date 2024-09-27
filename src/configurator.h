@@ -4,13 +4,13 @@
 #include <thread>
 #include <filesystem>
 #include <ncurses.h>
-// #include <fstream>
-// #include "worldbuilder.h"
-#include "debug.h"
+#include <fstream>
+//#include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
-//FOR DEBUG
+#include "debug.h"
 
+//FOR DEBUG
 //
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
@@ -81,23 +81,26 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
 	currentVertex=movingVertex;
-	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	transitionSystem[movingEdge].direction=STOP;
+	//dummy_vertex(currentVertex);
+	//movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+	//transitionSystem[movingEdge].direction=STOP;
 	currentTask.action.setVelocities(0,0);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
 
-void setBenchmarking(bool b){
+void setBenchmarking(bool b, char * new_folder){
 	benchmark =b;
 		if (benchmark){
 		char dirName[50];
 		sprintf(dirName, "benchmark");
 		if (!opendir(dirName)){
 			mkdir(dirName, 0777);
-			printf("made stats directory\n");
 		}
-		else{
-			printf("opened stats directory\n");
+		char new_path[60];
+		sprintf(new_path, "%s/%s", dirName, new_folder);
+		printf("%s", new_path);
+		if (!opendir(new_path)){
+			mkdir(new_path, 0777); //""
 		}
 		//TODAYS DATE AND TIME
 		time_t now =time(0);
@@ -108,8 +111,7 @@ void setBenchmarking(bool b){
 		d=ltm->tm_mday;
 		h= ltm->tm_hour;
 		min = ltm->tm_min;
-		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",dirName, d,m,y,h,min);
-		//sprintf(statFile,"stat");
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",new_path, d,m,y,h,min);
 		printf("%s\n", statFile);
 		FILE * f = fopen(statFile, "w");
 		printf("open\n");
@@ -156,7 +158,7 @@ void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tr
 
 void trackDisturbance(b2Transform &, Task::Action, float);
 
-void updateGraph(TransitionSystem&, ExecutionError error);
+void updateGraph(TransitionSystem&, ExecutionError error=ExecutionError());
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
@@ -168,12 +170,13 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
+void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, std::vector <vertexDescriptor>&, bool&);
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <bool, vertexDescriptor> findExactMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED); //matches to most likely
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0); //matches to most likely
 
-std::pair <bool, vertexDescriptor> findExactMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED); //has a safety to prevent matching a vertex with self
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 
 //std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
@@ -195,9 +198,11 @@ void resetPhi(TransitionSystem&g);
 
 void printPlan(std::vector <vertexDescriptor>* p=NULL);
 
-void applyAffineTrans(const b2Transform&, b2Transform&);
+void applyAffineTrans(const b2Transform& , Task& );
 
+void applyAffineTrans(const b2Transform&, TransitionSystem&);
 
+void applyAffineTrans(const b2Transform&, Disturbance&);
 
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
@@ -234,12 +239,12 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
-std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
+std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, const Task* custom_ctrl_goal=NULL, bool * finished =NULL) ;
+																																				
+//std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
-std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
-
-bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)));
+bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex());
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
@@ -288,6 +293,7 @@ void setSimulationStep(float f){
 	worldBuilder.simulationStep=f;
 }
 
+void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
 
 
