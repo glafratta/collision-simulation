@@ -40,7 +40,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			bool out_tx= robot.body->GetTransform().p.x>=BOX2DRANGE;
 			bool out_bx= robot.body->GetTransform().p.x<=-BOX2DRANGE;
 			bool out= out_bx||out_by||out_tx|| out_ty;
-			if (checkEnded(robot.body->GetTransform(), direction).ended || (start.p-robot.body->GetTransform().p).Length()>=simulationStep||out){
+			if (checkEnded(robot.body->GetTransform(), direction).ended || out){
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast

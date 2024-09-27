@@ -431,7 +431,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 		
 		}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
-		addToPriorityQueue(v1, priorityQueue, g, closed);
+		//addToPriorityQueue(v1, priorityQueue, g, closed);
+		evaluationQueue.push_back(v1);
 		}
 	}
 	backtrack(evaluationQueue, priorityQueue, closed, g);
@@ -517,7 +518,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].disturbance;
 	while (ep.second){
-		if(g[ep.first].direction!=DEFAULT){
+		if(g[ep.first].direction==LEFT || g[ep.first].direction==RIGHT ){
 			break;
 		}
 		if (ep.first.m_target!=v1){
@@ -1036,7 +1037,7 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	EndedResult er = controlGoal.checkEnded(state);
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
-	//controlGoal.disturbance.validate();
+	if (state.outcome==simResult::crashed)
 	return er;
 }
 

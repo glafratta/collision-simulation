@@ -5,7 +5,7 @@
 int main(int argc, char** argv){
     
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
-    bool debug=0;
+    bool debug=1;
     Disturbance target1;
     float simulationStep=0.5;
     if (argc>2){
@@ -16,7 +16,7 @@ int main(int argc, char** argv){
     }
     Task goal(target1,DEFAULT);
     Configurator conf(goal);
-    conf.setSimulationStep(simulationStep);
+    conf.simulationStep=simulationStep;
     ConfiguratorInterface ci;
     conf.registerInterface(&ci);
     DataInterface di(&ci);
