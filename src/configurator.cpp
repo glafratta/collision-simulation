@@ -518,7 +518,10 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].disturbance;
 	while (ep.second){
-		if(g[ep.first].direction==LEFT || g[ep.first].direction==RIGHT ){
+		if(g[ep.first].direction!=DEFAULT ){
+			if (g[ep.first].direction==STOP){
+				g[ep.first.m_target].disturbance = dist;
+			}
 			break;
 		}
 		if (ep.first.m_target!=v1){
@@ -1037,7 +1040,9 @@ EndedResult Configurator::estimateCost(State &state, b2Transform start, Directio
 	EndedResult er = controlGoal.checkEnded(state);
 	Task t(state.disturbance, d, start);
 	er.cost += t.checkEnded(state.endPose).estimatedCost;
-	if (state.outcome==simResult::crashed)
+	if (state.outcome==simResult::crashed){
+		er.cost+=2;
+	}
 	return er;
 }
 
