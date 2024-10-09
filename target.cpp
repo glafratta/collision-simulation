@@ -8,11 +8,12 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		std::vector <vertexDescriptor> options_src;
 		bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended;
 		printf("finished=%i, plan=%i, step=%i\n", fin, !planVertices.empty(), currentTask.motorStep);
-		if ( !fin && planVertices.empty()&& currentTask.motorStep==0){
+		if ( !fin && planVertices.empty()&& currentTask.motorStep==0 && conf.transitionSystem.m_vertices.size()>1){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
 			bool using_kmeans=1;
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
+			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, 
+												currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
 			if (b_features.size()>0){
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
