@@ -69,11 +69,13 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.planning =1;
+	if (argc>2){
+		configurator.planning= atoi(argv[2]);
+	}
 	char name[60];
-	//sprintf(name, "Dmatch_target");
-	//get_Foldername(,name);
-	//printf("foldername = %s\n", name);
-	configurator.setBenchmarking(1, "Dmatch_target_check");
+	if (configurator.planning){
+		configurator.setBenchmarking(1, "Dmatch_target_check");
+	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
