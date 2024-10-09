@@ -112,6 +112,7 @@ bool Configurator::Spawner(){
 		}
 	bool plan_works=true;
 	if (transitionSystem.m_vertices.size()<2){
+		printf("plan don't work\n");
 		plan_works=false;
 	}
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
