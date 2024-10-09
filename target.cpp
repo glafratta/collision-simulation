@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 	}
 	char name[60];
 	if (configurator.planning){
-		configurator.setBenchmarking(1, "Dmatch_target_check");
+		configurator.setBenchmarking(1, "Dmatch_target_check_nok");
 	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
