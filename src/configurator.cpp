@@ -478,7 +478,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		}
 	}
 	vertexDescriptor v1=v;
-	float nNodes = g[v].endPose.p.Length()/simulationStep, og_phi=g[v].phi;
+	float nNodes = g[v].distance()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
 	Task::Action a;
 	a.init(d);
