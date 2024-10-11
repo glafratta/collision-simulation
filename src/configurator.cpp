@@ -472,8 +472,10 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		return split;
 	}
 	if (src!=TransitionSystem::null_vertex()){
-		split.insert(split.begin(), src);
-		g[src].outcome=simResult::safeForNow;
+		if (auto ie=gt::inEdges(g, src, DEFAULT); !ie.empty()){
+			split.insert(split.begin(), src);
+			g[src].outcome=simResult::safeForNow;
+		}
 	}
 	vertexDescriptor v1=v;
 	float nNodes = g[v].endPose.p.Length()/simulationStep, og_phi=g[v].phi;
@@ -1273,11 +1275,6 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDesc
 	}
 	for (auto i =queue.begin(); i!=queue.end(); i++){
 		bool expanded=0;
-		// for (vertexDescriptor c: closed){
-		// 	if (v==c){
-		// 		expanded=true;
-		// 	}
-		// }
 		if (check_vector_for(closed, v)){
 			expanded=true;
 		}

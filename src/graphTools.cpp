@@ -17,9 +17,9 @@ b2Transform State::from_disturbance(){
 	return Dn.pose()-start;
 }
 
-// State State::operator=(const State& s){
-// 	*this=State(s);
-// }
+float State::distance(){
+	return (start-endPose).p.Length();
+}
 
 
 float angle_subtract(float a1, float a2){

@@ -88,6 +88,8 @@ struct State{
 
 	b2Transform from_disturbance();
 
+	float distance();
+
 };
 
 namespace math {

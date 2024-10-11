@@ -29,7 +29,7 @@ int main(int argc, char** argv){
     b2World world(b2Vec2(0,0));
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.dummy_vertex(conf.currentVertex);
-    conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
+    std::vector <std::pair<vertexDescriptor, vertexDescriptor>>to_prune =conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     debug::print_graph(conf.transitionSystem, target1, std::vector<vertexDescriptor>(), conf.currentVertex );
     return 0;
 }
