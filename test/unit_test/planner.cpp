@@ -21,7 +21,7 @@ int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
     bool debug=0;
     Disturbance target1;
-    std::vector <Direction> solution={DEFAULT, DEFAULT}, solution2=solution, solution3=solution;
+    std::vector <Direction> solution={DEFAULT}, solution2=solution, solution3=solution;
     float simStep=0.5;
     if (argc>2){
         if (atoi(argv[2])==1){
@@ -33,14 +33,14 @@ int main(int argc, char** argv){
             solution3={LEFT, DEFAULT, RIGHT,  DEFAULT,  DEFAULT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
         }
         else{
-            solution={LEFT, DEFAULT, DEFAULT};
-            solution2={RIGHT, DEFAULT, DEFAULT};
+            solution={LEFT, DEFAULT};
+            solution2={RIGHT, DEFAULT};
             solution3=solution;
         }
     }
     Task goal(target1,DEFAULT);
     Configurator conf(goal);
-    conf.setSimulationStep(simStep);
+    conf.simulationStep=simStep;
     ConfiguratorInterface ci;
     conf.debugOn=debug;
     conf.registerInterface(&ci);

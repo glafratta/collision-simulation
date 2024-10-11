@@ -441,14 +441,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 			}
 			applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
 			g[v1].phi=evaluationFunction(er);
-			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune;// =(propagateD(v1, v0, g)); //og v1 v0
+			std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g)); //og v1 v0
 			v0_exp=v0;
 			options=g[v0_exp].options;
 			v0=v1;			
-			//pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
+			pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 		
 		}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
-		//addToPriorityQueue(v1, priorityQueue, g, closed);
 		evaluationQueue.push_back(v1);
 		}
 	}

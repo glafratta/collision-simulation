@@ -292,7 +292,7 @@ int motorStep(Task::Action a);
 
 void setSimulationStep(float f){
 	simulationStep=f;
-	worldBuilder.simulationStep=f;
+	//worldBuilder.simulationStep=f;
 }
 
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
