@@ -216,7 +216,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			//Disturbance where=controlGoal.disturbance;
 			if (!b_features.empty()){
 				State s_temp;
-				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+				s_temp.Dn= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
 				//FIND STATE WHICH matches the relationship with the disturbance

@@ -21,7 +21,7 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> options_src;
     State s1, s2;
     std::vector <BodyFeatures> bf1=conf.worldBuilder.getFeatures(ci.data2fp, s1.start, DEFAULT, BOX2DRANGE);
-    s1.disturbance= Disturbance(bf1[0]); //assumes 1 item length
+    s1.Dn= Disturbance(bf1[0]); //assumes 1 item length
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
     math::applyAffineTrans(shift, s1);
     if (argc>3){
@@ -30,7 +30,7 @@ int main(int argc, char** argv){
     }
     conf.data2fp = ci.data2fp;
     std::vector <BodyFeatures> bf2=conf.worldBuilder.getFeatures(ci.data2fp, s2.start, DEFAULT, BOX2DRANGE);
-    s2.disturbance= Disturbance(bf2[0]); //assumes 1 item length
+    s2.Dn= Disturbance(bf2[0]); //assumes 1 item length
     StateDifference sd(s2, s1);
     StateMatcher matcher;
     StateMatcher::StateMatch sm(sd, matcher.error);

@@ -50,7 +50,7 @@ int main(int argc, char** argv){
     }
     std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
     if (!b_features.empty()){
-        state_tmp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
+        state_tmp.Dn= Disturbance(b_features[0]); //assumes 1 item length
     }
     bool relax_match=1, plan_works=false;
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);

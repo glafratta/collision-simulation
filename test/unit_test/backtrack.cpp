@@ -45,7 +45,13 @@ int main(int argc, char** argv){
     conf.transitionSystem[e1.first].direction=DEFAULT;
     conf.transitionSystem[v1].outcome=simResult::crashed;    
     conf.transitionSystem[v1].endPose=b2Transform(pos, rot);
-    conf.transitionSystem[v1].disturbance=Disturbance(AVOID,  b2Vec2(0.68, 0), 0);
+    float Dx=0.068, Dy=0, D_t=0;
+    if (argc>=10){
+        Dx=atof(argv[7]);
+        Dy=atof(argv[8]);
+        D_t=atof(argv[9]);
+    }
+    conf.transitionSystem[v1].Dn=Disturbance(AVOID,  b2Vec2(Dx, Dy), D_t);
     //simulating left
     auto v2 = boost::add_vertex(conf.transitionSystem);
     auto e2 = boost::add_edge(conf.movingVertex, v2, conf.transitionSystem);

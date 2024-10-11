@@ -14,12 +14,12 @@ orientation subtract(orientation o1, orientation o2){
 }
 
 b2Transform State::from_disturbance(){
-	return disturbance.pose()-start;
+	return Dn.pose()-start;
 }
 
-// State State::operator=(const State& s){
-// 	*this=State(s);
-// }
+float State::distance(){
+	return (start-endPose).p.Length();
+}
 
 
 float angle_subtract(float a1, float a2){
@@ -47,9 +47,13 @@ void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	applyAffineTrans(deltaPose, state.endPose);
 	applyAffineTrans(deltaPose, state.start);
-	if (state.disturbance.getAffIndex()!=NONE){
-		applyAffineTrans(deltaPose, state.disturbance.bf.pose);
+	if (state.Dn.getAffIndex()!=NONE){
+		applyAffineTrans(deltaPose, state.Dn.bf.pose);
 	}
+	if (state.Di.getAffIndex()!=NONE){
+		applyAffineTrans(deltaPose, state.Di.bf.pose);
+	}
+
 }
 
 float StateDifference::get_sum(int mt){
@@ -71,10 +75,10 @@ void StateDifference::init(State& s1, State& s2){ //observed, desired
 	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
 	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
-	if (s1.disturbance.getAffIndex()==NONE && s2.disturbance.getAffIndex()==NONE){
+	if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
 		return;
 	}
-	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex();
+	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex();
 	if (D_type!=0){
 		// if (s2.disturbance.getAffIndex()==PURSUE){
 		// 	D_position.x= s1.endPose.p.x-s2.disturbance.bf.pose.p.x; //endpose x
@@ -93,7 +97,7 @@ void StateDifference::init(State& s1, State& s2){ //observed, desired
 	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
 	D_position.x= d1.p.x - d2.p.x; //disturbance x
 	D_position.y= d1.p.y - d2.p.y; //disturbance y
-	D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
+	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
 	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
 	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
 	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;
@@ -101,14 +105,14 @@ void StateDifference::init(State& s1, State& s2){ //observed, desired
 	// 		return;
 	// }
 	D_angle=angle_subtract(d1.q.GetAngle(), d2.q.GetAngle());
-	D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
-	D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
+	D_width=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth)*2;
+	D_length=(s1.Dn.bodyFeatures().halfLength-s2.Dn.bodyFeatures().halfLength)*2;
 	}
 
 
 void gt::fill(simResult sr, State* s, Edge* e){
 	if (NULL!=s){
-		s->disturbance = sr.collision;
+		s->Dn = sr.collision;
 		s->endPose = sr.endPose;
 		s->outcome = sr.resultCode;
 		s->filled=true;
@@ -156,7 +160,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	// 	result.setTheta(o.second);
 	// 	errorMap.insert_or_assign(g[e.m_target].ID, result);
 	// }
-	g[e.m_target].disturbance = sk.first.disturbance;
+	g[e.m_target].Dn = sk.first.Dn;
 	if(sk.first.label==g[e.m_target].label){
 		g[e.m_target].endPose = sk.first.endPose;
 	}
@@ -224,7 +228,7 @@ Disturbance gt::getExpectedDisturbance(TransitionSystem& g, vertexDescriptor v, 
 	}
 	std::pair<bool,edgeDescriptor> mostLikely=getMostLikely(g, oe, it);
 	if (mostLikely.first){
-		result=g[mostLikely.second.m_target].disturbance;
+		result=g[mostLikely.second.m_target].Dn;
 	}
 	return result;
 

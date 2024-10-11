@@ -34,12 +34,18 @@ int main(int argc, char** argv){
     else{
         start.q.Set(rot.GetAngle());
     }
+    float Dx=0.068, Dy=0, D_t=0;
+    if (argc>=10){
+        Dx=atof(argv[7]);
+        Dy=atof(argv[8]);
+        D_t=atof(argv[9]);
+    }
     auto v1 = boost::add_vertex(conf.transitionSystem);
     auto e1 = boost::add_edge(conf.movingVertex, v1, conf.transitionSystem);
     conf.transitionSystem[e1.first].direction=DEFAULT;
     conf.transitionSystem[v1].outcome=simResult::crashed;    
     conf.transitionSystem[v1].endPose=b2Transform(pos, rot);
-    conf.transitionSystem[v1].disturbance=Disturbance(AVOID,  b2Vec2(0.68, 0), 0);
+    conf.transitionSystem[v1].Dn=Disturbance(AVOID,  b2Vec2(Dx, Dy), D_t);
     std::vector <vertexDescriptor> split =conf.splitTask(v1, conf.transitionSystem, conf.transitionSystem[e1.first].direction, start);
     bool split_size= split.size()==desired_split_size(pos, conf.simulationStep);
     int ct=0;
@@ -49,7 +55,7 @@ int main(int argc, char** argv){
         if (step_size>(conf.simulationStep+0.00001)){
             throw std::logic_error("wrong step size\n");
         }
-        if (!conf.transitionSystem[v].disturbance.isValid()){
+        if (!conf.transitionSystem[v].Dn.isValid()){
             throw std::logic_error("disturbance wrongly assingned\n");
         }
         if (ct<(split.size()-1) && conf.transitionSystem[v].outcome!=simResult::safeForNow){

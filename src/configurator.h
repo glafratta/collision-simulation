@@ -80,6 +80,7 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	worldBuilder.debug=debug;
 	ogGoal=controlGoal.disturbance.pose();
 	movingVertex=boost::add_vertex(transitionSystem);
+	transitionSystem[movingVertex].Di=controlGoal.disturbance;
 	currentVertex=movingVertex;
 	//dummy_vertex(currentVertex);
 	//movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
@@ -216,14 +217,15 @@ std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescript
 		if (!topDown){
 			g[src].options.erase(g[src].options.begin());
 		}
-		if (!g[v1].filled){
-			g[v1].disturbance = obs;
-		}
-		
-		//adjustProbability(g, result.first); //for now predictions and observations carry the same weight
+
 	}
 	return result;
 }
+
+std::pair <edgeDescriptor, bool> add_vertex_now(vertexDescriptor &, vertexDescriptor &, TransitionSystem &, Disturbance,Edge edge=Edge(), bool topDown=0);
+
+std::pair <edgeDescriptor, bool> add_vertex_retro(vertexDescriptor &, vertexDescriptor &, TransitionSystem &, Disturbance,Edge edge=Edge(), bool topDown=0);
+
 
 void setStateLabel(State& s, vertexDescriptor src, Direction d){
 	if(d!=currentTask.direction & src==movingVertex){
@@ -290,7 +292,7 @@ int motorStep(Task::Action a);
 
 void setSimulationStep(float f){
 	simulationStep=f;
-	worldBuilder.simulationStep=f;
+	//worldBuilder.simulationStep=f;
 }
 
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
