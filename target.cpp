@@ -12,7 +12,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
 			bool using_kmeans=1;
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
+			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, 
+												currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
 			if (b_features.size()>0){
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
@@ -69,11 +70,13 @@ int main(int argc, char** argv) {
 	ConfiguratorInterface configuratorInterface;
     Configurator configurator(controlGoal);
 	configurator.planning =1;
+	if (argc>2){
+		configurator.planning= atoi(argv[2]);
+	}
 	char name[60];
-	//sprintf(name, "Dmatch_target");
-	//get_Foldername(,name);
-	//printf("foldername = %s\n", name);
-	configurator.setBenchmarking(1, "Dmatch_target_check");
+	if (configurator.planning){
+		configurator.setBenchmarking(1, "Dmatch_target_check_nok");
+	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);

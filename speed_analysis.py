@@ -24,6 +24,11 @@ with open(file_list) as file:
         linect+=1
         l=np.append(l,[linect, file])
         data= np.loadtxt(line, ndmin=2, delimiter="\t")
+        for ch in line:
+            if ch=='*' or  ch=='!':
+                skip=True
+            if skip==False:
+                clean.write(line)
         if data.size !=0:
             bodies =np.append(bodies, data[:,0])
             branches =np.append(branches, data[:,1])

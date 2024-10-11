@@ -83,12 +83,15 @@ bool Configurator::Spawner(){
 			src=currentVertex;
 		}
 	bool plan_works=true;
+	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+	std::vector <vertexDescriptor> plan_provisional=planVertices;	
 	if (transitionSystem.m_vertices.size()<2){
+		printf("plan don't work\n");
 		plan_works=false;
 	}
-	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-	std::vector <vertexDescriptor> plan_provisional=planVertices;
-	done_that(src, plan_works, world, plan_provisional);
+	else{
+		done_that(src, plan_works, world, plan_provisional);
+	}
 	printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
@@ -138,7 +141,21 @@ bool Configurator::Spawner(){
 
 	}
 	else if (!planning){
-		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, simulationStep);
+		if (transitionSystem.m_vertices.size()==1){
+			//currentVertex=boost::add_vertex(transitionSystem);
+			// gt::fill(simResult(), &transitionSystem[currentVertex]);
+			// transitionSystem[currentVertex].nObs++;
+			movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
+			// currentEdge = movingEdge;
+			transitionSystem[movingEdge].direction=controlGoal.direction;
+			// transitionSystem[currentEdge].direction=DEFAULT;
+			currentTask.action.init(transitionSystem[movingEdge].direction);
+		}
+		float _simulationStep=simulationStep;
+		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
+		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
+		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
+		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome==simResult::crashed;
 	}
 	float duration=0;
@@ -1772,7 +1789,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		else{
 			currentTask = Task(controlGoal.disturbance, DEFAULT); //reactive
 		}
-
+		gt::fill(simResult(), &transitionSystem[currentVertex]);
 		currentTask.motorStep = motorStep(currentTask.getAction());
 		printf("changed to reactive\n");
 	}
