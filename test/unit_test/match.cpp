@@ -5,7 +5,7 @@ void assign_disturbance(State & s, const b2Transform& t=b2Transform(b2Vec2(0.02,
     bf.pose= s.start+t;
     bf.halfLength+=hl;
     bf.halfWidth+=hw;
-    s.disturbance=Disturbance(bf);
+    s.Dn=Disturbance(bf);
 }
 
 void rand_transform(b2Transform&t){
@@ -37,13 +37,13 @@ void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s,
         {
         case 0:
             candidate.start=s.start;
-            candidate.disturbance=Disturbance(s.disturbance); //exact match
+            candidate.Dn=Disturbance(s.Dn); //exact match
             break;
         case 1: //ratio +shape match
             rand_transform(candidate.start);
             assign_disturbance(candidate);
-            candidate.disturbance.bf.halfLength=s.disturbance.bf.halfLength;
-            candidate.disturbance.bf.halfWidth=s.disturbance.bf.halfWidth;
+            candidate.Dn.bf.halfLength=s.Dn.bf.halfLength;
+            candidate.Dn.bf.halfWidth=s.Dn.bf.halfWidth;
             break;
         case 2: //ratio match only //FAIL
             rand_transform(candidate.start);
@@ -76,8 +76,8 @@ int main(int argc, char** argv){
     s1.endPose=b2Transform(b2Vec2(0.5, 0.5), b2Rot(M_PI_4));
     s1.outcome=simResult::crashed;
     assign_disturbance(s1);
-    s1.disturbance.bf.halfWidth=0.05;
-    s1.disturbance.bf.halfLength=0.02;
+    s1.Dn.bf.halfWidth=0.05;
+    s1.Dn.bf.halfLength=0.02;
     StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_FALSE;
     int d_code=0;
     if (argc>2){
@@ -94,8 +94,8 @@ int main(int argc, char** argv){
     print_transform(candidate.endPose);
     print_transform(s1.endPose);
     printf("disturbance: ");
-    print_transform(candidate.disturbance.pose());
-    print_transform(s1.disturbance.pose());
+    print_transform(candidate.Dn.pose());
+    print_transform(s1.Dn.pose());
     StateMatcher::MATCH_TYPE result= matcher.isMatch(s1, candidate);
     if (result!=desired_match){
         return 1;

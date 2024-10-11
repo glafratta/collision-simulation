@@ -45,7 +45,7 @@ int main(int argc, char** argv){
     conf.transitionSystem[e1.first].direction=DEFAULT;
     conf.transitionSystem[v1].outcome=simResult::crashed;    
     conf.transitionSystem[v1].endPose=b2Transform(pos, rot);
-    conf.transitionSystem[v1].disturbance=Disturbance(AVOID,  b2Vec2(0.68, 0), 0);
+    conf.transitionSystem[v1].Dn=Disturbance(AVOID,  b2Vec2(0.68, 0), 0);
     //simulating left
     auto v2 = boost::add_vertex(conf.transitionSystem);
     auto e2 = boost::add_edge(conf.movingVertex, v2, conf.transitionSystem);

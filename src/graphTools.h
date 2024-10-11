@@ -59,7 +59,8 @@ struct Edge{
 
 
 struct State{
-	Disturbance disturbance; //disturbance encounters
+	Disturbance Di; //initial Disturbance
+	Disturbance Dn; //new Disturbance
 	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
 	simResult::resultType outcome;
 	std::vector <Direction> options;
@@ -69,21 +70,20 @@ struct State{
 	State* ID=this;
 	float phi=NAIVE_PHI; //arbitrarily large phi
 	VERTEX_LABEL label=VERTEX_LABEL::UNLABELED;
-	//Direction direction=DEFAULT;
 
 	
 	State()=default;
 
 	State(const b2Transform &_start): start(_start){}
 
-	//State(Direction d): direction(d){}
+	State(const b2Transform &_start, const Disturbance& di): start(_start), Di(di){}
 
 	bool visited(){
-		return phi<=1.0;
+		return phi<=NAIVE_PHI;
 	}
 
 	void resetVisited(){
-		phi=10.0;
+		phi=NAIVE_PHI;
 	}
 
 	b2Transform from_disturbance();
