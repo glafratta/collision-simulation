@@ -128,7 +128,7 @@ int gt::simToMotorStep(int simStep){
 }
 
 int gt::distanceToSimStep(const float& s, const float& ds){
-	float time=ds/s;
+	float time=s/ds; //ds:1=s:time
 	int sim_step=time*HZ;
 	return sim_step;
 }

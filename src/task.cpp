@@ -35,11 +35,15 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			bool out_ty= robot.body->GetTransform().p.y>=BOX2DRANGE;
-			bool out_by= robot.body->GetTransform().p.y<=-BOX2DRANGE;
-			bool out_tx= robot.body->GetTransform().p.x>=BOX2DRANGE;
-			bool out_bx= robot.body->GetTransform().p.x<=-BOX2DRANGE;
-			bool out= out_bx||out_by||out_tx|| out_ty;
+			const float BOUND= BOX2DRANGE-action.getLinearSpeed()/HZ;
+			//bool out_ty= robot.body->GetTransform().p.y>=(BOX2DRANGE-action.getLinearSpeed()/HZ);
+			//bool out_by= robot.body->GetTransform().p.y<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
+			//bool out_tx= robot.body->GetTransform().p.x>=(BOX2DRANGE-action.getLinearSpeed()/HZ);
+			//bool out_bx= robot.body->GetTransform().p.x<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
+			//bool out= out_bx||out_by||out_tx|| out_ty;
+			bool out_x= fabs(robot.body->GetTransform().p.x)>=BOUND;
+			bool out_y= fabs(robot.body->GetTransform().p.y)>=BOUND;
+			bool out=out_x || out_y;
 			if (checkEnded(robot.body->GetTransform(), direction).ended || out){
 				break;
 			}
