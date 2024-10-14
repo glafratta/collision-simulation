@@ -2,6 +2,8 @@
 #define TASK_H
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
+const float WHEEL_SPEED_DEFAULT=10/18;
+const float WHEEL_SPEED_TURN=0.218182;
 
 class Task{
 public:
@@ -24,36 +26,30 @@ private:
     float recordedOmega = omega;
     bool valid=0;
 public:
-    float R=.5;
-    float L=.5;
+    float R=WHEEL_SPEED_DEFAULT;
+    float L=WHEEL_SPEED_DEFAULT;
 
     Action()=default;
 
     void init(Direction& direction){
         switch (direction){
         case Direction::DEFAULT:
-        L=0.5;
-        R=.5;
+        L=WHEEL_SPEED_DEFAULT;
+        R=WHEEL_SPEED_DEFAULT;
         break;
         case Direction::LEFT:
-        L = -0.218182;
-        R=0.218182;
+        L=-WHEEL_SPEED_TURN;
+        R=WHEEL_SPEED_TURN;
         break;
         case Direction::RIGHT:
-        L=0.218182;//0.2537;
-        R = - 0.218182;
-        break;
-        case Direction::BACK:
-        L = -0.5;
-        R = -0.5;
+        L=WHEEL_SPEED_TURN;//0.2537;
+        R=-WHEEL_SPEED_TURN;
         break;
         default:
         L=0;
         R=0;
-       // direction=Direction::DEFAULT;
         break;
     }
-    //kinematic model internal to action so it can be versatile for use in real P and simulated P
     setVelocities(L, R);
     }
 

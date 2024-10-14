@@ -50,7 +50,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				Disturbance collision = Disturbance(listener.collisions[index]);
 				//b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
-				stepb2d=0;
+				//stepb2d=0;
 				break;
 			}
 		}

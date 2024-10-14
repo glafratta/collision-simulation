@@ -490,7 +490,6 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 			g[v].endPose = start;
 			g[v].phi=NAIVE_PHI;
 			g[ep.first].step= gt::distanceToSimStep(start.p.Length(), a.getLinearSpeed());
-			// g[v].endPose = start;
 			g[v].outcome=simResult::safeForNow;
 			split.push_back(v1);
 			nNodes--;

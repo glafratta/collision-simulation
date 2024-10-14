@@ -29,6 +29,9 @@ add_executable(disturbance_dimensions ../callbacks.h disturbance_dimensions.cpp)
 target_link_libraries(disturbance_dimensions CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 add_executable(planner ../callbacks.h planner.cpp)
 target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+add_executable(split_step ../callbacks.h split_step.cpp)
+target_link_libraries(split_step CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
+
 
 
 add_test(NAME split_task COMMAND split_task 0.6 0 0)
@@ -38,6 +41,8 @@ add_test(NAME split_task_offset COMMAND split_task 0.75 0.27 0 0.2 0.27 0)
 add_test(NAME split_task_offset_angle COMMAND split_task 0.27 0.75 1.57079633 0.27 0.2 1.57079633)
 add_test(NAME split_task_1_node COMMAND split_task 0.27 0 0)
 add_test(NAME split_task_0_nodes COMMAND split_task 0.18 0 0)
+
+add_test(NAME split_step COMMAND split_step 0.68 0 )
 
 add_test(NAME backtrack COMMAND backtrack 0.6 0 0)
 add_test(NAME backtrack_-01 COMMAND backtrack 0.26 -0.01 -1.570796 0 0 -1.570796 0.265 -0.16 0)
