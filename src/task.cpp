@@ -35,7 +35,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			const float BOUND= BOX2DRANGE-action.getLinearSpeed()/HZ;
+			const float BOUND= BOX2DRANGE;
 			//bool out_ty= robot.body->GetTransform().p.y>=(BOX2DRANGE-action.getLinearSpeed()/HZ);
 			//bool out_by= robot.body->GetTransform().p.y<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
 			//bool out_tx= robot.body->GetTransform().p.x>=(BOX2DRANGE-action.getLinearSpeed()/HZ);

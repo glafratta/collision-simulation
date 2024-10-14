@@ -2,8 +2,8 @@
 #define TASK_H
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
-const float WHEEL_SPEED_DEFAULT=10.0f/18.0f;
-const float WHEEL_SPEED_TURN=0.218182;
+const float WHEEL_SPEED_DEFAULT=0.05f;
+const float WHEEL_SPEED_TURN=0.218182f;
 
 class Task{
 public:
