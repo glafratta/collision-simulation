@@ -24,7 +24,7 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
 	printf("dummy, current edge = %i, %i\n", src, currentVertex);
-	transitionSystem[movingEdge].direction=STOP;
+	transitionSystem[movingEdge].direction=DEFAULT;
 	transitionSystem[currentEdge].direction=STOP;
 	//transitionSystem[currentEdge].it_observed=iteration;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
@@ -471,12 +471,12 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 	if (g[v].outcome != simResult::crashed){
 		return split;
 	}
-	if (src!=TransitionSystem::null_vertex()){
-		if (auto ie=gt::inEdges(g, src, DEFAULT); !ie.empty()){
-			split.insert(split.begin(), src);
-			g[src].outcome=simResult::safeForNow;
-		}
+	//if (src!=TransitionSystem::null_vertex()){
+	if (auto ie=gt::inEdges(g, src, DEFAULT); !ie.empty()){
+		split.insert(split.begin(), src);
+		g[src].outcome=simResult::safeForNow;
 	}
+	//}
 	vertexDescriptor v1=v;
 	float nNodes = g[v].distance()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
@@ -633,7 +633,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	paths.push_back(std::vector<vertexDescriptor>()={src});
 	std::vector <Frontier> frontier_v;
 	bool run=true, _finished=false;
-	std::vector <Frontier> priorityQueue;
+	std::vector <Frontier> priorityQueue={Frontier(src, std::vector<vertexDescriptor>())};
 	if (currentVertex==movingVertex){
 		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
 		//return plan;
@@ -653,6 +653,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
 		if (src==currentVertex){
 		}
+		priorityQueue.erase(priorityQueue.begin());
 		for (Frontier f: frontier_v){ //add to priority queue
 			planPriority(g, f.first);
 			addToPriorityQueue(f, priorityQueue, g);
@@ -660,7 +661,6 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (priorityQueue.empty()){
 			break;
 		}
-		priorityQueue.erase(priorityQueue.begin());
 		src=priorityQueue.begin()->first;
 		add=std::vector <vertexDescriptor>(priorityQueue.begin()->second.begin(), priorityQueue.begin()->second.end());
 		add.push_back(src);
