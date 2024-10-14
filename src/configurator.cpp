@@ -24,7 +24,7 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 	movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 	currentEdge = boost::add_edge(src, currentVertex, transitionSystem).first;
 	printf("dummy, current edge = %i, %i\n", src, currentVertex);
-	transitionSystem[movingEdge].direction=DEFAULT;
+	transitionSystem[movingEdge].direction=STOP;
 	transitionSystem[currentEdge].direction=STOP;
 	//transitionSystem[currentEdge].it_observed=iteration;
 	errorMap.emplace((transitionSystem[currentVertex].ID), ExecutionError());
@@ -472,7 +472,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		return split;
 	}
 	//if (src!=TransitionSystem::null_vertex()){
-	if (auto ie=gt::inEdges(g, src, DEFAULT); !ie.empty()){
+	if (auto ie=gt::inEdges(g, src, DEFAULT), stop_edges=gt::inEdges(g, src, STOP); !ie.empty()|| !stop_edges.empty()){
 		split.insert(split.begin(), src);
 		g[src].outcome=simResult::safeForNow;
 	}
