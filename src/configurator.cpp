@@ -1148,13 +1148,24 @@ void Configurator::run(Configurator * c){
 			c->ci->ready=0;
 			c->data2fp= CoordinateContainer(c->ci->data2fp);
 			c->Spawner();
-			//c->pcProc.previous=set2vec(c->ci->data);
-			//c->ci->ts = TaskSummary(c->currentTask.disturbance, c->currentTask.direction, c->currentTask.motorStep);
 		}
 	}
 
 }
 
+void Configurator::unexplored_transitions(TransitionSystem& g, const vertexDescriptor& v){
+	std::vector <int> it_remove;
+	for (int i=0; i<g[v].options.size(); i++){
+		for (edgeDescriptor e: gt::outEdges(g, v, g[v].options[i])){
+			if (g[e.m_target].visited()){
+				it_remove.push_back(i);
+			}
+		}
+	}
+	for (int r:it_remove){
+		g[v].options.erase(g[v].options.begin()+r);
+	}
+}
 
 void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor src){
 	Task temp(controlGoal.disturbance, DEFAULT, state.endPose); //reflex to disturbance
@@ -1195,42 +1206,12 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 				state.options.push_back(DEFAULT);
 			}
 			else{
-				// int random= rand();
-				// if (random%2==0){
-				// 	state.options = {DEFAULT, LEFT, RIGHT};
-				// }
-				// else{
-				// 	state.options = {DEFAULT, RIGHT, LEFT};
-				// }
 				state.options={DEFAULT};
 			}
 
 		}
 
 	}
-	//	}
-	//	break;
-	// 	case (FOUR_M):{
-	// 		if (g[vd].outcome != simResult::successful){ //accounts for simulation also being safe for now
-	// 			if (d ==DEFAULT){
-	// 				if (g[vd].nodesInSameSpot<maxNodesOnSpot){
-	// 						g[vd].options= {LEFT, RIGHT, BACK};
-	// 				}
-	// 			}
-	// 		}
-	// 		else { //will only enter if successful
-	// 			if (d== LEFT || d == RIGHT){
-	// 				g[vd].options = {DEFAULT};
-	// 			}
-	// 			else if (d == BACK){
-	// 					g[vd].options= {LEFT, RIGHT};
-	// 			}
-	// 		}
-	// 	}
-	// 	break;
-	// 	default:
-	// 	break;
-	// }
 }
 
 void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src){
@@ -1250,25 +1231,9 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	transitionMatrix(g[v0], d, src);
+	unexplored_transitions(g, v0);
 }
 
-
-
-
-// void Configurator::backtrack(TransitionSystem&g, vertexDescriptor &v){
-// 	while (g[v].options.size()==0){ //keep going back until it finds an incomplete node
-// 		if(boost::in_degree(v, g)>0){
-// 			edgeDescriptor inEdge = boost::in_edges(v, g).first.dereference();
-// 			v = inEdge.m_source;	
-// 			if (g[v].options.size()>0){ //if if the vertex exiting the while loop is incomplete add a new node
-// 				return;
-// 			}
-// 		}
-// 		else{
-// 			return;
-// 		}
-//     }
-// }
 
 void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDescriptor>& queue, TransitionSystem &g, const std::vector <vertexDescriptor>& closed){
 	if (g[v].outcome==simResult::crashed){
