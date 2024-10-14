@@ -660,6 +660,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (priorityQueue.empty()){
 			break;
 		}
+		priorityQueue.erase(priorityQueue.begin());
 		src=priorityQueue.begin()->first;
 		add=std::vector <vertexDescriptor>(priorityQueue.begin()->second.begin(), priorityQueue.begin()->second.end());
 		add.push_back(src);
@@ -699,7 +700,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				break;
 			}	
 		}
-		priorityQueue.erase(priorityQueue.begin());
+//		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
 			g[c].label=VERTEX_LABEL::UNLABELED;
 			path->push_back(c);	
