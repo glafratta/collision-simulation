@@ -145,6 +145,7 @@ bool Configurator::Spawner(){
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
 		transitionSystem.swap(tmp);
+		printf("now planning\n");
 		planVertices= planner(transitionSystem, src);
 		printPlan();
 		debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
@@ -640,7 +641,8 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				path=paths.rbegin();
 				printf("new empty path\n");
 				break;
-			}	
+			}
+			printf("inner loop\n");	
 		}
 		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -652,6 +654,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (NULL!=finished){
 			*finished=_finished;
 		}
+		printf("outer loop\n");
 	}while(!priorityQueue.empty() && (path_end!=goal &&!_finished));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
