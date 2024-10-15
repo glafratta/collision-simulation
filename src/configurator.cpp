@@ -642,7 +642,8 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				printf("new empty path\n");
 				break;
 			}
-			printf("inner loop\n");	
+			printf("inner loop v %i \t", end);
+			debug::print_pose(g[end].endPose);	
 		}
 		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -655,7 +656,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			*finished=_finished;
 		}
 		printf("outer loop\n");
-	}while(!priorityQueue.empty() && (path_end!=goal &&!_finished));
+	}while(!priorityQueue.empty() && (path_end!=goal &&! (*finished)));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
