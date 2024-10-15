@@ -656,7 +656,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			*finished=_finished;
 		}
 		printf("outer loop\n");
-	}while(!priorityQueue.empty() && (path_end!=goal &&! (*finished)));
+	}while(!priorityQueue.empty() && (path_end!=goal && !(_finished)));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
