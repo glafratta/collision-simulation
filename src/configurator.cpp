@@ -652,7 +652,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (NULL!=finished){
 			*finished=_finished;
 		}
-	}while(!priorityQueue.empty() & (path_end!=goal &!_finished));
+	}while(!priorityQueue.empty() && (path_end!=goal &&!_finished));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
