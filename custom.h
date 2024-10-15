@@ -111,7 +111,7 @@ void step( AlphaBot &motors){
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
 	//bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
 	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
-	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
+	if 5(er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		printf("goal reached\n");
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
 		c->controlGoal = Task(new_goal, UNDEFINED);
@@ -127,14 +127,14 @@ void step( AlphaBot &motors){
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	R= c->getTask()->getAction().getRWheelSpeed();
-	L=c->getTask()->getAction().getLWheelSpeed()*1.03;
+	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
 	if (c->getTask()->direction==LEFT){
 		R*=1.27; //23
 		L*=1.27;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=1.16; //17
-		L*=1.16;
+		R*=1.17; //17
+		L*=1.17;
 	}
 	else if (c->getTask()->direction==DEFAULT){
 		R*=1.1;
