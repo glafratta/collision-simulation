@@ -175,8 +175,11 @@ bool Configurator::Spawner(){
 			transitionSystem[movingEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
 		}
+		if (currentTask.direction!=DEFAULT && currentTask.motorStep<transitionSystem[movingEdge].step-1){
+			return 1;
+		}
 		float _simulationStep=simulationStep;
-		//adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
+		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
@@ -1734,6 +1737,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		}
 		gt::fill(simResult(), &transitionSystem[currentVertex]);
 		currentTask.motorStep = motorStep(currentTask.getAction());
+		transitionSystem[movingEdge].step=currentTask.motorStep;
 		printf("changed to reactive\n");
 	}
 	ogStep = currentTask.motorStep;
