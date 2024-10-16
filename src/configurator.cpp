@@ -171,17 +171,12 @@ bool Configurator::Spawner(){
 	}
 	else if (!planning){
 		if (transitionSystem.m_vertices.size()==1){
-			//currentVertex=boost::add_vertex(transitionSystem);
-			// gt::fill(simResult(), &transitionSystem[currentVertex]);
-			// transitionSystem[currentVertex].nObs++;
 			movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			// currentEdge = movingEdge;
 			transitionSystem[movingEdge].direction=DEFAULT;
-			// transitionSystem[currentEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
 		}
 		float _simulationStep=simulationStep;
-		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
+		//adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
@@ -1728,7 +1723,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
 	else{
-		if (transitionSystem[0].disturbance.isValid()){
+		if (transitionSystem[currentVertex].disturbance.isValid()){
 			currentTask = Task(transitionSystem[currentVertex].disturbance, DEFAULT); //reactive
 		}
 		else if(currentTask.direction!=DEFAULT){
