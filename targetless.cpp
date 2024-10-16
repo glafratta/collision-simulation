@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	char name[60];
 	//sprintf(name, "targetless");
 	//get_Foldername( ,name);
-	configurator.setBenchmarking(1, "targetless");
+	configurator.setBenchmarking(1, "targetless_cross");
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
 		configuratorInterface.debugOn = atoi(argv[1]);
