@@ -44,7 +44,9 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			bool out_x= fabs(robot.body->GetTransform().p.x+0.002)>=BOUND;
 			bool out_y= fabs(robot.body->GetTransform().p.y+0.002)>=BOUND;
 			bool out=(out_x || out_y );
-			if (checkEnded(robot.body->GetTransform(), direction).ended || out){
+			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){
+				
+				printf("ended=%i, out=%i\n", ended, out);
 				break;
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
