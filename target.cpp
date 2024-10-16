@@ -73,7 +73,6 @@ int main(int argc, char** argv) {
 	if (argc>2){
 		configurator.planning= atoi(argv[2]);
 	}
-	char name[60];
 	if (configurator.planning){
 		configurator.setBenchmarking(1, "Dmatch_target_check_nok");
 	}
