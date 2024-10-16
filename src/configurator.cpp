@@ -175,7 +175,7 @@ bool Configurator::Spawner(){
 			transitionSystem[movingEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
 		}
-		if (currentTask.direction!=DEFAULT && currentTask.motorStep<transitionSystem[movingEdge].step-1){
+		if (currentTask.direction!=DEFAULT && currentTask.motorStep<(transitionSystem[movingEdge].step)){
 			return 1;
 		}
 		float _simulationStep=simulationStep;
