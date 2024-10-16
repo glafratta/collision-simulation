@@ -175,7 +175,7 @@ bool Configurator::Spawner(){
 			transitionSystem[movingEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
 		}
-		if (currentTask.direction!=DEFAULT && currentTask.motorStep<(transitionSystem[movingEdge].step)){
+		if (currentTask.action.getOmega()!=0 && currentTask.motorStep<(transitionSystem[movingEdge].step)){
 			return 1;
 		}
 		float _simulationStep=simulationStep;
@@ -183,7 +183,10 @@ bool Configurator::Spawner(){
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
-		currentTask.change = transitionSystem[currentVertex].outcome==simResult::crashed;
+		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
+		if (currentTask.change){
+			printf("crashed, curre\n");
+		}
 	}
 	float duration=0;
 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -1738,7 +1741,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		gt::fill(simResult(), &transitionSystem[currentVertex]);
 		currentTask.motorStep = motorStep(currentTask.getAction());
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		printf("changed to reactive\n");
+		printf("changed to %f\n", currentTask.action.getOmega());
 	}
 	ogStep = currentTask.motorStep;
 	return pv;
