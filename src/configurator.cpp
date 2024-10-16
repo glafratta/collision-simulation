@@ -176,7 +176,7 @@ bool Configurator::Spawner(){
 			// transitionSystem[currentVertex].nObs++;
 			movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 			// currentEdge = movingEdge;
-			transitionSystem[movingEdge].direction=controlGoal.direction;
+			transitionSystem[movingEdge].direction=DEFAULT;
 			// transitionSystem[currentEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
 		}
