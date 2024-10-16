@@ -130,10 +130,15 @@ bool Configurator::Spawner(){
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
-		transitionSystem.swap(tmp);
+		transitionSystem.swap(tmp);		
+		if (debugOn){
+			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
+		}
 		planVertices= planner(transitionSystem, src);
+		if (debugOn){
+			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
+		}
 		printPlan();
-		debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
 		explored=1;
 	//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
