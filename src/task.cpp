@@ -41,8 +41,8 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			//bool out_tx= robot.body->GetTransform().p.x>=(BOX2DRANGE-action.getLinearSpeed()/HZ);
 			//bool out_bx= robot.body->GetTransform().p.x<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
 			//bool out= out_bx||out_by||out_tx|| out_ty;
-			bool out_x= fabs(robot.body->GetTransform().p.x)>=BOUND;
-			bool out_y= fabs(robot.body->GetTransform().p.y)>=BOUND;
+			bool out_x= fabs(robot.body->GetTransform().p.x)>=(BOUND-0.001);
+			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOUND-0.001);
 			bool out=(out_x || out_y );
 			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){
 				bool keep_going_out_x=(fabs(robot.body->GetTransform().p.x+action.getTransform().p.x) >fabs(robot.body->GetTransform().p.x))&&out_x;
