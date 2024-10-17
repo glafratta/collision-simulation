@@ -223,15 +223,15 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if (controlGoal.disturbance.isValid()){
 		distance= controlGoal.disturbance.getPosition().Length();
 	}
-	float remaining =distance/controlGoal.action.getLinearSpeed();
+	float remaining=distance/controlGoal.action.getLinearSpeed();
 	//IDENTIFY SOURCE NODE, IF ANY
-		if(t.direction == Direction::DEFAULT & 
-		fabs(src.endPose.q.GetAngle())<fabs(controlGoal.disturbance.pose().q.GetAngle())+M_PI/6){
-			remaining= (distance-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
-		}
-		if (remaining<0.01){
-			remaining=0;
-		}
+		// if(t.direction == Direction::DEFAULT & 
+		// fabs(src.endPose.q.GetAngle())<fabs(controlGoal.disturbance.pose().q.GetAngle())+M_PI/6){
+		// 	remaining= (distance-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
+		// }
+		// if (remaining<0.01){
+		// 	remaining=0;
+		// }
 	result =t.willCollide(w, iteration, debugOn, remaining, _simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
