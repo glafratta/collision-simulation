@@ -99,81 +99,83 @@ bool Configurator::Spawner(){
 			//ve=currentVertex;
 			src=currentVertex;
 		}
-	bool plan_works=true;
-	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-	std::vector <vertexDescriptor> plan_provisional=planVertices;	
-	if (transitionSystem.m_vertices.size()<2){
-		printf("plan don't work\n");
-		plan_works=false;
-	}
-	else{
-		done_that(src, plan_works, world, plan_provisional);
-	}
-	printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
-	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
-		is_not_v not_cv(currentVertex);
-		planVertices.clear();
-		boost::clear_vertex(movingVertex, transitionSystem);
-		if (transitionSystem.m_vertices.size()==1){
-			dummy_vertex(currentVertex);//currentEdge.m_source
+		bool plan_works=true;
+		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+		std::vector <vertexDescriptor> plan_provisional=planVertices;	
+		if (transitionSystem.m_vertices.size()<2){
+			printf("plan don't work\n");
+			plan_works=false;
 		}
-		currentTask.change=1;
-		// if (!planVertices.empty()){
-		// 	src=movingVertex;
-		// }
-		// else{
-		// 	src=currentVertex;
-		// }
-		src=currentVertex;
-		resetPhi(transitionSystem);
-		toRemove=explorer(src, transitionSystem, currentTask, world);
-		clearFromMap(toRemove, transitionSystem, errorMap);
-		Connected connected(&transitionSystem);
-		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
-		TransitionSystem tmp;
-		boost::copy_graph(fts, tmp);
-		transitionSystem.clear();
-		transitionSystem.swap(tmp);
-		planVertices= planner(transitionSystem, src);
-		printPlan();
-		debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
-		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
-		explored=1;
-	//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
-		//boost::print_graph(transitionSystem);
-	}
-	else if (planVertices.empty()&&currentTask.motorStep==0){
-		//reset to new src
-		planVertices=plan_provisional;
-		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[src].start;
-		//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
-		applyAffineTrans(deltaPose, transitionSystem);
-	}
-	//if plan fails or not there, 
-	
+		else{
+			done_that(src, plan_works, world, plan_provisional);
+		}
+		printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
+		if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
+			is_not_v not_cv(currentVertex);
+			planVertices.clear();
+			boost::clear_vertex(movingVertex, transitionSystem);
+			if (transitionSystem.m_vertices.size()==1){
+				dummy_vertex(currentVertex);//currentEdge.m_source
+			}
+			currentTask.change=1;
+			// if (!planVertices.empty()){
+			// 	src=movingVertex;
+			// }
+			// else{
+			// 	src=currentVertex;
+			// }
+			src=currentVertex;
+			resetPhi(transitionSystem);
+			toRemove=explorer(src, transitionSystem, currentTask, world);
+			clearFromMap(toRemove, transitionSystem, errorMap);
+			Connected connected(&transitionSystem);
+			FilteredTS fts(transitionSystem, boost::keep_all(), connected);
+			TransitionSystem tmp;
+			boost::copy_graph(fts, tmp);
+			transitionSystem.clear();
+			transitionSystem.swap(tmp);
+			printf("now planning\n");
+			planVertices= planner(transitionSystem, src);
+			printPlan();
+			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
+			boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
+			explored=1;
+		//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
+			//boost::print_graph(transitionSystem);
+		}
+		else if (planVertices.empty()&&currentTask.motorStep==0){
+			//reset to new src
+			planVertices=plan_provisional;
+			b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[src].start;
+			//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
+			applyAffineTrans(deltaPose, transitionSystem);
+		}
+		//if plan fails or not there, 
+		
 
-	// if (debugOn){
-	// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
-	// }
+		// if (debugOn){
+		// 	printf("graph size= %i\n", transitionSystem.m_vertices.size());
+		// }
 
 	}
-	else if (!planning){
-		if (transitionSystem.m_vertices.size()==1){
-			//currentVertex=boost::add_vertex(transitionSystem);
-			// gt::fill(simResult(), &transitionSystem[currentVertex]);
-			// transitionSystem[currentVertex].nObs++;
+	else {
+		if (transitionSystem.m_vertices.size()==1 && iteration<=1){
 			movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-			// currentEdge = movingEdge;
-			transitionSystem[movingEdge].direction=controlGoal.direction;
-			// transitionSystem[currentEdge].direction=DEFAULT;
+			transitionSystem[movingEdge].direction=DEFAULT;
 			currentTask.action.init(transitionSystem[movingEdge].direction);
+		}
+		if (currentTask.action.getOmega()!=0 && currentTask.motorStep<(transitionSystem[movingEdge].step)){
+			return 1;
 		}
 		float _simulationStep=simulationStep;
 		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
-		currentTask.change = transitionSystem[currentVertex].outcome==simResult::crashed;
+		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
+		if (currentTask.change){
+			printf("crashed, curre\n");
+		}
 	}
 	float duration=0;
 	auto endTime =std::chrono::high_resolution_clock::now();
@@ -714,7 +716,9 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				path=paths.rbegin();
 				printf("new empty path\n");
 				break;
-			}	
+			}
+			printf("inner loop v %i \t", end);
+			debug::print_pose(g[end].endPose);	
 		}
 		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -726,7 +730,8 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (NULL!=finished){
 			*finished=_finished;
 		}
-	}while(!priorityQueue.empty() & (path_end!=goal &!_finished));
+		printf("outer loop\n");
+	}while(!priorityQueue.empty() && (path_end!=goal && !(_finished)));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
 	for (std::vector<vertexDescriptor> p: paths){
@@ -1811,7 +1816,8 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		}
 		gt::fill(simResult(), &transitionSystem[currentVertex]);
 		currentTask.motorStep = motorStep(currentTask.getAction());
-		printf("changed to reactive\n");
+		transitionSystem[movingEdge].step=currentTask.motorStep;
+		printf("changed to %f\n", currentTask.action.getOmega());
 	}
 	ogStep = currentTask.motorStep;
 	return pv;
