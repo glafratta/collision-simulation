@@ -44,13 +44,18 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			bool out_x= fabs(robot.body->GetTransform().p.x)>=(BOUND-0.001);
 			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOUND-0.001);
 			bool out=(out_x || out_y );
-			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){
-				bool keep_going_out_x=(fabs(robot.body->GetTransform().p.x+action.getTransform().p.x) >fabs(robot.body->GetTransform().p.x))&&out_x;
-				bool keep_going_out_y=(fabs(robot.body->GetTransform().p.x+action.getTransform().p.y) >fabs(robot.body->GetTransform().p.y))&&out_y;
+			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){ //out
+				//b2Transform transpose= action.getTransform();
+				//math::applyAffineTrans(pose, transpose);
+				bool keep_going_out_x=(fabs(robot.body->GetTransform().p.x+instVelocity.x) >fabs(robot.body->GetTransform().p.x))&&out_x;
+				bool keep_going_out_y=(fabs(robot.body->GetTransform().p.y+instVelocity.y) >fabs(robot.body->GetTransform().p.y))&&out_y;
+				if (ended){
+					break;
+				}
 				if (keep_going_out_x || keep_going_out_y){
 					break;
 				}
-				printf("ended=%i, out=%i\n", ended, out);
+				//printf("ended=%i, out=%i\n", ended, out);
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t

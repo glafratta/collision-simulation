@@ -63,7 +63,8 @@ int main(int argc, char** argv){
     conf.transitionSystem[e3.first].direction=DEFAULT;
     conf.transitionSystem[v3].endPose=pos3;
     //add to ev queue
-    std::vector <vertexDescriptor> evaluationQ={v1, v2, v3}, priorityQ, closed;
+    std::vector <vertexDescriptor> evaluationQ={v1, v2, v3}, priorityQ;
+    std::set <vertexDescriptor> closed;
     //backtrack
     conf.backtrack(evaluationQ, priorityQ, closed, conf.transitionSystem);
     boost::print_graph(conf.transitionSystem);

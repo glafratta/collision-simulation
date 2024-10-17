@@ -25,7 +25,9 @@ void print_graph(const T& g, const Disturbance & goal, std::vector <vertexDescri
 		}
 		os<<*vi<<"-> ";
 		for (auto ei=es.first; ei!=es.second; ei++){
-			os<<(*ei).m_target <<"("<<g[(*ei)].probability<<")";
+			if (*ei!=edgeDescriptor()){
+				os<<(*ei).m_target <<"("<<g[(*ei)].probability<<")";
+			}
 		}
 		os<<"\t(x="<<g[*vi].endPose.p.x<<", y= "<<g[*vi].endPose.p.y<<", theta= "<<g[*vi].endPose.q.GetAngle()<<")\n";
 	}
@@ -52,6 +54,7 @@ void graph_file(const int &it, const T &g, const Disturbance &goal, std::vector<
 		}
 		fprintf(f,"%i -> ", *vi);
 		for (auto ei=es.first; ei!=es.second; ei++){
+
 			fprintf(f, "%i (%f) ", (*ei).m_target, g[(*ei)].probability);
 		}
 		fprintf(f, "\t(x=%.3f, y= %.3f, theta= %.3f)\n", g[*vi].endPose.p.x, g[*vi].endPose.p.y, g[*vi].endPose.q.GetAngle());
