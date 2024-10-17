@@ -127,9 +127,9 @@ int gt::simToMotorStep(int simStep){
 	return int(result);
 }
 
-int gt::distanceToSimStep(float d, float dv){
-	float time=d/dv;
-	int sim_step=time*HZ;
+int gt::distanceToSimStep(const float& s, const float& ds){
+	float time=s/ds; //ds:1=s:time
+	int sim_step=(time*HZ);
 	return sim_step;
 }
 
@@ -183,7 +183,7 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 	std::vector <edgeDescriptor> result;
 	auto es = boost::out_edges(v, g);
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		if (g[(*ei)].direction == d){
+		if (g[(*ei)].direction == d || d==UNDEFINED){
 			result.push_back(*ei);
 		}
 	}
@@ -193,10 +193,10 @@ std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v
 std::vector <edgeDescriptor> gt::inEdges(TransitionSystem&g, const vertexDescriptor& v, const Direction &d){
 	std::vector <edgeDescriptor> result;
 	auto es = boost::in_edges(v, g);
+	if (v==TransitionSystem::null_vertex()){
+		return result;
+	}
 	for (auto ei = es.first; ei!=es.second; ++ei){
-		// if ((*ei).m_source==22 || (*ei).m_target==0){
-		// 	printf("");
-		// }
 		if (g[(*ei)].direction == d || d==UNDEFINED){
 			if ((*ei).m_source!=v){
 				result.push_back(*ei);

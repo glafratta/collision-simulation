@@ -18,8 +18,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
 				BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
-				s_temp.disturbance= Disturbance(closest_D); //assumes 1 item length
-				debug::print_pose(s_temp.disturbance.pose());
+				s_temp.Dn= Disturbance(closest_D); //assumes 1 item length
+				debug::print_pose(s_temp.Dn.pose());
 				bool closest_match=true;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, closest_match);
 				printf("looked for matches, potential: %i, closest =%i\n", options_src.size(), closest_match);
