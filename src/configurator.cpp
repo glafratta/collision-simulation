@@ -1248,10 +1248,8 @@ void Configurator::addToPriorityQueue(vertexDescriptor v, std::vector<vertexDesc
 	}
 	for (auto i =queue.begin(); i!=queue.end(); i++){
 		bool expanded=0;
-		if (auto found=closed.find(v); found!=closed.end()){
-			expanded=true;
-		}
-		if (g[v].phi <abs(g[*i].phi) & !expanded){
+		auto found=closed.find(v); 
+		if (g[v].phi <abs(g[*i].phi) && found==closed.end()){
 			queue.insert(i, v);
 			return;
 		}
