@@ -147,11 +147,11 @@ Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::vector<vertexDescriptor>&, TransitionSystem&);
+void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
 
 std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, Direction, b2Transform, vertexDescriptor src=TransitionSystem::null_vertex());
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vector<vertexDescriptor>*propagated=NULL, std::vector<vertexDescriptor>*closed=NULL);
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vector<vertexDescriptor>*propagated=NULL, std::set<vertexDescriptor>*closed=NULL);
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
@@ -272,7 +272,7 @@ void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIG
 
 void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
 
-void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, const std::vector <vertexDescriptor>&);
+void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, const std::set<vertexDescriptor>&);
 
 void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, vertexDescriptor goal=TransitionSystem::null_vertex());
 
