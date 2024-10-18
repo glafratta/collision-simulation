@@ -29,6 +29,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
 	message("build test cases")
 else()
 	message("making simulation test cases")
+<<<<<<< HEAD
 	add_executable(targetless_sim callbacks.h targetless_sim.cpp)
 	add_executable(target_sim callbacks.h target_sim.cpp)
 	add_executable(target_reactive_sim callbacks.h target_reactive_sim.cpp)
@@ -36,6 +37,14 @@ else()
 	add_executable(loop_sim callbacks.h loop_sim.cpp)
 	add_executable(testLoop callbacks.h testLoop.cpp)
 	add_executable(update_graph callbacks.h update_graph.cpp)
+=======
+	add_executable(targetless_sim callbacks.h test_essentials.h targetless_sim.cpp)
+	add_executable(target_sim callbacks.h test_essentials.h target_sim.cpp)
+	add_executable(loop_RT callbacks.h test_essentials.h loop_RT.cpp)
+	add_executable(loop_sim callbacks.h test_essentials.h loop_sim.cpp)
+	add_executable(testLoop callbacks.h test_essentials.h testLoop.cpp)
+	add_executable(update_graph callbacks.h test_essentials.h update_graph.cpp)
+>>>>>>> reworkingGraph-forward
 	target_link_libraries(target_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 	target_link_libraries(target_reactive_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)
 	target_link_libraries(targetless_sim CloCK ${OpenCV_LIBS} box2d rt pthread cpptimer)

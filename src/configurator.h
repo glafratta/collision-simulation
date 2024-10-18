@@ -149,7 +149,7 @@ simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRA
 
 void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
 
-std::vector <vertexDescriptor> splitTask( vertexDescriptor v, TransitionSystem&, Direction, b2Transform, vertexDescriptor src=TransitionSystem::null_vertex());
+std::vector <vertexDescriptor> splitTask(vertexDescriptor v, TransitionSystem&, Direction, vertexDescriptor src=TransitionSystem::null_vertex());
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vector<vertexDescriptor>*propagated=NULL, std::set<vertexDescriptor>*closed=NULL);
 
