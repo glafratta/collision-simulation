@@ -41,12 +41,13 @@ int main(int argc, char** argv){
         D_t=atof(argv[9]);
     }
     auto v1 = boost::add_vertex(conf.transitionSystem);
-    auto e1 = boost::add_edge(conf.movingVertex, v1, conf.transitionSystem);
+    auto e1 = boost::add_edge(conf.currentVertex, v1, conf.transitionSystem);
     conf.transitionSystem[e1.first].direction=DEFAULT;
+    conf.transitionSystem[v1].start=start;
     conf.transitionSystem[v1].outcome=simResult::crashed;    
     conf.transitionSystem[v1].endPose=b2Transform(pos, rot);
     conf.transitionSystem[v1].Dn=Disturbance(AVOID,  b2Vec2(Dx, Dy), D_t);
-    std::vector <vertexDescriptor> split =conf.splitTask(v1, conf.transitionSystem, conf.transitionSystem[e1.first].direction, start);
+    std::vector <vertexDescriptor> split =conf.splitTask(v1, conf.transitionSystem, conf.transitionSystem[e1.first].direction, conf.currentVertex);
     bool split_size= split.size()==desired_split_size(pos, conf.simulationStep);
     int ct=0;
     for (vertexDescriptor v:split){ 

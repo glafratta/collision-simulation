@@ -467,7 +467,7 @@ printf("finished exploring\n");
 return toRemove;
 }
 
-std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, b2Transform start, vertexDescriptor src){
+std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, vertexDescriptor src){
 	std::vector <vertexDescriptor> split={v};
 
 	if (d ==RIGHT || d==LEFT){
@@ -482,6 +482,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		g[src].outcome=simResult::safeForNow;
 	}
 	//}
+	auto first_edge=boost::edge(src, v, g);
 	vertexDescriptor v1=v;
 	float nNodes = g[v].distance()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
@@ -489,23 +490,27 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 	a.init(d);
 	while(nNodes>1){
 		if(nNodes >1){
-			start.p =start.p+ b2Vec2(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
+			b2Vec2 step_v(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
 			g[v].options = {d};
-			auto ep =add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
-			g[v].endPose = start;
+			g[v].endPose = g[v].start+b2Transform(step_v, b2Rot(0));
+			g[first_edge.first].step= gt::distanceToSimStep(g[v].distance(), a.getLinearSpeed());
+			first_edge=add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
+			g[v1].start=g[v].endPose;
 			g[v].phi=NAIVE_PHI;
-			g[ep.first].step= gt::distanceToSimStep(start.p.Length(), a.getLinearSpeed());
+			g[first_edge.first].direction=d;
 			g[v].outcome=simResult::safeForNow;
 			split.push_back(v1);
 			nNodes--;
 		}
 		if (nNodes<=1){
 			g[v1].endPose = endPose;
+			g[first_edge.first].step= gt::distanceToSimStep(g[v1].distance(), a.getLinearSpeed());	
 			g[v1].outcome=simResult::crashed;
 			g[v1].phi=og_phi;
 		}
 
 		v=v1;
+
 	}
 	return split;
 }
@@ -520,7 +525,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			}
 			b2Transform start=g[ep.second.m_source].endPose;
 			vertexDescriptor src=ep.second.m_source;
-			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, start, src);
+			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, src);
 			for (vertexDescriptor split_v:split){
 					EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
 					g[split_v].phi=evaluationFunction(local_er);
