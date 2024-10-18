@@ -1,5 +1,6 @@
 #!/bin/bash
 ##temp=$(vcgencmd measure_temp | egrep -o '[0-9]*\.[0-9]*')
+export TIME="time result\ncmd:%C\nreal %es\nuser %Us \nsys  %Ss \nmemory:%MKB \ncpu %P"
 temp=$(head -n 1 /sys/class/thermal/thermal_zone0/temp)
   # Test if the string is an integer as expected with a regular expression.
 #  if [ $line =~ ^-?[0-9]+$ ]
