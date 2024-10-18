@@ -2,18 +2,19 @@
 #define CALLBACKS_H
 #include "CppTimer.h"
 #include <thread>
-#include "configurator.h"
-#include <unistd.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iomanip> 
-#include <sstream> //for writing string into file, for checking, std::ostringstream
-#include <ncurses.h>
-#include <ctime>
-#include <dirent.h>
-#include <filesystem>
-#define _USE_MATH_DEFINES
+#include "test_essentials.h"
+// #include "configurator.h"
+// #include <unistd.h>
+// #include <time.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <iomanip> 
+// #include <sstream> //for writing string into file, for checking, std::ostringstream
+// #include <ncurses.h>
+// #include <ctime>
+// #include <dirent.h>
+// #include <filesystem>
+// #define _USE_MATH_DEFINES
 
 
 void printGraph(TransitionSystem& g){
@@ -171,18 +172,6 @@ public:
 };
 
 
-std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
-    std::vector <BodyFeatures> result;
-    std::vector <Pointf> ptset= set2vec(points);
-    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
-    if (feature.first){
-        feature.second.pose.q.Set(start.q.GetAngle());
-        result.push_back(feature.second);
-    }
-    return result;
-}
-
-
 //FOR THREAD DEBUGGING
 
 class TimerStep: public CppTimer{
@@ -205,76 +194,5 @@ class TimerDI: public CppTimer{
     }
 };
 
-void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
-		//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
-		//was ve instead of src
-		std::vector <vertexDescriptor> options_src;
-        //IF THE CURRENT PLAN HAS EXECUTED
-		//if (bool fin=controlGoal.checkEnded(transitionSystem[src], UNDEFINED, true).ended; fin ){ //&& currentVertex!=movingVertex
-		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
-			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
-			//Disturbance where=controlGoal.disturbance;
-			if (!b_features.empty()){
-				State s_temp;
-				s_temp.disturbance= Disturbance(b_features[0]); //assumes 1 item length
-				bool closest_match=1;
-				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
-				//FIND STATE WHICH matches the relationship with the disturbance
-			}
-			//been= been_there(transitionSystem, where); 
-		//}
-		//printf("checked been = %i\n", been.first);
-
-		//std::vector <vertexDescriptor> plan_provisional=planVertices;
-	//	if (been.first){
-		//	printf("provisional plan\n");
-		for (auto o:options_src){
-			plan_provisional=planner(transitionSystem, o); //been.second, been.first
-			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
-			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
-				plan_works=true;
-				break;
-			}
-		}
-
-}
-
-// float Configurator::taskRotationError(){
-//     printf("previous coord=%i\n", pcProc.previous.size());
-// 	b2Transform velocity = b2Transform(currentTask.getAction().getTransform());
-//     float theta_error=0, theta=0;
-// 	if (currentTask.action.getOmega()==0){
-// 		float dataRange=0.25;
-// 	 	velocity= pcProc.affineTransEstimate(std::vector <Pointf>(ci->data2fp.begin(), ci->data.end()), currentTask.action, MOTOR_CALLBACK, dataRange);
-//         theta_error = atan(velocity.p.y/velocity.p.x)- currentTask.action.getOmega();
-// 	}
-// 	else{
-//         //displacement will be garbage
-//         if (currentTask.disturbance.isValid()){
-//             orientation prev_orientation= currentTask.disturbance.getOrientation();
-//             std::vector<Pointf> nb =pcProc.setDisturbanceOrientation(currentTask.disturbance, ci->data2fp);
-//             theta =subtract(currentTask.disturbance.getOrientation(), prev_orientation).second;
-//             theta_error=(theta -currentTask.action.getOmega()*MOTOR_CALLBACK);
-//             ExecutionError ee;
-//             if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-//                 ee.setR(it->second.r());
-//             }
-//             ee.setTheta(theta_error);
-//             errorMap.insert_or_assign(transitionSystem[currentVertex].ID, ee);
-//             velocity.q.Set(theta/MOTOR_CALLBACK);
-//             //get orientation
-//             printf("prev orientation = %f, current orientation = %f, or error=%f, neighbours= %i, theta=%f\n", prev_orientation.second, currentTask.disturbance.pose().q.GetAngle(), theta_error, nb.size(), theta);
-//         }
-// 		//velocity = b2Transform(currentTask.getAction().getTransform()); //open loop
-// 	}
-// 	currentTask.action.setRec(SignedVectorLength(velocity.p), velocity.q.GetAngle());
-//     // ExecutionError exErr;
-//     // if (auto it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-//     //     exErr= it->second;
-//    // }
-//     //exErr.setTheta(error);
-//     //errorMap.insert_or_assign(g[currentVertex].ID, exErr);
-//     return theta_error;
-// }
 
  #endif
