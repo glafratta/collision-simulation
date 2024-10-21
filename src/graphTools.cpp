@@ -97,7 +97,7 @@ void StateDifference::init(State& s1, State& s2){ //observed, desired
 	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
 	D_position.x= d1.p.x - d2.p.x; //disturbance x
 	D_position.y= d1.p.y - d2.p.y; //disturbance y
-	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
+//	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
 	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
 	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
 	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;

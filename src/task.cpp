@@ -35,14 +35,8 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			if (debugOn){
 				fprintf(robotPath, "%f\t%f\n", robot.body->GetPosition().x, robot.body->GetPosition().y); //save predictions/
 			}
-			const float BOUND= BOX2DRANGE;
-			//bool out_ty= robot.body->GetTransform().p.y>=(BOX2DRANGE-checkEnded(robot.body->GetTransform(), direction).endedaction.getLinearSpeed()/HZ);
-			//bool out_by= robot.body->GetTransform().p.y<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
-			//bool out_tx= robot.body->GetTransform().p.x>=(BOX2DRANGE-action.getLinearSpeed()/HZ);
-			//bool out_bx= robot.body->GetTransform().p.x<=(-BOX2DRANGE+action.getLinearSpeed()/HZ);
-			//bool out= out_bx||out_by||out_tx|| out_ty;
-			bool out_x= fabs(robot.body->GetTransform().p.x)>=(BOUND-0.001);
-			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOUND-0.001);
+			bool out_x= fabs(robot.body->GetTransform().p.x)>=(BOX2DRANGE-0.001);
+			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
 			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){ //out
 				//b2Transform transpose= action.getTransform();
@@ -202,15 +196,15 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
-		case AVOID:{
-			if (direction==DEFAULT){
+		// case AVOID:{
+		// 	if (direction==DEFAULT){
 				
-			}
-			else{
-				//endCriteria.distance = distance;
-				endCriteria.angle = angle;
-			}
-		}
+		// 	}
+		// 	else{
+		// 		//endCriteria.distance = distance;
+		// 		endCriteria.angle = angle;
+		// 	}
+		// }
 		break;
 		default:
 		endCriteria.distance = distance;
@@ -236,9 +230,6 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	//printf("check ended\n");
 	b2Vec2 distance=this_start.p-robotTransform.p;
 	if (round(distance.Length()*100)/100>=BOX2DRANGE){ //if length reached or turn
-		if (debug_k){
-		//	printf("distance of %f exceeds range, ended\n", distance.Length());
-		}
 		r.ended =true;
 	}
 	if (disturbance.isValid()){
@@ -259,24 +250,17 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 					robotAngle-=2*M_PI;
 				}
 			}
-
 			bool finishedLeft=robotAngle>=angleL;//-(action.getOmega()*HZ)/2;
 			bool finishedRight=robotAngle<=angleR;//+(action.getOmega()*HZ)/2;
 			if (finishedLeft|| finishedRight){
 				if (disturbance.getAffIndex()==AVOID){
 					disturbance.invalidate();
 				}
-				if (debug_k){
-			//	printf("angle of %f exceeds range, ended\n", robotTransform.q.GetAngle());
-				}
 				r.ended = 1;
 			}
 		}
 		else if (getAffIndex()== int(InnateAffordances::NONE)){
-			a =Angle(robotTransform.q.GetAngle());
-			if (debug_k){
-			//	printf("control goal null has D, ended\n");
-			}			
+			a =Angle(robotTransform.q.GetAngle());		
 			r.ended = true;
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
@@ -289,24 +273,15 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 			else{
 				r.ended = d<=endCriteria.distance; 
 			}
-			//if (!r.ended){
-			//}
-			
-			if (debug_k){
-				printf("distance to goal=%f, endCriteria.distance =%f", d.get(), endCriteria.distance.get());
-			}
-			if (debug_k & r.ended){
-				printf("robot %f %f has reached goal, ended =%i\n", robotTransform.p.x, robotTransform.p.y);
-			}	
 		}
 	}
 	else if (dir==LEFT || dir ==RIGHT){
 		float angleL = this_start.q.GetAngle()+endCriteria.angle.get();
 		float angleR = this_start.q.GetAngle()-endCriteria.angle.get();
-		r.ended = (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR);
-		if (debug_k &r.ended){
-			//printf("turn done, but no goal\n");
-		}	
+		r.ended = (robotTransform.q.GetAngle()>=angleL || robotTransform.q.GetAngle()<=angleR);	
+	}
+	else if (dir==DEFAULT && getAffIndex()==AVOID){
+		r.ended=true;
 	}
 	r.estimatedCost = endCriteria.getStandardError(a,d);
 	return r;
@@ -321,6 +296,14 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }
+
+void Task::makeRobotSensor(b2World *world, Robot &robot){
+	if (!disturbance.isValid()){
+		return;
+	}
+	
+}
+
 
 EndCriteria Task::getEndCriteria(const Disturbance &d){
 	EndCriteria endCriteria;

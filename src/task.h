@@ -28,6 +28,7 @@ public:
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
+    AffordanceIndex affordance=NONE;
 
 struct Action{
 private:
@@ -143,25 +144,53 @@ void setVelocities(float l, float r){
 
 
 class Listener : public b2ContactListener {
-  int iteration=1;
+ // int iteration=1;
+    Disturbance * d_ptr;
     public:
     Listener(){}
+    Listener(Disturbance * _d): d_ptr(_d){}
     std::vector <b2Body*> collisions;
-    bool in_sight=false;
-    
-		void BeginContact(b2Contact * contact) {
-			b2BodyUserData bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
-			if (bodyData.pointer) { //if fixtureA belongs to robot
- 
-                b2Body * other = contact->GetFixtureB()->GetBody();
-                collisions.push_back(other);
-			}
-			bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
-			if (bodyData.pointer) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
-                b2Body * other = contact->GetFixtureA()->GetBody();
-                collisions.push_back(other);
-                }       
-		}
+        void BeginContact(b2Contact * contact) {
+        b2Fixture * fixtureA= contact->GetFixtureA();
+        b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
+            b2Body * other = contact->GetFixtureB()->GetBody();
+            if (fixtureA->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+                d_ptr->validate();
+                return;
+            }
+            collisions.push_back(other);
+        }
+        b2Fixture * fixtureB= contact->GetFixtureB();
+        bodyData = fixtureB->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
+            b2Body * other = contact->GetFixtureA()->GetBody();
+            if (fixtureB->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+                d_ptr->validate();
+                return;
+            }
+            collisions.push_back(other);
+            }       
+        }
+
+        void EndContact(b2Contact * contact) {
+        b2Fixture * fixtureA= contact->GetFixtureA();
+        b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
+            b2Body * other = contact->GetFixtureB()->GetBody();
+            if (fixtureA->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+                d_ptr->invalidate();
+            }
+        }
+        b2Fixture * fixtureB= contact->GetFixtureB();
+        bodyData = fixtureB->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
+            b2Body * other = contact->GetFixtureA()->GetBody();
+            if (fixtureB->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+                d_ptr->invalidate();
+            }
+        }       
+    }
         
 	};
 
@@ -249,7 +278,7 @@ Task::Action getAction(){
 }
 
 AffordanceIndex getAffIndex(){
-    return disturbance.getAffIndex();
+    return affordance;
 }
 
 
@@ -279,6 +308,7 @@ Task(Direction d){
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
+    affordance=disturbance.getAffIndex();
     direction = H(disturbance, d, topDown);  
     action.init(direction);
     setEndCriteria();
@@ -287,6 +317,8 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     //     debug_k=true;
     // }
 }
+
+void makeRobotSensor(b2World *, Robot &);
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 

@@ -32,6 +32,9 @@ const int maxNodesOnSpot =4;
 const float TRACKING_ERROR_TOLERANCE = MAX_SPEED*MOTOR_CALLBACK*0.5; //OG *0.5
 const float TRACKING_ANGLE_TOLERANCE =MAX_OMEGA*0.5*MOTOR_CALLBACK;
 const float FORGET_THRESHOLD=0.05;
+const float D_POSE_MARGIN=0.065;
+const float D_DIMENSIONS_MARGIN=0.03;
+
 //camera filtering
 const int POS_IT=2;
 const int VEL_IT=6;
@@ -55,8 +58,8 @@ public:
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world->CreateBody(&bodyDef);
-		body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-		//body->GetUserData().pointer=ROBOT_FLAG;
+		//body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+		body->GetUserData().pointer=reinterpret_cast<uintptr_t>(ROBOT_FLAG);
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
 		//locally x is length, y is width
@@ -67,7 +70,6 @@ public:
 		
 	}
 
-	void makeSensor(b2World * world){}
 };
 
 

@@ -25,8 +25,6 @@ const float NAIVE_PHI=10.0;
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-const float D_DIMENSIONS_MARGIN=0.03;
-
 float angle_subtract(float a1, float a2);
 
 struct ComparePair{

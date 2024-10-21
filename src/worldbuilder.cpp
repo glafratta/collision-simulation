@@ -124,6 +124,9 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
         default:
         throw std::invalid_argument("not a valid shape\n");break;
     }
+    if (features.attention){
+        body->GetUserData().pointer=reinterpret_cast<uintptr_t>(DISTURBANCE_FLAG);
+    }
 
 	bodies++;
 }
@@ -197,6 +200,19 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     //     salient.first.emplace(getPointf(disturbance.getPosition()));
     //     features.push_back(disturbance.bodyFeatures());
     // }
+    bool has_D=false;
+    if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
+        for (BodyFeatures f: features){
+            if (f.match(disturbance.bf)){
+                has_D=true;
+                f.attention=true;
+            }
+        }
+        if (!has_D){
+            features.push_back(disturbance.bf);
+            
+        }
+    }
     for (BodyFeatures f: features){
         makeBody(world, f);
     }

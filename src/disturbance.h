@@ -30,7 +30,6 @@ std::vector <C> arrayToVec(C* c, int ct){
 }
 
 class Configurator;
-//class StateMatcher;
 
 class BodyFeatures{
     public:
@@ -41,6 +40,7 @@ class BodyFeatures{
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
+    bool attention=false;
 
     BodyFeatures(){}
 
@@ -54,12 +54,15 @@ class BodyFeatures{
         halfWidth=f;
     }
 
+    bool match(const BodyFeatures&);
+
 };
 
 struct Disturbance{ //this generates error
+
+private:
 friend Configurator;
 friend struct StateMatcher;
-private:
     AffordanceIndex affordanceIndex = NONE; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
     bool rotation_valid=0;    
@@ -136,6 +139,7 @@ public:
             bf.halfLength=(fabs(maxy-miny))/2; //local coordinates
             bf.halfWidth=(fabs(maxx-minx))/2;
         }
+        bf.attention=true;
         affordanceIndex=1;
     }
 
