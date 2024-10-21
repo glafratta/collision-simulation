@@ -85,7 +85,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 void Task::Correct::operator()(Action & action, int step){
 	float tolerance = 0.1; //tolerance in radians/pi = just under 2 degrees degrees
 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
-		printf("returning\n");
+		//printf("returning\n");
 		return;
 	}
 	//printf("error buffer sum = %f, i=%f\n", p(), get_i());
@@ -167,11 +167,49 @@ Direction Task::H(Disturbance ob, Direction d, bool topDown){
     return d;
 }
 
+void Task::Ray::assign(const Robot& robot, const Disturbance & disturbance){
+	if (!disturbance.isValid()){
+		return;
+	}
+	b2RayCastInput result;
+	result.p1=getClosest(robot, disturbance);
+	result.p2= disturbance.bf.pose.p;
+	result.maxFraction=1.5;
+	*input=result;
+}
+
+b2Vec2 Task::Ray::getClosest(const Robot& robot, const Disturbance & disturbance){
+	return b2Vec2();
+
+}
+
+
+
+void Task::Ray::update(const b2Transform& t){
+    if (NULL==input){
+        return;
+    }
+    b2Transform tmp(input->p1, b2Rot(0));
+    math::applyAffineTrans(t, tmp);
+    input->p1=tmp.p;
+}
+
+
 void Task::setEndCriteria(Angle angle, Distance distance){
 	switch(disturbance.getAffIndex()){
 		case PURSUE:{
 			endCriteria.angle=Angle(0);
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
+		}
+		break;
+		case AVOID:{
+			if (direction==DEFAULT){
+				
+			}
+			else{
+				//endCriteria.distance = distance;
+				endCriteria.angle = angle;
+			}
 		}
 		break;
 		default:

@@ -39,7 +39,8 @@ const int FPS=30;
 const int order=3;
 const int DC=0; //HZ
 const int cutoff_frequency=4; //HZ
-const int band_width=0.5;
+const float band_width=0.5;
+const uintptr_t ROBOT_FLAG=0x1, DISTURBANCE_FLAG=0x2;
 //delete
 
 class Robot {
@@ -55,6 +56,7 @@ public:
 		bodyDef.position.Set(0.0f, 0.0f);
 		body = world->CreateBody(&bodyDef);
 		body->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+		//body->GetUserData().pointer=ROBOT_FLAG;
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
 		//locally x is length, y is width
@@ -64,6 +66,8 @@ public:
 		body->CreateFixture(&fixtureDef);
 		
 	}
+
+	void makeSensor(b2World * world){}
 };
 
 

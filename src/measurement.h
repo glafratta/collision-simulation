@@ -2,6 +2,7 @@
 #define MEASUREMENT_H
 #include "graphTools.h" 
 
+
 class Measurement{
 protected:
     bool valid =0;
@@ -56,6 +57,7 @@ class Distance: public Measurement{
 struct EndCriteria{
     Angle angle;
     Distance distance;    //max distance, ideal
+    bool outOfSight=true;
     bool valid_d=false;
     float getStandardError(Angle, Distance);
     float getStandardError(Angle, Distance, State);

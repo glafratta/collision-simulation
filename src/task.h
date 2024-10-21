@@ -5,7 +5,19 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 const float WHEEL_SPEED_DEFAULT=0.5f;
 const float WHEEL_SPEED_TURN=0.218182f;
 
+
 class Task{
+
+struct Ray{
+    b2RayCastInput * input;
+
+    void assign(const Robot&, const Disturbance &);
+
+    b2Vec2 getClosest(const Robot&, const Disturbance &);
+
+    void update(const b2Transform&);
+};
+
 public:
     friend class Configurator;
     char planFile[250]; //for debug
@@ -16,7 +28,6 @@ public:
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
-//delet
 
 struct Action{
 private:
@@ -136,15 +147,17 @@ class Listener : public b2ContactListener {
     public:
     Listener(){}
     std::vector <b2Body*> collisions;
+    bool in_sight=false;
     
 		void BeginContact(b2Contact * contact) {
 			b2BodyUserData bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
-			if (bodyData.pointer) {
+			if (bodyData.pointer) { //if fixtureA belongs to robot
+ 
                 b2Body * other = contact->GetFixtureB()->GetBody();
                 collisions.push_back(other);
 			}
 			bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
-			if (bodyData.pointer) {
+			if (bodyData.pointer) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
                 b2Body * other = contact->GetFixtureA()->GetBody();
                 collisions.push_back(other);
                 }       
@@ -241,6 +254,7 @@ AffordanceIndex getAffIndex(){
 
 
 Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
+
 
 void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 

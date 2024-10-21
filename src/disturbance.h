@@ -35,6 +35,7 @@ class Configurator;
 class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
+   // b2Transform pose_local=pose;
     float halfLength=0.0005; //x
     float halfWidth=0.0005; //y
     float shift=0.0f;
@@ -119,6 +120,7 @@ public:
 
     Disturbance(b2Body* b){
         bf.pose=b->GetTransform(); //global
+//        bf.pose_local=b2Transform(b->GetLocalPoint(bf.pose.p), bf.pose.q);
         b2Fixture* fixture =b->GetFixtureList();
         bf.shape=(fixture->GetShape()->GetType());
         valid=1;
@@ -156,7 +158,7 @@ public:
     }
 
 
-    bool isValid(){
+    bool isValid()const{
         return valid;
     }
 
