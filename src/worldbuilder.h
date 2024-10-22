@@ -28,7 +28,7 @@ class WorldBuilder{
 
     std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
 
-    std::vector <BodyFeatures> processData_kmeans(CoordinateContainer, const b2Transform&);
+    std::vector <BodyFeatures> cluster_data(CoordinateContainer, const b2Transform&, bool kmeans=true);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
@@ -69,7 +69,9 @@ class WorldBuilder{
     result.first=true;
     return result;
 }
-    std::vector <std::vector<cv::Point2f>> feature_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
+    std::vector <std::vector<cv::Point2f>> kmeans_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
+
+    std::vector <std::vector<cv::Point2f>> partition_clusters( std::vector <cv::Point2f>);
 
     b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 

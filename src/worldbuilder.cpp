@@ -59,7 +59,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
 //     result.first=true;
 // }
 
-std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
+std::vector <std::vector<cv::Point2f>> WorldBuilder::kmeans_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
     
     const int MAX_CLUSTERS=3, attempts =3, flags=cv::KMEANS_PP_CENTERS;
     cv::Mat bestLabels;
@@ -74,13 +74,39 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vect
     return result;
 }
 
-std::vector <BodyFeatures> WorldBuilder::processData_kmeans( CoordinateContainer pts, const b2Transform& start){
+
+std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::vector <cv::Point2f> points){
+    struct Dist{ //define predicate
+        bool operator()(const cv::Point2f& p1, const cv::Point2f& p2){
+            float x_2=std::pow(p1.x-p2.x,2);
+            float y_2=std::pow(p1.y-p2.y,2);
+            return std::sqrt(x_2 +y_2)<.1;
+        }
+    }dist;
+    std::vector <int> labels;
+    cv::partition(points, labels, dist);
+    int n_clusters= *(std::max(labels.begin(), labels.end()));
+    std::vector <std::vector<cv::Point2f>>result(n_clusters);
+    for (int i=0; i<points.size(); i++){ //bestlabel[i] gives the index
+            int label=labels[i];
+            result[label].push_back(points[i]);
+    }
+    return result;
+}
+
+std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, const b2Transform& start, bool kmeans){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
     for (Pointf p:pts){
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
-    std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
+    std::vector<std::vector<cv::Point2f>> clusters;
+    if (kmeans){
+        clusters=kmeans_clusters(points, centers);
+    }
+    else{
+        clusters=partition_clusters(points);
+    }
     for (int c=0; c<clusters.size(); c++){
         if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
             feature.second.pose.q.Set(start.q.GetAngle());
@@ -185,7 +211,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
         features =processData(salient.first, start);
     }
     else{
-        features=processData_kmeans(salient.first, start);
+        features=cluster_data(salient.first, start,kmeans);
     }
     return features;
 }
@@ -195,7 +221,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
  std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
-    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth);
+    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, kmeans);
     // if (occluded(current, disturbance)){
     //     salient.first.emplace(getPointf(disturbance.getPosition()));
     //     features.push_back(disturbance.bodyFeatures());

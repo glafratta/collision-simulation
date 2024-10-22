@@ -8,7 +8,7 @@ std::vector <BodyFeatures> WorldBuilder::processData( const CoordinateContainer 
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
     //std::vector <cv::Point2f> centers;
-    std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
+    std::vector<std::vector<cv::Point2f>> clusters=kmeans_clusters(points, centers);
     for (int i=0;i<clusters.size(); i++){
         char filename[50];
         sprintf(filename, "/tmp/cluster%04i.txt", i+1);
