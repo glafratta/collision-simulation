@@ -321,13 +321,6 @@ void Task::makeRobotSensor(b2Body* robotBody){
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape=&fixture;
 	robotBody->CreateFixture(&fixtureDef);
-
-
-
-
-	
-	//x -> w , y -> l
-	b2Vec2 
 	
 }
 
