@@ -3,6 +3,7 @@
 #include "sensor.h"
 
 class WorldBuilder{
+    enum CLUSTERING{BOX=0, KMEANS=1, PARTITION=2}; //BOX: bounding box around points
     int bodies=0;
     public:
         struct CompareCluster{
@@ -28,13 +29,13 @@ class WorldBuilder{
 
     std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
 
-    std::vector <BodyFeatures> cluster_data(CoordinateContainer, const b2Transform&, bool kmeans=true);
+    std::vector <BodyFeatures> cluster_data(CoordinateContainer, const b2Transform&, CLUSTERING clustering=PARTITION);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, bool kmeans=0);
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, CLUSTERING clustering=BOX);
 
-    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, bool kmeans=0);
+    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, CLUSTERING clustering=BOX);
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
 

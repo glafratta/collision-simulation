@@ -94,17 +94,17 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::ve
     return result;
 }
 
-std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, const b2Transform& start, bool kmeans){
+std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, const b2Transform& start, CLUSTERING clustering){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
     for (Pointf p:pts){
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
     std::vector<std::vector<cv::Point2f>> clusters;
-    if (kmeans){
+    if (clustering==KMEANS){
         clusters=kmeans_clusters(points, centers);
     }
-    else{
+    else if (clustering==PARTITION){
         clusters=partition_clusters(points);
     }
     for (int c=0; c<clusters.size(); c++){
@@ -200,28 +200,28 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
 }
 
 
-std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, bool kmeans){
+std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, CLUSTERING clustering){
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, halfWindowWidth);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
     if (salient.first.empty()){
         return features;
     }
-    if (!kmeans){
+    if (clustering==BOX){
         features =processData(salient.first, start);
     }
     else{
-        features=cluster_data(salient.first, start,kmeans);
+        features=cluster_data(salient.first, start,clustering);
     }
     return features;
 }
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
-    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, kmeans);
+    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
     // if (occluded(current, disturbance)){
     //     salient.first.emplace(getPointf(disturbance.getPosition()));
     //     features.push_back(disturbance.bodyFeatures());
