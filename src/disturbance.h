@@ -54,6 +54,8 @@ class BodyFeatures{
         halfWidth=f;
     }
 
+    BodyFeatures operator=(const BodyFeatures&);
+
     bool match(const BodyFeatures&);
 
 };

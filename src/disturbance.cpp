@@ -1,5 +1,16 @@
 #include "disturbance.h"
 
+BodyFeatures BodyFeatures::operator=(const BodyFeatures& bf){
+    pose=bf.pose;
+    halfLength=bf.halfLength;
+    halfWidth=bf.halfWidth;
+    shift=bf.shift;
+    bodyType=bf.bodyType;
+    shape=bf.shape;
+    attention=bf.attention;
+}
+
+
 bool BodyFeatures::match(const BodyFeatures& bf){
     bool match_x=(pose.p.x-bf.pose.p.x)<D_POSE_MARGIN;
     bool match_y=(pose.p.y-bf.pose.p.y)<D_POSE_MARGIN;

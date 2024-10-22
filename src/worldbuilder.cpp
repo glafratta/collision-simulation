@@ -85,7 +85,7 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::ve
     }dist;
     std::vector <int> labels;
     cv::partition(points, labels, dist);
-    int n_clusters= *(std::max(labels.begin(), labels.end()));
+    int n_clusters= *(std::max(labels.begin(), labels.end())) +1;
     std::vector <std::vector<cv::Point2f>>result(n_clusters);
     for (int i=0; i<points.size(); i++){ //bestlabel[i] gives the index
             int label=labels[i];
@@ -228,15 +228,15 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     // }
     bool has_D=false;
     if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
-        for (BodyFeatures f: features){
-            if (f.match(disturbance.bf)){
+        for (int i=0; i<features.size(); i++){
+            if (features[i].match(disturbance.bf)){
+                features[i]=disturbance.bf;
                 has_D=true;
-                f.attention=true;
+                features[i].attention=true;
             }
         }
         if (!has_D){
             features.push_back(disturbance.bf);
-            
         }
     }
     for (BodyFeatures f: features){

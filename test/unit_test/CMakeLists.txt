@@ -137,6 +137,7 @@ add_test(NAME replanner COMMAND replanner 170924_1321_badrun/ 2 1)
 
 add_test(NAME fill_avoid1 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0 1.5714 1)
 add_test(NAME fill_avoid2 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0.27 0 2)
+add_test(NAME fill_avoid_close COMMAND fill_for_dist ../251023_TAGET/ 0.54 0 1.5714 3)
 
 set(CMAKE_BUILD_TYPE Debug)
 
