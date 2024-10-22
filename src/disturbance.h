@@ -29,6 +29,7 @@ std::vector <C> arrayToVec(C* c, int ct){
 	return result;
 }
 
+
 class Configurator;
 
 class BodyFeatures{
@@ -40,6 +41,7 @@ class BodyFeatures{
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
+    b2Fixture * fixture= NULL;
     bool attention=false;
 
     BodyFeatures(){}
@@ -126,11 +128,11 @@ public:
     Disturbance(b2Body* b){
         bf.pose=b->GetTransform(); //global
 //        bf.pose_local=b2Transform(b->GetLocalPoint(bf.pose.p), bf.pose.q);
-        b2Fixture* fixture =b->GetFixtureList();
-        bf.shape=(fixture->GetShape()->GetType());
+        *bf.fixture =*b->GetFixtureList();
+        bf.shape=(bf.fixture->GetShape()->GetType());
         valid=1;
         if (bf.shape==b2Shape::e_polygon){
-            b2PolygonShape * poly=(b2PolygonShape*)fixture->GetShape();
+            b2PolygonShape * poly=(b2PolygonShape*)bf.fixture->GetShape();
             std::vector<b2Vec2> vertices=arrayToVec(poly->m_vertices, poly->m_count);
             CompareX compareX;
             CompareY compareY;

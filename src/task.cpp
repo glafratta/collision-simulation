@@ -297,10 +297,37 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	return r;
 }
 
-void Task::makeRobotSensor(b2World *world, Robot &robot){
+void Task::makeRobotSensor(b2Body* robotBody){
 	if (!disturbance.isValid()){
 		return;
 	}
+	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
+	b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture->GetShape();
+	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_points=arrayToVec(poly_d->m_vertices, poly_d->m_count);
+	for (b2Vec2 p: d_points){
+		p =robotBody->GetLocalPoint(p);
+		all_points.push_back(p);
+	}
+	float minx=(std::min_element(all_points.begin(),all_points.end(), CompareX())).base()->x;
+	float miny=(std::min_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float maxx=(std::max_element(all_points.begin(), all_points.end(), CompareX())).base()->x;
+	float maxy=(std::max_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float halfLength=(fabs(maxy-miny))/2; //
+    float halfWidth=(fabs(maxx-minx))/2;
+	b2Vec2 centroid(maxx-halfWidth, maxy-halfLength);
+	b2Vec2 offset=centroid - robotBody->GetLocalPoint(robotBody->GetPosition());
+	b2PolygonShape fixture;
+	fixture.SetAsBox(halfWidth, halfLength, offset, 0);
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape=&fixture;
+	robotBody->CreateFixture(&fixtureDef);
+
+
+
+
+	
+	//x -> w , y -> l
+	b2Vec2 
 	
 }
 
