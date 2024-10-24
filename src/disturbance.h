@@ -41,7 +41,7 @@ class BodyFeatures{
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
     b2Shape::Type shape = b2Shape::e_polygon;
-    b2Fixture * fixture= NULL;
+    //std::vector<b2Vec2> vertices;
     bool attention=false;
 
     BodyFeatures(){}
@@ -55,8 +55,6 @@ class BodyFeatures{
     void setHalfWidth(float f){
         halfWidth=f;
     }
-
-    BodyFeatures operator=(const BodyFeatures&);
 
     bool match(const BodyFeatures&);
 
@@ -84,7 +82,6 @@ friend struct StateMatcher;
         setOrientation(dtheta);
     }
 }
-protected:
 
 public:
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
@@ -127,19 +124,18 @@ public:
 
     Disturbance(b2Body* b){
         bf.pose=b->GetTransform(); //global
-//        bf.pose_local=b2Transform(b->GetLocalPoint(bf.pose.p), bf.pose.q);
-        *bf.fixture =*b->GetFixtureList();
-        bf.shape=(bf.fixture->GetShape()->GetType());
+        b2Fixture * fixture =b->GetFixtureList();
+        bf.shape=(fixture->GetShape()->GetType());
         valid=1;
         if (bf.shape==b2Shape::e_polygon){
-            b2PolygonShape * poly=(b2PolygonShape*)bf.fixture->GetShape();
-            std::vector<b2Vec2> vertices=arrayToVec(poly->m_vertices, poly->m_count);
+            b2PolygonShape * poly=(b2PolygonShape*)fixture->GetShape();
+            std::vector <b2Vec2> local_vertices=arrayToVec(poly->m_vertices, poly->m_count);
             CompareX compareX;
             CompareY compareY;
-            float minx=(std::min_element(vertices.begin(), vertices.end(), compareX)).base()->x;
-            float miny=(std::min_element(vertices.begin(), vertices.end(), compareY)).base()->y;
-            float maxx=(std::max_element(vertices.begin(), vertices.end(), compareX)).base()->x;
-            float maxy=(std::max_element(vertices.begin(), vertices.end(), compareY)).base()->y;
+            float minx=(std::min_element(local_vertices.begin(), local_vertices.end(), compareX)).base()->x;
+            float miny=(std::min_element(local_vertices.begin(), local_vertices.end(), compareY)).base()->y;
+            float maxx=(std::max_element(local_vertices.begin(), local_vertices.end(), compareX)).base()->x;
+            float maxy=(std::max_element(local_vertices.begin(), local_vertices.end(), compareY)).base()->y;
             bf.halfLength=(fabs(maxy-miny))/2; //local coordinates
             bf.halfWidth=(fabs(maxx-minx))/2;
         }
@@ -222,6 +218,7 @@ public:
 
     void setOrientation(float, float);
 
+    std::vector <b2Vec2> vertices();
 
 
 

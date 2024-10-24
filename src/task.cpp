@@ -8,7 +8,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			return result;
 		}
 		Robot robot(&_world);
-		Listener listener;
+		Listener listener(&disturbance);
 		_world.SetContactListener(&listener);	
 		FILE * robotPath;
 		if (debugOn){
@@ -18,6 +18,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
 		robot.body->SetTransform(start.p, theta);
+		makeRobotSensor(robot.body);
 		int stepb2d=0;
 		float traj_error=0;
 		for (stepb2d; stepb2d < (HZ*remaining); stepb2d++) {//3 second
@@ -39,8 +40,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
 			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){ //out
-				//b2Transform transpose= action.getTransform();
-				//math::applyAffineTrans(pose, transpose);
 				bool keep_going_out_x=(fabs(robot.body->GetTransform().p.x+instVelocity.x) >fabs(robot.body->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot.body->GetTransform().p.y+instVelocity.y) >fabs(robot.body->GetTransform().p.y))&&out_y;
 				if (ended){
@@ -49,7 +48,6 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 				if (keep_going_out_x || keep_going_out_y){
 					break;
 				}
-				//printf("ended=%i, out=%i\n", ended, out);
 			}
 			_world.Step(1.0f/HZ, 3, 8); //time step 100 ms which also is alphabot callback time, possibly put it higher in the future if fast
 			theta += action.getOmega()/HZ; //= omega *t
@@ -70,7 +68,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		if (debugOn){
 			fclose(robotPath);
 		}
-		int bodies = _world.GetBodyCount();
+		//int bodies = _world.GetBodyCount();
 		return result;
 	
 }
@@ -298,13 +296,13 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 }
 
 void Task::makeRobotSensor(b2Body* robotBody){
-	if (!disturbance.isValid()){
+	if (!(disturbance.getAffIndex()==AVOID)){
 		return;
 	}
 	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
-	b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture->GetShape();
-	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_points=arrayToVec(poly_d->m_vertices, poly_d->m_count);
-	for (b2Vec2 p: d_points){
+	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
+	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=disturbance.vertices();
+	for (b2Vec2 p: d_vertices){
 		p =robotBody->GetLocalPoint(p);
 		all_points.push_back(p);
 	}
@@ -319,6 +317,7 @@ void Task::makeRobotSensor(b2Body* robotBody){
 	b2PolygonShape fixture;
 	fixture.SetAsBox(halfWidth, halfLength, offset, 0);
 	b2FixtureDef fixtureDef;
+	fixtureDef.isSensor=true;
 	fixtureDef.shape=&fixture;
 	robotBody->CreateFixture(&fixtureDef);
 	

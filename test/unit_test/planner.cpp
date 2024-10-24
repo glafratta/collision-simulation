@@ -30,7 +30,7 @@ int main(int argc, char** argv){
             solution={DEFAULT, DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT };  
             simStep=ROBOT_HALFLENGTH*2;
             solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT};  
-            solution3={LEFT, DEFAULT, RIGHT,  DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
+            solution3={LEFT, DEFAULT, RIGHT,  DEFAULT, RIGHT, DEFAULT};  
         }
         else{
             solution={LEFT, DEFAULT};

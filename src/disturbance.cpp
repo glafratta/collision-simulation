@@ -1,15 +1,5 @@
 #include "disturbance.h"
 
-BodyFeatures BodyFeatures::operator=(const BodyFeatures& bf){
-    pose=bf.pose;
-    halfLength=bf.halfLength;
-    halfWidth=bf.halfWidth;
-    shift=bf.shift;
-    bodyType=bf.bodyType;
-    shape=bf.shape;
-    attention=bf.attention;
-}
-
 
 bool BodyFeatures::match(const BodyFeatures& bf){
     bool match_x=(pose.p.x-bf.pose.p.x)<D_POSE_MARGIN;
@@ -19,6 +9,21 @@ bool BodyFeatures::match(const BodyFeatures& bf){
     return match_x && match_y && match_w && match_h;
 }
 
+std::vector <b2Vec2> Disturbance::vertices(){
+    std::vector <b2Vec2> result;
+    if (getAffIndex()==NONE){
+        return result;
+    }
+    //assume orientation 0
+    float pm_x=bf.halfWidth*cos(pose().q.GetAngle());
+    float pm_y=bf.halfLength*sin(pose().q.GetAngle());
+    result.push_back(b2Vec2(pose().p.x+pm_x,pose().p.y+pm_y));
+    result.push_back(b2Vec2(pose().p.x-pm_x,pose().p.y+pm_y));
+    result.push_back(b2Vec2(pose().p.x+pm_x,pose().p.y-pm_y));
+    result.push_back(b2Vec2(pose().p.x-pm_x,pose().p.y-pm_y));
+    return result;
+
+}
 
 float Disturbance::getAngle(b2Transform t){ //gets the angle of an Disturbance wrt to another Disturbance (robot)
         //reference is position vector 2. If the angle >0 means that Disturbance 1 is to the left of Disturbance 2

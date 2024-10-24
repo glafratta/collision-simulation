@@ -152,21 +152,31 @@ class Listener : public b2ContactListener {
     std::vector <b2Body*> collisions;
         void BeginContact(b2Contact * contact) {
         b2Fixture * fixtureA= contact->GetFixtureA();
+        b2Fixture * fixtureB= contact->GetFixtureB();
         b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
         if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
             b2Body * other = contact->GetFixtureB()->GetBody();
-            if (fixtureA->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
-                d_ptr->validate();
+            if (fixtureA->IsSensor()){
+                if (other->GetUserData().pointer==DISTURBANCE_FLAG){
+                    d_ptr->validate();
+                }
+                return;
+            }
+            if (fixtureB->IsSensor()){
                 return;
             }
             collisions.push_back(other);
         }
-        b2Fixture * fixtureB= contact->GetFixtureB();
         bodyData = fixtureB->GetBody()->GetUserData();
         if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
             b2Body * other = contact->GetFixtureA()->GetBody();
-            if (fixtureB->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
-                d_ptr->validate();
+            if (fixtureB->IsSensor()){
+                if (other->GetUserData().pointer==DISTURBANCE_FLAG){
+                    d_ptr->validate();
+                }
+                return;
+            }
+            if (fixtureA->IsSensor()){
                 return;
             }
             collisions.push_back(other);

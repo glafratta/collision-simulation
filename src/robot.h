@@ -8,8 +8,8 @@
 #include <math.h>
 const float SAFE_ANGLE =M_PI_2;
 const float MAX_TURN =M_PI;
-const float ROBOT_HALFLENGTH =0.135; //uncomment for robot
-const float ROBOT_HALFWIDTH =0.09; //real
+const float ROBOT_HALFWIDTH =0.135; //uncomment for robot
+const float ROBOT_HALFLENGTH =0.09; //real
 const float ROBOT_BOX_OFFSET_X= -0.09;
 const float ROBOT_BOX_OFFSET_Y =0;
 const float ROBOT_BOX_OFFSET_ANGLE =0;
@@ -62,8 +62,7 @@ public:
 		body->GetUserData().pointer=reinterpret_cast<uintptr_t>(ROBOT_FLAG);
 		b2Vec2 center(ROBOT_BOX_OFFSET_X, ROBOT_BOX_OFFSET_Y);
 		b2PolygonShape box;
-		//locally x is length, y is width
-		box.SetAsBox(ROBOT_HALFLENGTH, ROBOT_HALFWIDTH, center, ROBOT_BOX_OFFSET_ANGLE);
+		box.SetAsBox(ROBOT_HALFWIDTH, ROBOT_HALFLENGTH, center, ROBOT_BOX_OFFSET_ANGLE);
 		fixtureDef.shape = &box;
 		fixtureDef.friction =0;
 		body->CreateFixture(&fixtureDef);
