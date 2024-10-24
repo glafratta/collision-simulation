@@ -62,13 +62,13 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 		}
 		result.endPose = robot.body->GetTransform();
 		result.step=stepb2d;
-		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
-			_world.DestroyBody(b);
-		}
+		// for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
+		// 	_world.DestroyBody(b);
+		// }
 		if (debugOn){
 			fclose(robotPath);
 		}
-		//int bodies = _world.GetBodyCount();
+		int bodies = _world.GetBodyCount();
 		return result;
 	
 }
@@ -295,9 +295,10 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	return r;
 }
 
-void Task::makeRobotSensor(b2Body* robotBody){
+std::pair<b2Vec2, b2Vec2> Task::makeRobotSensor(b2Body* robotBody){
+	std::pair<b2Vec2, b2Vec2> result;
 	if (!(disturbance.getAffIndex()==AVOID)){
-		return;
+		return result;
 	}
 	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
 	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
@@ -320,6 +321,11 @@ void Task::makeRobotSensor(b2Body* robotBody){
 	fixtureDef.isSensor=true;
 	fixtureDef.shape=&fixture;
 	robotBody->CreateFixture(&fixtureDef);
+	result.first=b2Vec2(minx, maxy);
+	result.first=robotBody->GetWorldPoint(result.first);
+	result.second=b2Vec2(maxx, miny);
+	result.second=robotBody->GetWorldPoint(result.second);
+	return result;
 	
 }
 

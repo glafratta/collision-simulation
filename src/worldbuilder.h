@@ -85,5 +85,10 @@ class WorldBuilder{
     }
 
     bool occluded(CoordinateContainer, Disturbance);
+
+    void world_cleanup(b2World *);
+
+    b2Body * get_robot(b2World *);
+
 };
 #endif

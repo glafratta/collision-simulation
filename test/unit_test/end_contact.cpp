@@ -19,9 +19,10 @@ int main(int argc, char** argv){
     debug_draw(world, 8);
     simResult sr= task.willCollide(world, 69, 1);
     //linear speed =0.1
-    int expected=((ROBOT_HALFWIDTH*2)+(start.p.x-d_pose.p.x) + bf.halfWidth)*HZ/task.action.getLinearSpeed();
-    if (sr.step!=expected-1){
-        printf("step=%i, expected=%i\n", sr.step, expected-1);
+    int expected=((ROBOT_HALFWIDTH+(ROBOT_HALFWIDTH+ROBOT_BOX_OFFSET_X))+(start.p.x-d_pose.p.x) + bf.halfWidth)*HZ/task.action.getLinearSpeed();
+    if (sr.step!=expected){
+        printf("step=%i, expected=%i\n", sr.step, expected);
+        debug::print_pose(sr.endPose);
         return 1;
     }
     return 0;

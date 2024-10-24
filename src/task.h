@@ -328,7 +328,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     // }
 }
 
-void makeRobotSensor(b2Body*);
+std::pair<b2Vec2, b2Vec2> makeRobotSensor(b2Body*); //returns top left and bottom right in world coord
 
 simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
 

@@ -201,10 +201,39 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	}
 	return result;
 }
-Disturbance Configurator::getDisturbance(TransitionSystem&g, vertexDescriptor v){
+Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World * world){
 	std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
 	if (!g[v].Dn.isValid() ){
 		if (oe.empty()){
+			//either query callback or willcollide
+			if (g[v].Di.isValid()){
+				Task task(g[v].Di, DEFAULT, g[v].endPose, true);
+				b2Body * robot=worldBuilder.get_robot(world);
+				robot->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
+				std::pair<b2Vec2, b2Vec2> tl_br= task.makeRobotSensor(robot);
+				
+				class Query : public b2QueryCallback {
+					public:
+						std::vector<b2Body*> d;
+						
+						bool ReportFixture(b2Fixture* fixture) {
+							if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
+								d.push_back( fixture->GetBody() ); 
+								return true;//keep going to find all fixtures in the query area
+							}
+							return false;
+						}
+				}query;
+
+				b2AABB box;
+				box.upperBound=tl_br.first;
+				box.lowerBound=tl_br.second;
+				world->QueryAABB(&query, box);
+				if (!query.d.empty()){
+					return g[v].Di;
+				}
+			}
+			//check if Di was eliminated 
 			return controlGoal.disturbance;
 		}
 		else {
@@ -400,6 +429,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				do {
 				changeStart(start, v0, g);
 				std::pair <State, Edge> sk(State(start, getDisturbance(g, v0)), Edge(g[v0].options[0]));
+				worldBuilder.world_cleanup(&w);
 				bool topDown=1;
 				t = Task(sk.first.Di, g[v0].options[0], start, topDown);
 				float _simulationStep=BOX2DRANGE;
@@ -429,12 +459,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;//t.direction;
 					}
-					else{
-						printf("same vertex %i\n", v1);
-					}
-				}
-				else if (match.first==StateMatcher::DISTURBANCE){
-						printf("SIMILAR to %i\n", match.second);
 				}
 				else{
 					edge= addVertex(v0, v1,g, Disturbance(),sk.second);
@@ -1836,5 +1860,4 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	applyAffineTrans(deltaPose, g);
 	applyAffineTrans(deltaPose, controlGoal);
 }
-
 

@@ -315,3 +315,19 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     //to finish
     return result;
 }
+
+void WorldBuilder::world_cleanup(b2World * world){
+	for (b2Body * b = world->GetBodyList(); b!=NULL; b = b->GetNext()){
+		world->DestroyBody(b);
+	}
+}
+
+b2Body * WorldBuilder::get_robot(b2World * world){
+    for (b2Body * b=world->GetBodyList();b; b=b->GetNext()){
+        if (b->GetUserData().pointer==ROBOT_FLAG){
+            return b;
+        }
+    }
+    return NULL;
+
+}

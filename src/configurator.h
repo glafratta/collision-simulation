@@ -143,7 +143,7 @@ void dummy_vertex(vertexDescriptor src);
 
 float taskRotationError(); // returns lateral displacement error (local y)
 
-Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
+Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World *);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
