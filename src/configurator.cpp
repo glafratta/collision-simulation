@@ -428,7 +428,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				std::vector <vertexDescriptor> propagated;
 				do {
 				changeStart(start, v0, g);
-				std::pair <State, Edge> sk(State(start, getDisturbance(g, v0)), Edge(g[v0].options[0]));
+				std::pair <State, Edge> sk(State(start, getDisturbance(g, v0, &w)), Edge(g[v0].options[0]));
 				worldBuilder.world_cleanup(&w);
 				bool topDown=1;
 				t = Task(sk.first.Di, g[v0].options[0], start, topDown);
