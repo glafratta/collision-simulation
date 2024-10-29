@@ -59,3 +59,10 @@ void Disturbance::setOrientation(float s, float c){
     bf.pose.q.c=og.c;
     rotation_valid=1;
 }
+
+
+bool Disturbance::operator==(const Disturbance & d){
+    bool _pose=bf.pose.p==d.bf.pose.p && bf.pose.q.GetAngle()==d.bf.pose.q.GetAngle();
+    bool dim=halfLength()==d.bf.halfLength && halfWidth()==d.bf.halfWidth;
+    bool aff=affordanceIndex==d.affordanceIndex;
+}  

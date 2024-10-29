@@ -5,7 +5,6 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 const float WHEEL_SPEED_DEFAULT=0.5f;
 const float WHEEL_SPEED_TURN=0.218182f;
 
-
 class Task{
 
 struct Ray{
@@ -299,7 +298,7 @@ void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
 void setErrorWeights();
 
-EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))));
+EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, b2Body* robot=NULL); //, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)))
 
 EndedResult checkEnded(State, Direction dir=UNDEFINED, bool relax=false, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)))); //usually used to check against control goal
 
@@ -328,9 +327,9 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     // }
 }
 
-std::pair<b2Vec2, b2Vec2> makeRobotSensor(b2Body*); //returns top left and bottom right in world coord
+b2AABB  makeRobotSensor(b2Body*); //returns bounding box in world coord
 
-simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
+simResult willCollide(b2World &, int, bool debug =0, float remaining = SIM_DURATION, float simulationStep=BOX2DRANGE);
 
 EndCriteria getEndCriteria(const Disturbance&);
 };

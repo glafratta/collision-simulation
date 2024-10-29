@@ -39,7 +39,7 @@ simResult Task::willCollide(b2World & _world, int iteration, bool debugOn, float
 			bool out_x= fabs(robot.body->GetTransform().p.x)>=(BOX2DRANGE-0.001);
 			bool out_y= fabs(robot.body->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
-			if (bool ended=checkEnded(robot.body->GetTransform(), direction).ended; ended || out){ //out
+			if (bool ended=checkEnded(robot.body->GetTransform(), direction, false, robot.body).ended; ended || out){ //out
 				bool keep_going_out_x=(fabs(robot.body->GetTransform().p.x+instVelocity.x) >fabs(robot.body->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot.body->GetTransform().p.y+instVelocity.y) >fabs(robot.body->GetTransform().p.y))&&out_y;
 				if (ended){
@@ -214,14 +214,14 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	}
 }
 
-EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool relax, std::pair<bool,b2Transform> use_start){ //self-ended
+EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool relax, b2Body * robot){ //self-ended , std::pair<bool,b2Transform> use_start
 	if (dir==UNDEFINED){
 		dir=direction;
 	}
 	b2Transform this_start= start;
-	if (!use_start.first){
-		this_start=use_start.second;
-	}
+	// if (!use_start.first){
+	// 	this_start=use_start.second;
+	// }
 	EndedResult r;
 	Angle a;
 	Distance d;
@@ -263,8 +263,13 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 		}
 		else if (getAffIndex()==int(InnateAffordances::PURSUE)){
 			a = Angle(disturbance.getAngle(robotTransform));
-			
-			if (relax){
+			//local level if D
+			if (robot!=NULL){
+				b2Vec2 pos_local=disturbance.getPosition();
+				pos_local=robot->GetLocalPoint(pos_local);
+				r.ended=fabs(pos_local.x)<=endCriteria.distance.get()/2;
+			}
+			else if (relax){
 				Distance _d(RELAXED_DIST_ERROR_TOLERANCE);
 				r.ended = d<=_d; 
 			}
@@ -295,8 +300,8 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	return r;
 }
 
-std::pair<b2Vec2, b2Vec2> Task::makeRobotSensor(b2Body* robotBody){
-	std::pair<b2Vec2, b2Vec2> result;
+b2AABB Task::makeRobotSensor(b2Body* robotBody){
+	b2AABB result;
 	if (!(disturbance.getAffIndex()==AVOID)){
 		return result;
 	}
@@ -315,16 +320,13 @@ std::pair<b2Vec2, b2Vec2> Task::makeRobotSensor(b2Body* robotBody){
     float halfWidth=(fabs(maxx-minx))/2;
 	b2Vec2 centroid(maxx-halfWidth, maxy-halfLength);
 	b2Vec2 offset=centroid - robotBody->GetLocalPoint(robotBody->GetPosition());
-	b2PolygonShape fixture;
-	fixture.SetAsBox(halfWidth, halfLength, offset, 0);
+	b2PolygonShape shape;
+	shape.SetAsBox(halfWidth, halfLength, offset, 0);
 	b2FixtureDef fixtureDef;
 	fixtureDef.isSensor=true;
-	fixtureDef.shape=&fixture;
+	fixtureDef.shape=&shape;
 	robotBody->CreateFixture(&fixtureDef);
-	result.first=b2Vec2(minx, maxy);
-	result.first=robotBody->GetWorldPoint(result.first);
-	result.second=b2Vec2(maxx, miny);
-	result.second=robotBody->GetWorldPoint(result.second);
+	shape.ComputeAABB(&result, robotBody->GetTransform(), 0);
 	return result;
 	
 }

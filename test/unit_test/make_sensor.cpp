@@ -27,7 +27,7 @@ int main(int argc, char** argv){
     Robot robot(&world);
     robot.body->SetTransform(start.p, start.q.GetAngle());
     conf.worldBuilder.buildWorld(world, conf.data2fp, task.start, task.direction, task.disturbance,0.15, WorldBuilder::PARTITION);
-    task.makeRobotSensor(robot.body);
+    b2AABB aabb=task.makeRobotSensor(robot.body);
     debug_draw(world, atoi(argv[4]));
     char name_v[256];
     sprintf(name_v, "/tmp/debug_disturbance_v_%i.txt", atoi(argv[4]));
@@ -37,6 +37,6 @@ int main(int argc, char** argv){
         fprintf(f, "%f\t%f\n", p.x, p.y);
     }
     fclose(f);
-
+    printf("tl=%f, %f\t br=%f\t%f\n", aabb.upperBound.x, aabb.upperBound.y, aabb.lowerBound.x, aabb.lowerBound.y);
     return 0;
 }

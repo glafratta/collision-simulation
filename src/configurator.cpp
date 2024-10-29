@@ -32,7 +32,7 @@ void Configurator::dummy_vertex(vertexDescriptor src){
 }
 
 std::pair <edgeDescriptor, bool> Configurator::add_vertex_now(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge, bool topDown){
-	std::pair<edgeDescriptor, bool> result=addVertex(src, v1, g, obs, edge, topDown);
+	std::pair<edgeDescriptor, bool> result=addVertex(src, v1, g, edge, topDown);
 	if (!g[v1].filled){
 		g[v1].Di= obs;
 	}
@@ -40,7 +40,7 @@ std::pair <edgeDescriptor, bool> Configurator::add_vertex_now(vertexDescriptor &
 }
 
 std::pair <edgeDescriptor, bool> Configurator::add_vertex_retro(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge, bool topDown){
-	std::pair<edgeDescriptor, bool> result=addVertex(src, v1, g, obs, edge, topDown);
+	std::pair<edgeDescriptor, bool> result=addVertex(src, v1, g, edge, topDown);
 	g[v1].Di= g[src].Di;
 	g[v1].Dn=g[src].Dn;
 	return result;
@@ -201,44 +201,43 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	}
 	return result;
 }
-Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World * world){
+Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World * world, const Direction& dir){
 	std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
 	if (!g[v].Dn.isValid() ){
-		if (oe.empty()){
-			//either query callback or willcollide
-			if (g[v].Di.isValid()){
-				Task task(g[v].Di, DEFAULT, g[v].endPose, true);
-				b2Body * robot=worldBuilder.get_robot(world);
-				robot->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
-				std::pair<b2Vec2, b2Vec2> tl_br= task.makeRobotSensor(robot);
-				
-				class Query : public b2QueryCallback {
-					public:
-						std::vector<b2Body*> d;
-						
-						bool ReportFixture(b2Fixture* fixture) {
-							if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
-								d.push_back( fixture->GetBody() ); 
-								return true;//keep going to find all fixtures in the query area
-							}
-							return false;
-						}
-				}query;
+		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
+		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
+		if (visited.first){
+			if (oe.empty() && g[visited.second].direction!=dir){
+				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID){
 
-				b2AABB box;
-				box.upperBound=tl_br.first;
-				box.lowerBound=tl_br.second;
-				world->QueryAABB(&query, box);
-				if (!query.d.empty()){
-					return g[v].Di;
+					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
+					b2Body * robot=worldBuilder.get_robot(world);
+					robot->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
+					b2AABB box= GetSensor(robot)->GetAABB(0);
+					class Query : public b2QueryCallback {
+						public:
+							std::vector<b2Body*> d;
+							
+							bool ReportFixture(b2Fixture* fixture) {
+								if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
+									d.push_back( fixture->GetBody() ); 
+									return true;//keep going to find all fixtures in the query area
+								}
+								return false;
+							}
+					}query;
+					world->QueryAABB(&query, box); //is Di in this box
+					if (!query.d.empty()){
+						return g[v].Di;
+					}
 				}
+				//check if Di was eliminated 
+				return controlGoal.disturbance;
 			}
-			//check if Di was eliminated 
-			return controlGoal.disturbance;
-		}
-		else {
-			std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
-			return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
+			else {
+				std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
+				return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
+			}
 		}
 	}
 	return g[v].Dn;
@@ -253,14 +252,6 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		distance= controlGoal.disturbance.getPosition().Length();
 	}
 	float remaining=distance/controlGoal.action.getLinearSpeed();
-	//IDENTIFY SOURCE NODE, IF ANY
-		// if(t.direction == Direction::DEFAULT & 
-		// fabs(src.endPose.q.GetAngle())<fabs(controlGoal.disturbance.pose().q.GetAngle())+M_PI/6){
-		// 	remaining= (distance-fabs(src.endPose.p.y))/controlGoal.getAction().getLinearSpeed();			//remaining = (controlGoal.disturbance.getPosition()-g[srcVertex].endPose.p).Length()/controlGoal.getAction().getLinearSpeed();
-		// }
-		// if (remaining<0.01){
-		// 	remaining=0;
-		// }
 	result =t.willCollide(w, iteration, debugOn, remaining, _simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
@@ -273,13 +264,6 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	if(!result.collision.isValid()){
 		return result;
 	}
-	// std::vector <Pointf> vec= set2vec(ci->data);
-	//std::vector <Pointf> nb=pcProc.setDisturbanceOrientation(result.collision, ci->data); //pcProc.neighbours(result.collision.getPosition(), pcProc.NEIGHBOURHOOD, vec);
-	// pcProc.findOrientation(nb);
-	//set d orientation
-	
-	// cv::Rect2f rect =worldBuilder.getRect(nb);
-	// result.collision.setAsBox(rect.width/2, rect.height/2);
 	return result;
 	}
 
@@ -428,13 +412,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				std::vector <vertexDescriptor> propagated;
 				do {
 				changeStart(start, v0, g);
-				std::pair <State, Edge> sk(State(start, getDisturbance(g, v0, &w)), Edge(g[v0].options[0]));
+				std::pair <State, Edge> sk(State(start, getDisturbance(g, v0, &w, g[v0].options[0])), Edge(g[v0].options[0]));
 				worldBuilder.world_cleanup(&w);
 				bool topDown=1;
 				t = Task(sk.first.Di, g[v0].options[0], start, topDown);
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
-				worldBuilder.buildWorld(w, data2fp, t.start, t.direction); //was g[v].endPose
+				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance); //was g[v].endPose
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
@@ -461,7 +445,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					}
 				}
 				else{
-					edge= addVertex(v0, v1,g, Disturbance(),sk.second);
+					edge= addVertex(v0, v1,g, sk.second);
 					g[edge.first.m_target].label=sk.first.label; //new edge, valid
 				}
 				if(edge.second){

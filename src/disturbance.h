@@ -40,6 +40,7 @@ class BodyFeatures{
     float halfWidth=0.0005; //y
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
+
     b2Shape::Type shape = b2Shape::e_polygon;
     //std::vector<b2Vec2> vertices;
     bool attention=false;
@@ -220,7 +221,7 @@ public:
 
     std::vector <b2Vec2> vertices();
 
-
+    bool operator==(const Disturbance & d);
 
 }; //sub action f
 
