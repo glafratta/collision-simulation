@@ -234,14 +234,19 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					// 		}
 					// }query;
 					// world.QueryAABB(&query, box); //is Di in this box
-					// //world.DestroyBody(robot.body);
+					//world.DestroyBody(robot.body);
 					// if (!query.d.empty()){
 					// 	return g[v].Di;
 					// }
-					if (overlaps(robot.body, d) && sensor){
+					bool overlap=overlaps(robot.body, d) && sensor;
+					// for (b2Body *b=world.GetBodyList();b;b=b->GetNext()){
+					// 	world.DestroyBody(b);
+					// }
+					worldBuilder.world_cleanup(&world);
+					if (overlap){
 						return g[v].Di;
 					}
-					worldBuilder.world_cleanup(&world);
+					//worldBuilder.world_cleanup(&world);
 				}
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
