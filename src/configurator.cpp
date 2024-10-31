@@ -242,7 +242,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					// for (b2Body *b=world.GetBodyList();b;b=b->GetNext()){
 					// 	world.DestroyBody(b);
 					// }
-					worldBuilder.world_cleanup(&world);
+					//worldBuilder.world_cleanup(&world);
 					if (overlap){
 						return g[v].Di;
 					}

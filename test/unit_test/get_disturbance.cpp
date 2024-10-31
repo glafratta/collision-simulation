@@ -43,7 +43,7 @@ int main(int argc, char** argv){
             solution=obstacle;
         }
         else if (code==3){
-            start.p.x=0.80;
+            start.p.x=0.82;
             start.p.y=0.31;
         }
         else if (code==4){
