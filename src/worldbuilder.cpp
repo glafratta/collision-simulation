@@ -117,7 +117,7 @@ std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, 
 
 }
 
-void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
+b2Body* WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2Body * body;
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -155,6 +155,7 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
     }
 
 	bodies++;
+    return body;
 }
 
 std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair<Pointf, Pointf> bt){
@@ -351,6 +352,9 @@ b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
 	// if (!(goal->getAffIndex()==AVOID)){
 	// 	return result;
 	// }
+    if (!goal->isValid()){
+        return result;
+    }
 	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
 	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
 	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=goal->vertices();

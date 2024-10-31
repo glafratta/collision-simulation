@@ -67,6 +67,7 @@ int main(int argc, char** argv){
     //conf.transitionSystem[v].options.push_back(curr_d);
 
     Disturbance result = conf.getDisturbance(conf.transitionSystem, conf.currentVertex, world, curr_d);
+    //debug_draw(world, 43);
     if (result==solution){
         return 0;
     }

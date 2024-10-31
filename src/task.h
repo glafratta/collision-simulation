@@ -5,8 +5,11 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 const float WHEEL_SPEED_DEFAULT=0.5f;
 const float WHEEL_SPEED_TURN=0.218182f;
 
-b2Fixture * GetSensor(b2Body * body);																																
+b2Fixture * GetSensor(b2Body * body);
 
+b2Body * GetDisturbance(b2World *);
+
+bool overlaps(b2Body *, b2Body *);
 
 class Task{
 

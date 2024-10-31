@@ -9,6 +9,29 @@ b2Fixture * GetSensor(b2Body * body){
 	return NULL;
 }
 
+b2Body * GetDisturbance(b2World * w){
+	for (b2Body * b=w->GetBodyList();b;b=b->GetNext()){
+		if (b->GetUserData().pointer==DISTURBANCE_FLAG){
+			return b;
+		}
+	}
+	return NULL;
+}
+
+
+bool overlaps(b2Body * robot, b2Body * disturbance){
+	b2Fixture * sensor=GetSensor(robot);
+	if (sensor==NULL){
+		return true;
+	}
+	if (disturbance==NULL){
+		return true;
+	}
+	b2Shape * d=disturbance->GetFixtureList()->GetShape();
+	b2Transform robot_pose=robot->GetTransform(), d_pose= disturbance->GetTransform();
+	return b2TestOverlap(sensor->GetShape(), 0, d, 0,robot_pose, d_pose);
+}
+
 simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
 		result.endPose = start;
@@ -18,6 +41,7 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 		//Robot robot(&_world);
 		Listener listener(&disturbance);
 		Query query(&disturbance);
+		b2Body * d_body=GetDisturbance(&_world);
 		_world.SetContactListener(&listener);	
 		FILE * robotPath;
 		if (debugOn){
@@ -48,8 +72,13 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 			bool out_x= fabs(robot->GetTransform().p.x)>=(BOX2DRANGE-0.001);
 			bool out_y= fabs(robot->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
-			b2Fixture* box=GetSensor(robot);
-			_world.QueryAABB(&query, box->GetAABB(0));
+			//b2Fixture* box=GetSensor(robot);
+			// if (box!=NULL){
+			// 	_world.QueryAABB(&query, box->GetAABB(0));
+			// }
+			if (!overlaps(robot, d_body)){
+				disturbance.invalidate();
+			}
 			if (bool ended=checkEnded(robot->GetTransform(), direction, false, robot).ended; ended || out){ //out
 				bool keep_going_out_x=(fabs(robot->GetTransform().p.x+instVelocity.x) >fabs(robot->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot->GetTransform().p.y+instVelocity.y) >fabs(robot->GetTransform().p.y))&&out_y;

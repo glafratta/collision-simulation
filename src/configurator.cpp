@@ -213,31 +213,35 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
 					Robot robot(&world);
 					robot.body->SetTransform(task.start.p, task.start.q.GetAngle());
-					worldBuilder.makeBody(world, g[v].Di.bf);
+					b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
 					b2AABB box =worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
-					b2Fixture * chassis=worldBuilder.get_chassis(robot.body), *sensor =GetSensor(robot.body);
-					//b2Body * robot=worldBuilder.get_robot(world);
-					//robot.body->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
-					//b2AABB box= sensor->GetAABB(0);
-					//robot.body->DestroyFixture(chassis);
-					//robot.body->DestroyFixture(sensor);
-					class Query : public b2QueryCallback {
-						public:
-							std::vector<b2Body*> d;
-							bool ReportFixture(b2Fixture* fixture) {
-								if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
-									d.push_back( fixture->GetBody() ); 
-									return true;//keep going to find all fixtures in the query area
-								}
-								return false;
-							}
-					}query;
-					world.QueryAABB(&query, box); //is Di in this box
-					//world.DestroyBody(robot.body);
-					worldBuilder.world_cleanup(&world);
-					if (!query.d.empty()){
+					// b2Fixture * chassis=worldBuilder.get_chassis(robot.body),
+					b2Fixture *sensor =GetSensor(robot.body);
+					// //b2Body * robot=worldBuilder.get_robot(world);
+					// //robot.body->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
+					// //b2AABB box= sensor->GetAABB(0);
+					// robot.body->DestroyFixture(chassis); //for some reason this needs to be in
+					// robot.body->DestroyFixture(sensor); //ya allah
+					// class Query : public b2QueryCallback {
+					// 	public:
+					// 		std::vector<b2Body*> d;
+					// 		bool ReportFixture(b2Fixture* fixture) {
+					// 			if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
+					// 				d.push_back( fixture->GetBody() ); 
+					// 				return true;//keep going to find all fixtures in the query area
+					// 			}
+					// 			return false;
+					// 		}
+					// }query;
+					// world.QueryAABB(&query, box); //is Di in this box
+					// //world.DestroyBody(robot.body);
+					// if (!query.d.empty()){
+					// 	return g[v].Di;
+					// }
+					if (overlaps(robot.body, d) && sensor){
 						return g[v].Di;
 					}
+					worldBuilder.world_cleanup(&world);
 				}
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
