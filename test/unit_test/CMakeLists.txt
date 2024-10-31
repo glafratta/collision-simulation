@@ -94,11 +94,40 @@ target_link_libraries(make_sensor CloCK ${OpenCV_LIBS} box2d)
 target_link_libraries(end_contact CloCK ${OpenCV_LIBS} box2d)
 target_link_libraries(get_disturbance CloCK ${OpenCV_LIBS} box2d)
 
+add_test(NAME processData_k COMMAND processData_k ../170924_1321_badrun/ 1 )
+
+add_test(NAME kmeans_clusters COMMAND kmeans_clusters ../170924_1321_badrun/ 0 )
+
+
+add_test(NAME fill_avoid1 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0 1.5714 1)
+add_test(NAME fill_avoid2 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0.27 0 2)
+add_test(NAME fill_avoid_close COMMAND fill_for_dist ../251023_TAGET/ 0.54 0 1.5714 3)
+add_test(NAME make_sensor_start COMMAND make_sensor 0 0 0 6)
+add_test(NAME make_sensor_turned COMMAND make_sensor 0 0 1.5714 7)
+add_test(NAME make_sensor_close COMMAND make_sensor 0.54 0 1.5714 4)
+add_test(NAME make_sensor_far COMMAND make_sensor 0.20 0 1.5714 5)
+
+add_test(NAME end_contact_obstacle_avoid COMMAND end_contact 0 0)
+add_test(NAME end_contact_obstacle_goal COMMAND end_contact 0 1)
+add_test(NAME end_contact_goal COMMAND end_contact 1 1)
+
+add_test(NAME get_disturbance_0dl COMMAND get_disturbance 0 2 0) #position 1, prev: DEF, curr: LEFT
+add_test(NAME get_disturbance_1l COMMAND get_disturbance 1 0) #position 1, prev: LEFT, curr: DEF
+add_test(NAME get_disturbance_2r COMMAND get_disturbance 2 1) #position 2, prev: RIGHT, curr:DEF
+add_test(NAME get_disturbance_3 COMMAND get_disturbance 3)
+add_test(NAME get_disturbance_3dr COMMAND get_disturbance 3 2 1)
+add_test(NAME get_disturbance_3l COMMAND get_disturbance 3 0)
+add_test(NAME get_disturbance_3r COMMAND get_disturbance 3 1)
+add_test(NAME get_disturbance_4r COMMAND get_disturbance 4)
+add_test(NAME get_disturbance_4dr COMMAND get_disturbance 4 2 1)
+
+add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
+
+
 add_test(NAME explorer_no COMMAND explorer)
 add_test(NAME explorer_cds COMMAND explorer ../cul_de_sac/ 0)
 add_test(NAME explorer_target COMMAND explorer ../251023_TAGET/ 1)
 
-add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
 
 add_test(NAME planner_no COMMAND planner)
 add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
@@ -130,31 +159,9 @@ add_test(NAME state_difference COMMAND state_difference ../251023_TAGET/ 1)
 add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 55)
 
 add_test(NAME match_equal COMMAND match_equal)
-
-add_test(NAME processData_k COMMAND processData_k ../170924_1321_badrun/ 1 )
-
-add_test(NAME kmeans_clusters COMMAND kmeans_clusters ../170924_1321_badrun/ 0 )
-
 add_test(NAME replanner COMMAND replanner 170924_1321_badrun/ 2 1)
 
-add_test(NAME fill_avoid1 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0 1.5714 1)
-add_test(NAME fill_avoid2 COMMAND fill_for_dist ../251023_TAGET/ 0.37 0.27 0 2)
-add_test(NAME fill_avoid_close COMMAND fill_for_dist ../251023_TAGET/ 0.54 0 1.5714 3)
-add_test(NAME make_sensor_start COMMAND make_sensor 0 0 0 6)
-add_test(NAME make_sensor_turned COMMAND make_sensor 0 0 1.5714 7)
-add_test(NAME make_sensor_close COMMAND make_sensor 0.54 0 1.5714 4)
-add_test(NAME make_sensor_far COMMAND make_sensor 0.20 0 1.5714 5)
 
-add_test(NAME end_contact_obstacle COMMAND end_contact)
-add_test(NAME end_contact_goal COMMAND end_contact 1)
-
-add_test(NAME get_disturbance_1l COMMAND get_disturbance 1 0)
-add_test(NAME get_disturbance_2r COMMAND get_disturbance 2 1)
-add_test(NAME get_disturbance_3 COMMAND get_disturbance 3)
-add_test(NAME get_disturbance_3l COMMAND get_disturbance 3 0)
-add_test(NAME get_disturbance_3r COMMAND get_disturbance 3 1)
-add_test(NAME get_disturbance_4r COMMAND get_disturbance 4)
-add_test(NAME get_disturbance_4dr COMMAND get_disturbance 4 2 1)
 
 
 set(CMAKE_BUILD_TYPE Debug)

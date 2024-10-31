@@ -27,7 +27,7 @@ int main(int argc, char** argv){
     Robot robot(&world);
     robot.body->SetTransform(start.p, start.q.GetAngle());
     conf.worldBuilder.buildWorld(world, conf.data2fp, task.start, task.direction, task.disturbance,0.15, WorldBuilder::PARTITION);
-    b2AABB aabb=task.makeRobotSensor(robot.body);
+    b2AABB aabb=conf.worldBuilder.makeRobotSensor(robot.body, &conf.controlGoal.disturbance);
     debug_draw(world, atoi(argv[4]));
     char name_v[256];
     sprintf(name_v, "/tmp/debug_disturbance_v_%i.txt", atoi(argv[4]));

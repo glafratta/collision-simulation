@@ -71,14 +71,6 @@ public:
 
 };
 
-b2Fixture * GetSensor(b2Body * body){
-	for (b2Fixture * f=body->GetFixtureList(); f;f=f->GetNext()){
-		if (f->IsSensor()){
-			return f;
-		}
-	}
-	return NULL;
-}
 
 
 #endif

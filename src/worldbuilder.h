@@ -90,5 +90,10 @@ class WorldBuilder{
 
     b2Body * get_robot(b2World *);
 
+    b2Fixture * get_chassis(b2Body *);
+
+    b2AABB  makeRobotSensor(b2Body*, Disturbance *goal); //returns bounding box in world coord
+
+
 };
 #endif

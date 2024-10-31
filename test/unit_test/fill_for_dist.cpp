@@ -41,7 +41,8 @@ int main(int argc, char** argv){
     Task task(DEFAULT);
     conf.worldBuilder.buildWorld(world, conf.data2fp, task.start, task.direction, task.disturbance,0.15, WorldBuilder::PARTITION);
     debug_draw(world, atof(argv[5]), "first");
-    simResult sim= task.willCollide(world, conf.getIteration());
+    Robot robot(&world);
+    simResult sim= task.willCollide(world, conf.getIteration(), robot.body);
     Disturbance obstacle=sim.collision; 
     if (argc>4){
         start.p.x=atof(argv[2]);

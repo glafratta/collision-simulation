@@ -317,7 +317,8 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
 }
 
 void WorldBuilder::world_cleanup(b2World * world){
-	for (b2Body * b = world->GetBodyList(); b!=NULL; b = b->GetNext()){
+    int ct=world->GetBodyCount();
+	for (b2Body * b = world->GetBodyList(); b; b = b->GetNext()){
 		world->DestroyBody(b);
 	}
 }
@@ -331,3 +332,49 @@ b2Body * WorldBuilder::get_robot(b2World * world){
     return NULL;
 
 }
+
+b2Fixture * WorldBuilder::get_chassis(b2Body * r){
+    if (r->GetUserData().pointer!=ROBOT_FLAG){
+        return NULL;
+    }
+    for (b2Fixture * f=r->GetFixtureList(); f; f=f->GetNext()){
+        if (!f->IsSensor()){
+            return f;
+        }
+    }
+    return NULL;
+
+}
+
+b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
+	b2AABB result;
+	// if (!(goal->getAffIndex()==AVOID)){
+	// 	return result;
+	// }
+	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
+	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
+	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=goal->vertices();
+	for (b2Vec2 p: d_vertices){
+		p =robotBody->GetLocalPoint(p);
+		all_points.push_back(p);
+	}
+	float minx=(std::min_element(all_points.begin(),all_points.end(), CompareX())).base()->x;
+	float miny=(std::min_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float maxx=(std::max_element(all_points.begin(), all_points.end(), CompareX())).base()->x;
+	float maxy=(std::max_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float halfLength=(fabs(maxy-miny))/2; //
+    float halfWidth=(fabs(maxx-minx))/2;
+	b2Vec2 centroid(maxx-halfWidth, maxy-halfLength);
+	b2Vec2 offset=centroid - robotBody->GetLocalPoint(robotBody->GetPosition());
+	b2PolygonShape shape;
+	shape.SetAsBox(halfWidth, halfLength, offset, 0);
+	b2FixtureDef fixtureDef;
+	fixtureDef.isSensor=true;
+	fixtureDef.shape=&shape;
+	robotBody->CreateFixture(&fixtureDef);
+	shape.ComputeAABB(&result, robotBody->GetTransform(), 0);
+	return result;
+	
+}
+
+

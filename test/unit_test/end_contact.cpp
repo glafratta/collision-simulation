@@ -17,22 +17,37 @@ int main(int argc, char** argv){
     obstacle.validate();
     int expected=100;
     Task task;
-    if (argc==1){
+    bool goal_d=atoi(argv[1]), goal_conf=atoi(argv[2]);
+    if (!goal_d){
         task=Task(obstacle, DEFAULT, start,true);
-        expected=abs((ROBOT_HALFWIDTH+(ROBOT_HALFWIDTH+ROBOT_BOX_OFFSET_X))+(start.p.x-d_pose.p.x) + bf.halfWidth)*HZ/task.action.getLinearSpeed();
         conf.worldBuilder.buildWorld(world, conf.data2fp, task.start, task.direction, task.disturbance,0.15, WorldBuilder::PARTITION);
     }
-    else if (argc==2){
-        task=Task(goal, DEFAULT, start,true);
-        expected=abs((start.p.x-goal.bf.pose.p.x))*HZ/task.action.getLinearSpeed();
+    if (goal_conf){
+        Task goal_t=Task(goal, UNDEFINED);
+        conf.controlGoal=goal_t;
+        if (!goal_d){
+            start.q.Set(M_PI_2);
+            task.disturbance.bf.pose.p.x=-d_pose.p.y;
+            task.disturbance.bf.pose.p.y=d_pose.p.x;
+            expected=19;
+            conf.worldBuilder.buildWorld(world, conf.data2fp, task.start, task.direction, task.disturbance,0.15, WorldBuilder::PARTITION);
+        }
+        else{
+            task=Task(goal, DEFAULT, start,true);
+            expected=abs((start.p.x-goal.bf.pose.p.x))*HZ/task.action.getLinearSpeed();
+        }
     }
+    Robot robot(&world);
+    b2AABB aabb= conf.worldBuilder.makeRobotSensor(robot.body, &conf.controlGoal.disturbance);
     debug_draw(world, 8);
-    simResult sr= task.willCollide(world, 69, true);
+    simResult sr= task.willCollide(world, 69, robot.body, true);
+
     //linear speed =0.1
+    printf("step=%i, expected=%i\n", sr.step, expected);
     if (sr.step!=expected){
-        printf("step=%i, expected=%i\n", sr.step, expected);
         debug::print_pose(sr.endPose);
         return 1;
     }
+
     return 0;
 }

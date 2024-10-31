@@ -144,7 +144,7 @@ void dummy_vertex(vertexDescriptor src);
 float taskRotationError(); // returns lateral displacement error (local y)
 
 //inputs: g, src vertex, b2d world, direction of the task to be created
-Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World *, const Direction &);
+Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &, const Direction &);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
@@ -243,7 +243,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, const Task* custom_ctrl_goal=NULL, bool * finished =NULL) ;
-																																				
+
 //std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
 
