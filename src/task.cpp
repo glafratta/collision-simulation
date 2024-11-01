@@ -27,8 +27,12 @@ bool overlaps(b2Body * robot, b2Body * disturbance){
 	if (disturbance==NULL){
 		return true;
 	}
+	b2AABB aabb=sensor->GetAABB(0);
 	b2Shape * d=disturbance->GetFixtureList()->GetShape();
 	b2Transform robot_pose=robot->GetTransform(), d_pose= disturbance->GetTransform();
+	b2AABB aabb_shape, aabb_zero;
+	sensor->GetShape()->ComputeAABB(&aabb_shape, robot_pose,0);
+	sensor->GetShape()->ComputeAABB(&aabb_shape, b2Transform_zero,0);
 	return b2TestOverlap(sensor->GetShape(), 0, d, 0,robot_pose, d_pose);
 }
 
@@ -38,7 +42,6 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 		if (action.L==0 & action.R==0){
 			return result;
 		}
-		//Robot robot(&_world);
 		Listener listener(&disturbance);
 		Query query(&disturbance);
 		b2Body * d_body=GetDisturbance(&_world);
@@ -50,7 +53,7 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 		}
 		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
-		robot->SetTransform(start.p, theta);
+		//robot->SetTransform(start.p, theta);
 		//makeRobotSensor(robot.body);
 		int stepb2d=0;
 		float traj_error=0;
@@ -72,11 +75,8 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 			bool out_x= fabs(robot->GetTransform().p.x)>=(BOX2DRANGE-0.001);
 			bool out_y= fabs(robot->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
-			//b2Fixture* box=GetSensor(robot);
-			// if (box!=NULL){
-			// 	_world.QueryAABB(&query, box->GetAABB(0));
-			// }
-			if (!overlaps(robot, d_body)){
+			bool overlap=overlaps(robot, d_body);
+			if (!overlap){
 				disturbance.invalidate();
 			}
 			if (bool ended=checkEnded(robot->GetTransform(), direction, false, robot).ended; ended || out){ //out
@@ -102,7 +102,7 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 		}
 		result.endPose = robot->GetTransform();
 		result.step=stepb2d;
-		for (b2Body * b = _world.GetBodyList(); b!=NULL; b = b->GetNext()){
+		for (b2Body * b = _world.GetBodyList(); b; b = b->GetNext()){
 			_world.DestroyBody(b);
 		}
 		if (debugOn){

@@ -210,44 +210,18 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 			if (oe.empty()){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
-					b2World world_tmp(b2Vec2_zero);
+					//b2World world_tmp(b2Vec2_zero);
 					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
-					Robot robot(&world_tmp);
+					Robot robot(&world);
 					robot.body->SetTransform(task.start.p, task.start.q.GetAngle());
-					b2Body * d=worldBuilder.makeBody(world_tmp, g[v].Di.bf);
+					b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
 					b2AABB box =worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
-					// b2Fixture * chassis=worldBuilder.get_chassis(robot.body),
 					b2Fixture *sensor =GetSensor(robot.body);
-					// //b2Body * robot=worldBuilder.get_robot(world);
-					// //robot.body->SetTransform(g[v].endPose.p, g[v].endPose.q.GetAngle());
-					// //b2AABB box= sensor->GetAABB(0);
-					// robot.body->DestroyFixture(chassis); //for some reason this needs to be in
-					// robot.body->DestroyFixture(sensor); //ya allah
-					// class Query : public b2QueryCallback {
-					// 	public:
-					// 		std::vector<b2Body*> d;
-					// 		bool ReportFixture(b2Fixture* fixture) {
-					// 			if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
-					// 				d.push_back( fixture->GetBody() ); 
-					// 				return true;//keep going to find all fixtures in the query area
-					// 			}
-					// 			return false;
-					// 		}
-					// }query;
-					// world.QueryAABB(&query, box); //is Di in this box
-					//world.DestroyBody(robot.body);
-					// if (!query.d.empty()){
-					// 	return g[v].Di;
-					// }
 					bool overlap=overlaps(robot.body, d) && sensor;
-					// for (b2Body *b=world.GetBodyList();b;b=b->GetNext()){
-					// 	world.DestroyBody(b);
-					// }
-					worldBuilder.world_cleanup(&world_tmp);
+					worldBuilder.world_cleanup(&world);
 					if (overlap){
 						return g[v].Di;
 					}
-					//worldBuilder.world_cleanup(&world);
 				}
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
@@ -271,18 +245,14 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	}
 	float remaining=distance/controlGoal.action.getLinearSpeed();
 	Robot robot(&w);
-	worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
+	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
+	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
-	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
 		state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
 	}
 	else{
 		state.nodesInSameSpot =0; //reset if robot is moving
-	}
-	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
-	if(!result.collision.isValid()){
-		return result;
 	}
 	return result;
 	}
@@ -438,7 +408,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				t = Task(sk.first.Di, g[v0].options[0], start, true);
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
-				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance); //was g[v].endPose
+				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;

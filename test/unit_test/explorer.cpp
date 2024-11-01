@@ -11,7 +11,7 @@ int main(int argc, char** argv){
     if (argc>2){
         if (atoi(argv[2])==1){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);   
-            simulationStep=ROBOT_HALFLENGTH*2; 
+            simulationStep=std::max(ROBOT_HALFWIDTH*2, ROBOT_HALFLENGTH*2);
         }
     }
     Task goal(target1,DEFAULT);

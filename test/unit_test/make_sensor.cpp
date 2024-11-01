@@ -2,7 +2,8 @@
 
 
 int main(int argc, char** argv){
-    Configurator conf;
+    Task goal(Disturbance(PURSUE, b2Vec2(1.0,0), 0), UNDEFINED);
+    Configurator conf(goal);
     b2World world(b2Vec2(0,0));
     //boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     b2Transform start, d_pose=b2Transform(b2Vec2(0.68, 0), b2Rot(0));
