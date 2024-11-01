@@ -210,10 +210,11 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 			if (oe.empty()){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
+					b2World world_tmp(b2Vec2_zero);
 					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
-					Robot robot(&world);
+					Robot robot(&world_tmp);
 					robot.body->SetTransform(task.start.p, task.start.q.GetAngle());
-					b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
+					b2Body * d=worldBuilder.makeBody(world_tmp, g[v].Di.bf);
 					b2AABB box =worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 					// b2Fixture * chassis=worldBuilder.get_chassis(robot.body),
 					b2Fixture *sensor =GetSensor(robot.body);
@@ -242,7 +243,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					// for (b2Body *b=world.GetBodyList();b;b=b->GetNext()){
 					// 	world.DestroyBody(b);
 					// }
-					//worldBuilder.world_cleanup(&world);
+					worldBuilder.world_cleanup(&world_tmp);
 					if (overlap){
 						return g[v].Di;
 					}
