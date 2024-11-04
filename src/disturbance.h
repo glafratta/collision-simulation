@@ -167,7 +167,7 @@ public:
         return valid;
     }
 
-    AffordanceIndex getAffIndex(){
+    AffordanceIndex getAffIndex()const{
         return affordanceIndex;
     }
 
@@ -185,7 +185,7 @@ public:
         return std::pair<bool, float>(rotation_valid, bf.pose.q.GetAngle());
     }
 
-    b2Transform pose(){
+    b2Transform pose()const{
         return bf.pose;
     }
 
@@ -198,7 +198,7 @@ public:
         bf.halfWidth=w;
     }
 
-    BodyFeatures bodyFeatures(){
+    BodyFeatures bodyFeatures()const{
         return bf;
     }
 

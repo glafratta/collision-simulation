@@ -85,7 +85,7 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::ve
     }dist;
     std::vector <int> labels;
     cv::partition(points, labels, dist);
-    int n_clusters= *(std::max(labels.begin(), labels.end())) +1;
+    int n_clusters= *(std::max_element(labels.begin(), labels.end())) +1;
     std::vector <std::vector<cv::Point2f>>result(n_clusters);
     for (int i=0; i<points.size(); i++){ //bestlabel[i] gives the index
             int label=labels[i];

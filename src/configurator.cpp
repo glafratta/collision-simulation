@@ -388,7 +388,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	printf("EXPLORING\n");
 	do{
 		v=bestNext;
-		closed.emplace(*priorityQueue.begin());
+		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
 		applyTransitionMatrix(g, v, direction, er.ended, v);
@@ -516,24 +516,24 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 
 
 void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g){
-		for (vertexDescriptor v:evaluation_q){
-			std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
-			std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
-			if (!ep.first){
-				ep=gt::getMostLikely(g, ie, iteration);
-			}
-			b2Transform start=g[ep.second.m_source].endPose;
-			vertexDescriptor src=ep.second.m_source;
-			std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, src);
-			for (vertexDescriptor split_v:split){
-					EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
-					g[split_v].phi=evaluationFunction(local_er);
-					applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
-					addToPriorityQueue(split_v, priority_q, g, closed);
-					src=split_v;
-			}
+	for (vertexDescriptor v:evaluation_q){
+		std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
+		std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
+		if (!ep.first){
+			ep=gt::getMostLikely(g, ie, iteration);
 		}
-		evaluation_q.clear();
+		b2Transform start=g[ep.second.m_source].endPose;
+		vertexDescriptor src=ep.second.m_source;
+		std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, src);
+		for (vertexDescriptor split_v:split){
+				EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
+				g[split_v].phi=evaluationFunction(local_er);
+				applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
+				addToPriorityQueue(split_v, priority_q, g, closed);
+				src=split_v;
+		}
+	}
+	evaluation_q.clear();
 }
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed){
@@ -1003,16 +1003,19 @@ void Configurator::run(Configurator * c){
 }
 
 void Configurator::unexplored_transitions(TransitionSystem& g, const vertexDescriptor& v){
-	std::vector <int> it_remove;
+	std::vector <Direction> to_remove;
 	for (int i=0; i<g[v].options.size(); i++){
-		for (edgeDescriptor e: gt::outEdges(g, v, g[v].options[i])){
+		for (edgeDescriptor &e: gt::outEdges(g, v, g[v].options[i])){
 			if (g[e.m_target].visited()){
-				it_remove.push_back(i);
+				to_remove.push_back(g[e].direction);
 			}
 		}
 	}
-	for (int r:it_remove){
-		g[v].options.erase(g[v].options.begin()+r);
+	for (Direction & d:to_remove){
+		auto it=std::find(g[v].options.begin(), g[v].options.end(), d);
+		if (it !=g[v].options.end()){
+			g[v].options.erase(it);
+		}
 	}
 }
 
