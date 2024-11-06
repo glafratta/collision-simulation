@@ -166,7 +166,6 @@ struct Connected{
 	bool operator()(const vertexDescriptor& v)const{
 	 	bool in= boost::in_degree(v, *g)>0;
 		bool out =boost::out_degree(v, *g)>0;
-
 	 	return in || out;
 	}
 private:
@@ -179,6 +178,17 @@ struct MoreLikely{
 	}
 };
 
+struct NotSelfEdge{
+	NotSelfEdge(){}
+
+//	NotSelfEdge(TransitionSystem * _g):g(_g){}
+
+	bool operator()(const edgeDescriptor & e) const {
+		bool not_self= e.m_source!=e.m_target;
+	}
+// private:
+// TransitionSystem * g=NULL;
+};
 
 struct Remember{
 	Remember(){}
@@ -290,7 +300,7 @@ namespace gt{
 
 
 
-typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, NotSelfEdge, Connected> FilteredTS;
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
 
 

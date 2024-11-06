@@ -126,7 +126,7 @@ bool Configurator::Spawner(){
 		toRemove=explorer(src, transitionSystem, currentTask, world);
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		Connected connected(&transitionSystem);
-		FilteredTS fts(transitionSystem, boost::keep_all(), connected);
+		FilteredTS fts(transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
 		TransitionSystem tmp;
 		boost::copy_graph(fts, tmp);
 		transitionSystem.clear();
@@ -428,11 +428,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				if (match.first==StateMatcher::MATCH_TYPE::_TRUE){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
-					if ((v0!=v1)){
+					//if ((v0!=v1)){
 						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;//t.direction;
-					}
+					//}
 				}
 				else{
 					edge= add_vertex_now(v0, v1,g,sk.first.Di, sk.second); //addVertex
