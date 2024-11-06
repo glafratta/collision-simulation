@@ -27,7 +27,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			}
 			else{
 				vertexDescriptor new_v;
-				auto e=addVertex(currentVertex, new_v, transitionSystem, Disturbance());
+				auto e=addVertex(currentVertex, new_v, transitionSystem);
 				simResult fake_result;
 				fake_result.endPose=b2Transform(b2Vec2(BOX2DRANGE, 0), b2Rot(0));
 				fake_result.step=100;
