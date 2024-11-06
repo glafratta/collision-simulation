@@ -14,9 +14,6 @@ find_package(box2d REQUIRED)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 
-add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
-
-add_subdirectory(test/unit_test "${CMAKE_CURRENT_BINARY_DIR}/test/unit_test")
 
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
@@ -32,7 +29,9 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
   #target_link_libraries(targetless_forget ${OpenCV_LIBS} iir::iir_static box2d alphabot a1lidarrpi CloCK pigpio PkgConfig::LIBCAMERA cam2opencv)
   message("detected architecture aarch64, building executables")
 else()
-#	add_subdirectory(test)
+  add_subdirectory(test "${CMAKE_CURRENT_BINARY_DIR}/test")
+
+  add_subdirectory(test/unit_test "${CMAKE_CURRENT_BINARY_DIR}/test/unit_test")
 	message("not building any executable")
 endif()
 
