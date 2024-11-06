@@ -21,9 +21,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		if ( !fin && planVertices.empty()&& currentTask.motorStep==0){
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			printf("NOW CHECKING FOR MATCHES\n");
-			bool using_kmeans=1;
+			//bool using_kmeans=1;
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, 
-												currentTask.direction, BOX2DRANGE, 0.15, using_kmeans);
+												currentTask.direction, BOX2DRANGE, 0.15, WorldBuilder::CLUSTERING::PARTITION);
 			if (b_features.size()>0){
 				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
