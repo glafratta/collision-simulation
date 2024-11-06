@@ -29,17 +29,21 @@ std::vector <C> arrayToVec(C* c, int ct){
 	return result;
 }
 
+
 class Configurator;
-//class StateMatcher;
 
 class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
+   // b2Transform pose_local=pose;
     float halfLength=0.0005; //x
     float halfWidth=0.0005; //y
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
+
     b2Shape::Type shape = b2Shape::e_polygon;
+    //std::vector<b2Vec2> vertices;
+    bool attention=false;
 
     BodyFeatures(){}
 
@@ -53,12 +57,15 @@ class BodyFeatures{
         halfWidth=f;
     }
 
+    bool match(const BodyFeatures&);
+
 };
 
 struct Disturbance{ //this generates error
+
+private:
 friend Configurator;
 friend struct StateMatcher;
-private:
     AffordanceIndex affordanceIndex = NONE; //not using the enum because in the future we might want to add more affordances
     bool valid= 0;
     bool rotation_valid=0;    
@@ -76,7 +83,6 @@ private:
         setOrientation(dtheta);
     }
 }
-protected:
 
 public:
     BodyFeatures bf=BodyFeatures(b2Transform(b2Vec2(2*BOX2DRANGE, 2*BOX2DRANGE), b2Rot(M_PI)));
@@ -119,21 +125,22 @@ public:
 
     Disturbance(b2Body* b){
         bf.pose=b->GetTransform(); //global
-        b2Fixture* fixture =b->GetFixtureList();
+        b2Fixture * fixture =b->GetFixtureList();
         bf.shape=(fixture->GetShape()->GetType());
         valid=1;
         if (bf.shape==b2Shape::e_polygon){
             b2PolygonShape * poly=(b2PolygonShape*)fixture->GetShape();
-            std::vector<b2Vec2> vertices=arrayToVec(poly->m_vertices, poly->m_count);
+            std::vector <b2Vec2> local_vertices=arrayToVec(poly->m_vertices, poly->m_count);
             CompareX compareX;
             CompareY compareY;
-            float minx=(std::min_element(vertices.begin(), vertices.end(), compareX)).base()->x;
-            float miny=(std::min_element(vertices.begin(), vertices.end(), compareY)).base()->y;
-            float maxx=(std::max_element(vertices.begin(), vertices.end(), compareX)).base()->x;
-            float maxy=(std::max_element(vertices.begin(), vertices.end(), compareY)).base()->y;
+            float minx=(std::min_element(local_vertices.begin(), local_vertices.end(), compareX)).base()->x;
+            float miny=(std::min_element(local_vertices.begin(), local_vertices.end(), compareY)).base()->y;
+            float maxx=(std::max_element(local_vertices.begin(), local_vertices.end(), compareX)).base()->x;
+            float maxy=(std::max_element(local_vertices.begin(), local_vertices.end(), compareY)).base()->y;
             bf.halfLength=(fabs(maxy-miny))/2; //local coordinates
             bf.halfWidth=(fabs(maxx-minx))/2;
         }
+        bf.attention=true;
         affordanceIndex=1;
     }
 
@@ -156,11 +163,11 @@ public:
     }
 
 
-    bool isValid(){
+    bool isValid()const{
         return valid;
     }
 
-    AffordanceIndex getAffIndex(){
+    AffordanceIndex getAffIndex()const{
         return affordanceIndex;
     }
 
@@ -178,7 +185,7 @@ public:
         return std::pair<bool, float>(rotation_valid, bf.pose.q.GetAngle());
     }
 
-    b2Transform pose(){
+    b2Transform pose()const{
         return bf.pose;
     }
 
@@ -191,7 +198,7 @@ public:
         bf.halfWidth=w;
     }
 
-    BodyFeatures bodyFeatures(){
+    BodyFeatures bodyFeatures()const{
         return bf;
     }
 
@@ -212,8 +219,9 @@ public:
 
     void setOrientation(float, float);
 
+    std::vector <b2Vec2> vertices();
 
-
+    bool operator==(const Disturbance & d);
 
 }; //sub action f
 

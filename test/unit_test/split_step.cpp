@@ -14,7 +14,8 @@ int main(int argc, char** argv){
     b2World world(b2Vec2(0.0, 0.0));
     conf.worldBuilder.buildWorld(world, conf.data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)),DEFAULT);
     Task task(Disturbance(), DEFAULT);
-    simResult result=task.willCollide(world, 1);
+    Robot robot(&world);
+    simResult result=task.willCollide(world, 1, robot.body);
     gt::fill(result, &conf.transitionSystem[v1], &conf.transitionSystem[e1.first]);
     int total_step=result.step, counted_step=0;
     std::vector <vertexDescriptor> split =conf.splitTask(v1, conf.transitionSystem, conf.transitionSystem[e1.first].direction, conf.currentVertex);

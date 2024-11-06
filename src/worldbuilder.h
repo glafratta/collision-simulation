@@ -5,6 +5,7 @@
 class WorldBuilder{
     int bodies=0;
     public:
+    enum CLUSTERING{BOX=0, KMEANS=1, PARTITION=2}; //BOX: bounding box around points
         struct CompareCluster{
         CompareCluster()=default;
 
@@ -24,17 +25,17 @@ class WorldBuilder{
     //int buildType=0;
     std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Pointf, Pointf>); //gets points from the raw data that are relevant to the task based on bounding boxes
                                                                                                                                         //std::pair<points, obstaclestillthere>
-    void makeBody(b2World&, BodyFeatures);
+    b2Body* makeBody(b2World&, BodyFeatures);
 
     std::vector <BodyFeatures> processData(const CoordinateContainer&, const b2Transform&);
 
-    std::vector <BodyFeatures> processData_kmeans(CoordinateContainer, const b2Transform&);
+    std::vector <BodyFeatures> cluster_data(CoordinateContainer, const b2Transform&, CLUSTERING clustering=PARTITION);
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, bool kmeans=0);
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, CLUSTERING clustering=BOX);
 
-    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, bool kmeans=0);
+    std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, CLUSTERING clustering=BOX);
 
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
 
@@ -69,7 +70,9 @@ class WorldBuilder{
     result.first=true;
     return result;
 }
-    std::vector <std::vector<cv::Point2f>> feature_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
+    std::vector <std::vector<cv::Point2f>> kmeans_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
+
+    std::vector <std::vector<cv::Point2f>> partition_clusters( std::vector <cv::Point2f>);
 
     b2Vec2 averagePoint(CoordinateContainer, Disturbance &, float rad = 0.025); //finds centroid of a poitn cluster, return position vec difference
 
@@ -82,5 +85,15 @@ class WorldBuilder{
     }
 
     bool occluded(CoordinateContainer, Disturbance);
+
+    void world_cleanup(b2World *);
+
+    b2Body * get_robot(b2World *);
+
+    b2Fixture * get_chassis(b2Body *);
+
+    b2AABB  makeRobotSensor(b2Body*, Disturbance *goal); //returns bounding box in world coord
+
+
 };
 #endif

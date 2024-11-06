@@ -13,7 +13,7 @@ orientation subtract(orientation o1, orientation o2){
 	return result;
 }
 
-b2Transform State::from_disturbance(){
+b2Transform State::from_disturbance()const{
 	return Dn.pose()-start;
 }
 
@@ -71,7 +71,7 @@ float StateDifference::get_sum(int mt){
 	}
 }
 
-void StateDifference::init(State& s1, State& s2){ //observed, desired
+void StateDifference::init(const State& s1, const State& s2){ //observed, desired
 	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
 	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
@@ -97,7 +97,7 @@ void StateDifference::init(State& s1, State& s2){ //observed, desired
 	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
 	D_position.x= d1.p.x - d2.p.x; //disturbance x
 	D_position.y= d1.p.y - d2.p.y; //disturbance y
-	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
+//	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
 	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
 	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
 	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;
@@ -349,13 +349,16 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(StateDifference sd, float endDist
     return match.what();
 }
 
-StateMatcher::MATCH_TYPE StateMatcher::isMatch(State s, State candidate, State *src, StateDifference*_sd){
+StateMatcher::MATCH_TYPE StateMatcher::isMatch(const State & s, const State &candidate, const State *src, StateDifference*_sd){
 	//src is the source of candidate
 	StateDifference sd(s, candidate);
 	float stray=0;
-	if (src!=NULL & s.label!=UNDEFINED){
-		stray=(s.endPose.p-src->endPose.p).Length();
-	}
+	// if (src!=NULL && s.label!=UNDEFINED){
+	// 	b2Vec2 stray_v;
+	// 	stray_v.x=s.endPose.p.x-src->endPose.p.x;
+	// 	stray_v.y=s.endPose.p.y-src->endPose.p.y;
+	// 	stray=(stray_v).Length();
+	// }
 	if ((stray>error.endPosition && s.label==candidate.label)){ //
 		sd.r_position.x=10000; // now pose will not be matched
 		sd.r_position.y=10000;
@@ -385,10 +388,11 @@ std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> StateMatcher::match_vertex
 
 float StateMatcher::get_coefficient(const float & endDistance){
 	float coefficient=1.0;
-	if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
-		float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
-		coefficient*=scale*1.2; //it's a bit high but need for debugging
-	}
+	// if (endDistance>COEFFICIENT_INCREASE_THRESHOLD){
+	// 	float scale=1+(endDistance-COEFFICIENT_INCREASE_THRESHOLD);// /.9
+	// 	//coefficient+=(endDistance-COEFFICIENT_INCREASE_THRESHOLD)/2;
+	// 	coefficient*=scale; //it's a bit high but need for debugging (before *1.2)
+	// }
 	return coefficient;
 }
 

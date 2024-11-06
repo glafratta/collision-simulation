@@ -25,8 +25,6 @@ const float NAIVE_PHI=10.0;
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
-const float D_DIMENSIONS_MARGIN=0.03;
-
 float angle_subtract(float a1, float a2);
 
 struct ComparePair{
@@ -86,7 +84,7 @@ struct State{
 		phi=NAIVE_PHI;
 	}
 
-	b2Transform from_disturbance();
+	b2Transform from_disturbance()const;
 
 	float distance();
 
@@ -111,7 +109,7 @@ struct StateDifference{
 
 	StateDifference()=default;
 
-	StateDifference( State& s1, State& s2){
+	StateDifference(const State& s1, const State& s2){
 		init(s1, s2);
 	}
 
@@ -137,7 +135,7 @@ struct StateDifference{
 	
 	float get_sum(int);
 
-	void init(State& s1, State& s2);
+	void init(const State& s1,const State& s2);
 
 };
 
@@ -180,6 +178,17 @@ struct MoreLikely{
 	}
 };
 
+struct NotSelfEdge{
+	NotSelfEdge(){}
+
+//	NotSelfEdge(TransitionSystem * _g):g(_g){}
+
+	bool operator()(const edgeDescriptor & e) const {
+		bool not_self= e.m_source!=e.m_target;
+	}
+// private:
+// TransitionSystem * g=NULL;
+};
 
 struct Remember{
 	Remember(){}
@@ -291,7 +300,7 @@ namespace gt{
 
 
 
-typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Connected> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, NotSelfEdge, Connected> FilteredTS;
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
 
 
@@ -397,7 +406,7 @@ class StateMatcher{
 
 		MATCH_TYPE isMatch(StateDifference, float endDistance=0); //endDistance=endpose
 
-		MATCH_TYPE isMatch(State, State, State* src=NULL, StateDifference * _sd=NULL); //first state: state to find a match for, second state: candidate match
+		MATCH_TYPE isMatch(const State &, const State&, const State* src=NULL, StateDifference * _sd=NULL); //first state: state to find a match for, second state: candidate match
 
 		std::pair<MATCH_TYPE, vertexDescriptor> match_vertex(TransitionSystem, vertexDescriptor, Direction, State, StateMatcher::MATCH_TYPE mt=StateMatcher::_TRUE); //find match amoung vertex out edges
 		

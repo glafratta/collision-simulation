@@ -143,7 +143,8 @@ void dummy_vertex(vertexDescriptor src);
 
 float taskRotationError(); // returns lateral displacement error (local y)
 
-Disturbance getDisturbance(TransitionSystem&, vertexDescriptor);
+//inputs: g, src vertex, b2d world, direction of the task to be created
+Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &, const Direction &);
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
@@ -205,7 +206,7 @@ void applyAffineTrans(const b2Transform&, TransitionSystem&);
 
 void applyAffineTrans(const b2Transform&, Disturbance&);
 
-std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Disturbance obs,Edge edge=Edge(), bool topDown=0){ //returns edge added
+std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;
 	result.second=false;
 	if (g[src].options.size()>0 || topDown){
@@ -242,7 +243,7 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 //void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, const Task* custom_ctrl_goal=NULL, bool * finished =NULL) ;
-																																				
+
 //std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
 

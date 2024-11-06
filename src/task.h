@@ -5,7 +5,24 @@ const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 const float WHEEL_SPEED_DEFAULT=0.5f;
 const float WHEEL_SPEED_TURN=0.218182f;
 
+b2Fixture * GetSensor(b2Body * body);
+
+b2Body * GetDisturbance(b2World *);
+
+bool overlaps(b2Body *, b2Body *);
+
 class Task{
+
+struct Ray{
+    b2RayCastInput * input;
+
+    void assign(const Robot&, const Disturbance &);
+
+    b2Vec2 getClosest(const Robot&, const Disturbance &);
+
+    void update(const b2Transform&);
+};
+
 public:
     friend class Configurator;
     char planFile[250]; //for debug
@@ -16,7 +33,7 @@ public:
     Direction direction= DEFAULT;
     int motorStep=0;
     int stepError=0;
-//delet
+    AffordanceIndex affordance=NONE;
 
 struct Action{
 private:
@@ -132,25 +149,84 @@ void setVelocities(float l, float r){
 
 
 class Listener : public b2ContactListener {
-  int iteration=1;
+ // int iteration=1;
+    Disturbance * d_ptr;
     public:
     Listener(){}
+    Listener(Disturbance * _d): d_ptr(_d){}
     std::vector <b2Body*> collisions;
-    
-		void BeginContact(b2Contact * contact) {
-			b2BodyUserData bodyData = contact->GetFixtureA()->GetBody()->GetUserData();
-			if (bodyData.pointer) {
-                b2Body * other = contact->GetFixtureB()->GetBody();
-                collisions.push_back(other);
-			}
-			bodyData = contact->GetFixtureB()->GetBody()->GetUserData();
-			if (bodyData.pointer) {
-                b2Body * other = contact->GetFixtureA()->GetBody();
-                collisions.push_back(other);
-                }       
-		}
+        void BeginContact(b2Contact * contact) {
+        b2Fixture * fixtureA= contact->GetFixtureA();
+        b2Fixture * fixtureB= contact->GetFixtureB();
+        b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
+            b2Body * other = contact->GetFixtureB()->GetBody();
+            if (fixtureA->IsSensor()){
+                if (other->GetUserData().pointer==DISTURBANCE_FLAG){
+                    d_ptr->validate();
+                }
+                return;
+            }
+            if (fixtureB->IsSensor()){
+                return;
+            }
+            collisions.push_back(other);
+        }
+        bodyData = fixtureB->GetBody()->GetUserData();
+        if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
+            b2Body * other = contact->GetFixtureA()->GetBody();
+            if (fixtureB->IsSensor()){
+                if (other->GetUserData().pointer==DISTURBANCE_FLAG){
+                    d_ptr->validate();
+                }
+                return;
+            }
+            if (fixtureA->IsSensor()){
+                return;
+            }
+            collisions.push_back(other);
+            }       
+        }
+
+    //     void EndContact(b2Contact * contact) {
+    //     b2Fixture * fixtureA= contact->GetFixtureA();
+    //     b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
+    //     if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
+    //         b2Body * other = contact->GetFixtureB()->GetBody();
+    //         if (fixtureA->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+    //             d_ptr->invalidate();
+    //         }
+    //     }
+    //     b2Fixture * fixtureB= contact->GetFixtureB();
+    //     bodyData = fixtureB->GetBody()->GetUserData();
+    //     if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
+    //         b2Body * other = contact->GetFixtureA()->GetBody();
+    //         if (fixtureB->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
+    //             d_ptr->invalidate();
+    //         }
+    //     }       
+    // }
         
 	};
+	
+    class Query : public b2QueryCallback {
+		Disturbance * d_ptr=NULL;
+        public:
+            Query(Disturbance * _d_ptr):d_ptr(_d_ptr){}
+            std::vector<b2Body*> d;
+            
+            bool ReportFixture(b2Fixture* fixture) {
+                if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
+                    //d.push_back( fixture->GetBody() ); 
+                    if (d_ptr==NULL){
+                        return false;
+                    }
+                    d_ptr->invalidate();
+                    return true;//keep going to find all fixtures in the query area
+                }
+                return false;
+            }
+    };
 
 
 struct Correct{
@@ -236,17 +312,18 @@ Task::Action getAction(){
 }
 
 AffordanceIndex getAffIndex(){
-    return disturbance.getAffIndex();
+    return affordance;
 }
 
 
 Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configurator topdown control on reactive behaviour
 
+
 void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
 void setErrorWeights();
 
-EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))));
+EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, b2Body* robot=NULL, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))));
 
 EndedResult checkEnded(State, Direction dir=UNDEFINED, bool relax=false, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)))); //usually used to check against control goal
 
@@ -265,6 +342,7 @@ Task(Direction d){
 Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), bool topDown=0){
     start = _start;
     disturbance = ob;
+    affordance=disturbance.getAffIndex();
     direction = H(disturbance, d, topDown);  
     action.init(direction);
     setEndCriteria();
@@ -274,7 +352,8 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
     // }
 }
 
-simResult willCollide(b2World &, int, bool debug =0, float remaining = 8.0, float simulationStep=BOX2DRANGE);
+
+simResult willCollide(b2World &, int, b2Body *,bool debug =0, float remaining = SIM_DURATION, float simulationStep=BOX2DRANGE);
 
 EndCriteria getEndCriteria(const Disturbance&);
 };

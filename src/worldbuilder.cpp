@@ -59,7 +59,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
 //     result.first=true;
 // }
 
-std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
+std::vector <std::vector<cv::Point2f>> WorldBuilder::kmeans_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
     
     const int MAX_CLUSTERS=3, attempts =3, flags=cv::KMEANS_PP_CENTERS;
     cv::Mat bestLabels;
@@ -74,13 +74,39 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::feature_clusters( std::vect
     return result;
 }
 
-std::vector <BodyFeatures> WorldBuilder::processData_kmeans( CoordinateContainer pts, const b2Transform& start){
+
+std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::vector <cv::Point2f> points){
+    struct Dist{ //define predicate
+        bool operator()(const cv::Point2f& p1, const cv::Point2f& p2){
+            float x_2=std::pow(p1.x-p2.x,2);
+            float y_2=std::pow(p1.y-p2.y,2);
+            return std::sqrt(x_2 +y_2)<.1;
+        }
+    }dist;
+    std::vector <int> labels;
+    cv::partition(points, labels, dist);
+    int n_clusters= *(std::max_element(labels.begin(), labels.end())) +1;
+    std::vector <std::vector<cv::Point2f>>result(n_clusters);
+    for (int i=0; i<points.size(); i++){ //bestlabel[i] gives the index
+            int label=labels[i];
+            result[label].push_back(points[i]);
+    }
+    return result;
+}
+
+std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, const b2Transform& start, CLUSTERING clustering){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
     for (Pointf p:pts){
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
-    std::vector<std::vector<cv::Point2f>> clusters=feature_clusters(points, centers);
+    std::vector<std::vector<cv::Point2f>> clusters;
+    if (clustering==KMEANS){
+        clusters=kmeans_clusters(points, centers);
+    }
+    else if (clustering==PARTITION){
+        clusters=partition_clusters(points);
+    }
     for (int c=0; c<clusters.size(); c++){
         if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
             feature.second.pose.q.Set(start.q.GetAngle());
@@ -91,7 +117,7 @@ std::vector <BodyFeatures> WorldBuilder::processData_kmeans( CoordinateContainer
 
 }
 
-void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
+b2Body* WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2Body * body;
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -124,8 +150,12 @@ void WorldBuilder::makeBody(b2World&w, BodyFeatures features){
         default:
         throw std::invalid_argument("not a valid shape\n");break;
     }
+    if (features.attention){
+        body->GetUserData().pointer=reinterpret_cast<uintptr_t>(DISTURBANCE_FLAG);
+    }
 
 	bodies++;
+    return body;
 }
 
 std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair<Pointf, Pointf> bt){
@@ -171,32 +201,45 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
 }
 
 
-std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, bool kmeans){
+std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, CLUSTERING clustering){
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, halfWindowWidth);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
     if (salient.first.empty()){
         return features;
     }
-    if (!kmeans){
+    if (clustering==BOX){
         features =processData(salient.first, start);
     }
     else{
-        features=processData_kmeans(salient.first, start);
+        features=cluster_data(salient.first, start,clustering);
     }
     return features;
 }
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, bool kmeans){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
-    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, kmeans);
+    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
     // if (occluded(current, disturbance)){
     //     salient.first.emplace(getPointf(disturbance.getPosition()));
     //     features.push_back(disturbance.bodyFeatures());
     // }
+    bool has_D=false;
+    if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
+        for (int i=0; i<features.size(); i++){
+            if (features[i].match(disturbance.bf)){
+                features[i]=disturbance.bf;
+                has_D=true;
+                features[i].attention=true;
+            }
+        }
+        if (!has_D){
+            features.push_back(disturbance.bf);
+        }
+    }
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
@@ -273,3 +316,69 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     //to finish
     return result;
 }
+
+void WorldBuilder::world_cleanup(b2World * world){
+    int ct=world->GetBodyCount();
+	for (b2Body * b = world->GetBodyList(); b; b = b->GetNext()){
+		world->DestroyBody(b);
+	}
+}
+
+b2Body * WorldBuilder::get_robot(b2World * world){
+    for (b2Body * b=world->GetBodyList();b; b=b->GetNext()){
+        if (b->GetUserData().pointer==ROBOT_FLAG){
+            return b;
+        }
+    }
+    return NULL;
+
+}
+
+b2Fixture * WorldBuilder::get_chassis(b2Body * r){
+    if (r->GetUserData().pointer!=ROBOT_FLAG){
+        return NULL;
+    }
+    for (b2Fixture * f=r->GetFixtureList(); f; f=f->GetNext()){
+        if (!f->IsSensor()){
+            return f;
+        }
+    }
+    return NULL;
+
+}
+
+b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
+	b2AABB result;
+	// if (!(goal->getAffIndex()==AVOID)){
+	// 	return result;
+	// }
+    if (!goal->isValid()){
+        return result;
+    }
+	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
+	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
+	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=goal->vertices();
+	for (b2Vec2 p: d_vertices){
+		p =robotBody->GetLocalPoint(p);
+		all_points.push_back(p);
+	}
+	float minx=(std::min_element(all_points.begin(),all_points.end(), CompareX())).base()->x;
+	float miny=(std::min_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float maxx=(std::max_element(all_points.begin(), all_points.end(), CompareX())).base()->x;
+	float maxy=(std::max_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
+	float halfLength=(fabs(maxy-miny))/2; //
+    float halfWidth=(fabs(maxx-minx))/2;
+	b2Vec2 centroid(maxx-halfWidth, maxy-halfLength);
+	b2Vec2 offset=centroid - robotBody->GetLocalPoint(robotBody->GetPosition());
+	b2PolygonShape shape;
+	shape.SetAsBox(halfWidth, halfLength, offset, 0);
+	b2FixtureDef fixtureDef;
+	fixtureDef.isSensor=true;
+	fixtureDef.shape=&shape;
+	robotBody->CreateFixture(&fixtureDef);
+	shape.ComputeAABB(&result, robotBody->GetTransform(), 0);
+	return result;
+	
+}
+
+
