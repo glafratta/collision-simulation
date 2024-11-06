@@ -21,7 +21,7 @@ int main(int argc, char** argv){
     //we imagine that we have executed a plan and then the robot is instructed to go back on its steps
     bool debug=0;
     Disturbance target1;
-    std::vector <Direction> solution={DEFAULT}, solution2=solution, solution3=solution;
+    std::vector <Direction> solution={DEFAULT}, solution2=solution, solution3=solution, solution4=solution;
     float simStep=0.5;
     if (argc>2){
         if (atoi(argv[2])==1){
@@ -29,8 +29,9 @@ int main(int argc, char** argv){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);  
             solution={DEFAULT, DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT };  
             simStep=std::max(ROBOT_HALFWIDTH*2, ROBOT_HALFLENGTH*2);
-            solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT};  
+            solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
             solution3={LEFT, DEFAULT, RIGHT,  DEFAULT, RIGHT, DEFAULT};  
+            solution4={LEFT, DEFAULT, RIGHT,  DEFAULT, DEFAULT RIGHT, DEFAULT};  
         }
         else{
             solution={LEFT, DEFAULT};

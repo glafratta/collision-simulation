@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 		configurator.planning= atoi(argv[2]);
 	}
 	if (configurator.planning){
-		configurator.setBenchmarking(1, "Dmatch_target_cross");
+		configurator.setBenchmarking(1, "Dmatch_target_cross_forward");
 	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
