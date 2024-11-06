@@ -31,7 +31,7 @@ int main(int argc, char** argv){
             simStep=std::max(ROBOT_HALFWIDTH*2, ROBOT_HALFLENGTH*2);
             solution2={DEFAULT, LEFT, DEFAULT, RIGHT, DEFAULT, RIGHT, DEFAULT, LEFT, DEFAULT};  
             solution3={LEFT, DEFAULT, RIGHT,  DEFAULT, RIGHT, DEFAULT};  
-            solution4={LEFT, DEFAULT, RIGHT,  DEFAULT, DEFAULT RIGHT, DEFAULT};  
+            solution4={LEFT, DEFAULT, RIGHT,  DEFAULT, DEFAULT, RIGHT, DEFAULT};  
         }
         else{
             solution={LEFT, DEFAULT};
