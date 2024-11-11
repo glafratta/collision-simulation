@@ -30,9 +30,9 @@ bool overlaps(b2Body * robot, b2Body * disturbance){
 	b2AABB aabb=sensor->GetAABB(0);
 	b2Shape * d=disturbance->GetFixtureList()->GetShape();
 	b2Transform robot_pose=robot->GetTransform(), d_pose= disturbance->GetTransform();
-	b2AABB aabb_shape, aabb_zero;
-	sensor->GetShape()->ComputeAABB(&aabb_shape, robot_pose,0);
-	sensor->GetShape()->ComputeAABB(&aabb_shape, b2Transform_zero,0);
+	//b2AABB aabb_shape, aabb_zero;
+	//sensor->GetShape()->ComputeAABB(&aabb_shape, robot_pose,0);
+	//sensor->GetShape()->ComputeAABB(&aabb_shape, b2Transform_zero,0);
 	return b2TestOverlap(sensor->GetShape(), 0, d, 0,robot_pose, d_pose);
 }
 
@@ -243,7 +243,7 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 		// 		endCriteria.angle = angle;
 		// 	}
 		// }
-		break;
+		//break;
 		default:
 		endCriteria.distance = distance;
 		endCriteria.angle = angle;
