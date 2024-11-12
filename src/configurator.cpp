@@ -393,7 +393,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 // }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=currentTask.direction;
-	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue;
+	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue={v};
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
@@ -483,8 +483,8 @@ return toRemove;
 }
 
 std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, vertexDescriptor src){
-	std::vector <vertexDescriptor> split={v};
-
+	std::vector <vertexDescriptor> split={ v};
+	return split;
 	if (d ==RIGHT || d==LEFT){
 		return split;
 	}
@@ -564,6 +564,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 		if(g[ep.first].direction!=DEFAULT ){
 			if (g[ep.first].direction==STOP){
 				g[ep.first.m_target].Dn = dist;
+				g[ep.first.m_target].outcome=simResult::safeForNow;
 			}
 			break;
 		}
