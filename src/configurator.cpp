@@ -1443,12 +1443,14 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 						EndedResult er = estimateCost(g[(*ei3).m_target], g[(*ei3).m_source].endPose, g[*ei3].direction);
 						g[(*ei3).m_target].phi=evaluationFunction(er);
 					}
-					if (g[(*ei3)].direction==d){
+					if (g[(*ei3)].direction==d ){
 						Frontier f;
 						//f_added=1;
 						f.first= (*ei3).m_target;
 						f.second=connecting2;
-						result.push_back(f);
+						if (g[(*ei3).m_target].outcome!=simResult::crashed){
+							result.push_back(f);
+						}
 						if (ei3!=ei){
 							ei3++;
 							//connecting2.clear();
