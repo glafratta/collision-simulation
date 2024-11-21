@@ -13,6 +13,7 @@ int main(int argc, char** argv){
     if (argc>3){
         if (atoi(argv[3])==1){
             target1= Disturbance(PURSUE, b2Vec2(1.0,0), 0);    
+            printf("target");
         }
     }
     Task goal(target1,DEFAULT);
@@ -34,6 +35,7 @@ int main(int argc, char** argv){
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
     conf.planVertices= conf.planner(conf.transitionSystem, conf.currentVertex);
     printf("OG PLAN: ");
+    int n_v=conf.transitionSystem.m_vertices.size();
     conf.printPlan(&conf.planVertices);
     conf.addIteration();
     conf.currentVertex=*(conf.planVertices.end()-1);
@@ -55,16 +57,21 @@ int main(int argc, char** argv){
     bool relax_match=1, plan_works=false;
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
+
     std::vector<vertexDescriptor> plan_provisional;
     for (vertexDescriptor o: options_src){
         conf.recall_plan_from(o, conf.transitionSystem, world, plan_provisional, plan_works);
     }
-    
+    if (conf.transitionSystem.m_vertices.size() > n_v){
+        printf("size error = %i\n", conf.transitionSystem.m_vertices.size());
+        return 2;
+    }
     if (plan_provisional!=conf.planVertices){
         printf("PROVISIONAL: ");
         conf.printPlan(&plan_provisional);
 
         return 1;
     }
+     
     return 0;
 }
