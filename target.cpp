@@ -44,7 +44,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			//been= been_there(transitionSystem, where); 
 		}
 		else{
-			plan_works=true;//temporary to simplify things
+			//plan_works=true;//temporary to simplify things
+			plan_works=checkPlan(world,planVertices,transitionSystem, transitionSystem[movingVertex].start, currentVertex);
 		}
 		for (auto o:options_src){
 			printf("recall from %i : ", o);
