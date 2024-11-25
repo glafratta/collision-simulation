@@ -660,10 +660,6 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	std::vector <Frontier> frontier_v;
 	bool run=true, _finished=false;
 	std::vector <Frontier> priorityQueue={Frontier(src, std::vector<vertexDescriptor>())};
-	if (currentVertex==movingVertex){
-		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
-		//return plan;
-	}
 	Task overarching_goal;
 	if (NULL==custom_ctrl_goal){
 		overarching_goal=controlGoal;
@@ -722,10 +718,10 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			if ( path==paths.rend()) { //if there are no other paths
 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
 				path=paths.rbegin();
-				printf("new empty path\n");
+				//printf("new empty path\n");
 				break;
 			}
-			printf("inner loop v %i \t", end);
+			//printf("inner loop v %i \t", end);
 			debug::print_pose(g[end].endPose);	
 		}
 //		priorityQueue.erase(priorityQueue.begin());
@@ -738,7 +734,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (NULL!=finished){
 			*finished=_finished;
 		}
-		printf("outer loop\n");
+		//printf("outer loop\n");
 	}while(!priorityQueue.empty() && (path_end!=goal && !(_finished)));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
@@ -1349,13 +1345,8 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	printPlan(&plan_provisional);
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
-	//= controlGoal_adjusted.checkEnded(g[end], UNDEFINED, true).ended;
-	//printf("adjusted goal:\t");
-	//debug::print_pose(controlGoal_adjusted.disturbance.pose());
-	//printf("end pose of plan:\t");
-	//debug::print_pose(g[end].endPose);
 	if (ctrl_finished){
-	//	printf("plan reaches goal\n");
+
 		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
 		if (plan_works){
 			return;
@@ -1427,9 +1418,6 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		}
 		else{
 			condition= sum_tmp<sum;
-		}
-		if (v==2 && others!=NULL){
-			printf("v%i sum = %f, condition=%i, relax=%i, Tmatch=%i\n", v, sum_tmp, condition, relax, Tmatch);
 		}
 		if ( condition&& v!=movingVertex && boost::in_degree(v, g)>0 &&Tmatch ){ 
 			sum=sum_tmp;
@@ -1691,6 +1679,8 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
+	printf("displacement: ");
+	debug::print_pose(deltaPose);
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
 	applyAffineTrans(deltaPose, g);
 	applyAffineTrans(deltaPose, controlGoal);

@@ -19,10 +19,11 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 				WorldBuilder::CompareCluster compareCluster;
 				BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
 				s_temp.Dn= Disturbance(closest_D); //assumes 1 item length
+				printf("d to match: ")
 				debug::print_pose(s_temp.Dn.pose());
 				bool closest_match=true;
 				findMatch(s_temp,transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, closest_match);
-				printf("looked for matches, potential: %i, closest =%i\n", options_src.size(), closest_match);
+				printf("looked for matches, potential: %i\n", options_src.size());
 				//FIND STATE WHICH matches the relationship with the disturbance
 			}
 			else{
@@ -46,7 +47,9 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			plan_works=true;//temporary to simplify things
 		}
 		for (auto o:options_src){
-			printf("recall from %i\n", o);
+			printf("recall from %i : ", o);
+			debug::print_pose(g[o].Dn.pose());
+			printf("\n");
 			recall_plan_from(o, transitionSystem, world, plan_provisional, plan_works);
 			if (plan_works){
 				break;

@@ -122,7 +122,7 @@ void step( AlphaBot &motors){
 			fprintf(f, "!");
 			fclose(f);			
 		}
-		forget(c);
+	//	forget(c);
 
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);

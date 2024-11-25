@@ -51,8 +51,10 @@ int main(int argc, char** argv){
         conf.data2fp = ci.data2fp;
     }
     std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
-    if (!b_features.empty()){
-        state_tmp.Dn= Disturbance(b_features[0]); //assumes 1 item length
+    if (!b_features.empty()){				
+        WorldBuilder::CompareCluster compareCluster;
+		BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
+        state_tmp.Dn= Disturbance(closest_D);
     }
     bool relax_match=1, plan_works=false;
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
