@@ -1340,22 +1340,22 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	}
 	b2Transform o_shift= -g[v].start;
 	printf("shift\n");
-	debug::print_pose(o_shift);
+	//debug::print_pose(o_shift);
 	Task controlGoal_adjusted= controlGoal;
 	applyAffineTrans(o_shift, controlGoal_adjusted);
 	bool ctrl_finished=false;
 	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted, &ctrl_finished); //been.second, been.first
-	printf("provisional plan from v%i\n", v);
+	//printf("provisional plan from v%i\n", v);
 	printPlan(&plan_provisional);
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
 	//= controlGoal_adjusted.checkEnded(g[end], UNDEFINED, true).ended;
-	printf("adjusted goal:\t");
-	debug::print_pose(controlGoal_adjusted.disturbance.pose());
-	printf("end pose of plan:\t");
-	debug::print_pose(g[end].endPose);
+	//printf("adjusted goal:\t");
+	//debug::print_pose(controlGoal_adjusted.disturbance.pose());
+	//printf("end pose of plan:\t");
+	//debug::print_pose(g[end].endPose);
 	if (ctrl_finished){
-		printf("plan reaches goal\n");
+	//	printf("plan reaches goal\n");
 		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
 		if (plan_works){
 			return;
