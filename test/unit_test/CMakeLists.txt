@@ -84,6 +84,8 @@ add_executable(fill_for_dist ../test_essentials.h fill_for_dist.cpp)
 add_executable(make_sensor ../test_essentials.h make_sensor.cpp)
 add_executable(end_contact ../test_essentials.h end_contact.cpp)
 add_executable(get_disturbance ../test_essentials.h get_disturbance.cpp)
+add_executable(checkPlan ../test_essentials.h checkPlan.cpp)
+
 target_link_libraries(match CloCK ${OpenCV_LIBS} box2d )
 target_link_libraries(find_match_state CloCK ${OpenCV_LIBS} box2d )
 target_link_libraries(state_difference CloCK ${OpenCV_LIBS} box2d )
@@ -93,6 +95,7 @@ target_link_libraries(fill_for_dist CloCK ${OpenCV_LIBS} box2d)
 target_link_libraries(make_sensor CloCK ${OpenCV_LIBS} box2d)
 target_link_libraries(end_contact CloCK ${OpenCV_LIBS} box2d)
 target_link_libraries(get_disturbance CloCK ${OpenCV_LIBS} box2d)
+target_link_libraries(checkPlan CloCK ${OpenCV_LIBS} box2d )
 
 add_test(NAME processData_k COMMAND processData_k ../170924_1321_badrun/ 1 )
 
@@ -161,6 +164,7 @@ add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 
 add_test(NAME match_equal COMMAND match_equal)
 add_test(NAME replanner COMMAND replanner ../170924_1321_badrun/ 2 1)
 
+add_test(NAME checkPlan_7 COMMAND checkPlan ../251023_TAGET/ 2 1 7)
 
 
 

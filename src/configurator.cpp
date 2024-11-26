@@ -777,7 +777,16 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		it=-1;
 		end_it=p.size()-1;
 	}
-	auto ep=boost::edge(custom_start, *p.begin(), g);	
+	std::pair<edgeDescriptor, bool> ep(edgeDescriptor(), false);
+	if (currentTask.motorStep==0){
+		ep =boost::edge(custom_start, *p.begin(), g);	
+	} 
+	else{
+		ep =boost::edge(custom_start, currentVertex, g);	
+
+	}
+	printf("start from v=%i\n", ep.first.m_target);
+
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
