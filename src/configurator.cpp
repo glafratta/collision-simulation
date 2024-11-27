@@ -786,17 +786,17 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 
 	}
 	printf("start from v=%i\n", ep.first.m_target);
-
+	std::pair <State, Edge> sk;
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
 		//debug::print_pose(start);
-		Disturbance d_adjusted=g[ep.first.m_target].Di;
+		Disturbance d_adjusted=g[ep.first.m_source].Dn;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance, 0.15, WorldBuilder::CLUSTERING::PARTITION);
-		std::pair <State, Edge> sk(State(start, d_adjusted), Edge(t.direction));
+		sk=std::pair <State, Edge> (State(start, d_adjusted), Edge(t.direction));
 		//printf("from %i", ep.first.m_target);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
@@ -804,6 +804,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		compare_tmp.start=g[t_start_v].start;
 		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		Robot robot(&world);
+		robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 		//make sensor
 		simResult sr=t.willCollide(world, iteration,robot.body, debugOn, SIM_DURATION, stepDistance);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
@@ -811,7 +812,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
 		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length())){
 			if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
-				b2Transform shift_2=sk.first.start-g[t_start_v].start; //get shift 
+				b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
 				Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
 				applyAffineTrans(shift_2, d_adjusted_2); //transfer adjusted expected D to current state
 				sk.first.Dn=d_adjusted_2;
@@ -846,13 +847,14 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//propagateD(v1,prev_edge.second.m_source, g);
 		//gt::adjustProbability(g, ep.first);
 		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
-	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <end_it & result );
-	if (ep.first.m_target==TransitionSystem::null_vertex()){
-		result=controlGoal.checkEnded(g[ep.first.m_source]).ended;
-	}
-	else if (it >=end_it){
-		result=controlGoal.checkEnded(g[ep.first.m_target]).ended;
-	}
+	}while (ep.first.m_target!=TransitionSystem::null_vertex() && it <end_it && result );
+	// if (ep.first.m_target==TransitionSystem::null_vertex()){
+	// }
+	// else if (it >=end_it){
+	// 	result=controlGoal.checkEnded(g[ep.first.m_target]).ended;
+	// }
+	result=controlGoal.checkEnded(sk.first).ended;
+
 	return result;
 }
 
