@@ -131,8 +131,8 @@ int getIteration(){
 	return iteration;
 }
 
-void addIteration(){
-	iteration++;
+void addIteration(int i=1){
+	iteration+=i;
 }
 
 Task * getTask(int advance=0){ //returns Task being executed
