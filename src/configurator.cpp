@@ -775,7 +775,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	if (custom_start==TransitionSystem::null_vertex()){
 		custom_start=movingVertex;
 		it=-1;
-		end_it=p.size()-1;
+//		end_it=p.size();
 	}
 	std::pair<edgeDescriptor, bool> ep(edgeDescriptor(), false);
 	if (currentTask.motorStep==0){

@@ -166,7 +166,9 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	}
 	g[e.m_target].options = sk.first.options;
 	g[e.m_target].nObs++;
-	g[e.m_target].start=sk.first.start;
+	if (e.m_source!=e.m_target){
+		g[e.m_target].start=sk.first.start;
+	}
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
