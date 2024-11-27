@@ -37,7 +37,7 @@ int main(int argc, char** argv){
     conf.changeTask(true, og, conf.planVertices);
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
-    int steps= atoi(argv[4])-5;
+    int steps= atoi(argv[4]);
     float distanceTraversed = MOTOR_CALLBACK*conf.getTask()->action.getLinearSpeed()*steps;
     b2Transform shift;
     shift.q.Set(MOTOR_CALLBACK*conf.getTask()->action.getOmega()*steps);
@@ -46,9 +46,11 @@ int main(int argc, char** argv){
     conf.applyAffineTrans(shift, conf.transitionSystem);    
     if (argc>4){
         di.iteration=atoi(argv[4]);
+        conf.addIteration(steps-conf.getIteration());
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
+    conf.debugOn=1;
     bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem);
     return !plan_works;
 }

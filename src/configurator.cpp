@@ -791,6 +791,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
 		debug::print_pose(start);
+		//Disturbance d_adjusted=getDisturbance(g, ep.first.m_source, world,  g[ep.first].direction); //g[ep.first.m_source].Dn;
 		Disturbance d_adjusted=g[ep.first.m_source].Dn;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
@@ -845,6 +846,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//gt::adjustProbability(g, ep.first);
 		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <end_it & result );
+	if (ep.first.m_target==TransitionSystem::null_vertex()){
+		result=controlGoal.checkEnded(g[ep.first.m_source]).ended;
+	}
+	else if (it >=end_it){
+		result=controlGoal.checkEnded(g[ep.first.m_target]).ended;
+	}
 	return result;
 }
 
@@ -883,16 +890,16 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 		}while (g[e].direction==t->direction && i<planVertices.size()&& g[e].direction==DEFAULT);
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	if (g[e_start.m_target].Dn.getAffIndex()!=NONE){
-		//printf("targ=%i, d index=%i, d hl=%f, d hw=%f\n", e_start.m_target, g[e_start.m_target].disturbance.getAffIndex(), g[e_start.m_target].disturbance.bodyFeatures().halfLength, g[e_start.m_target].disturbance.bodyFeatures().halfWidth);
 		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_target].Dn.pose().p).Length();
-		//was e.m_target
 	}
 	else{
 		if (g[e_start].direction==DEFAULT){
 			step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
 			printf("step=%f\n", step);
 		}
-		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
+		//else{
+		 adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
+		//}
 		printf("adjusted step=%f\n", step);
 	}
 
