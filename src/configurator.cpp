@@ -263,12 +263,12 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
-	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
-		state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
-	}
-	else{
-		state.nodesInSameSpot =0; //reset if robot is moving
-	}
+	// if (b2Vec2(result.endPose.p -state.start.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
+	// 	state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
+	// }
+	// else{
+	// 	state.nodesInSameSpot =0; //reset if robot is moving
+	// }
 	return result;
 	}
 
@@ -791,7 +791,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
 		//debug::print_pose(start);
-		Disturbance d_adjusted=g[ep.first.m_source].Dn;
+		Disturbance d_adjusted=g[ep.first.m_target].Di;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -803,14 +803,16 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		State compare_tmp=g[ep.first.m_source];
 		compare_tmp.start=g[t_start_v].start;
 		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
-		Robot robot(&world);
-		robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
-		//make sensor
-		simResult sr=t.willCollide(world, iteration,robot.body, debugOn, SIM_DURATION, stepDistance);
+		// Robot robot(&world);
+		// robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
+		// //make sensor
+		// simResult sr=t.willCollide(world, iteration,robot.body, debugOn, SIM_DURATION, stepDistance);
+		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
+		//COMMENITNG THIS BIT OUT BECAUSE NOW WE DON'T CARE ABOUT FIXED DISTANCE
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
-		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length())){
+		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && compare_tmp.Dn.affordanceIndex!=NONE){
 			if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
 				b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
 				Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
@@ -897,12 +899,12 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	else{
 		if (g[e_start].direction==DEFAULT){
-			step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
+			//step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
 			printf("step=%f\n", step);
 		}
-		//else{
-		 adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
-		//}
+		else{
+	 	adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
+		}
 		printf("adjusted step=%f\n", step);
 	}
 
@@ -1059,7 +1061,7 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	srand(unsigned(time(NULL)));
 	if (state.outcome == simResult::safeForNow){ //accounts for simulation also being safe for now
 		if (d ==DEFAULT ||d==STOP){
-			if (state.nodesInSameSpot<maxNodesOnSpot){
+			//if (state.nodesInSameSpot<maxNodesOnSpot){
 				//in order, try the task which represents the reflex towards the goal
 				if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
 					state.options.push_back(temp.direction);
@@ -1074,7 +1076,10 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 						state.options = {RIGHT, LEFT};
 					}
 				}
-			}
+			// }
+			// else{
+			// 	int boo=0;
+			// }
 			}
 	}
 	else if (state.outcome==simResult::successful) { //will only enter if successful
