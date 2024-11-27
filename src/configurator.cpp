@@ -790,8 +790,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	do {
 		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
-		debug::print_pose(start);
-		Disturbance d_adjusted=g[ep.first.m_source].Dn;
+		//debug::print_pose(start);
+		Disturbance d_adjusted=g[ep.first.m_target].Di;
 		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -800,6 +800,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//printf("from %i", ep.first.m_target);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
+		State compare_tmp=g[ep.first.m_source];
+		compare_tmp.start=g[t_start_v].start;
 		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		Robot robot(&world);
 		//make sensor
@@ -819,7 +821,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		}
 		start = sk.first.endPose;
 		StateDifference sd;
-		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(g[ep.first.m_source], sk.first, NULL, &sd);
+		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(compare_tmp, sk.first, NULL, &sd); //og match to g[ep.first.m_source]
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
 		if (!prev_edge.first){
@@ -845,6 +847,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//gt::adjustProbability(g, ep.first);
 		//printf("skipping from %i, edge %i ->%i\n", it, ep.first.m_source, ep.first.m_target);
 	}while (ep.first.m_target!=TransitionSystem::null_vertex() & it <end_it & result );
+	if (ep.first.m_target==TransitionSystem::null_vertex()){
+		result=controlGoal.checkEnded(g[ep.first.m_source]).ended;
+	}
+	else if (it >=end_it){
+		result=controlGoal.checkEnded(g[ep.first.m_target]).ended;
+	}
 	return result;
 }
 
