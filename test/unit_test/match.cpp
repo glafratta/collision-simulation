@@ -73,7 +73,7 @@ int main(int argc, char** argv){
     StateMatcher matcher;
     State s1, candidate;
     s1.start=b2Transform(b2Vec2(0.25, 0.25), b2Rot(M_PI_4));
-    s1.endPose=b2Transform(b2Vec2(0.5, 0.5), b2Rot(M_PI_4));
+    s1.endPose=b2Transform(b2Vec2(0.5, 0.5), b2Rot(M_PI_4));    
     s1.outcome=simResult::crashed;
     assign_disturbance(s1);
     s1.Dn.bf.halfWidth=0.05;
@@ -98,6 +98,7 @@ int main(int argc, char** argv){
     print_transform(s1.Dn.pose());
     StateMatcher::MATCH_TYPE result= matcher.isMatch(s1, candidate);
     if (result!=desired_match){
+        printf(" desired =%i, result=%i\n", desired_match, result);
         return 1;
     }
     return 0;

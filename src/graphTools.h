@@ -84,7 +84,9 @@ struct State{
 		phi=NAIVE_PHI;
 	}
 
-	b2Transform from_disturbance()const;
+	b2Transform start_from_disturbance()const;
+
+	b2Transform end_from_disturbance()const;
 
 	float distance();
 
@@ -109,8 +111,8 @@ struct StateDifference{
 
 	StateDifference()=default;
 
-	StateDifference(const State& s1, const State& s2){
-		init(s1, s2);
+	StateDifference(const State& s1, const State& s2, bool match_outcome=false, bool match_start=true){
+		init(s1, s2, match_outcome, match_start);
 	}
 
 	float sum(){
@@ -135,7 +137,7 @@ struct StateDifference{
 	
 	float get_sum(int);
 
-	void init(const State& s1,const State& s2);
+	void init(const State& ,const State&, bool, bool);
 
 };
 
@@ -406,7 +408,7 @@ class StateMatcher{
 
 		MATCH_TYPE isMatch(StateDifference, float endDistance=0); //endDistance=endpose
 
-		MATCH_TYPE isMatch(const State &, const State&, const State* src=NULL, StateDifference * _sd=NULL); //first state: state to find a match for, second state: candidate match
+		MATCH_TYPE isMatch(const State &, const State&, const State* src=NULL, StateDifference * _sd=NULL, bool match_outcome=false); //first state: state to find a match for, second state: candidate match
 
 		std::pair<MATCH_TYPE, vertexDescriptor> match_vertex(TransitionSystem, vertexDescriptor, Direction, State, StateMatcher::MATCH_TYPE mt=StateMatcher::_TRUE); //find match amoung vertex out edges
 		

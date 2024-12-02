@@ -321,6 +321,8 @@ Direction H(Disturbance, Direction, bool topDown=0); //topDown enables Configura
 
 void setEndCriteria(Angle angle=SAFE_ANGLE, Distance distance=BOX2DRANGE);
 
+void setEndCriteria(const Distance& distance);
+
 void setErrorWeights();
 
 EndedResult checkEnded(b2Transform robotTransform = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0)), Direction dir=UNDEFINED, bool relax=0, b2Body* robot=NULL, std::pair<bool,b2Transform> use_start= std::pair <bool,b2Transform>(1, b2Transform(b2Vec2(0.0, 0.0), b2Rot(0.0))));

@@ -13,8 +13,12 @@ orientation subtract(orientation o1, orientation o2){
 	return result;
 }
 
-b2Transform State::from_disturbance()const{
-	return Dn.pose()-start;
+b2Transform State::start_from_disturbance()const{
+	return Dn.pose()-start; //START
+}
+
+b2Transform State::end_from_disturbance()const{
+	return Dn.pose()-endPose; //START
 }
 
 float State::distance(){
@@ -71,14 +75,30 @@ float StateDifference::get_sum(int mt){
 	}
 }
 
-void StateDifference::init(const State& s1, const State& s2){ //observed, desired
+void StateDifference::init(const State& s1, const State& s2, bool match_outcome, bool match_start){ //observed, desired
 	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
 	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
 	if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
 		return;
 	}
-	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex();
+	if (match_outcome){
+		if (s1.outcome==s2.outcome){
+			D_type=0;
+			return;
+		}
+		else if (s1.outcome==simResult::safeForNow && s2.outcome==simResult::successful){
+			D_type=0;
+			return;
+		}
+		else if(s2.outcome==simResult::safeForNow && s1.outcome==simResult::successful){
+			D_type=0;
+			return;
+		}
+	}
+	else{
+		D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex();
+	}
 	if (D_type!=0){
 		// if (s2.disturbance.getAffIndex()==PURSUE){
 		// 	D_position.x= s1.endPose.p.x-s2.disturbance.bf.pose.p.x; //endpose x
@@ -94,7 +114,13 @@ void StateDifference::init(const State& s1, const State& s2){ //observed, desire
 		D_length=10000;
 		return;
 	}
-	b2Transform d1=s1.from_disturbance(), d2=s2.from_disturbance();
+	b2Transform d1, d2;
+	//if (match_start){
+		d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
+	//}
+	// else{
+	// 	d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
+	// }
 	D_position.x= d1.p.x - d2.p.x; //disturbance x
 	D_position.y= d1.p.y - d2.p.y; //disturbance y
 //	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
@@ -351,9 +377,9 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(StateDifference sd, float endDist
     return match.what();
 }
 
-StateMatcher::MATCH_TYPE StateMatcher::isMatch(const State & s, const State &candidate, const State *src, StateDifference*_sd){
+StateMatcher::MATCH_TYPE StateMatcher::isMatch(const State & s, const State &candidate, const State *src, StateDifference*_sd,bool match_outcome){
 	//src is the source of candidate
-	StateDifference sd(s, candidate);
+	StateDifference sd(s, candidate, match_outcome);
 	float stray=0;
 	// if (src!=NULL && s.label!=UNDEFINED){
 	// 	b2Vec2 stray_v;

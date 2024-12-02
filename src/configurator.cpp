@@ -559,43 +559,43 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	vertexDescriptor p=TransitionSystem::null_vertex();
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
-	while (ep.second){
+	//while (ep.second){
 		if(g[ep.first].direction!=DEFAULT ){
 			if (g[ep.first].direction==STOP){
 				g[ep.first.m_target].Dn = dist;
 			}
-			break;
-		}
-		if (ep.first.m_target!=v1){
-			g[ep.first.m_target].Dn = dist;
-			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
-			g[ep.first.m_target].phi =evaluationFunction(er);	
-			std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
-			if ( match.first){
-				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-				deletion.push_back(pair);			//first is eliminated, the second is its match
-				p=(pair.second);
+	// 		break;
+	 	}
+	// 	if (ep.first.m_target!=v1){
+	// 		g[ep.first.m_target].Dn = dist;
+	// 		EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
+	// 		g[ep.first.m_target].phi =evaluationFunction(er);	
+	// 		std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
+	// 		if ( match.first){
+	// 			std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
+	// 			deletion.push_back(pair);			//first is eliminated, the second is its match
+	// 			p=(pair.second);
 	
-			}
-			else{
-				p=(ep.first.m_target);
-			}
-			// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
-			// 	if (*vi==p){
-			// 		closed->erase(vi);
-			// 	}
-			// }
-			if (auto found=closed->find(p); found!=closed->end()){
-				closed->erase(found);
-			}
-			propagated->push_back(p);
-		}
-		ep.second= boost::in_degree(ep.first.m_source, g)>0;
-		if (!ep.second){
-			return deletion;
-		}
-		ep.first= *(boost::in_edges(ep.first.m_source, g).first);
-	}	
+	// 		}
+	// 		else{
+	// 			p=(ep.first.m_target);
+	// 		}
+	// 		// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
+	// 		// 	if (*vi==p){
+	// 		// 		closed->erase(vi);
+	// 		// 	}
+	// 		// }
+	// 		if (auto found=closed->find(p); found!=closed->end()){
+	// 			closed->erase(found);
+	// 		}
+	// 		propagated->push_back(p);
+	// 	}
+	// 	ep.second= boost::in_degree(ep.first.m_source, g)>0;
+	// 	if (!ep.second){
+	// 		return deletion;
+	// 	}
+	// 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
+	// //}	
 	return deletion;
 }
 
@@ -788,20 +788,33 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
 	do {
-		b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
+		//b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
 		//printf("start= \t");
 		//debug::print_pose(start);
-		Disturbance d_adjusted=g[ep.first.m_target].Di;
-		applyAffineTrans(shift, d_adjusted);
+		//Disturbance d_adjusted=getDisturbance(g, ep.first.m_source,world, g[ep.first].direction);
+		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
+		Disturbance d_adjusted;
+		if (g[t_start_v].Dn.affordanceIndex==AVOID){
+			d_adjusted=g[t_start_v].Dn;
+			d_adjusted.affordanceIndex=PURSUE;
+		}
+		else{
+			d_adjusted=g[t_start_v].Di;
+		}
+		//applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance, 0.15, WorldBuilder::CLUSTERING::PARTITION);
 		sk=std::pair <State, Edge> (State(start, d_adjusted), Edge(t.direction));
 		//printf("from %i", ep.first.m_target);
-		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
 		State compare_tmp=g[ep.first.m_source];
-		compare_tmp.start=g[t_start_v].start;
+		if (int(t_start_v)==int(currentVertex) && g[t_start_v].start.p.x<0){
+			compare_tmp.start=b2Transform_zero;
+		}
+		else{
+			compare_tmp.start=g[t_start_v].start;	
+		}
 		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
 		// Robot robot(&world);
 		// robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
@@ -812,7 +825,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 									// simulation result step, so this needs to be adjusted
 		//COMMENITNG THIS BIT OUT BECAUSE NOW WE DON'T CARE ABOUT FIXED DISTANCE
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
-		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && compare_tmp.Dn.affordanceIndex!=NONE){
+		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && sk.first.outcome== simResult::crashed){
 			if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
 				b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
 				Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
@@ -820,11 +833,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 				sk.first.Dn=d_adjusted_2;
 			}
 			sk.first.endPose=sk.first.start+expected_deltaPose;
-			sk.first.outcome=simResult::successful;
+			sk.first.outcome=simResult::safeForNow;
 		}
 		start = sk.first.endPose;
 		StateDifference sd;
-		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(compare_tmp, sk.first, NULL, &sd); //og match to g[ep.first.m_source]
+		bool match_outcome=true;
+		StateMatcher::MATCH_TYPE is_match=matcher.isMatch(compare_tmp, sk.first, NULL, &sd, match_outcome); //og match to g[ep.first.m_source]
 		vertexDescriptor v1=ep.first.m_source;
 		std::pair <bool,edgeDescriptor> prev_edge= gt::getMostLikely(g, gt::inEdges(g, v1, t.direction),iteration);
 		if (!prev_edge.first){

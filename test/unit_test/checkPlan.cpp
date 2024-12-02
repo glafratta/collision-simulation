@@ -60,5 +60,12 @@ int main(int argc, char** argv){
     }
     conf.debugOn=1;
     bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[conf.movingVertex].start);
+    if (plan_works){
+        printf("plan works");
+        return 0;
+    }
+    else{
+        return 1;
+    }
     return !plan_works;
 }

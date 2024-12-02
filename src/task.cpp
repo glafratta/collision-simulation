@@ -254,6 +254,11 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 	}
 }
 
+void Task::setEndCriteria(const Distance& distance){
+	endCriteria.distance=distance;
+}
+
+
 EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool relax, b2Body * robot, std::pair<bool,b2Transform> use_start){ //self-ended , std::pair<bool,b2Transform> use_start
 	if (dir==UNDEFINED){
 		dir=direction;
