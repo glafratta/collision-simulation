@@ -787,9 +787,12 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	}
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
+	b2Transform shift=b2Transform_zero;
+	if (SignedVectorLength(g[ep.first.m_target].start)<0){
+		shift=g[movingVertex].start-g[ep.first.m_target].start;
+	}
 	do {
-		b2Transform shift=g[movingVertex].start-g[ep.first.m_target].start;
-		//printf("start= \t");
+//printf("start= \t");
 		//debug::print_pose(start);
 		//Disturbance d_adjusted=getDisturbance(g, ep.first.m_source,world, g[ep.first].direction);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
@@ -878,7 +881,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	// else if (it >=end_it){
 	// 	result=controlGoal.checkEnded(g[ep.first.m_target]).ended;
 	// }
-	result=controlGoal.checkEnded(sk.first).ended;
+	result=controlGoal.checkEnded(sk.first,UNDEFINED, true).ended;
 
 	return result;
 }
