@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+#include<vector>
 const float SAFE_ANGLE =M_PI_2;
 const float MAX_TURN =M_PI;
 const float ROBOT_HALFWIDTH =0.135; //uncomment for robot
@@ -70,8 +71,16 @@ public:
 		
 	}
 
+
 };
 
+std::vector <b2Vec2> GetLocalPoints( std::vector <b2Vec2> pts, const b2Body * body){
+	std::vector <b2Vec2> result;
+	for (b2Vec2 p:pts){
+		result.push_back(body->GetLocalPoint(p));
+	}
+	return result;
+}
 
 
 #endif

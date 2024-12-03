@@ -794,9 +794,11 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//Disturbance d_adjusted=getDisturbance(g, ep.first.m_source,world, g[ep.first].direction);
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		Disturbance d_adjusted;
+		bool reset_end_criteria=0;
 		if (g[t_start_v].Dn.affordanceIndex==AVOID){
 			d_adjusted=g[t_start_v].Dn;
 			d_adjusted.affordanceIndex=PURSUE;
+			reset_end_criteria=1;
 		}
 		else{
 			d_adjusted=g[t_start_v].Di;
@@ -808,6 +810,10 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		sk=std::pair <State, Edge> (State(start, d_adjusted), Edge(t.direction));
 		//printf("from %i", ep.first.m_target);
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
+		if (reset_end_criteria){
+			float distance = g[ep.first.m_source].end_from_disturbance().p.Length();
+			t.setEndCriteria(Distance(distance));
+		}
 		State compare_tmp=g[ep.first.m_source];
 		if (int(t_start_v)==int(currentVertex) && g[t_start_v].start.p.x<0){
 			compare_tmp.start=b2Transform_zero;
@@ -821,20 +827,23 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		// //make sensor
 		// simResult sr=t.willCollide(world, iteration,robot.body, debugOn, SIM_DURATION, stepDistance);
 		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
+		if (sr.resultCode==simResult::crashed){
+			return false;
+		}
 		gt::fill(sr, &sk.first, &sk.second); //this also takes an edge, but it'd set the step to the whole
 									// simulation result step, so this needs to be adjusted
 		//COMMENITNG THIS BIT OUT BECAUSE NOW WE DON'T CARE ABOUT FIXED DISTANCE
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
-		if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && sk.first.outcome== simResult::crashed){
-			if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
-				b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
-				Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
-				applyAffineTrans(shift_2, d_adjusted_2); //transfer adjusted expected D to current state
-				sk.first.Dn=d_adjusted_2;
-			}
-			sk.first.endPose=sk.first.start+expected_deltaPose;
-			sk.first.outcome=simResult::safeForNow;
-		}
+		// if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && sk.first.outcome== simResult::crashed){
+		// 	if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
+		// 		b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
+		// 		Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
+		// 		applyAffineTrans(shift_2, d_adjusted_2); //transfer adjusted expected D to current state
+		// 		sk.first.Dn=d_adjusted_2;
+		// 	}
+		// 	sk.first.endPose=sk.first.start+expected_deltaPose;
+		// 	sk.first.outcome=simResult::safeForNow;
+		// }
 		start = sk.first.endPose;
 		StateDifference sd;
 		bool match_outcome=true;

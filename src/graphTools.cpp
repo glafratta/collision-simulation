@@ -114,9 +114,8 @@ void StateDifference::init(const State& s1, const State& s2, bool match_outcome,
 		D_length=10000;
 		return;
 	}
-	b2Transform d1, d2;
+	b2Transform d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
 	//if (match_start){
-		d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
 	//}
 	// else{
 	// 	d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
