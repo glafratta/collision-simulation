@@ -66,3 +66,11 @@ bool Disturbance::operator==(const Disturbance & d){
     bool dim=halfLength()==d.bf.halfLength && halfWidth()==d.bf.halfWidth;
     bool aff=affordanceIndex==d.affordanceIndex;
 }  
+
+std::vector <b2Vec2> GetLocalPoints( std::vector <b2Vec2> pts, const b2Body * body){
+	std::vector <b2Vec2> result;
+	for (b2Vec2 p:pts){
+		result.push_back(body->GetLocalPoint(p));
+	}
+	return result;
+}

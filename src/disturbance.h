@@ -246,4 +246,6 @@ struct simResult{
     }
 };
 
+std::vector <b2Vec2> GetLocalPoints( std::vector <b2Vec2>, const b2Body *);
+
 #endif

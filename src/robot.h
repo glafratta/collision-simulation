@@ -74,13 +74,6 @@ public:
 
 };
 
-std::vector <b2Vec2> GetLocalPoints( std::vector <b2Vec2> pts, const b2Body * body){
-	std::vector <b2Vec2> result;
-	for (b2Vec2 p:pts){
-		result.push_back(body->GetLocalPoint(p));
-	}
-	return result;
-}
 
 
 #endif
