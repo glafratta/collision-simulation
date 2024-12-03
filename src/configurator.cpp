@@ -788,7 +788,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
 	b2Transform shift=b2Transform_zero;
-	if (SignedVectorLength(g[ep.first.m_target].start)<0){
+	if (SignedVectorLength(g[ep.first.m_target].start.p)<0){
 		shift=g[movingVertex].start-g[ep.first.m_target].start;
 	}
 	do {
