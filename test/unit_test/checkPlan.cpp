@@ -52,6 +52,7 @@ int main(int argc, char** argv){
     shift.p.x= cos(shift.q.GetAngle())*distanceTraversed;
     shift.p.y= sin(shift.q.GetAngle())*distanceTraversed;
     conf.applyAffineTrans(shift, conf.transitionSystem);    
+    conf.applyAffineTrans(shift, conf.controlGoal.disturbance);
     if (argc>4){
         di.iteration=atoi(argv[4]);
         conf.addIteration(steps-conf.getIteration());

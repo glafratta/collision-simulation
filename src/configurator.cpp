@@ -788,7 +788,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
 	do {
-		//b2Transform shift=g[movingVertex].endPose-g[ep.first.m_target].endPose;
+		b2Transform shift=g[movingVertex].start-g[ep.first.m_target].start;
 		//printf("start= \t");
 		//debug::print_pose(start);
 		//Disturbance d_adjusted=getDisturbance(g, ep.first.m_source,world, g[ep.first].direction);
@@ -803,7 +803,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		else{
 			d_adjusted=g[t_start_v].Di;
 		}
-		//applyAffineTrans(shift, d_adjusted);
+		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance, 0.15, WorldBuilder::CLUSTERING::PARTITION);
