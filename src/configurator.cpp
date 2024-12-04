@@ -775,7 +775,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	if (custom_start==TransitionSystem::null_vertex()){
 		custom_start=movingVertex;
 		it=-1;
-//		end_it=p.size();
+//		end_it=p.size(); 
 	}
 	std::pair<edgeDescriptor, bool> ep(edgeDescriptor(), false);
 	if (currentTask.motorStep==0){
@@ -788,8 +788,8 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
 	b2Transform shift=b2Transform_zero;
-	if (SignedVectorLength(g[ep.first.m_target].start.p)<0){
-		shift=g[movingVertex].start-g[ep.first.m_target].start;
+	if (SignedVectorLength(g[ep.first.m_target].start.p)<0  && SignedVectorLength(g[p[p.size()-1]].endPose.p)<0){
+		shift=g[ep.first.m_target].start-g[movingVertex].start;
 	}
 	do {
 //printf("start= \t");
@@ -911,7 +911,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				if (plan.empty()){
 					break;
 				}
-				if ((*ei).m_target == plan[i]){
+				if ((*ei).m_target == plan[i] && g[(*ei).m_target].Di==g[v_tgt].Di){
 					e= (*ei);
 					v_tgt=e.m_source;
 					break;
