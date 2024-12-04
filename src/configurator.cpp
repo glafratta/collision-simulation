@@ -895,6 +895,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	// 	e_start=currentEdge;
 	// }
 	vertexDescriptor v_tgt= e.m_target;
+	Disturbance D=g[v_tgt].Di;
 //adjust here
 	do{
 		i++;
@@ -918,7 +919,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				}
 			}
 		result=g[e.m_source].endPose; 
-		}while (g[e].direction==t->direction && i<planVertices.size()&& g[e].direction==DEFAULT);
+		}while (g[e].direction==t->direction && i<planVertices.size()&& g[e].direction==DEFAULT && (g[e.m_target].Di==D));
 //	printf("ended skip, result = %f, %f, %f\n", result.p.x, result.p.y, result.q.GetAngle());
 	if (g[e_start.m_target].Dn.getAffIndex()!=NONE){
 		step=b2Vec2(g[e_start.m_source].endPose.p-g[e_start.m_target].Dn.pose().p).Length();
