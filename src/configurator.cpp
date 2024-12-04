@@ -911,7 +911,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 				if (plan.empty()){
 					break;
 				}
-				if ((*ei).m_target == plan[i] && g[(*ei).m_target].Di==g[v_tgt].Di){
+				if ((*ei).m_target == plan[i]){
 					e= (*ei);
 					v_tgt=e.m_source;
 					break;
