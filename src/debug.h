@@ -67,6 +67,8 @@ void print_pose(const b2Transform& p);
 
 void print_matrix(cv::Mat);
 
+std::vector<b2Vec2> GetBodies( b2World&);
+
 }
 
 

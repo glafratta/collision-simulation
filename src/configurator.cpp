@@ -824,11 +824,6 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		else{
 			compare_tmp.start=g[t_start_v].start;	
 		}
-		//printf("to edge %i ->%i, stepDistance %f, direction = %i\n", ep.first.m_source, ep.first.m_target, stepDistance, g[ep.first].direction);
-		// Robot robot(&world);
-		// robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
-		// //make sensor
-		// simResult sr=t.willCollide(world, iteration,robot.body, debugOn, SIM_DURATION, stepDistance);
 		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
 		if (sr.resultCode==simResult::crashed){
 			return false;
@@ -837,16 +832,6 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 									// simulation result step, so this needs to be adjusted
 		//COMMENITNG THIS BIT OUT BECAUSE NOW WE DON'T CARE ABOUT FIXED DISTANCE
 		b2Transform expected_deltaPose=(endPose-g[t_start_v].start);
-		// if (((sk.first.start.p-sk.first.endPose.p).Length()> expected_deltaPose.p.Length()) && sk.first.outcome== simResult::crashed){
-		// 	if (sk.first.Dn.affordanceIndex!=g[ep.first.m_source].Dn.affordanceIndex){ //this is used in the case the task goes further than expected and encounters new D
-		// 		b2Transform shift_2=g[t_start_v].start-sk.first.start; //get shift 
-		// 		Disturbance d_adjusted_2=Disturbance(g[ep.first.m_source].Dn); 
-		// 		applyAffineTrans(shift_2, d_adjusted_2); //transfer adjusted expected D to current state
-		// 		sk.first.Dn=d_adjusted_2;
-		// 	}
-		// 	sk.first.endPose=sk.first.start+expected_deltaPose;
-		// 	sk.first.outcome=simResult::safeForNow;
-		// }
 		start = sk.first.endPose;
 		StateDifference sd;
 		bool match_outcome=true;
@@ -1397,7 +1382,6 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
 	if (ctrl_finished){
-
 		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
 		if (plan_works){
 			return;

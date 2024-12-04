@@ -60,3 +60,11 @@ void debug::print_pose(const b2Transform& p){
 void debug::print_matrix(cv::Mat m){
 	std::cout << "M = " << std::endl << " "  << m << std::endl << std::endl;
 }
+
+std::vector<b2Vec2> debug::GetBodies( b2World& w){
+	std::vector<b2Vec2> result;
+	for (b2Body * b=w.GetBodyList(); b; b=b->GetNext()){
+		result.push_back(b->GetPosition());
+	}
+
+}
