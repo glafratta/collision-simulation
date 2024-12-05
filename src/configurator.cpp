@@ -755,7 +755,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 }
 
 
-bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start, vertexDescriptor custom_start){
+bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start, vertexDescriptor custom_start, Disturbance * dist_match){
 	b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
@@ -798,8 +798,11 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		Disturbance d_adjusted;
 		bool reset_end_criteria=0;
-		if (g[t_start_v].Dn.affordanceIndex==AVOID){
-			d_adjusted=g[t_start_v].Dn;
+		sk.first=State(start, *dist_match);
+		if (matcher.isMatch(g[t_start_v],sk.first)==StateMatcher::DISTURBANCE){
+		//if (g[t_start_v].Dn.affordanceIndex==AVOID){
+			//d_adjusted=g[t_start_v].Dn;
+			d_adjusted=*dist_match;
 			d_adjusted.affordanceIndex=PURSUE;
 			reset_end_criteria=1;
 		}
@@ -810,7 +813,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance, 0.15, WorldBuilder::CLUSTERING::PARTITION);
-		sk=std::pair <State, Edge> (State(start, d_adjusted), Edge(t.direction));
+		sk.second=Edge(t.direction);
 		//printf("from %i", ep.first.m_target);
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
 		if (reset_end_criteria){
@@ -1363,7 +1366,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 	return result;
 }
 
-void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, b2World &world,  std::vector <vertexDescriptor>& plan_provisional, bool & plan_works){
+void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, b2World &world,  std::vector <vertexDescriptor>& plan_provisional, bool & plan_works, Disturbance *dist){
    // printf("recalling\n");
 	auto srcs= gt::inEdges(g, v);
     vertexDescriptor src=v;
