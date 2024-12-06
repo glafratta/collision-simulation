@@ -452,8 +452,15 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						g[edge.first]=sk.second;//t.direction;
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
-						planVertices=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal);
+						bool finished=false;
+						auto plan_prov=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
+						if (finished){
+							planVertices=plan_prov;
+							g[v0].options.clear();
+						}
+
 					}
+
 				}
 				else{
 					edge= add_vertex_now(v0, v1,g,sk.first.Di, sk.second); //addVertex
@@ -1566,9 +1573,9 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 	if (currentTask.motorStep!=0 || !planVertices.empty()){
 		return;
 	}
-	closest_match=true;
 	if (v==movingVertex){
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+		closest_match=true;
 	}
 
 }
