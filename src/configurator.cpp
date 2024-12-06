@@ -438,12 +438,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				else{
 					source=g[v0].ID;
 				}
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction);			
-				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+				bool closest_match=false;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
-				if (v==movingVertex){
-					desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
-				}
+				match_setup(closest_match, desired_match, v);
+				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match );			
+				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
@@ -452,6 +451,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;//t.direction;
 					//}
+					if (planVertices.empty()&&currentTask.motorStep==0){
+						planVertices=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal);
+					}
 				}
 				else{
 					edge= add_vertex_now(v0, v1,g,sk.first.Di, sk.second); //addVertex
@@ -1558,6 +1560,17 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 		}
 	}
 	return result;
+}
+
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v){
+	if (currentTask.motorStep!=0 || !planVertices.empty()){
+		return;
+	}
+	closest_match=true;
+	if (v==movingVertex){
+		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+	}
+
 }
 
 
