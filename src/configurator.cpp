@@ -440,7 +440,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction);			
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
-				if (match.first==StateMatcher::MATCH_TYPE::_TRUE){
+				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
+				if (v==movingVertex){
+					desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+				}
+				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
