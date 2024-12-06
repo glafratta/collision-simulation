@@ -60,7 +60,7 @@ int main(int argc, char** argv){
         conf.data2fp = ci.data2fp;
     }
     conf.debugOn=1;
-    bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[conf.movingVertex].start);
+    bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     if (plan_works){
         printf("plan works");
         return 0;

@@ -60,8 +60,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		//printf("is target=%i, task ended = %i\n", target.getAffIndex()==PURSUE, fin);
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, b2Transform(b2Vec2(0,0), b2Rot(0)), currentTask.direction, BOX2DRANGE);
 			//Disturbance where=controlGoal.disturbance;
+			State s_temp;
 			if (!b_features.empty()){
-				State s_temp;
 				s_temp.Dn= Disturbance(b_features[0]); //assumes 1 item length
 				bool closest_match=1;
 				findMatch(s_temp,transitionSystem, transitionSystem[movingEdge.m_source].ID, UNDEFINED, StateMatcher::DISTURBANCE, &options_src);
@@ -77,7 +77,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 		for (auto o:options_src){
 			plan_provisional=planner(transitionSystem, o); //been.second, been.first
 			vertexDescriptor end =*(plan_provisional.rbegin().base()-1);
-			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem)){
+			if (controlGoal.checkEnded(transitionSystem[end]).ended && checkPlan(world, plan_provisional, transitionSystem, s_temp.Dn)){
 				plan_works=true;
 				break;
 			}

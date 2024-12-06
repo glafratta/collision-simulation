@@ -24,8 +24,8 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			//bool using_kmeans=1;
 			std::vector <BodyFeatures> b_features=worldBuilder.getFeatures(data2fp, transitionSystem[movingVertex].endPose, 
 												currentTask.direction, BOX2DRANGE, 0.15, WorldBuilder::CLUSTERING::PARTITION);
+			State s_temp;
 			if (b_features.size()>0){
-				State s_temp;
 				WorldBuilder::CompareCluster compareCluster;
 				BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
 				s_temp.Dn= Disturbance(closest_D); //assumes 1 item length
@@ -53,7 +53,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 			//been= been_there(transitionSystem, where); 
 		}
 		else{
-			plan_works=true;//temporary to simplify things
+			plan_works=checkPlan(world,planVertices,transitionSystem, s_temp.Dn, transitionSystem[movingVertex].start, currentVertex);
 		}
 		for (auto o:options_src){
 			printf("recall from %i\n", o);

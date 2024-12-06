@@ -755,7 +755,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 }
 
 
-bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, b2Transform start, vertexDescriptor custom_start, Disturbance * dist_match){
+bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, TransitionSystem &g, Disturbance & dist_match, b2Transform start, vertexDescriptor custom_start){
 	b2Vec2 v = controlGoal.disturbance.getPosition() - b2Vec2(0,0);
 	//printf("check goal start: %f, %f, %f, distance = %f, valid =%i\n", controlGoal.start.p.x,controlGoal.start.p.y, controlGoal.start.q.GetAngle(), v.Length(), controlGoal.disturbance.isValid());
 	//printf("CHECK goal position= %f, %f, %f, valid =%i\n", controlGoal.disturbance.pose().p.x, controlGoal.disturbance.pose().p.y, controlGoal.disturbance.pose().q.GetAngle(), controlGoal.disturbance.isValid());
@@ -787,7 +787,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 	}
 	printf("start from v=%i\n", ep.first.m_target);
 	std::pair <State, Edge> sk;
-	b2Transform shift=b2Transform_zero;
+	b2Transform shift=b2Transform_zero, compare_start=b2Transform_zero;
 	if (SignedVectorLength(g[ep.first.m_target].start.p)<0  && SignedVectorLength(g[p[p.size()-1]].endPose.p)<0){
 		shift=g[ep.first.m_target].start-g[movingVertex].start;
 	}
@@ -798,21 +798,34 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		vertexDescriptor t_start_v=ep.first.m_target; //vertex denoting start of task
 		Disturbance d_adjusted;
 		bool reset_end_criteria=0;
-		sk.first=State(start, *dist_match);
-		if (matcher.isMatch(g[t_start_v],sk.first)==StateMatcher::DISTURBANCE){
+		sk.first=State(start);
+		sk.first.Dn=dist_match;
+		State compare_tmp=g[t_start_v];
+		if (int(t_start_v)==int(currentVertex) && g[t_start_v].start.p.x<0){
+			compare_start=b2Transform_zero-shift;
+		}
+		else{
+			compare_start=g[t_start_v].start;	
+		}
+		compare_tmp.start=compare_start;
+		StateDifference sd_check;
+		auto state_match=matcher.isMatch(compare_tmp,sk.first, NULL, &sd_check);
+		if (state_match==StateMatcher::DISTURBANCE){
 		//if (g[t_start_v].Dn.affordanceIndex==AVOID){
 			//d_adjusted=g[t_start_v].Dn;
-			d_adjusted=*dist_match;
+			d_adjusted=dist_match;
+			d_adjusted.validate();
 			d_adjusted.affordanceIndex=PURSUE;
 			reset_end_criteria=1;
 		}
 		else{
 			d_adjusted=g[t_start_v].Di;
+			applyAffineTrans(shift, d_adjusted);
 		}
-		applyAffineTrans(shift, d_adjusted);
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
 		worldBuilder.buildWorld(world, data2fp, start, t.direction, t.disturbance, 0.15, WorldBuilder::CLUSTERING::PARTITION);
+		sk.first.Di=d_adjusted;
 		sk.second=Edge(t.direction);
 		//printf("from %i", ep.first.m_target);
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
@@ -820,13 +833,14 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			float distance = g[ep.first.m_source].end_from_disturbance().p.Length();
 			t.setEndCriteria(Distance(distance));
 		}
-		State compare_tmp=g[ep.first.m_source];
+		compare_tmp=g[ep.first.m_source];
 		if (int(t_start_v)==int(currentVertex) && g[t_start_v].start.p.x<0){
-			compare_tmp.start=b2Transform_zero;
+			compare_start=b2Transform_zero;
 		}
 		else{
-			compare_tmp.start=g[t_start_v].start;	
+			compare_start=g[t_start_v].start;	
 		}
+		compare_tmp.start=compare_start;
 		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
 		if (sr.resultCode==simResult::crashed){
 			return false;
@@ -1385,7 +1399,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	auto vi= (plan_provisional.end()-1);
 	vertexDescriptor end =*(vi);
 	if (ctrl_finished){
-		plan_works= checkPlan(world, plan_provisional, g,  g[movingVertex].start,src);
+		plan_works= checkPlan(world, plan_provisional, g, *dist,  g[movingVertex].start,src);
 		if (plan_works){
 			return;
 		}

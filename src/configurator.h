@@ -172,7 +172,7 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
-void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, std::vector <vertexDescriptor>&, bool&, Disturbance *dist=NULL);
+void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, std::vector <vertexDescriptor>&, bool&, Disturbance *dist);
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
@@ -247,7 +247,7 @@ std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vert
 //std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
 
-bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex(), Disturbance * dist_match);
+bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, Disturbance &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex());
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
