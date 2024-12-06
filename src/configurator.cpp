@@ -83,14 +83,14 @@ bool Configurator::Spawner(){
 	auto startTime =std::chrono::high_resolution_clock::now();
 	bool explored=0;
 	if (planning){ //|| !planError.m_vertices.empty())
-		auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
-		transitionSystem[movingVertex].Dn=transitionSystem[currentVertex].Dn;
-		transitionSystem[movingVertex].Dn.invalidate();
-		if (debugOn){
-			printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
-		}
-		//have I seen this envronment configuration before?
-		vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
+		// auto checkedge = boost::edge(movingVertex, currentVertex, transitionSystem);
+		// transitionSystem[movingVertex].Dn=transitionSystem[currentVertex].Dn;
+		// transitionSystem[movingVertex].Dn.invalidate();
+		// if (debugOn){
+		// 	printf("moving edge= %i -> %i\n", movingEdge.m_source, movingEdge.m_target);
+		// }
+		// //have I seen this envronment configuration before?
+		 vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
 		if (!planVertices.empty()){
 			//ve= *(planVertices.rbegin().base()-1);
 			src=movingVertex;
@@ -99,14 +99,14 @@ bool Configurator::Spawner(){
 			//ve=currentVertex;
 			src=currentVertex;
 		}
-	bool plan_works=true;
-	if (transitionSystem.m_vertices.size()<2){
-		plan_works=false;
-	}
-	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-	std::vector <vertexDescriptor> plan_provisional=planVertices;
-	done_that(src, plan_works, world, plan_provisional);
-	printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
+	// bool plan_works=true;
+	// if (transitionSystem.m_vertices.size()<2){
+	bool 	plan_works=false;
+	// }
+	 std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
+	// std::vector <vertexDescriptor> plan_provisional=planVertices;
+	// done_that(src, plan_works, world, plan_provisional);
+	// printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
 		planVertices.clear();
@@ -144,13 +144,13 @@ bool Configurator::Spawner(){
 	//	printf("after remoing out edges from 0->current=%i exists=%i\n", currentVertex, currentEdge !=edgeDescriptor());
 		//boost::print_graph(transitionSystem);
 	}
-	else if (planVertices.empty()&&currentTask.motorStep==0){
-		//reset to new src
-		planVertices=plan_provisional;
-		b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[src].start;
-		//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
-		applyAffineTrans(deltaPose, transitionSystem);
-	}
+	// else if (planVertices.empty()&&currentTask.motorStep==0){
+	// 	//reset to new src
+	// 	planVertices=plan_provisional;
+	// 	b2Transform deltaPose = transitionSystem[movingVertex].start - transitionSystem[src].start;
+	// 	//updateGraph(transitionSystem, ExecutionError(),& deltaPose);
+	// 	applyAffineTrans(deltaPose, transitionSystem);
+	// }
 	//if plan fails or not there, 
 	
 
@@ -1149,8 +1149,14 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		}
 		return;
 	}
-	transitionMatrix(g[v0], d, src);
-	unexplored_transitions(g, v0);
+	if (auto it =check_vector_for(planVertices, v0); it!=planVertices.end() && it!=(planVertices.end()-1)){
+		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
+		g[v0].options={g[e.first].direction};
+	}
+	else{
+		transitionMatrix(g[v0], d, src);
+		unexplored_transitions(g, v0);
+	}
 }
 
 
