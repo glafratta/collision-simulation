@@ -60,13 +60,23 @@ int main(int argc, char** argv){
         conf.data2fp = ci.data2fp;
     }
     conf.debugOn=1;
-    bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
-    if (plan_works){
+  //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
+    conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
+     Connected connected(&conf.transitionSystem);
+    FilteredTS fts(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
+    TransitionSystem tmp;
+    boost::copy_graph(fts, tmp);
+    conf.transitionSystem.clear();
+    conf.transitionSystem.swap(tmp);	
+    bool finished=false;	
+    std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
+    conf.planVertices=plan;
+    if (finished){
         printf("plan works");
         return 0;
     }
     else{
         return 1;
     }
-    return !plan_works;
+    return !finished;
 }
