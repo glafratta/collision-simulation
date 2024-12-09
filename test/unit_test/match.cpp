@@ -2,7 +2,7 @@
 
 void assign_disturbance(State & s, const b2Transform& t=b2Transform(b2Vec2(0.02,0.02), b2Rot(0)), float hw=0.0, float hl=0.0){
     BodyFeatures bf;
-    bf.pose= s.start+t;
+    bf.pose= s.endPose+t;
     bf.halfLength+=hl;
     bf.halfWidth+=hw;
     s.Dn=Disturbance(bf);
@@ -37,20 +37,21 @@ void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s,
         {
         case 0:
             candidate.start=s.start;
+            candidate.start=s.endPose;
             candidate.Dn=Disturbance(s.Dn); //exact match
             break;
         case 1: //ratio +shape match
-            rand_transform(candidate.start);
+            rand_transform(candidate.endPose);
             assign_disturbance(candidate);
             candidate.Dn.bf.halfLength=s.Dn.bf.halfLength;
             candidate.Dn.bf.halfWidth=s.Dn.bf.halfWidth;
             break;
         case 2: //ratio match only //FAIL
-            rand_transform(candidate.start);
+            rand_transform(candidate.endPose);
             assign_disturbance(candidate, b2Transform(b2Vec2((0.02), (0.02)), ((b2Rot)(0))), 0.1, 0.1);
             break;
         case 3: //shape match only
-            rand_transform(candidate.start);
+            rand_transform(candidate.endPose);
             assign_disturbance(candidate, rand_transform());
             break;
         default:

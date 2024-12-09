@@ -41,6 +41,7 @@ int main(int argc, char** argv){
     
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
     conf.planVertices=plan;
+    int n_v=conf.transitionSystem.m_vertices.size();
     conf.printPlan(&plan);
     int og=0;
     conf.changeTask(true, og, conf.planVertices);
@@ -75,7 +76,11 @@ int main(int argc, char** argv){
     bool finished=false;	
     plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
     conf.planVertices=plan;
-    conf.printPlan(&plan);
+    conf.printPlan(&plan);    
+    int n_v_2=conf.transitionSystem.m_vertices.size();
+    if (n_v_2>n_v){
+        return 1;
+    }
     if (finished){
         printf("plan works");
         return 0;
