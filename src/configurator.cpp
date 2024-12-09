@@ -545,7 +545,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		if (nNodes<=1){
 			s_tmp.endPose=endPose;
 			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(s_tmp, g, NULL, d);
-			if (match.first!=StateMatcher::_TRUE){
+			if (match.first!=StateMatcher::_TRUE || match.second==v){
 				g[v1].endPose = endPose;
 				g[first_edge.first].step= gt::distanceToSimStep(g[v1].distance(), a.getLinearSpeed());	
 				g[v1].outcome=simResult::crashed;	
