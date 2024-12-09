@@ -221,8 +221,9 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
-		if (visited.first){
-			if (oe.empty()){
+		if (oe.empty()){
+
+			if (visited.first){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
 					//b2World world_tmp(b2Vec2_zero);
@@ -241,10 +242,10 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
 			}
-			else {
-				std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
-				return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
-			}
+			// else {
+			// 	std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
+			// 	return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
+			// }
 		}
 	}
 	return g[v].Dn;
@@ -442,6 +443,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
 				match_setup(closest_match, desired_match, v);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
+				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
@@ -1574,13 +1576,14 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 }
 
 void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v){
-	// if (currentTask.motorStep!=0 || !planVertices.empty()){
-	// 	return;
-	// }
-	//if (v==movingVertex){
+	if (currentTask.motorStep!=0 || !planVertices.empty()){
+		return;
+	}
+	if (v==movingVertex){
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
 		closest_match=true;
-	//}
+	}
+
 
 }
 

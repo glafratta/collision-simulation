@@ -41,6 +41,7 @@ int main(int argc, char** argv){
     
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
     conf.planVertices=plan;
+    conf.printPlan(&plan);
     int og=0;
     conf.changeTask(true, og, conf.planVertices);
     std::vector <vertexDescriptor> options_src;
@@ -61,6 +62,7 @@ int main(int argc, char** argv){
     }
     conf.debugOn=1;
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
+    
     conf.addIteration(di.iteration);
     conf.resetPhi(conf.transitionSystem);
     conf.explorer(conf.movingVertex, conf.transitionSystem, *conf.getTask(), world);
@@ -71,8 +73,9 @@ int main(int argc, char** argv){
     conf.transitionSystem.clear();
     conf.transitionSystem.swap(tmp);	
     bool finished=false;	
-    plan=conf.planner(conf.transitionSystem, conf.movingVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
+    plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
     conf.planVertices=plan;
+    conf.printPlan(&plan);
     if (finished){
         printf("plan works");
         return 0;
