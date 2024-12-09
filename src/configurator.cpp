@@ -519,13 +519,15 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 	Task::Action a;
 	a.init(d);
 	while(nNodes>1){
+		State s_tmp=State(g[v]);
 		if(nNodes >1){
-
-			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(g[v], g, NULL, d);
+			b2Vec2 step_v(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
+			s_tmp.endPose=g[v].start+b2Transform(step_v, b2Rot(0));
+			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(s_tmp, g, NULL, d);
 			if (match.first!=StateMatcher::_TRUE){
-				b2Vec2 step_v(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
 				g[v].options = {d};
-				g[v].endPose = g[v].start+b2Transform(step_v, b2Rot(0));
+				g[v].endPose=s_tmp.endPose;
+				g[v].Dn=s_tmp.Dn;
 				g[first_edge.first].step= gt::distanceToSimStep(g[v].distance(), a.getLinearSpeed());
 				first_edge=add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
 				g[v1].Di=g[v].Di;
@@ -541,7 +543,8 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 			nNodes--;
 		}
 		if (nNodes<=1){
-			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(g[v1], g, NULL, d);
+			s_tmp.endPose=endPose;
+			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(s_tmp, g, NULL, d);
 			if (match.first!=StateMatcher::_TRUE){
 				g[v1].endPose = endPose;
 				g[first_edge.first].step= gt::distanceToSimStep(g[v1].distance(), a.getLinearSpeed());	
