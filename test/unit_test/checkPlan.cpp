@@ -61,7 +61,9 @@ int main(int argc, char** argv){
     }
     conf.debugOn=1;
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
-    conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
+    conf.addIteration(di.iteration);
+    conf.resetPhi(conf.transitionSystem);
+    conf.explorer(conf.movingVertex, conf.transitionSystem, *conf.getTask(), world);
     connected=Connected(&conf.transitionSystem);
     FilteredTS fts2(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
     tmp.clear();
@@ -69,7 +71,7 @@ int main(int argc, char** argv){
     conf.transitionSystem.clear();
     conf.transitionSystem.swap(tmp);	
     bool finished=false;	
-    plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
+    plan=conf.planner(conf.transitionSystem, conf.movingVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
     conf.planVertices=plan;
     if (finished){
         printf("plan works");

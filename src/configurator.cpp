@@ -386,7 +386,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 // 		direction = g[boost::in_edges(bestNext, g).first.dereference().m_target].direction;
 // 	}while(g[bestNext].options.size()>0);
 // 	return toRemove;
-// }
+//  
 
 std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	// if (controlGoal.disturbance.isValid()){
@@ -441,7 +441,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				bool closest_match=false;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
 				match_setup(closest_match, desired_match, v);
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL);		//, closest_match	
+				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
@@ -1167,6 +1167,9 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		g[v0].options={g[e.first].direction};
 	}
+	else if (v0==movingVertex){
+		transitionMatrix(g[v0], d, src);	
+	}
 	else{
 		transitionMatrix(g[v0], d, src);
 		unexplored_transitions(g, v0);
@@ -1571,13 +1574,13 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 }
 
 void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v){
-	if (currentTask.motorStep!=0 || !planVertices.empty()){
-		return;
-	}
-	if (v==movingVertex){
+	// if (currentTask.motorStep!=0 || !planVertices.empty()){
+	// 	return;
+	// }
+	//if (v==movingVertex){
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
 		closest_match=true;
-	}
+	//}
 
 }
 
