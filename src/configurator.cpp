@@ -523,6 +523,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 			g[v].options = {d};
 			g[v].endPose = g[v].start+b2Transform(step_v, b2Rot(0));
 			g[first_edge.first].step= gt::distanceToSimStep(g[v].distance(), a.getLinearSpeed());
+			
 			first_edge=add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
 			g[v1].Di=g[v].Di;
 			g[v1].start=g[v].endPose;
