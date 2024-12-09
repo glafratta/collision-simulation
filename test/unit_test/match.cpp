@@ -26,7 +26,7 @@ b2Transform rand_transform(){
 }
 
 void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s, int d_code=0){
-    
+    b2Transform transform= rand_transform();
     switch (mt)
     {
     case StateMatcher::_TRUE:
@@ -37,8 +37,9 @@ void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s,
         {
         case 0:
             candidate.start=s.start;
-            candidate.start=s.endPose;
+            candidate.endPose=s.endPose+transform;
             candidate.Dn=Disturbance(s.Dn); //exact match
+            candidate.Dn.bf.pose=candidate.Dn.bf.pose+transform;
             break;
         case 1: //ratio +shape match
             rand_transform(candidate.endPose);
@@ -81,11 +82,15 @@ int main(int argc, char** argv){
     s1.Dn.bf.halfLength=0.02;
     StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_FALSE;
     int d_code=0;
+    printf("MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6}\n");
+    printf("D code = 0: exact, 1:  ratio+ shape, 2: ratio only, 3: shape\n");
     if (argc>2){
+        printf("chosen D code= %i\n", atoi(argv[2]));
         d_code=atoi(argv[2]);
     }
     if (argc>1){
         desired_match=StateMatcher::MATCH_TYPE(atoi(argv[1]));
+        printf("chosen desired match= %i\n", atoi(argv[1]));
         create_match(candidate, desired_match, s1, d_code);
     }
     printf("start: c ");

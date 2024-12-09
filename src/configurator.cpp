@@ -428,6 +428,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
+				sk.second.it_observed=iteration;
 				er  = estimateCost(sk.first, g[v0].endPose, sk.second.direction);
 				State * source=NULL;
 				StateMatcher::MATCH_TYPE vm= matcher.isMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
@@ -451,7 +452,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					//if ((v0!=v1)){
 						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
-						g[edge.first]=sk.second;//t.direction;
+						g[edge.first]=sk.second;
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
@@ -519,25 +520,35 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 	a.init(d);
 	while(nNodes>1){
 		if(nNodes >1){
-			b2Vec2 step_v(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
-			g[v].options = {d};
-			g[v].endPose = g[v].start+b2Transform(step_v, b2Rot(0));
-			g[first_edge.first].step= gt::distanceToSimStep(g[v].distance(), a.getLinearSpeed());
-			
-			first_edge=add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
-			g[v1].Di=g[v].Di;
-			g[v1].start=g[v].endPose;
-			g[v].phi=NAIVE_PHI;
-			g[first_edge.first].direction=d;
-			g[v].outcome=simResult::safeForNow;
+
+			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(g[v], g, NULL, d);
+			if (match.first!=StateMatcher::_TRUE){
+				b2Vec2 step_v(simulationStep*endPose.q.c, simulationStep*endPose.q.s);
+				g[v].options = {d};
+				g[v].endPose = g[v].start+b2Transform(step_v, b2Rot(0));
+				g[first_edge.first].step= gt::distanceToSimStep(g[v].distance(), a.getLinearSpeed());
+				first_edge=add_vertex_retro(v, v1,g, g[v].Dn); //passing on the disturbance
+				g[v1].Di=g[v].Di;
+				g[v1].start=g[v].endPose;
+				g[v].phi=NAIVE_PHI;
+				g[first_edge.first].direction=d;
+				g[v].outcome=simResult::safeForNow;
+			}
+			else{
+				v1=match.second;
+			}
 			split.push_back(v1);
 			nNodes--;
 		}
 		if (nNodes<=1){
-			g[v1].endPose = endPose;
-			g[first_edge.first].step= gt::distanceToSimStep(g[v1].distance(), a.getLinearSpeed());	
-			g[v1].outcome=simResult::crashed;
-			g[v1].phi=og_phi;
+			std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(g[v1], g, NULL, d);
+			if (match.first!=StateMatcher::_TRUE){
+				g[v1].endPose = endPose;
+				g[first_edge.first].step= gt::distanceToSimStep(g[v1].distance(), a.getLinearSpeed());	
+				g[v1].outcome=simResult::crashed;	
+				g[v1].phi=og_phi;
+			}
+
 		}
 
 		v=v1;
@@ -711,7 +722,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			if (!add.empty()&!edge.second & path!=paths.rend()){ //if this path does not have an edge and there are 
 													//other possible paths, go to previous paths
 				if (pend.base()-1!=(path->begin())){ //if the current vertex is not the root of the path
-					pend++;
+					pend++; //go back a step
 				}
 				else{
 					path++; //go back a previously explored path
@@ -722,13 +733,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				bool found=0;
 				for (auto _p=paths.rbegin(); _p!=paths.rend(); _p++ ){
 					if (std::vector <vertexDescriptor>(path->begin(), pend.base())==*_p){
-						path=_p;
+						path=_p; //
 						found=1;
 					}
 				}
 				if (!found){
-				paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
-				path=paths.rbegin();				
+					paths.emplace_back(std::vector <vertexDescriptor>(path->begin(), pend.base()));
+					path=paths.rbegin();				
 				}
 				break;
 			}
