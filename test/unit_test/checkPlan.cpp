@@ -62,14 +62,14 @@ int main(int argc, char** argv){
     conf.debugOn=1;
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-     Connected connected(&conf.transitionSystem);
-    FilteredTS fts(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
-    TransitionSystem tmp;
-    boost::copy_graph(fts, tmp);
+    connected=Connected(&conf.transitionSystem);
+    FilteredTS fts2(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
+    tmp.clear();
+    boost::copy_graph(fts2, tmp);
     conf.transitionSystem.clear();
     conf.transitionSystem.swap(tmp);	
     bool finished=false;	
-    std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
+    plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
     conf.planVertices=plan;
     if (finished){
         printf("plan works");

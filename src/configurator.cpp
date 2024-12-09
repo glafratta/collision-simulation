@@ -441,7 +441,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				bool closest_match=false;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
 				match_setup(closest_match, desired_match, v);
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match );			
+				bool closest_match=false;
+				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);			
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
@@ -455,8 +456,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						bool finished=false;
 						auto plan_prov=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
 						if (finished){
-							planVertices=plan_prov;
+							//planVertices=plan_prov;
 							g[v0].options.clear();
+							return toRemove;
 						}
 
 					}
@@ -762,7 +764,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			final_phi=g[end_plan].phi;
 		}
 	}
-	printf("PLANNED!\n");
+	//printf("PLANNED!\n");
 	return plan;
 
 }
