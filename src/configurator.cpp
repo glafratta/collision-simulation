@@ -456,9 +456,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
-						edge.first= gt::add_edge(v0, v1, g, iteration, t.direction).first; //assumes edge added
-						edge.second=true; //just means that the edge is valid
-						g[edge.first]=sk.second;
+						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
+						//edge.second=true; //just means that the edge is valid
+						if (edge.second){
+							g[edge.first]=sk.second;
+						}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
