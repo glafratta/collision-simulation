@@ -46,11 +46,13 @@ std::pair <edgeDescriptor, bool> Configurator::add_vertex_retro(vertexDescriptor
 	return result;
 }
 
-// std::pair <edgeDescriptor, bool> Configurator::add_edge(const vertexDescriptor & src, const vertexDescriptor & v1, TransitionSystem & g){
-// 	std::pair <edgeDescriptor, bool> result(edgeDescriptor(), false);
-// 	auto oe=gt::
-	
-// }	
+bool Configurator::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, TransitionSystem& g, Direction d){
+	bool result=false;
+	if (ep.second){
+		result=g[ep.first].direction==d;
+	}
+	return result;
+}
 
 
 
@@ -456,11 +458,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
-						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
-						//edge.second=true; //just means that the edge is valid
-						if (edge.second){
+						edge= boost::add_edge(v0, v1, g); //assumes edge added
+						edge.second=true; //just means that the edge is valid
+						//if (edge.second){
 							g[edge.first]=sk.second;
-						}
+						//}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
@@ -599,42 +601,42 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
 	//while (ep.second){
-		if(g[ep.first].direction!=DEFAULT ){
-			if (g[ep.first].direction==STOP){
+		if(!check_edge_direction(ep, g, DEFAULT)){ //g[ep.first].direction!=DEFAULT 
+			if (check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
 				g[ep.first.m_target].Dn = dist;
 			}
 	// 		break;
 	 	}
-	// 	if (ep.first.m_target!=v1){
-	// 		g[ep.first.m_target].Dn = dist;
-	// 		EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
-	// 		g[ep.first.m_target].phi =evaluationFunction(er);	
-	// 		std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
-	// 		if ( match.first){
-	// 			std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-	// 			deletion.push_back(pair);			//first is eliminated, the second is its match
-	// 			p=(pair.second);
+		if (ep.first.m_target!=v1){
+			g[ep.first.m_target].Dn = dist;
+			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
+			g[ep.first.m_target].phi =evaluationFunction(er);	
+			std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
+			if ( match.first){
+				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
+				deletion.push_back(pair);			//first is eliminated, the second is its match
+				p=(pair.second);
 	
-	// 		}
-	// 		else{
-	// 			p=(ep.first.m_target);
-	// 		}
-	// 		// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
-	// 		// 	if (*vi==p){
-	// 		// 		closed->erase(vi);
-	// 		// 	}
-	// 		// }
-	// 		if (auto found=closed->find(p); found!=closed->end()){
-	// 			closed->erase(found);
-	// 		}
-	// 		propagated->push_back(p);
-	// 	}
-	// 	ep.second= boost::in_degree(ep.first.m_source, g)>0;
-	// 	if (!ep.second){
-	// 		return deletion;
-	// 	}
-	// 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
-	// //}	
+			}
+			else{
+				p=(ep.first.m_target);
+			}
+			// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
+			// 	if (*vi==p){
+			// 		closed->erase(vi);
+			// 	}
+			// }
+			if (auto found=closed->find(p); found!=closed->end()){
+				closed->erase(found);
+			}
+			propagated->push_back(p);
+		}
+		ep.second= boost::in_degree(ep.first.m_source, g)>0;
+		if (!ep.second){
+			return deletion;
+		}
+		ep.first= *(boost::in_edges(ep.first.m_source, g).first);
+	//}	
 	return deletion;
 }
 
