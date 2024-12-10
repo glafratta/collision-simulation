@@ -294,12 +294,19 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	}
 }
 
-std::pair <edgeDescriptor, bool> gt::add_edge(vertexDescriptor u, vertexDescriptor v, TransitionSystem& g, int it){
-	std::pair <edgeDescriptor, bool> result(edgeDescriptor(), false);
+std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const  vertexDescriptor & v, TransitionSystem& g, const int &it, Direction d){
+	std::pair <edgeDescriptor, bool> result=boost::edge(u, v, g);
 	if (u==v){
+		result.second=false;
 		return result;
 	}
-	result =boost::add_edge(u, v, g);
+	auto oe=outEdges(g, u, d);
+	for (auto e:oe){
+		if (g[v].Dn == g[e.m_target].Dn){
+			return result;
+		}
+	}
+	result=boost::add_edge(u, v, g);
 	g[result.first].it_observed=it;
 	return result;
 }

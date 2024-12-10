@@ -296,7 +296,7 @@ namespace gt{
 
 	void adjustProbability(TransitionSystem&, edgeDescriptor);
 
-	std::pair <edgeDescriptor, bool> add_edge(vertexDescriptor, vertexDescriptor, TransitionSystem&, int); //wrapper around boost function, disallows edges to self
+	std::pair <edgeDescriptor, bool> add_edge(const vertexDescriptor&, const vertexDescriptor &, TransitionSystem&, const int &, Direction d=UNDEFINED); //wrapper around boost function, disallows edges to self
 
 }
 

@@ -46,6 +46,12 @@ std::pair <edgeDescriptor, bool> Configurator::add_vertex_retro(vertexDescriptor
 	return result;
 }
 
+// std::pair <edgeDescriptor, bool> Configurator::add_edge(const vertexDescriptor & src, const vertexDescriptor & v1, TransitionSystem & g){
+// 	std::pair <edgeDescriptor, bool> result(edgeDescriptor(), false);
+// 	auto oe=gt::
+	
+// }	
+
 
 
 bool Configurator::Spawner(){ 
@@ -450,7 +456,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
-						edge.first= boost::add_edge(v0, v1, g).first; //assumes edge added
+						edge.first= gt::add_edge(v0, v1, g).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;
 					//}
