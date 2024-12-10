@@ -328,12 +328,12 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 	do {
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, d);
 		ep2= gt::visitedEdge(ie, g,v);
-		if (!ep.first){
+		if (!ep2.first){
 			ep2=getMostLikely(g, ie, it);
 		}
 		if (ep2.first){
-			if (ep.second.m_target==result[0]){
-				ep=ep2;
+			if (ep2.second.m_target==result[0]){
+				ep=ep2; //assign ep to define direction
 				d= g[ep.second].direction;
 			}
 			else{
@@ -342,6 +342,7 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){
+			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
 			break;
 		}
 	}while(ep2.first);

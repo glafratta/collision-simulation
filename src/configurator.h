@@ -148,7 +148,7 @@ Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &
 
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
+void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&, vertexDescriptor );
 
 std::vector <vertexDescriptor> splitTask(vertexDescriptor v, TransitionSystem&, Direction, vertexDescriptor src=TransitionSystem::null_vertex());
 
