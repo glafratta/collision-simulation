@@ -321,23 +321,30 @@ bool gt::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, Transi
 }
 
 
-std::vector <vertexDescriptor> gt::task_vertices(const vertexDescriptor & v, TransitionSystem& g, Direction d, const int & it, const vertexDescriptor & current_v){
+std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, TransitionSystem& g, const int & it, const vertexDescriptor & current_v, std::pair<bool, edgeDescriptor>& ep){
 	std::vector <vertexDescriptor> result= {v};
-	std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
+	Direction d=UNDEFINED;
+	std::pair<bool, edgeDescriptor>ep2;
 	do {
-		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, DEFAULT);
-		ep= gt::visitedEdge(ie, g,v);
+		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, d);
+		ep2= gt::visitedEdge(ie, g,v);
 		if (!ep.first){
-			ep=getMostLikely(g, ie, it);
+			ep2=getMostLikely(g, ie, it);
 		}
-		if (ep.first){
-			result.push_back(ep.second.m_source);
+		if (ep2.first){
+			if (ep.second.m_target==result[0]){
+				ep=ep2;
+				d= g[ep.second].direction;
+			}
+			else{
+				result.push_back(ep2.second.m_target);
+			}
 		}
-		if (ep.second.m_target==current_v){
+		v=ep2.second.m_source;
+		if (ep2.second.m_target==current_v){
 			break;
 		}
-
-	}while(ep.first);
+	}while(ep2.first);
 	std::reverse(result.begin(), result.end());
 	return result;
 }

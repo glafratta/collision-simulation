@@ -572,15 +572,16 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		// 	ep=gt::getMostLikely(g, ie, iteration);
 		// }
 		// b2Transform start=g[ep.second.m_source].endPose;
-		// vertexDescriptor src=ep.second.m_source;
-		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, DEFAULT, iteration, currentVertex); 
-		if (split.size()==2){
-			split =splitTask(v, g, DEFAULT, split[split.size()-1]);
+		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
+		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
+		vertexDescriptor src=ep.second.m_source;
+		if (split.size()<=2){
+			split =splitTask(v, g, DEFAULT, src);
 		}
 		for (vertexDescriptor split_v:split){
 				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, g[ep.second].direction);
 				g[split_v].phi=evaluationFunction(local_er);
-				applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
+				applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,split[0]);
 				addToPriorityQueue(split_v, priority_q, g, closed);
 				src=split_v;
 		}

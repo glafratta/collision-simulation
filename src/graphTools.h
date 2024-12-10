@@ -300,7 +300,7 @@ namespace gt{
 
 	bool check_edge_direction(const std::pair<edgeDescriptor, bool> &, TransitionSystem&, Direction);
 
-	std::vector <vertexDescriptor> task_vertices(const vertexDescriptor &, TransitionSystem&, Direction, const int &, const vertexDescriptor &);
+	std::vector <vertexDescriptor> task_vertices(vertexDescriptor, TransitionSystem&, const int &, const vertexDescriptor &, std::pair<bool, edgeDescriptor>&);
 }
 
 
