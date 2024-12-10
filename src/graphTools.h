@@ -298,6 +298,9 @@ namespace gt{
 
 	std::pair <edgeDescriptor, bool> add_edge(const vertexDescriptor&, const vertexDescriptor &, TransitionSystem&, const int &, Direction d=UNDEFINED); //wrapper around boost function, disallows edges to self
 
+	bool check_edge_direction(const std::pair<edgeDescriptor, bool> &, TransitionSystem&, Direction);
+
+	std::vector <vertexDescriptor> task_vertices(const vertexDescriptor &, TransitionSystem&, Direction, const int &, const vertexDescriptor &);
 }
 
 

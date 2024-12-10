@@ -46,13 +46,6 @@ std::pair <edgeDescriptor, bool> Configurator::add_vertex_retro(vertexDescriptor
 	return result;
 }
 
-bool Configurator::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, TransitionSystem& g, Direction d){
-	bool result=false;
-	if (ep.second){
-		result=g[ep.first].direction==d;
-	}
-	return result;
-}
 
 
 
@@ -458,11 +451,11 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
-						edge= boost::add_edge(v0, v1, g); //assumes edge added
-						edge.second=true; //just means that the edge is valid
-						//if (edge.second){
+						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
+						//edge.second=true; //just means that the edge is valid
+						if (edge.second){
 							g[edge.first]=sk.second;
-						//}
+						}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
@@ -509,8 +502,9 @@ return toRemove;
 
 std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, vertexDescriptor src){
 	std::vector <vertexDescriptor> split={v};
+	auto first_edge=boost::edge(src, v, g); //assumes exists
 
-	if (d ==RIGHT || d==LEFT){
+	if (gt::check_edge_direction(first_edge, g, RIGHT)|| gt::check_edge_direction(first_edge, g, LEFT)){ //d
 		return split;
 	}
 	if (g[v].outcome != simResult::crashed){
@@ -522,7 +516,6 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 		g[src].outcome=simResult::safeForNow;
 	}
 	//}
-	auto first_edge=boost::edge(src, v, g);
 	vertexDescriptor v1=v;
 	float nNodes = g[v].distance()/simulationStep, og_phi=g[v].phi;
 	b2Transform endPose = g[v].endPose;
@@ -573,16 +566,19 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 
 void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g){
 	for (vertexDescriptor v:evaluation_q){
-		std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
-		std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
-		if (!ep.first){
-			ep=gt::getMostLikely(g, ie, iteration);
+		// std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
+		// std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
+		// if (!ep.first){
+		// 	ep=gt::getMostLikely(g, ie, iteration);
+		// }
+		// b2Transform start=g[ep.second.m_source].endPose;
+		// vertexDescriptor src=ep.second.m_source;
+		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, DEFAULT, iteration, currentVertex); 
+		if (split.size()==2){
+			split =splitTask(v, g, DEFAULT, split[split.size()-1]);
 		}
-		b2Transform start=g[ep.second.m_source].endPose;
-		vertexDescriptor src=ep.second.m_source;
-		std::vector <vertexDescriptor> split = splitTask(v, g, g[ep.second].direction, src);
 		for (vertexDescriptor split_v:split){
-				EndedResult local_er=estimateCost(g[split_v],start, g[ep.second].direction);
+				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, g[ep.second].direction);
 				g[split_v].phi=evaluationFunction(local_er);
 				applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,src);
 				addToPriorityQueue(split_v, priority_q, g, closed);
@@ -601,42 +597,42 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
 	//while (ep.second){
-		if(!check_edge_direction(ep, g, DEFAULT)){ //g[ep.first].direction!=DEFAULT 
-			if (check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
+		if(!gt::check_edge_direction(ep, g, DEFAULT)){ //g[ep.first].direction!=DEFAULT 
+			if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
 				g[ep.first.m_target].Dn = dist;
 			}
 	// 		break;
 	 	}
-		if (ep.first.m_target!=v1){
-			g[ep.first.m_target].Dn = dist;
-			EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
-			g[ep.first.m_target].phi =evaluationFunction(er);	
-			std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
-			if ( match.first){
-				std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-				deletion.push_back(pair);			//first is eliminated, the second is its match
-				p=(pair.second);
+	// 	if (ep.first.m_target!=v1){
+	// 		g[ep.first.m_target].Dn = dist;
+	// 		EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
+	// 		g[ep.first.m_target].phi =evaluationFunction(er);	
+	// 		std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
+	// 		if ( match.first){
+	// 			std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
+	// 			deletion.push_back(pair);			//first is eliminated, the second is its match
+	// 			p=(pair.second);
 	
-			}
-			else{
-				p=(ep.first.m_target);
-			}
-			// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
-			// 	if (*vi==p){
-			// 		closed->erase(vi);
-			// 	}
-			// }
-			if (auto found=closed->find(p); found!=closed->end()){
-				closed->erase(found);
-			}
-			propagated->push_back(p);
-		}
-		ep.second= boost::in_degree(ep.first.m_source, g)>0;
-		if (!ep.second){
-			return deletion;
-		}
-		ep.first= *(boost::in_edges(ep.first.m_source, g).first);
-	//}	
+	// 		}
+	// 		else{
+	// 			p=(ep.first.m_target);
+	// 		}
+	// 		// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
+	// 		// 	if (*vi==p){
+	// 		// 		closed->erase(vi);
+	// 		// 	}
+	// 		// }
+	// 		if (auto found=closed->find(p); found!=closed->end()){
+	// 			closed->erase(found);
+	// 		}
+	// 		propagated->push_back(p);
+	// 	}
+	// 	ep.second= boost::in_degree(ep.first.m_source, g)>0;
+	// 	if (!ep.second){
+	// 		return deletion;
+	// 	}
+	// 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
+	// //}	
 	return deletion;
 }
 

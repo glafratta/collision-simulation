@@ -312,6 +312,36 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 	return result;
 }
 
+bool gt::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, TransitionSystem& g, Direction d){
+	bool result=false;
+	if (ep.second){
+		result=g[ep.first].direction==d;
+	}
+	return result;
+}
+
+
+std::vector <vertexDescriptor> gt::task_vertices(const vertexDescriptor & v, TransitionSystem& g, Direction d, const int & it, const vertexDescriptor & current_v){
+	std::vector <vertexDescriptor> result= {v};
+	std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
+	do {
+		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, DEFAULT);
+		ep= gt::visitedEdge(ie, g,v);
+		if (!ep.first){
+			ep=getMostLikely(g, ie, it);
+		}
+		if (ep.first){
+			result.push_back(ep.second.m_source);
+		}
+		if (ep.second.m_target==current_v){
+			break;
+		}
+
+	}while(ep.first);
+	std::reverse(result.begin(), result.end());
+	return result;
+}
+
 bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired){
 	bool result=false;
 	switch (desired){ //the desired match

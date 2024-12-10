@@ -228,7 +228,6 @@ std::pair <edgeDescriptor, bool> add_vertex_now(vertexDescriptor &, vertexDescri
 
 std::pair <edgeDescriptor, bool> add_vertex_retro(vertexDescriptor &, vertexDescriptor &, TransitionSystem &, Disturbance,Edge edge=Edge(), bool topDown=0);
 
-bool check_edge_direction(const std::pair<edgeDescriptor, bool> &, TransitionSystem&);
 
 void setStateLabel(State& s, vertexDescriptor src, Direction d){
 	if(d!=currentTask.direction & src==movingVertex){
