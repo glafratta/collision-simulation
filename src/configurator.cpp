@@ -456,7 +456,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
-						edge.first= gt::add_edge(v0, v1, g).first; //assumes edge added
+						edge.first= gt::add_edge(v0, v1, g, iteration, t.direction).first; //assumes edge added
 						edge.second=true; //just means that the edge is valid
 						g[edge.first]=sk.second;
 					//}

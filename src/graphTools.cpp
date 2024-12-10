@@ -297,8 +297,9 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const  vertexDescriptor & v, TransitionSystem& g, const int &it, Direction d){
 	std::pair <edgeDescriptor, bool> result=boost::edge(u, v, g);
 	if (u==v){
-		result.second=false;
-		return result;
+		if (d==UNDEFINED){
+			return result;
+		}
 	}
 	auto oe=outEdges(g, u, d);
 	for (auto e:oe){
