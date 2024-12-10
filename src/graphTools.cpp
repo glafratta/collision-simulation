@@ -339,13 +339,14 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			else if (g[ep2.second].direction==d){
 				result.push_back(ep2.second.m_target);
 			}
+			
 		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){
 			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
 			break;
 		}
-	}while(ep2.first);
+	}while(g[ep2.second].direction==d);
 	if (!ep2.first){
 
 	}
