@@ -489,7 +489,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		evaluationQueue.push_back(v1);
 		}
 	}
-	backtrack(evaluationQueue, priorityQueue, closed, g, v0_exp);
+	backtrack(evaluationQueue, priorityQueue, closed, g);
 	bestNext=priorityQueue[0];
 		if (controlGoal.getAffIndex()==PURSUE){
 			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
@@ -564,7 +564,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 }
 
 
-void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g, vertexDescriptor src){
+void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g){
 	for (vertexDescriptor v:evaluation_q){
 		// std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
 		// std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
@@ -574,7 +574,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		// b2Transform start=g[ep.second.m_source].endPose;
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
-		//vertexDescriptor src=ep.second.m_source;
+		vertexDescriptor src=ep.second.m_source;
 		if (split.size()<=2){
 			split =splitTask(v, g, DEFAULT, src);
 		}

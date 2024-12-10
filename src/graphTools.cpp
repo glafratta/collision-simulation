@@ -326,7 +326,7 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 	Direction d=UNDEFINED;
 	std::pair<bool, edgeDescriptor>ep2;
 	do {
-		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, d);
+		std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
 		ep2= gt::visitedEdge(ie, g,v);
 		if (!ep2.first){
 			ep2=getMostLikely(g, ie, it);
@@ -336,7 +336,7 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 				ep=ep2; //assign ep to define direction
 				d= g[ep.second].direction;
 			}
-			else{
+			else if (g[ep2.second].direction==d){
 				result.push_back(ep2.second.m_target);
 			}
 		}
@@ -346,6 +346,10 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			break;
 		}
 	}while(ep2.first);
+	if (!ep2.first){
+
+	}
+	//ep=boost::edge(ep2.second)
 	std::reverse(result.begin(), result.end());
 	return result;
 }
