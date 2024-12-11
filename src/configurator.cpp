@@ -1704,7 +1704,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		currentVertex= pv[0];
 		pv.erase(pv.begin());
 		currentEdge=ep.first;
-
+		transitionSystem[movingVertex].Di=transitionSystem[currentVertex].Di;
 		boost::clear_vertex(movingVertex, transitionSystem);
 	//	printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;

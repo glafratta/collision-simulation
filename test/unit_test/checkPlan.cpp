@@ -65,6 +65,7 @@ int main(int argc, char** argv){
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     
     conf.addIteration(di.iteration);
+    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
     conf.explorer(conf.movingVertex, conf.transitionSystem, *conf.getTask(), world);
     connected=Connected(&conf.transitionSystem);
