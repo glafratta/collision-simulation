@@ -134,8 +134,8 @@ add_test(NAME explorer_target COMMAND explorer ../251023_TAGET/ 1)
 
 add_test(NAME planner_no COMMAND planner)
 add_test(NAME planner_cds COMMAND planner ../cul_de_sac/ 0)
-add_test(NAME planner_target_17 COMMAND planner ../170924_1321_badrun/ 1)
-add_test(NAME planner_target COMMAND planner ../251023_TAGET 1)
+add_test(NAME planner_target_40cm COMMAND planner ../170924_1321_badrun/ 1)
+add_test(NAME planner_target_68cm COMMAND planner ../251023_TAGET 1)
 
 
 add_test(NAME match_false COMMAND match)

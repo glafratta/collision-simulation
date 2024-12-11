@@ -598,13 +598,16 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	Disturbance dist = g[v1].Dn;
 	//while (ep.second){
 	bool is_default=gt::check_edge_direction(ep, g, DEFAULT);
-	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
-		if (gt::check_edge_direction(ep, g, STOP) || (is_default && v0 ==1)){//g[ep.first].direction==STOP
-			g[ep.first.m_target].Dn = dist;
-		}
+	if (is_default && g[ep.first.m_source].Di==g[ep.first.m_target].Di){
+
+	
+// 	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
+// 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
+ 			g[ep.first.m_source].Dn = dist; //was target
+// 		}
 		
-// 		break;
-	}
+// // 		break;
+ 	}
 	// 	if (ep.first.m_target!=v1){
 	// 		g[ep.first.m_target].Dn = dist;
 	// 		EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
