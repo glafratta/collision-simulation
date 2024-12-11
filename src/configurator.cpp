@@ -1426,6 +1426,9 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 				else if (ei3!=ei){
 					ei3++;
 				}
+				else if (ei3==ei){ //not sure if this is right
+					ei3++;
+				}
 				if(ei3==es3.second){
 					if (ei3!=ei2 & ei2!=ei){
 						ei2++;
