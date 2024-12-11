@@ -1200,12 +1200,12 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	if (auto it =check_vector_for(planVertices, v0); it!=planVertices.end() && it!=(planVertices.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		//if (!g[e.first.m_target].visited()){ //target visited 
+		if (!g[e.first.m_target].visited()){ //target visited 
 			g[v0].options={g[e.first].direction};
-		//	return;
-		//}
+			return;
+		}
 	}
-	else if (v0==movingVertex){
+	if (v0==movingVertex){
 		transitionMatrix(g[v0], d, src);	
 	}
 	else{
@@ -1427,7 +1427,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 					ei3++;
 				}
 				else { //not sure if this is right just added
-					ei3++;
+					break;
 				}
 				if(ei3==es3.second){
 					if (ei3!=ei2 & ei2!=ei){
