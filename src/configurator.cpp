@@ -597,6 +597,9 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
 	//while (ep.second){
+	if (!ep.second){
+		return deletion;
+	}
 	Direction dir= g[ep.first].direction;
 	bool same_Di=g[ep.first.m_source].Di==g[ep.first.m_target].Di;
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
@@ -606,6 +609,8 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 // 	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
 // 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
  			g[ep.first.m_target].Dn = dist; //was target
+			//propagated->push_back(ep.first) //do i push back vertex i've propagated?
+			//do I reopen closed vertices 
 // 		}
 		
 // // 		break;
@@ -1195,7 +1200,10 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	if (auto it =check_vector_for(planVertices, v0); it!=planVertices.end() && it!=(planVertices.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		g[v0].options={g[e.first].direction};
+		//if (!g[e.first.m_target].visited()){ //target visited 
+			g[v0].options={g[e.first].direction};
+		//	return;
+		//}
 	}
 	else if (v0==movingVertex){
 		transitionMatrix(g[v0], d, src);	

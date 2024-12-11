@@ -77,7 +77,7 @@ struct State{
 	State(const b2Transform &_start, const Disturbance& di): start(_start), Di(di){}
 
 	bool visited(){
-		return phi<=NAIVE_PHI;
+		return phi<NAIVE_PHI;
 	}
 
 	void resetVisited(){
