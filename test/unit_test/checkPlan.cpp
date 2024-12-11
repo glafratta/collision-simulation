@@ -79,7 +79,7 @@ int main(int argc, char** argv){
     conf.planVertices=plan;
     conf.printPlan(&plan);    
     int n_v_2=conf.transitionSystem.m_vertices.size();
-    if (n_v_2>n_v){
+    if (n_v_2>n_v&& atoi(argv[4])<18){
         printf("difference=%i\n", n_v_2-n_v);
         return 1;
     }

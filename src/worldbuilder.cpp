@@ -219,9 +219,13 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering, Task * task){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
+    std::vector <cv::Point2f> points_to_track, *pointer_to_track;
+    if (NULL!=task){
+        pointer_to_track=&points_to_track;
+    }
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
     // if (occluded(current, disturbance)){
     //     salient.first.emplace(getPointf(disturbance.getPosition()));

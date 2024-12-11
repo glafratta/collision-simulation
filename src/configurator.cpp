@@ -252,6 +252,24 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 }
 
 
+Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescriptor& e){
+	Task t=controlGoal;
+	if (Disturbance Dn= g[e.m_target].Dn; Dn.getAffIndex()==AVOID){
+		Disturbance Di= Dn;
+		Di.affordanceIndex=PURSUE;
+		t=Task(Di, g[e].direction, b2Transform_zero, true);
+		float distance = g[e.m_target].end_from_disturbance().p.Length();
+		t.setEndCriteria(Distance(distance));
+	}
+	else{
+		t=Task(g[e.m_target].Di, g[e].direction, b2Transform_zero, true);
+
+	}
+	return t;
+
+}
+
+
 simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
 		//EVALUATE NODE()
 	simResult result;
@@ -453,7 +471,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
 						//edge.second=true; //just means that the edge is valid
 						if (edge.second){
-							g[edge.first]=sk.second;
+							g[edge.first]=sk.second; //doesn't update motorstep
 						}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
@@ -574,13 +592,17 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
 		vertexDescriptor src=ep.second.m_source;
+		Direction direction= g[ep.second].direction;
 		if (split.size()<=2){
 			split =splitTask(v, g, DEFAULT, src);
 		}
+		else{
+			boost::remove_edge(ep.second, g);
+		}
 		for (vertexDescriptor split_v:split){
-				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, g[ep.second].direction);
+				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 				g[split_v].phi=evaluationFunction(local_er);
-				applyTransitionMatrix(g, split_v, g[ep.second].direction, local_er.ended,split[0]);
+				applyTransitionMatrix(g, split_v, direction, local_er.ended,split[0]);
 				addToPriorityQueue(split_v, priority_q, g, closed);
 				src=split_v;
 		}
@@ -1728,7 +1750,8 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
-		currentTask = Task(transitionSystem[currentEdge.m_source].Dn, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
+		//currentTask = Task(transitionSystem[currentEdge.m_source].Dn, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
+		currentTask = task_to_execute(transitionSystem, currentEdge);
 		currentTask.motorStep = transitionSystem[currentEdge].step;
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
@@ -1765,6 +1788,11 @@ void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float er
 	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
+
+void Configurator::track_disturbance_cl(b2Transform & pose, Task::Action a, float error){
+
+}
+
 
 void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     for (vertexDescriptor p:planVertices){

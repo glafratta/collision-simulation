@@ -146,6 +146,8 @@ float taskRotationError(); // returns lateral displacement error (local y)
 //inputs: g, src vertex, b2d world, direction of the task to be created
 Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &, const Direction &);
 
+Task task_to_execute(const TransitionSystem &, const edgeDescriptor&);
+
 simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
 
 void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
@@ -158,7 +160,9 @@ void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tran
 
 void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
 
-void trackDisturbance(b2Transform &, Task::Action, float);
+void trackDisturbance(b2Transform &, Task::Action, float); //open loop
+
+void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
 void updateGraph(TransitionSystem&, ExecutionError error=ExecutionError());
 
