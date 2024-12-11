@@ -597,10 +597,9 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
 	//while (ep.second){
-	bool is_default=gt::check_edge_direction(ep, g, DEFAULT);
-	if (is_default && g[ep.first.m_source].Di==g[ep.first.m_target].Di){
-
-	
+	Direction dir= g[ep.first].direction;
+	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
+	if (g[ep.first].direction==dir && g[ep.first.m_source].Di==g[ep.first.m_target].Di){
 // 	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
 // 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
  			g[ep.first.m_source].Dn = dist; //was target
