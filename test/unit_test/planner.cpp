@@ -60,7 +60,7 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
     std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
     conf.printPlan(&plan);
-    if (plan_d!=solution & plan_d !=solution2 &plan_d!=solution3){
+    if (plan_d!=solution && plan_d !=solution2 && plan_d!=solution3 && plan_d!=solution4){
         return 1;
     }
     return 0;

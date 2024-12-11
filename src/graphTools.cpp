@@ -335,10 +335,18 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			if (ep2.second.m_target==result[0]){
 				ep=ep2; //assign ep to define direction
 				d= g[ep.second].direction;
+				if (ie.size()>1){
+				for (edgeDescriptor e: ie){
+					if (g[e].direction==d && e!=ep2.second && g[e.m_source].Di == g[ep.second.m_source].Di){
+						ep2.second=e;
+					}
+				}
+			}
 			}
 			else if (g[ep2.second].direction==d){
 				result.push_back(ep2.second.m_target);
 			}
+
 			
 		}
 		v=ep2.second.m_source;
