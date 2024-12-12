@@ -415,7 +415,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 // }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=currentTask.direction;
-	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov;
+	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
@@ -480,12 +480,10 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							g[v0].options.clear();
-							//return toRemove;
 						}
 						else{
 							plan_prov.clear();
 						}
-
 					}
 
 				}
