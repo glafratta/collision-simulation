@@ -593,10 +593,10 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
 		vertexDescriptor src=ep.second.m_source;
 		Direction direction= g[ep.second].direction;
-		if (split.size()<=2){
+		if (split.size()<2){
 			split =splitTask(v, g, DEFAULT, src);
 		}
-		else if (split.size())
+		//else if (split.size())
 		for (vertexDescriptor split_v:split){
 				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 				g[split_v].phi=evaluationFunction(local_er);
