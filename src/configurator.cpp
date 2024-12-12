@@ -626,8 +626,9 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	ep.second= boost::edge(ep.first.m_source, ep.first.m_target, g).second;
 	bool same_direction=gt::check_edge_direction(ep, g, dir) || (gt::check_edge_direction(ep, g, STOP)&& dir==DEFAULT) ;
-	if ( same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
-// 	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
+	if (gt::check_edge_direction(ep, g, STOP)){
+	//if ( same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
+//if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
 // 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
  			g[ep.first.m_target].Dn = dist; //was target
 			//propagated->push_back(ep.first) //do i push back vertex i've propagated?
@@ -820,10 +821,10 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		}
 	}
 	//printf("PLANNED!\n");
-	if (_finished && g[plan[plan.size()-1]].Dn.getAffIndex()==NONE){
-		g[plan[plan.size()-1]].Dn=controlGoal.disturbance;
-		g[plan[plan.size()-1]].Dn.invalidate();
-	}
+	// if (_finished && g[plan[plan.size()-1]].Dn.getAffIndex()==NONE){
+	// 	g[plan[plan.size()-1]].Dn=controlGoal.disturbance;
+	// 	g[plan[plan.size()-1]].Dn.invalidate();
+	// }
 	return plan;
 
 }
