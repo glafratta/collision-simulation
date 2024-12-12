@@ -496,7 +496,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
 				g[v1].phi=evaluationFunction(er);
-				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
+				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed, match.first)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
@@ -608,9 +608,9 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 	evaluation_q.clear();
 }
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed){
+std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed,StateMatcher::MATCH_TYPE match){
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
-	if (g[v1].outcome == simResult::successful ){
+	if (g[v1].outcome == simResult::successful){
 		return deletion;
 	}
 	vertexDescriptor p=TransitionSystem::null_vertex();
@@ -625,7 +625,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	ep.second= boost::edge(ep.first.m_source, ep.first.m_target, g).second;
 	bool same_direction=gt::check_edge_direction(ep, g, dir) || (gt::check_edge_direction(ep, g, STOP)&& dir==DEFAULT) ;
-	if ( same_direction&& same_Di){
+	if ( same_direction&& same_Di && match!=StateMatcher::DISTURBANCE){
 // 	if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
 // 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
  			g[ep.first.m_target].Dn = dist; //was target
