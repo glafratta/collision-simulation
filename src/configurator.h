@@ -188,7 +188,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescripto
 
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task at vertex v fails, start is set to v's predecessor's end
 
-void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &);
+void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, const std::vector<vertexDescriptor>&);
 //bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
 //void backtrackingBuildTree(vertexDescriptor v, TransitionSystem&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
@@ -276,7 +276,7 @@ void unexplored_transitions(TransitionSystem&, const vertexDescriptor&);
 
 void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIGHT
 
-void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor);
+void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor, const std::vector<vertexDescriptor>&);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, const std::set<vertexDescriptor>&);
 

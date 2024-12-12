@@ -415,7 +415,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 // }
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=currentTask.direction;
-	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue;
+	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov;
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
@@ -425,7 +425,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
-		applyTransitionMatrix(g, v, direction, er.ended, v);
+		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
 			std::vector <Direction> options=g[v0_exp].options;
@@ -460,7 +460,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				bool closest_match=false;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_TRUE;
-				match_setup(closest_match, desired_match, v);
+				match_setup(closest_match, desired_match, v, plan_prov);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
@@ -476,11 +476,14 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
-						auto plan_prov=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
+						auto plan_tmp=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
 						if (finished){
-							//planVertices=plan_prov;
+							plan_prov=plan_tmp;
 							g[v0].options.clear();
-							return toRemove;
+							//return toRemove;
+						}
+						else{
+							plan_prov.clear();
 						}
 
 					}
@@ -494,7 +497,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
 					gt::adjustProbability(g, edge.first);
 				}
-				applyTransitionMatrix(g, v1, t.direction, er.ended, v0);
+				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
 				v0_exp=v0;
@@ -600,7 +603,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		for (vertexDescriptor split_v:split){
 				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 				g[split_v].phi=evaluationFunction(local_er);
-				applyTransitionMatrix(g, split_v, direction, local_er.ended,split[0]);
+				applyTransitionMatrix(g, split_v, direction, local_er.ended,split[0], planVertices);
 				addToPriorityQueue(split_v, priority_q, g, closed);
 				src=split_v;
 		}
@@ -1206,20 +1209,16 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	}
 }
 
-void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src){
+void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src, const std::vector<vertexDescriptor>& plan_prov){
 	if (!g[v0].options.empty()){
 		return;
 	}
 	if (controlGoal.endCriteria.hasEnd()){
 		if (ended){
-			//printf("no options added because %i ended\n", v0);
 			return;
 		}
 	}
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
-		if (controlGoal.getAffIndex()==PURSUE){
-			//printf("no options added because %i out of bounds\n", v0);
-		}
 		return;
 	}
 	if (auto it =check_vector_for(planVertices, v0); it!=planVertices.end() && it!=(planVertices.end()-1)){
@@ -1638,11 +1637,11 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v){
-	if (currentTask.motorStep!=0 || !planVertices.empty()){ //
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov){
+	if (currentTask.motorStep!=0 || (!planVertices.empty()&& plan_prov.empty())){ //
 		return;
 	}
-	if (v==movingVertex || v==currentVertex){
+	if (v==movingVertex || v==currentVertex || !plan_prov.empty()){
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
 		closest_match=true;
 	}

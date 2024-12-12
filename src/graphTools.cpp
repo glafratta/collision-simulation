@@ -358,9 +358,6 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			break;
 		}
 	}while(g[ep2.second].direction==d);
-	if (!ep2.first){
-
-	}
 	//ep=boost::edge(ep2.second)
 	std::reverse(result.begin(), result.end());
 	return result;
