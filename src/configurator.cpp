@@ -593,7 +593,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
 		vertexDescriptor src=ep.second.m_source;
 		Direction direction= g[ep.second].direction;
-		if (split.size()<2){
+		if (split.size()<=2){
 			split =splitTask(v, g, DEFAULT, src);
 		}
 		else if (split.size())
