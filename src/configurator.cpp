@@ -1648,7 +1648,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 
 
 void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
-	if (g[v].outcome == ::crashed && boost::in_degree(v, g)>0){
+	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
 		start = g[e.m_source].endPose;
 	}
