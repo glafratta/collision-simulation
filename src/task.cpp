@@ -83,9 +83,6 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 				bool keep_going_out_x=(fabs(robot->GetTransform().p.x+instVelocity.x) >fabs(robot->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot->GetTransform().p.y+instVelocity.y) >fabs(robot->GetTransform().p.y))&&out_y;
 				if (ended){
-					if (disturbance.getAffIndex()==PURSUE){
-						result.collision=disturbance;
-					}
 					break;
 				}
 				if (keep_going_out_x || keep_going_out_y){
