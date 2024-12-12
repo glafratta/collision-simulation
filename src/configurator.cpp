@@ -626,7 +626,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	ep.second= boost::edge(ep.first.m_source, ep.first.m_target, g).second;
 	bool same_direction=gt::check_edge_direction(ep, g, dir) || (gt::check_edge_direction(ep, g, STOP)&& dir==DEFAULT) ;
-	if (gt::check_edge_direction(ep, g, STOP)){
+	if (gt::check_edge_direction(ep, g, STOP) &&same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE  && dir==DEFAULT){
 	//if ( same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
 //if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
 // 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
