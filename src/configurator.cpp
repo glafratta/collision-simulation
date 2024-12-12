@@ -476,7 +476,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
-						auto plan_tmp=planner(g, v1, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
+						auto plan_tmp=planner(g, v0, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
 						if (finished){
 							plan_prov=plan_tmp;
 							g[v0].options.clear();
