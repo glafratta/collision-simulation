@@ -349,6 +349,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 
 			
 		}
+		else{
+			break;
+		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){
 			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
