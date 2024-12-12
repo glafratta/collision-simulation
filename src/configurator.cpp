@@ -1635,7 +1635,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 }
 
 void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v){
-	if (!planVertices.empty()){ //currentTask.motorStep!=0 || 
+	if (currentTask.motorStep!=0 || !planVertices.empty()){ //
 		return;
 	}
 	if (v==movingVertex || v==currentVertex){
