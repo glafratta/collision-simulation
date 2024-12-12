@@ -437,9 +437,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				do {
 				changeStart(start, v0, g);
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0]);
-				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				//worldBuilder.world_cleanup(&w);
-				t = Task(sk.first.Di, g[v0].options[0], start, true);
+				t = Task(Di, g[v0].options[0], start, true);
+				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
@@ -1648,7 +1648,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 
 
 void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
-	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
+	if (g[v].outcome == ::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
 		start = g[e.m_source].endPose;
 	}
