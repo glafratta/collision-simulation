@@ -113,7 +113,7 @@ int main(int argc, char** argv){
     conf.transitionSystem[e.first].direction=direction;
     conf.transitionSystem[v1].outcome=outcome;
     int expected_options=expectedOptions(direction, outcome, target1);
-    conf.applyTransitionMatrix(conf.transitionSystem, v1, direction, false, conf.currentVertex);
+    conf.applyTransitionMatrix(conf.transitionSystem, v1, direction, false, conf.currentVertex,conf.planVertices );
     printf("expected options=%i\n", expected_options);
     print_directions(conf.transitionSystem[v1].options);
     if (int(conf.transitionSystem[v1].options.size())!=expected_options){
