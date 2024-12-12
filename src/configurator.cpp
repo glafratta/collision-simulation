@@ -821,6 +821,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	//printf("PLANNED!\n");
 	if (_finished && g[plan[plan.size()-1]].Dn.getAffIndex()==NONE){
 		g[plan[plan.size()-1]].Dn=controlGoal.disturbance;
+		g[plan[plan.size()-1]].Dn.invalidate();
 	}
 	return plan;
 
