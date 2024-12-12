@@ -481,9 +481,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 							plan_prov=plan_tmp;
 							g[v0].options.clear();
 						}
-						else{
-							plan_prov.clear();
-						}
 					}
 
 				}
@@ -1637,12 +1634,14 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 }
 
 void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov){
-	if ((currentTask.motorStep!=0 &&planVertices.empty())|| !plan_prov.empty()){ //(!planVertices.empty()&& plan_prov.empty())
+	if (currentTask.motorStep!=0 || (!planVertices.empty() || plan_prov.empty())){ //
 		return;
 	}
 	if ((v==movingVertex || v==currentVertex) ){ //|| !plan_prov.empty()
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
-		closest_match=true;
+		if (!plan_prov.empty()){
+			closest_match=true;
+		}
 	}
 
 
