@@ -625,7 +625,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	bool same_Di=g[ep.first.m_source].Di==g[ep.first.m_target].Di;
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	ep.second= boost::edge(ep.first.m_source, ep.first.m_target, g).second;
-	bool same_direction=(gt::check_edge_direction(ep, g, dir) || (gt::check_edge_direction(ep, g, STOP))&& dir==DEFAULT) ;
+	bool same_direction=gt::check_edge_direction(ep, g, dir) ||( (gt::check_edge_direction(ep, g, STOP))&& dir==DEFAULT) ;
 	//if (gt::check_edge_direction(ep, g, STOP) &&same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE  && dir==DEFAULT){
 	if ( same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
 //if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
@@ -1640,7 +1640,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 	if (currentTask.motorStep!=0 || (!planVertices.empty()&& plan_prov.empty())){ //
 		return;
 	}
-	if (v==movingVertex || v==currentVertex || !plan_prov.empty()){
+	if ((v==movingVertex || v==currentVertex)){
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
 		closest_match=true;
 	}
