@@ -28,7 +28,7 @@ int main(int argc, char** argv){
         di.newScanAvail();          
     }
     conf.data2fp = ci.data2fp;
-    conf.addIteration();
+  //  conf.addIteration();
 //    b2World world(b2Vec2(0,0));
     // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     // conf.dummy_vertex(conf.currentVertex);
