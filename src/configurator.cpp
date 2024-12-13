@@ -1634,7 +1634,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  const TransitionSystem & g){
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
 	//if (plan_prov.empty()){
 		return;
@@ -1643,7 +1643,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 	auto v_it=check_vector_for(plan_prov, v);
 	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
 		int out_deg = boost::out_degree(v, g);
-		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end()){
+		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){
 			desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
 		}
 		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
