@@ -477,6 +477,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					if (planVertices.empty()&&currentTask.motorStep==0){
 						bool finished=false;
 						auto plan_tmp=planner(g, v0, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
+						bool filler=0;
 						if (finished){
 							plan_prov=plan_tmp;
 							g[v0].options.clear();
@@ -1633,15 +1634,16 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov){
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
 	//if (plan_prov.empty()){
 		return;
 	//}
 	}
-	if ((v==movingVertex || v==currentVertex) ){ //|| !plan_prov.empty()
+	auto v_it=check_vector_for(plan_prov, v);
+	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
 		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
-		if (!plan_prov.empty()){
+		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
 			closest_match=true;
 		}
 	}
