@@ -59,6 +59,7 @@ int main(int argc, char** argv){
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
+    conf.planVertices.clear();
     conf.Spawner();
     conf.printPlan(&conf.planVertices);
     // std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
