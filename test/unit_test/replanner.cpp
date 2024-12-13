@@ -47,6 +47,8 @@ int main(int argc, char** argv){
     auto og_plan=conf.planVertices;
     conf.printPlan(&conf.planVertices);
     conf.addIteration();
+    int og_step=0;
+    conf.changeTask(1, og_step, conf.planVertices);
     conf.currentVertex=*(conf.planVertices.end()-1);
     vertexDescriptor prev=*(conf.planVertices.end()-2);
     conf.currentEdge=boost::edge(prev, conf.currentVertex, conf.transitionSystem).first;
@@ -59,6 +61,7 @@ int main(int argc, char** argv){
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
+    
     conf.planVertices.clear();
     conf.Spawner();
     conf.printPlan(&conf.planVertices);
