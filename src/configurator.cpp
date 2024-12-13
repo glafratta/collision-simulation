@@ -110,12 +110,12 @@ bool Configurator::Spawner(){
 	// printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
-		planVertices.clear();
+		//planVertices.clear();
 		boost::clear_vertex(movingVertex, transitionSystem);
 		if (transitionSystem.m_vertices.size()==1){
 			dummy_vertex(currentVertex);//currentEdge.m_source
+			currentTask.change=1;
 		}
-		currentTask.change=1;
 		// if (!planVertices.empty()){
 		// 	src=movingVertex;
 		// }
@@ -1634,7 +1634,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir){
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  const TransitionSystem & g){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
 	//if (plan_prov.empty()){
 		return;
@@ -1642,7 +1642,9 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 	}
 	auto v_it=check_vector_for(plan_prov, v);
 	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
-		desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+		if (g[v].options.capacity() <= boost::out_degree(v, g)){
+			desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+		}
 		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
 			closest_match=true;
 		}
