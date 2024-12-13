@@ -475,8 +475,12 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
-						bool finished=false;
-						auto plan_tmp=planner(g, v0, TransitionSystem::null_vertex(), false, &controlGoal, &finished);
+						bool finished=false, been=(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
+						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
+						vertexDescriptor task_start=gt::task_vertices(v0, g, iteration, currentVertex, e_tmp)[0];
+						Task controlGoal_adjusted= controlGoal;
+						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
+						auto plan_tmp=planner(g, v0, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
 						if (finished){
 							plan_prov=plan_tmp;
@@ -1406,7 +1410,6 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 			auto es3=es2;
 			std::vector <vertexDescriptor>connecting2;
 			do {
-				//=connecting;
 				if (g[(*ei3).m_target].visited() || been){
 					if (!g[(*ei3).m_target].visited()){
 						EndedResult er = estimateCost(g[(*ei3).m_target], g[(*ei3).m_source].endPose, g[*ei3].direction);
