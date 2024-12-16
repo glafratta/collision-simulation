@@ -527,7 +527,7 @@ void operator+=(Transform & t1, Transform const&t2){
 	t1.q.Set(t1.q.GetAngle()+t2.q.GetAngle());
 }
 
-Transform operator+(const Transform & t1, const Transform &t2){
+Transform operator+(Transform const & t1, Transform const&t2){
 	b2Transform result;
 	result.p.x=t1.p.x+t2.p.x;
 	result.p.y=t1.p.y+t2.p.y;
@@ -535,7 +535,7 @@ Transform operator+(const Transform & t1, const Transform &t2){
 	return result;
 }
 
-Transform operator-(const Transform & t1, const Transform &t2){
+Transform operator-(Transform const & t1, Transform const&t2){
 	b2Transform result;
 	result.p.x=t1.p.x-t2.p.x;
 	result.p.y=t1.p.y-t2.p.y;
