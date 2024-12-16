@@ -417,7 +417,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	Direction direction=currentTask.direction;
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
-	b2Transform start= b2Transform(b2Vec2(0,0), b2Rot(0));
+	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	printf("EXPLORING\n");
 	do{
@@ -435,7 +435,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				v1 =v0; //frontier
 				std::vector <vertexDescriptor> propagated;
 				do {
-				changeStart(start, v0, g);
+				changeStart(start, v0, g, shift);
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0]);
 				//worldBuilder.world_cleanup(&w);
 				t = Task(Di, g[v0].options[0], start, true);
@@ -482,6 +482,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
 						auto plan_tmp=planner(g, v0, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
+						shift= start-g[task_start].start;
 						if (finished){
 							plan_prov=plan_tmp;
 							e_tmp.second=boost::edge(v0, plan_tmp[0], g).first;
@@ -1233,7 +1234,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		if (g[e.first].it_observed<iteration){ //!g[e.first.m_target].visited()
+		if (g[e.first].it_observed<iteration){ // !g[e.first.m_target].visited()
 			g[v0].options={g[e.first].direction};
 			return;
 		}
@@ -1667,13 +1668,13 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 }
 
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g){
+void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
-		start = g[e.m_source].endPose;
+		start = g[e.m_source].endPose + shift;
 	}
 	else{
-		start=g[v].endPose;
+		start=g[v].endPose +shift;
 	}
 }
 

@@ -147,9 +147,9 @@ bool operator!=(Transform const &, Transform const &);
 bool operator==(Transform const &, Transform const &);
 void operator-=(Transform &, Transform const&);
 void operator+=(Transform &, Transform const&);
-Transform operator+( Transform const &, Transform const &);
-Transform operator-( Transform const &, Transform const &);
-Transform operator-(Transform const &);
+Transform operator+( Transform  &,const Transform  &);
+Transform operator-( Transform &, const Transform&);
+//Transform operator-(Transform const &);
 
 
 typedef std::pair<bool, float> orientation;

@@ -186,7 +186,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescripto
 
 //std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
-void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&); //if task at vertex v fails, start is set to v's predecessor's end
+void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end
 
 void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, const std::vector<vertexDescriptor>&, const Direction&, TransitionSystem &);
 //bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
