@@ -1232,20 +1232,20 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
+	if (v0==movingVertex){
+		transitionMatrix(g[v0], d, src);	
+		return;
+	}
+	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
-			return;
 		}
-	}
-	if (v0==movingVertex){
-		transitionMatrix(g[v0], d, src);	
 	}
 	else{
 		transitionMatrix(g[v0], d, src);
-		unexplored_transitions(g, v0);
 	}
+	unexplored_transitions(g, v0);
 }
 
 
