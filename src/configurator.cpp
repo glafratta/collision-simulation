@@ -1410,7 +1410,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 			auto es3=es2;
 			std::vector <vertexDescriptor>connecting2;
 			do {
-				if (g[(*ei3).m_target].visited() || been){
+				if ((g[(*ei3).m_target].visited() || been)&& (*ei3).m_source!=(*ei3).m_target){
 					if (!g[(*ei3).m_target].visited()){
 						EndedResult er = estimateCost(g[(*ei3).m_target], g[(*ei3).m_source].endPose, g[*ei3].direction);
 						g[(*ei3).m_target].phi=evaluationFunction(er);
