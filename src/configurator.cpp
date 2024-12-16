@@ -1233,10 +1233,10 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		//if (!g[e.first.m_target].visited()){ //target visited 
+		if (g[e.first].it_observed<iteration){ //!g[e.first.m_target].visited()
 			g[v0].options={g[e.first].direction};
 			return;
-		//}
+		}
 	}
 	if (v0==movingVertex){
 		transitionMatrix(g[v0], d, src);	
