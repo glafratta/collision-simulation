@@ -484,7 +484,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						bool filler=0;
 						if (finished){
 							plan_prov=plan_tmp;
-							g[v0].options.clear();
+							e_tmp.second=boost::edge(v0, plan_tmp[0], g).first;
+							if (t.direction== g[e_tmp.second].direction){
+								g[v0].options.clear();
+							}
+							else{
+								g[v0].options={g[e_tmp.second].direction};
+							}
 						}
 					}
 
