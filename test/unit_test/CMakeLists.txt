@@ -150,8 +150,8 @@ set_property(TEST match_disturbance_shape PROPERTY WILL_FAIL true)
 
 add_test(NAME find_match_state COMMAND find_match_state ../251023_TAGET/ 2 1)
 add_test(NAME find_match_state_f COMMAND find_match_state ../251023_TAGET/ 3 1)
-add_test(NAME find_match_11 COMMAND find_match_state ../251023_TAGET/ 7 1 29)
-add_test(NAME find_match_midtask11 COMMAND find_match_state ../251023_TAGET/ 7 1 14)
+add_test(NAME find_match_3 COMMAND find_match_state ../251023_TAGET/ 3 1 29)
+add_test(NAME find_match_midtask11 COMMAND find_match_state ../251023_TAGET/ 3 1 14)
 add_test(NAME find_match_midtask2 COMMAND find_match_state ../251023_TAGET/ 2 1 14)
 add_test(NAME find_match_quarter COMMAND find_match_state ../251023_TAGET/ 2 1 7)
 

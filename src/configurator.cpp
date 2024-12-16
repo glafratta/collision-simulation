@@ -726,7 +726,7 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal, bool *finished, std::vector<std::vector<vertexDescriptor>> _paths){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal, bool *finished){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});

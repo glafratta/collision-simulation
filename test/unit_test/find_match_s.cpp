@@ -45,6 +45,7 @@ int main(int argc, char** argv){
         state_tmp.Dn= Disturbance(b_features[0]); //assumes 1 item length
     }
     bool relax_match=1;
+    conf.addIteration();
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
     if (options_src.empty()){
