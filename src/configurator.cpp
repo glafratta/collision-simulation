@@ -475,7 +475,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						}
 					//}
 					if (planVertices.empty()&&currentTask.motorStep==0){
-						bool finished=false, been=(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
+						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::DISTURBANCE); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						vertexDescriptor task_start=gt::task_vertices(v0, g, iteration, currentVertex, e_tmp)[0];
 						Task controlGoal_adjusted= controlGoal;
@@ -726,7 +726,7 @@ void Configurator::clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDe
 	//}
 }
 
-std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal, bool *finished){
+std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, vertexDescriptor src, vertexDescriptor goal, bool been, const Task* custom_ctrl_goal, bool *finished, std::vector<std::vector<vertexDescriptor>> _paths){
 	std::vector <vertexDescriptor> plan;
 	std::vector<std::vector<vertexDescriptor>> paths;
 	paths.push_back(std::vector<vertexDescriptor>()={src});
@@ -806,6 +806,9 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		_finished=overarching_goal.checkEnded(g[path_end].endPose, UNDEFINED, true).ended;
 		if (NULL!=finished){
 			*finished=_finished;
+		}
+		if (_finished){
+			goal=path_end;
 		}
 		//printf("outer loop\n");
 	}while(!priorityQueue.empty() && (path_end!=goal && !(_finished)));

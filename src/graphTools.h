@@ -407,7 +407,7 @@ class StateMatcher{
 
 		//FUZZY LOGIC FUNCTIONS USED TO CLASSIFY MATCH
 
-		bool match_equal(const MATCH_TYPE&, const MATCH_TYPE&);
+		bool match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired);
 
 		MATCH_TYPE isMatch(StateDifference, float endDistance=0); //endDistance=endpose
 
