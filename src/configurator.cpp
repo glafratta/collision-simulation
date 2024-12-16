@@ -1157,7 +1157,7 @@ void Configurator::unexplored_transitions(TransitionSystem& g, const vertexDescr
 	std::vector <Direction> to_remove;
 	for (int i=0; i<g[v].options.size(); i++){
 		for (edgeDescriptor &e: gt::outEdges(g, v, g[v].options[i])){
-			if (g[e.m_target].visited()){
+			if (g[e].it_observed==iteration){ //g[e.m_target].visited()
 				to_remove.push_back(g[e].direction);
 			}
 		}
@@ -1240,6 +1240,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
+
 		}
 	}
 	else{
