@@ -614,8 +614,13 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 				addToPriorityQueue(split_v, priority_q, g, closed);
 				src=split_v;
 		}
+		if (ep.second.m_source!=split[0]){
+			boost::remove_edge(ep.second.m_source, v, g);
+			boost::add_edge(ep.second.m_source, split[0], g);
+		}
 	}
 	evaluation_q.clear();
+
 }
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed,StateMatcher::MATCH_TYPE match){
