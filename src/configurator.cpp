@@ -474,7 +474,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 							g[edge.first]=sk.second; //doesn't update motorstep
 						}
 					//}
-					if (planVertices.empty()&&currentTask.motorStep==0){
+					if (plan_prov.empty()&&currentTask.motorStep==0){
 						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::DISTURBANCE); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						vertexDescriptor task_start=gt::task_vertices(v0, g, iteration, currentVertex, e_tmp)[0];
@@ -1233,10 +1233,10 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		if (!g[e.first.m_target].visited()){ //target visited 
+		//if (!g[e.first.m_target].visited()){ //target visited 
 			g[v0].options={g[e.first].direction};
 			return;
-		}
+		//}
 	}
 	if (v0==movingVertex){
 		transitionMatrix(g[v0], d, src);	
