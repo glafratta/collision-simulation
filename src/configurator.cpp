@@ -1225,7 +1225,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	if (auto it =check_vector_for(planVertices, v0); it!=planVertices.end() && it!=(planVertices.end()-1)){
+	if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		if (!g[e.first.m_target].visited()){ //target visited 
 			g[v0].options={g[e.first].direction};
