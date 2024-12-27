@@ -429,7 +429,7 @@ class StateMatcher{
 };
 
 template <class I>
-auto check_vector_for(const std::vector <I>& vector, const I& item){
+auto check_vector_for(std::vector <I>& vector, const I& item){
 	for (int i=0; i<vector.size(); i++){
 		if (vector[i]==item){
 			return vector.begin()+i;

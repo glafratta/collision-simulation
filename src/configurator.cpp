@@ -614,10 +614,10 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 				addToPriorityQueue(split_v, priority_q, g, closed);
 				src=split_v;
 		}
-		if (ep.second.m_source!=split[0]){
-			boost::remove_edge(ep.second.m_source, v, g);
-			boost::add_edge(ep.second.m_source, split[0], g);
-		}
+		// if (ep.second.m_source!=split[0]){
+		// 	boost::remove_edge(ep.second.m_source, v, g);
+		// 	boost::add_edge(ep.second.m_source, split[0], g);
+		// }
 	}
 	evaluation_q.clear();
 
@@ -1033,6 +1033,41 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 }
 
 
+void Configurator::skip_reduced(edgeDescriptor& e, TransitionSystem &g, const Direction & direction, const std::vector<vertexDescriptor> & plan,  std::vector<vertexDescriptor>::iterator it){ 
+edgeDescriptor e_start=e;
+//adjust here
+	while(it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di)){
+		//auto es = boost::out_edges(e.m_target, g);
+		// if (es.first==es.second){
+		// 	vertexDescriptor new_src=e.m_target;
+		// 	e.m_source=new_src;
+		// 	e.m_target=TransitionSystem::null_vertex();
+		// }
+		// for (auto ei = es.first; ei!=es.second; ++ei){ //was ++ei
+		// 	if (plan.empty()){
+		// 		break;
+		// 	}
+		// 	if ((*ei).m_target == plan[i]){
+		// 		e= (*ei);
+		// 		v_tgt=e.m_source;
+		// 		break;
+		// 	}
+		// }
+		it++;
+		auto ep=boost::edge(*it, *(it+1), g);
+		if (!ep.second){
+			return;
+		}
+		if (g[ep.first].direction==direction){
+			e=ep.first;
+		}
+		else{
+			break;
+		}
+	 }
+}
+
+
 
 std::vector <vertexDescriptor> Configurator::back_planner(TransitionSystem& g, vertexDescriptor leaf, vertexDescriptor root){
 	std::vector <vertexDescriptor> vertices;
@@ -1225,7 +1260,7 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 	}
 }
 
-void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src, const std::vector<vertexDescriptor>& plan_prov){
+void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0, Direction d, bool ended, vertexDescriptor src, std::vector<vertexDescriptor>& plan_prov){
 	if (!g[v0].options.empty()){
 		return;
 	}
@@ -1243,6 +1278,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
+		skip_reduced(e.first, g, g[e.first].direction, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
 

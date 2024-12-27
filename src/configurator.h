@@ -256,6 +256,8 @@ bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, 
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
+void skip_reduced(edgeDescriptor &, TransitionSystem &, const Direction &, const std::vector<vertexDescriptor> &, std::vector<vertexDescriptor>::iterator);
+
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
 EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
@@ -276,7 +278,7 @@ void unexplored_transitions(TransitionSystem&, const vertexDescriptor&);
 
 void transitionMatrix(State&, Direction, vertexDescriptor); //DEFAULT, LEFT, RIGHT
 
-void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor, const std::vector<vertexDescriptor>&);
+void applyTransitionMatrix(TransitionSystem&, vertexDescriptor, Direction,bool, vertexDescriptor, std::vector<vertexDescriptor>&);
 
 void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, TransitionSystem&, const std::set<vertexDescriptor>&);
 
