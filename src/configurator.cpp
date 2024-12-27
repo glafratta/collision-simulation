@@ -1689,7 +1689,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
 	//if (plan_prov.empty()){
 		return;
