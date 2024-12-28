@@ -619,7 +619,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			}
 			EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 			g[split_v].phi=evaluationFunction(local_er);
-			applyTransitionMatrix(g, split_v, direction, local_er.ended,split[0], planVertices);
+			applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
 			addToPriorityQueue(split_v, priority_q, g, closed);
 			src=split_v;
 		}
@@ -1046,8 +1046,8 @@ void Configurator::skip_reduced(edgeDescriptor& e, TransitionSystem &g, const Di
 edgeDescriptor e_start=e;
 //adjust here
 	while(g[e].direction==direction && it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di)){
-		it++;
 		auto ep=boost::edge(*it, *(it+1), g);
+		it++;
 		if (!ep.second){
 			return;
 		}
