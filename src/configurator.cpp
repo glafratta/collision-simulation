@@ -494,7 +494,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 							}
 						}
 					}
-
 				}
 				else{
 					edge= add_vertex_now(v0, v1,g,sk.first.Di, sk.second); //addVertex
@@ -1036,34 +1035,21 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 void Configurator::skip_reduced(edgeDescriptor& e, TransitionSystem &g, const Direction & direction, const std::vector<vertexDescriptor> & plan,  std::vector<vertexDescriptor>::iterator it){ 
 edgeDescriptor e_start=e;
 //adjust here
-	while(it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di)){
-		//auto es = boost::out_edges(e.m_target, g);
-		// if (es.first==es.second){
-		// 	vertexDescriptor new_src=e.m_target;
-		// 	e.m_source=new_src;
-		// 	e.m_target=TransitionSystem::null_vertex();
-		// }
-		// for (auto ei = es.first; ei!=es.second; ++ei){ //was ++ei
-		// 	if (plan.empty()){
-		// 		break;
-		// 	}
-		// 	if ((*ei).m_target == plan[i]){
-		// 		e= (*ei);
-		// 		v_tgt=e.m_source;
-		// 		break;
-		// 	}
-		// }
+	while(g[e].direction==direction && it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di)){
 		it++;
 		auto ep=boost::edge(*it, *(it+1), g);
 		if (!ep.second){
 			return;
 		}
-		if (g[ep.first].direction==direction){
+		else{
 			e=ep.first;
 		}
-		else{
-			break;
-		}
+		// if (){
+		// 	e=ep.first;
+		// }
+		// else{
+		// 	break;
+		// }
 	 }
 }
 
@@ -1281,7 +1267,6 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		skip_reduced(e.first, g, g[e.first].direction, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
-
 		}
 	}
 	else{
@@ -1689,7 +1674,7 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(v
 	return result;
 }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, vertexDescriptor& v, const std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
+void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
 	//if (plan_prov.empty()){
 		return;
