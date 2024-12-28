@@ -600,18 +600,28 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		// b2Transform start=g[ep.second.m_source].endPose;
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
-		vertexDescriptor src=ep.second.m_source;
+		//vertexDescriptor src=ep.second.m_source;
 		Direction direction= g[ep.second].direction;
 		if (split.size()<2){
-			split =splitTask(v, g, DEFAULT, src);
+			split =splitTask(v, g, DEFAULT, ep.second.m_source);
 		}
 		//else if (split.size())
-		for (vertexDescriptor split_v:split){
-				EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
-				g[split_v].phi=evaluationFunction(local_er);
-				applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
-				addToPriorityQueue(split_v, priority_q, g, closed);
-				src=split_v;
+		for (int i=0; i<split.size(); i++){ //
+			vertexDescriptor split_v=split[i], src=TransitionSystem::null_vertex();
+			if (i<1){
+				auto ep=gt::getMostLikely(g, gt::inEdges(g, split_v), iteration);
+				if (ep.first){
+					src=ep.second.m_source;
+				}
+			}
+			else{
+				src=split[i-1];
+			}
+			EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
+			g[split_v].phi=evaluationFunction(local_er);
+			applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
+			addToPriorityQueue(split_v, priority_q, g, closed);
+			src=split_v;
 		}
 		// if (ep.second.m_source!=split[0]){
 		// 	boost::remove_edge(ep.second.m_source, v, g);
@@ -1258,7 +1268,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	if (v0==movingVertex){
+	if (v0==movingVertex || src==TransitionSystem::null_vertex()){
 		transitionMatrix(g[v0], d, src);	
 		return;
 	}
