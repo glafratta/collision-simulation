@@ -619,7 +619,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			}
 			EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 			g[split_v].phi=evaluationFunction(local_er);
-			applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
+			//applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
 			addToPriorityQueue(split_v, priority_q, g, closed);
 			src=split_v;
 		}
