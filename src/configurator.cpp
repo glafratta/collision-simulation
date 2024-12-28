@@ -1263,7 +1263,8 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
-		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
+		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
+		auto e=boost::edge(src, v0, g);
 		skip_reduced(e.first, g, g[e.first].direction, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
