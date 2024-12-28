@@ -608,18 +608,18 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		//else if (split.size())
 		for (int i=0; i<split.size(); i++){ //
 			vertexDescriptor split_v=split[i], src=TransitionSystem::null_vertex();
-			if (i<1){
-				auto ep=gt::getMostLikely(g, gt::inEdges(g, split_v), iteration);
-				if (ep.first){
-					src=ep.second.m_source;
-				}
-			}
-			else{
-				src=split[i-1];
-			}
+			// if (i<1){
+			// 	auto ep=gt::getMostLikely(g, gt::inEdges(g, split_v), iteration);
+			// 	if (ep.first){
+			// 		src=ep.second.m_source;
+			// 	}
+			// }
+			// else{
+			// 	src=split[i-1];
+			// }
 			EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 			g[split_v].phi=evaluationFunction(local_er);
-			//applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
+			applyTransitionMatrix(g, split_v, direction, local_er.ended,split[0], planVertices);
 			addToPriorityQueue(split_v, priority_q, g, closed);
 			src=split_v;
 		}
@@ -1273,8 +1273,8 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
-		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
-		auto e=boost::edge(src, v0, g);
+		auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
+		//auto e=boost::edge(src, v0, g);
 		skip_reduced(e.first, g, g[e.first].direction, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
