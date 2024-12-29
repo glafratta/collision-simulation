@@ -256,7 +256,7 @@ bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, 
 
 b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
-void skip_reduced(edgeDescriptor &, TransitionSystem &, const Direction &, const std::vector<vertexDescriptor> &, std::vector<vertexDescriptor>::iterator);
+void skip_reduced(edgeDescriptor &, TransitionSystem &, const std::vector<vertexDescriptor> &, std::vector<vertexDescriptor>::iterator);
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 

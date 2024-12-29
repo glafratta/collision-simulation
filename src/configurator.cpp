@@ -1042,10 +1042,10 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 }
 
 
-void Configurator::skip_reduced(edgeDescriptor& e, TransitionSystem &g, const Direction & direction, const std::vector<vertexDescriptor> & plan,  std::vector<vertexDescriptor>::iterator it){ 
+void Configurator::skip_reduced(edgeDescriptor& e, TransitionSystem &g, const std::vector<vertexDescriptor> & plan,  std::vector<vertexDescriptor>::iterator it){ 
 edgeDescriptor e_start=e;
 //adjust here
-	while(g[e].direction==direction && it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di)){
+	do{
 		auto ep=boost::edge(*it, *(it+1), g);
 		it++;
 		if (!ep.second){
@@ -1054,13 +1054,7 @@ edgeDescriptor e_start=e;
 		else{
 			e=ep.first;
 		}
-		// if (){
-		// 	e=ep.first;
-		// }
-		// else{
-		// 	break;
-		// }
-	 }
+	}	while(g[e].direction==g[e_start].direction && it != plan.end() && it!=(plan.end()-1)&& g[e].direction==DEFAULT && (g[e.m_target].Di==g[e_start.m_source].Di));
 }
 
 
@@ -1275,7 +1269,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		auto e=boost::edge(src, v0, g);
-		skip_reduced(e.first, g, g[e.first].direction, plan_prov, it);
+		skip_reduced(e.first, g, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
 		}
