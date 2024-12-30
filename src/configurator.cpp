@@ -520,7 +520,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		if (controlGoal.getAffIndex()==PURSUE){
 			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
 	}
-	direction = g[boost::in_edges(bestNext, g).first.dereference()].direction;
+	std::vector <edgeDescriptor> best_in_edges= gt::inEdges(g,bestNext);
+	if (best_in_edges.empty()){
+		direction=currentTask.direction;
+	}
+	else{
+	direction = g[best_in_edges[0]].direction;
+	}
 }while(g[bestNext].options.size()>0);
 printf("finished exploring\n");
 return toRemove;
