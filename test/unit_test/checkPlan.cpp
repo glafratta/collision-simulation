@@ -67,8 +67,8 @@ int main(int argc, char** argv){
     conf.addIteration(di.iteration);
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
-    int og_step=0;
-    conf.changeTask(true, og_step, conf.planVertices);
+    //int og_step=0;
+    //conf.changeTask(true, og_step, conf.planVertices);
     conf.explorer(conf.movingVertex, conf.transitionSystem, *conf.getTask(), world);
     connected=Connected(&conf.transitionSystem);
     FilteredTS fts2(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()

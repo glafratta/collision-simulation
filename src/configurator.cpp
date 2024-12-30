@@ -1269,7 +1269,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	if (v0==movingVertex || src==TransitionSystem::null_vertex()){
-		transitionMatrix(g[v0], d, src);	
+		transitionMatrix(g[v0], DEFAULT, src);	
 		return;
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
