@@ -307,7 +307,7 @@ void setSimulationStep(float f){
 
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
-
+//bool current_task_equivalent(const Task &,const  Task &, const vertexDescriptor&);
 
 };
 

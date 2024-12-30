@@ -223,6 +223,8 @@ public:
 
     bool operator==(const Disturbance & d);
 
+    bool operator==(const Disturbance & d)const;
+
 }; //sub action f
 
 

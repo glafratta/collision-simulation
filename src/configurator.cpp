@@ -655,47 +655,12 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
 	ep.second= boost::edge(ep.first.m_source, ep.first.m_target, g).second;
 	bool same_direction=gt::check_edge_direction(ep, g, dir) ||( (gt::check_edge_direction(ep, g, STOP))&& dir==DEFAULT) ;
-	//if (gt::check_edge_direction(ep, g, STOP) &&same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE  && dir==DEFAULT){
-	if ( same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
-//if(!is_default || (is_default && v0 ==1)){ //g[ep.first].direction!=DEFAULT 
-// 		if (gt::check_edge_direction(ep, g, STOP)){//g[ep.first].direction==STOP
+	if (same_direction&& same_Di && g[ep.first.m_target].Dn.getAffIndex()==NONE){
  			g[ep.first.m_target].Dn = dist; //was target
-			//propagated->push_back(ep.first) //do i push back vertex i've propagated?
-			//do I reopen closed vertices 
-// 		}
-		
-// // 		break;
  	}
-	// 	if (ep.first.m_target!=v1){
-	// 		g[ep.first.m_target].Dn = dist;
-	// 		EndedResult er=estimateCost(g[ep.first.m_target], g[ep.first.m_source].endPose,g[ep.first].direction); //reassign cost
-	// 		g[ep.first.m_target].phi =evaluationFunction(er);	
-	// 		std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> match= findMatch(ep.first.m_target, g, g[ep.first].direction);
-	// 		if ( match.first){
-	// 			std::pair<vertexDescriptor, vertexDescriptor>pair(ep.first.m_target, match.second);
-	// 			deletion.push_back(pair);			//first is eliminated, the second is its match
-	// 			p=(pair.second);
-	
-	// 		}
-	// 		else{
-	// 			p=(ep.first.m_target);
-	// 		}
-	// 		// for (auto vi=closed.begin(); vi!=closed.end(); vi++){
-	// 		// 	if (*vi==p){
-	// 		// 		closed->erase(vi);
-	// 		// 	}
-	// 		// }
-	// 		if (auto found=closed->find(p); found!=closed->end()){
-	// 			closed->erase(found);
-	// 		}
-	// 		propagated->push_back(p);
-	// 	}
-	// 	ep.second= boost::in_degree(ep.first.m_source, g)>0;
-	// 	if (!ep.second){
-	// 		return deletion;
-	// 	}
-	// 	ep.first= *(boost::in_edges(ep.first.m_source, g).first);
-	// //}	
+	if (v1==currentVertex){
+		g[v0].outcome=simResult::safeForNow;
+	}
 	return deletion;
 }
 
@@ -1247,6 +1212,9 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 				state.options.push_back(getOppositeDirection(temp.direction).second);
 				state.options.push_back(DEFAULT);
 			}
+			else if (src==TransitionSystem::null_vertex()){
+				state.options={currentTask.direction};
+			}
 			else{
 				state.options={DEFAULT};
 			}
@@ -1269,8 +1237,8 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	if (v0==movingVertex || src==TransitionSystem::null_vertex()){
-		transitionMatrix(g[v0], DEFAULT, src);	
-		return;
+		transitionMatrix(g[v0], DEFAULT, TransitionSystem::null_vertex());	
+		//return;
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
@@ -1803,6 +1771,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		currentEdge=ep.first;
 		transitionSystem[movingVertex].Di=transitionSystem[currentVertex].Di;
 		boost::clear_vertex(movingVertex, transitionSystem);
+		transitionSystem[movingVertex].outcome=simResult::successful;
 	//	printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
@@ -1899,3 +1868,12 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	applyAffineTrans(deltaPose, controlGoal);
 }
 
+// bool Configurator::current_task_equivalent(const Task & candidate, const Task & compare, const vertexDescriptor& cand_src){
+// 	bool result=false;
+// 	if (cand_src==0){
+// 		candidate.disturbance==compare.disturbance;
+// 		candidate.direction==compare.direction;
+
+// 	}
+
+// }
