@@ -3,8 +3,8 @@
 #include "measurement.h"
 const float SIM_DURATION = int(BOX2DRANGE*2 /MAX_SPEED);
 const float WHEEL_SPEED_DEFAULT=0.5f;
-const float WHEEL_SPEED_TURN=0.218182f;
-
+const float WHEEL_SPEED_TURN=0.3534291; //0.218182f;
+ 
 b2Fixture * GetSensor(b2Body * body);
 
 b2Body * GetDisturbance(b2World *);
