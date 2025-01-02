@@ -293,8 +293,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 					robotAngle-=2*M_PI;
 				}
 			}
-			bool finishedLeft=robotAngle>=angleL;//-(action.getOmega()*HZ)/2;
-			bool finishedRight=robotAngle<=angleR;//+(action.getOmega()*HZ)/2;
+			bool finishedLeft=(round(robotAngle*100)/100)>=(round(angleL*100)/100);//-(action.getOmega()*HZ)/2;
+			bool finishedRight=(round(robotAngle*100)/100)<=(round(angleR*100)/100);//+(action.getOmega()*HZ)/2;
 			if (finishedLeft|| finishedRight){
 				if (disturbance.getAffIndex()==AVOID){
 					disturbance.invalidate();
