@@ -303,7 +303,7 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 	}
 	auto oe=outEdges(g, u, d);
 	for (auto e:oe){
-		if (g[v].Dn == g[e.m_target].Dn){
+		if (g[v].Dn == g[e.m_target].Dn&& u!=v ){
 			return result;
 		}
 	}
