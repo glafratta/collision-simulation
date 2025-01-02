@@ -65,6 +65,9 @@ int main(int argc, char** argv){
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     
     conf.addIteration(di.iteration);
+    for (int i=0;i<di.iteration*2; i++){
+        conf.trackTaskExecution(*conf.getTask());
+    }
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
     //int og_step=0;

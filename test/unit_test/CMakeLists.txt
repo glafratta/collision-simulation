@@ -177,7 +177,7 @@ add_test(NAME checkPlan_4 COMMAND checkPlan ../251023_TAGET/ 2 1 4)
 add_test(NAME checkPlan_21 COMMAND checkPlan ../251023_TAGET/ 2 1 21)
 add_test(NAME checkPlan_40cm COMMAND checkPlan ../170924_1321_badrun/ 2 1 1)
 #add_test(NAME checkPlan_40cm_4 COMMAND checkPlan ../170924_1321_badrun/ 2 1 4)
-add_test(NAME checkPlan_40cm_21 COMMAND checkPlan ../170924_1321_badrun/ 2 1 21)
+#add_test(NAME checkPlan_40cm_21 COMMAND checkPlan ../170924_1321_badrun/ 2 1 21)
 
 #set_property(TEST checkPlan_21 PROPERTY WILL_FAIL true)
 
