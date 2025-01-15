@@ -477,7 +477,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					if (plan_prov.empty()&&currentTask.motorStep==0){
 						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::DISTURBANCE); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
-						vertexDescriptor task_start=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp)[0];
+						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
+						vertexDescriptor task_start= task_vertices[0];
+						edge.first.m_target=task_start;
 						Task controlGoal_adjusted= controlGoal;
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
