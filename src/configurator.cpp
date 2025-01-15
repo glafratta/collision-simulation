@@ -479,7 +479,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
-						edge.first.m_target=task_start;
+						e_tmp.second= edge.first=gt::add_edge(v0, task_start, g, iteration, t.direction).first;
 						Task controlGoal_adjusted= controlGoal;
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
@@ -487,7 +487,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						shift= start-g[task_start].start;
 						if (finished){
 							plan_prov=plan_tmp;
-							e_tmp.second=boost::edge(v0, plan_tmp[0], g).first;
+							//e_tmp.second=boost::edge(v0, , g).first; //plan_tmp[0]
 							if (t.direction== g[e_tmp.second].direction){
 								g[v0].options.clear();
 							}
@@ -495,6 +495,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 								g[v0].options={g[e_tmp.second].direction};
 							}
 						}
+						boost::remove_edge(e_tmp.second);
 					}
 				}
 				else{
