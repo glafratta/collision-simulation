@@ -66,7 +66,7 @@ int main(int argc, char** argv){
     
     conf.addIteration(di.iteration);
     for (int i=0;i<di.iteration*2; i++){
-        conf.trackTaskExecution(*conf.getTask());
+      //  conf.trackTaskExecution(*conf.getTask());
     }
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
