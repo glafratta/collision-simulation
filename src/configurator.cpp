@@ -495,7 +495,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 								g[v0].options={g[e_tmp.second].direction};
 							}
 						}
-						boost::remove_edge(e_tmp.second);
+						//boost::remove_edge(e_tmp.second, g);
 					}
 				}
 				else{
