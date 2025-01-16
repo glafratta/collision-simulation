@@ -277,12 +277,12 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	if (e.m_target==TransitionSystem::null_vertex()){
 		return;
 	}
-	auto es= out_edges(e.m_source, g);
+	auto es= boost::out_edges(e.m_source, g);
 	float totObs=0;
 	std::vector <edgeDescriptor> sameTask;
 	//find total observations
-	for (auto ei= es.first; ei!=es.second; ei++){
-		if (g[((*ei))].direction==g[e].direction){
+	for (auto ei= es.first; ei!=es.second; ++ei){
+		if (g[(*ei)].direction==g[e].direction){
 			totObs+=g[(*ei).m_target].nObs;
 			sameTask.push_back(*ei);
 			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
