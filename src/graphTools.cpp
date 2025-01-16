@@ -331,9 +331,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		if (!ep2.first){
 			ep2=getMostLikely(g, ie, it);
 		}
-		if (!ep.first){
-			if (ep.second.m_target!= result){}
-		}
+		// if (!ep.first){
+		// 	if (ep.second.m_target!= result){}
+		// }
 		if (ep2.first){
 			if (ep2.second.m_target==result[0]){ //size 1
 				ep=ep2; //assign ep to define direction
