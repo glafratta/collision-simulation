@@ -254,17 +254,17 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 
 Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescriptor& e){
 	Task t=controlGoal;
-	if (Disturbance Dn= g[e.m_target].Dn; Dn.getAffIndex()==AVOID){
-		Disturbance Di= Dn;
-		Di.affordanceIndex=PURSUE;
-		t=Task(Di, g[e].direction, b2Transform_zero, true);
-		float distance = g[e.m_target].end_from_disturbance().p.Length();
-		t.setEndCriteria(Distance(distance));
-	}
-	else{
+	// if (Disturbance Dn= g[e.m_target].Dn; Dn.getAffIndex()==AVOID){
+	// 	Disturbance Di= Dn;
+	// 	Di.affordanceIndex=PURSUE;
+	// 	t=Task(Di, g[e].direction, b2Transform_zero, true);
+	// 	float distance = g[e.m_target].end_from_disturbance().p.Length();
+	// 	t.setEndCriteria(Distance(distance));
+	// }
+	// else{
 		t=Task(g[e.m_target].Di, g[e].direction, b2Transform_zero, true);
 
-	}
+	//}
 	return t;
 
 }
@@ -479,7 +479,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
-						e_tmp.second=gt::add_edge(v0, task_start, g, iteration, t.direction).first;
+
+						//e_tmp.second=gt::add_edge(v0, task_start, g, iteration, t.direction).first;
 						Task controlGoal_adjusted= controlGoal;
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
@@ -487,15 +488,15 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						shift= start-g[task_start].start;
 						if (finished){
 							plan_prov=plan_tmp;
-							//e_tmp.second=boost::edge(v0, , g).first; //plan_tmp[0]
-							if (t.direction== g[e_tmp.second].direction){
+							boost::remove_edge(edge.first, g);
+							edge= gt::add_edge(v0, task_start, g, iteration, g[e_tmp.second].direction);
+							if (t.direction== g[edge.first].direction){
 								g[v0].options.clear();
 							}
 							else{
-								g[v0].options={g[e_tmp.second].direction};
+								g[v0].options={g[edge.first].direction};
 							}
 						}
-						boost::remove_edge(e_tmp.second, g);
 					}
 				}
 				else{
@@ -1781,7 +1782,12 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		transitionSystem[movingEdge].step=currentTask.motorStep;
 		//currentTask = Task(transitionSystem[currentEdge.m_source].Dn, transitionSystem[currentEdge].direction, b2Transform(b2Vec2(0,0), b2Rot(0)), true);
 		currentTask = task_to_execute(transitionSystem, currentEdge);
-		currentTask.motorStep = transitionSystem[currentEdge].step;
+		if (currentTask.action.getLinearSpeed()==0){
+			currentTask.motorStep=transitionSystem[currentEdge].step;
+		}
+		else{
+			currentTask.motorStep = gt::distanceToSimStep(transitionSystem[currentVertex].distance(), currentTask.action.getLinearSpeed());// 			
+		}
 	//	printf("l=%f, r=%f, step=%i\n", currentTask.action.L, currentTask.action.R, currentTask.motorStep);
 	}
 	else{
