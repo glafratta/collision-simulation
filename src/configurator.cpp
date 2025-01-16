@@ -479,7 +479,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
-
+						
 						//e_tmp.second=gt::add_edge(v0, task_start, g, iteration, t.direction).first;
 						Task controlGoal_adjusted= controlGoal;
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
