@@ -463,12 +463,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
-				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false), new_edge;
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
+						new_edge=edge;
 						//edge.second=true; //just means that the edge is valid
 						if (edge.second){
 							g[edge.first]=sk.second; //doesn't update motorstep
@@ -489,7 +490,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
-							auto new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+
+							new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
 							if (t.direction== g[new_edge.first].direction){
 								g[v0].options.clear();
 							}
@@ -505,7 +507,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
-					gt::adjustProbability(g, edge.first);
+					gt::adjustProbability(g, new_edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
