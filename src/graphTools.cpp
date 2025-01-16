@@ -345,7 +345,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 				//}
 			}
 			}
-			else if (g[ep2.second].direction==d){ //if
+			else if (g[ep2.second].direction==d &&
+			 		g[ep2.second.m_target].Di == g[ep.second.m_target].Di &&
+			 		g[ep2.second.m_target].Dn == g[ep.second.m_target].Dn){ //same task!
 				result.push_back(ep2.second.m_target); //source
 			}
 
@@ -356,6 +358,7 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){ //source
+			//result.push_back(0);
 			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
 			break;
 		}

@@ -489,12 +489,12 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
-							edge= gt::add_edge(v0, task_start, g, iteration, g[e_tmp.second].direction);
-							if (t.direction== g[edge.first].direction){
+							auto new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+							if (t.direction== g[new_edge.first].direction){
 								g[v0].options.clear();
 							}
 							else{
-								g[v0].options={g[edge.first].direction};
+								g[v0].options={g[new_edge.first].direction};
 							}
 						}
 					}
