@@ -254,17 +254,17 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 
 Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescriptor& e){
 	Task t=controlGoal;
-	// if (Disturbance Dn= g[e.m_target].Dn; Dn.getAffIndex()==AVOID){
-	// 	Disturbance Di= Dn;
-	// 	Di.affordanceIndex=PURSUE;
-	// 	t=Task(Di, g[e].direction, b2Transform_zero, true);
-	// 	float distance = g[e.m_target].end_from_disturbance().p.Length();
-	// 	t.setEndCriteria(Distance(distance));
-	// }
-	// else{
+	if (Disturbance Dn= g[e.m_target].Dn; Dn.getAffIndex()==AVOID){
+		Disturbance Di= Dn;
+		Di.affordanceIndex=PURSUE;
+		t=Task(Di, g[e].direction, b2Transform_zero, true);
+		float distance = g[e.m_target].end_from_disturbance().p.Length();
+		t.setEndCriteria(Distance(distance));
+	}
+	else{
 		t=Task(g[e.m_target].Di, g[e].direction, b2Transform_zero, true);
 
-	//}
+	}
 	return t;
 
 }
