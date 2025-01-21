@@ -172,7 +172,7 @@ bool Configurator::Spawner(){
 		float _simulationStep=simulationStep;
 		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
-		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
+		simResult result = simulate(currentTask, world, _simulationStep); //transitionSystem[currentVertex],transitionSystem[currentVertex],
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
 		if (currentTask.change){
@@ -270,7 +270,7 @@ Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescrip
 }
 
 
-simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
+simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ //State& state, State src, 
 		//EVALUATE NODE()
 	simResult result;
 	float distance=BOX2DRANGE;
@@ -440,7 +440,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
-				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
+				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
 				sk.second.it_observed=iteration;
@@ -915,7 +915,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			compare_start=g[t_start_v].start;	
 		}
 		compare_tmp.start=compare_start;
-		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
+		simResult sr = simulate( t, world); //sk.first, g[p[it-1]],
 		if (sr.resultCode==simResult::crashed){
 			return false;
 		}
@@ -1878,15 +1878,13 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
 	float result=angle;
 	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
-		const float resolution=M_PI/40; 
-		float ratio= angle/resolution;
+		float ratio= angle/ANGLE_RESOLUTION;
 		float decimal, integer;
 		decimal=std::modf(ratio, &integer);
-		result=integer*resolution;
 		if (decimal>=0.5){
-			result+=1;
-		}
-
+			integer+=1;
+		}		
+		result=integer*ANGLE_RESOLUTION;
 	}
 	return result;
 }

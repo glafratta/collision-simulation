@@ -148,7 +148,7 @@ Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &
 
 Task task_to_execute(const TransitionSystem &, const edgeDescriptor&);
 
-simResult simulate(State&, State, Task, b2World &, float _simulationStep=BOX2DRANGE);
+simResult simulate(Task, b2World &, float _simulationStep=BOX2DRANGE);
 
 void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
 
