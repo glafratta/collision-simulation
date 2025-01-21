@@ -1877,7 +1877,7 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 
 float approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
 	float result=angle;
-	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::resultCode::crashed){
+	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
 		const float resolution=M_PI/10; 
 		float ratio= angle/resolution;
 		float decimal, integer;
