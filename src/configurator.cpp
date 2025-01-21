@@ -1875,10 +1875,10 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	applyAffineTrans(deltaPose, controlGoal);
 }
 
-float approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
+float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
 	float result=angle;
 	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
-		const float resolution=M_PI/10; 
+		const float resolution=M_PI/20; 
 		float ratio= angle/resolution;
 		float decimal, integer;
 		decimal=std::modf(ratio, &integer);
