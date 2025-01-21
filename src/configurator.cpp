@@ -282,12 +282,9 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
-	// if (b2Vec2(result.endPose.p -state.start.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
-	// 	state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
-	// }
-	// else{
-	// 	state.nodesInSameSpot =0; //reset if robot is moving
-	// }
+	//approximate angle to avoid stupid rounding errors
+	float approximated_angle=approximate_angle(result.endPose.q.GetAngle(), t.direction, result.resultCode);
+	result.endPose.q.Set(approximated_angle);
 	return result;
 	}
 
@@ -490,7 +487,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
-
 							new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
 							if (t.direction== g[new_edge.first].direction){
 								g[v0].options.clear();
@@ -1878,6 +1874,19 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	applyAffineTrans(deltaPose, g);
 	applyAffineTrans(deltaPose, controlGoal);
 }
+
+float approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
+	float result=angle;
+	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::resultCode::crashed){
+		const float resolution=M_PI/10; 
+		float ratio= angle/resolution;
+		float decimal, integer;
+		decimal=std::modf(ratio, &integer);
+		result=integer*resolution;
+	}
+	return result;
+}
+
 
 // bool Configurator::current_task_equivalent(const Task & candidate, const Task & compare, const vertexDescriptor& cand_src){
 // 	bool result=false;

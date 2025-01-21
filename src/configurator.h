@@ -309,6 +309,8 @@ void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescript
 
 //bool current_task_equivalent(const Task &,const  Task &, const vertexDescriptor&);
 
+float approximate_angle(const float &, const Direction &, const simResult::resultType &);
+
 };
 
 
