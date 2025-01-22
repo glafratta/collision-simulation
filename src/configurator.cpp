@@ -885,7 +885,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	else{
 		if (g[e_start].direction==DEFAULT){
 			step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
-			printf("step=%f\n", step);
+			//printf("step=%f\n", step);
 		}
 		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
 		printf("adjusted step=%f\n", step);
