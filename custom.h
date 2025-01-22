@@ -133,8 +133,8 @@ void step( AlphaBot &motors){
 		L*=1.37;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=1.05; //17
-		L*=1.05;
+		R*=1.07; //17
+		L*=1.07;
 	}
 	else if (c->getTask()->direction==DEFAULT){
 		R*=1.15*1.1;
