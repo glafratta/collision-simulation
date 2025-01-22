@@ -127,17 +127,17 @@ void step( AlphaBot &motors){
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	R= c->getTask()->getAction().getRWheelSpeed();
-	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
+	L=c->getTask()->getAction().getLWheelSpeed();
 	if (c->getTask()->direction==LEFT){
-		R*=1.27; //23
-		L*=1.27;
+		R*=1.37; //23
+		L*=1.37;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=1.17; //17
-		L*=1.17;
+		R*=1.05; //17
+		L*=1.05;
 	}
 	else if (c->getTask()->direction==DEFAULT){
-		R*=1.13;
+		R*=1.13*1.05;
 		L*=1.13;
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
