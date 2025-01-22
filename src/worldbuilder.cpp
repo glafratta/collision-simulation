@@ -229,15 +229,15 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     // }
     bool has_D=false;
     if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
-        for (int i=0; i<features.size(); i++){
+        for (int i=0; i<features.size(); i++){ //SEARCH THROUGH FEATures TO FIND TASK'S DI
             if (features[i].match(disturbance.bf)){
                 features[i]=disturbance.bf;
-                has_D=true;
+                has_D=true; //if found, do nothing
                 features[i].attention=true;
             }
         }
         if (!has_D){
-            features.push_back(disturbance.bf);
+            features.push_back(disturbance.bf); //if not found, add manually
         }
     }
     for (BodyFeatures f: features){

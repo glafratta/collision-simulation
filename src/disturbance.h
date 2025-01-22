@@ -219,7 +219,7 @@ public:
 
     void setOrientation(float, float);
 
-    std::vector <b2Vec2> vertices();
+    std::vector <b2Vec2> vertices(); //global vertices
 
     bool operator==(const Disturbance & d);
 
