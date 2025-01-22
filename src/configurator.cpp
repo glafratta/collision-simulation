@@ -661,7 +661,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	bool run=true, _finished=false;
 	std::vector <Frontier> priorityQueue={Frontier(src, std::vector<vertexDescriptor>())};
 	if (currentVertex==movingVertex){
-		printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
+		//printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
 		//return plan;
 	}
 	Task overarching_goal;
@@ -722,11 +722,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			if ( path==paths.rend()) { //if there are no other paths
 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
 				path=paths.rbegin();
-				printf("new empty path\n");
+				//printf("new empty path\n");
 				break;
 			}
-			printf("inner loop v %i \t", end);
-			debug::print_pose(g[end].endPose);	
+			//printf("inner loop v %i \t", end);
+			//debug::print_pose(g[end].endPose);	
 		}
 //		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -753,7 +753,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			final_phi=g[end_plan].phi;
 		}
 	}
-	printf("PLANNED!\n");
+	//printf("PLANNED!\n");
 	return plan;
 
 }
@@ -888,7 +888,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 			//printf("step=%f\n", step);
 		}
 		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
-		printf("adjusted step=%f\n", step);
+		//printf("adjusted step=%f\n", step);
 	}
 
 	return result;
@@ -1535,7 +1535,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	// }
 	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
 		t.motorStep--;
-		printf("step =%i\n", t.motorStep);
+		//printf("step =%i\n", t.motorStep);
 	}
 	else if (fabs(error.r())>=TRACKING_ERROR_TOLERANCE){
 		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*LIDAR_SAMPLING_RATE)+0.5);
