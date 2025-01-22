@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+const float ANGLE_RESOLUTION=M_PI/4; 
 const float SAFE_ANGLE =M_PI_2;
 const float MAX_TURN =M_PI;
 const float ROBOT_HALFLENGTH =0.135; //uncomment for robot
