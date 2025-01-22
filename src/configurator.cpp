@@ -106,7 +106,7 @@ bool Configurator::Spawner(){
 	std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 	std::vector <vertexDescriptor> plan_provisional=planVertices;
 	done_that(src, plan_works, world, plan_provisional);
-	printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
+	//printf("plan provisional size = %i, plan_works=%i, plan vertices=%i", plan_provisional.size(), plan_works, planVertices.size());
 	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		is_not_v not_cv(currentVertex);
 		planVertices.clear();
