@@ -296,6 +296,7 @@ void setSimulationStep(float f){
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
 
+float approximate_angle(const float &, const Direction &, const simResult::resultType &);
 
 };
 

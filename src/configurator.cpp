@@ -258,6 +258,8 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		state.nodesInSameSpot =0; //reset if robot is moving
 	}
 	//SET ORIENTATION OF POINT RELATED TO ITS NEIGHBOURS
+	float approximated_angle=approximate_angle(result.endPose.q.GetAngle(), t.direction, result.resultCode);
+	result.endPose.q.Set(approximated_angle);
 	if(!result.collision.isValid()){
 		return result;
 	}
@@ -1809,3 +1811,16 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 }
 
 
+float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
+	float result=angle;
+	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
+		float ratio= angle/ANGLE_RESOLUTION;
+		float decimal, integer;
+		decimal=std::modf(ratio, &integer);
+		if (decimal>=0.5){
+			integer+=1;
+		}		
+		result=integer*ANGLE_RESOLUTION;
+	}
+	return result;
+}
