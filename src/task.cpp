@@ -46,14 +46,15 @@ bool overlaps(b2Body * robot, Disturbance * disturbance){
 	}
 	b2AABB aabb=sensor->GetAABB(0);
 	// b2Shape * d=disturbance->GetFixtureList()->GetShape();
-	// b2Transform robot_pose=robot->GetTransform(), d_pose= disturbance->GetTransform();
+	 b2Transform robot_pose=robot->GetTransform(), d_pose= disturbance->pose();
 	// b2AABB aabb_shape, aabb_zero;
 	// sensor->GetShape()->ComputeAABB(&aabb_shape, robot_pose,0);
 	// sensor->GetShape()->ComputeAABB(&aabb_shape, b2Transform_zero,0);
-	
+	b2PolygonShape d_shape;
+	d_shape.SetAsBox(disturbance->bf.halfWidth, disturbance->bf.halfLength, b2Vec2(0,0), 0);
 	//create AABB with disturbance vertices
 	//test overlap
-	return b2TestOverlap(sensor->GetShape(), 0, d, 0,robot_pose, d_pose);
+	return b2TestOverlap(sensor->GetShape(), 0, &d_shape, 0,robot_pose, d_pose);
 }
 
 simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
@@ -95,7 +96,7 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 			bool out_x= fabs(robot->GetTransform().p.x)>=(BOX2DRANGE-0.001);
 			bool out_y= fabs(robot->GetTransform().p.y)>=(BOX2DRANGE-0.001);
 			bool out=(out_x || out_y );
-			bool overlap=overlaps(robot, d_body);
+			bool overlap=overlaps(robot, &disturbance);
 			if (!overlap){
 				disturbance.invalidate();
 			}

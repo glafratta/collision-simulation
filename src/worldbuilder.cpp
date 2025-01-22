@@ -237,7 +237,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
             }
         }
         if (!has_D){
-            features.push_back(disturbance.bf); //if not found, add manually
+            //features.push_back(disturbance.bf); //if not found, add manually
         }
     }
     for (BodyFeatures f: features){
