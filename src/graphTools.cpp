@@ -38,8 +38,8 @@ float angle_subtract(float a1, float a2){
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
 	float og_x= pose.p.x, og_y=pose.p.y;
-	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
-	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
+	pose.p.x= og_x* cos(deltaPose.q.GetAngle())- og_y*sin(deltaPose.q.GetAngle());
+	pose.p.y= og_y* cos(deltaPose.q.GetAngle())+ og_x*sin(deltaPose.q.GetAngle());
 	pose.p.x-=deltaPose.p.x;
 	pose.p.y-=deltaPose.p.y;
 }
