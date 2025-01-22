@@ -172,7 +172,7 @@ bool Configurator::Spawner(){
 		float _simulationStep=simulationStep;
 		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
-		simResult result = simulate(transitionSystem[currentVertex],transitionSystem[currentVertex],currentTask, world, _simulationStep);
+		simResult result = simulate(currentTask, world, _simulationStep); //transitionSystem[currentVertex],transitionSystem[currentVertex],
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
 		if (currentTask.change){
@@ -270,7 +270,7 @@ Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescrip
 }
 
 
-simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, float _simulationStep){
+simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ //State& state, State src, 
 		//EVALUATE NODE()
 	simResult result;
 	float distance=BOX2DRANGE;
@@ -282,12 +282,9 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
-	// if (b2Vec2(result.endPose.p -state.start.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
-	// 	state.nodesInSameSpot = src.nodesInSameSpot+1; //keep track of how many times the robot is spinning on the spot
-	// }
-	// else{
-	// 	state.nodesInSameSpot =0; //reset if robot is moving
-	// }
+	//approximate angle to avoid stupid rounding errors
+	float approximated_angle=approximate_angle(result.endPose.q.GetAngle(), t.direction, result.resultCode);
+	result.endPose.q.Set(approximated_angle);
 	return result;
 	}
 
@@ -443,7 +440,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
-				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
+				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
 				sk.second.it_observed=iteration;
@@ -463,12 +460,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
-				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false);
+				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false), new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
+						new_edge=edge;
 						//edge.second=true; //just means that the edge is valid
 						if (edge.second){
 							g[edge.first]=sk.second; //doesn't update motorstep
@@ -489,7 +487,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
-							auto new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+							new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
 							if (t.direction== g[new_edge.first].direction){
 								g[v0].options.clear();
 							}
@@ -505,7 +503,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
-					gt::adjustProbability(g, edge.first);
+					gt::adjustProbability(g, new_edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
@@ -917,7 +915,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			compare_start=g[t_start_v].start;	
 		}
 		compare_tmp.start=compare_start;
-		simResult sr = simulate(sk.first, g[p[it-1]], t, world);
+		simResult sr = simulate( t, world); //sk.first, g[p[it-1]],
 		if (sr.resultCode==simResult::crashed){
 			return false;
 		}
@@ -1876,6 +1874,21 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	applyAffineTrans(deltaPose, g);
 	applyAffineTrans(deltaPose, controlGoal);
 }
+
+float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
+	float result=angle;
+	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
+		float ratio= angle/ANGLE_RESOLUTION;
+		float decimal, integer;
+		decimal=std::modf(ratio, &integer);
+		if (decimal>=0.5){
+			integer+=1;
+		}		
+		result=integer*ANGLE_RESOLUTION;
+	}
+	return result;
+}
+
 
 // bool Configurator::current_task_equivalent(const Task & candidate, const Task & compare, const vertexDescriptor& cand_src){
 // 	bool result=false;

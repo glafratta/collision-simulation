@@ -277,12 +277,13 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	if (e.m_target==TransitionSystem::null_vertex()){
 		return;
 	}
-	auto es= out_edges(e.m_source, g);
+	auto es= boost::out_edges(e.m_source, g);
 	float totObs=0;
 	std::vector <edgeDescriptor> sameTask;
 	//find total observations
-	for (auto ei= es.first; ei!=es.second; ei++){
-		if (g[((*ei))].direction==g[e].direction){
+	for (auto ei= es.first; ei!=es.second; ++ei){
+		edgeDescriptor ei_deref=*ei;
+		if (g[ei_deref].direction==g[e].direction){
 			totObs+=g[(*ei).m_target].nObs;
 			sameTask.push_back(*ei);
 			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
@@ -348,10 +349,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 				//}
 				}
 			}
-			else if (g[ep2.second].direction==d 
-			&& g[ep2.second.m_target].Di == g[ep.second.m_source].Di &&
-			 		g[ep2.second.m_target].Dn == g[ep.second.m_target].Dn
-			){ //same task!
+			else if (g[ep2.second].direction==d &&
+			 		g[ep2.second.m_target].Di == g[ep.second.m_target].Di &&
+			 		g[ep2.second.m_target].Dn == g[ep.second.m_target].Dn){ //same task!
 				result.push_back(ep2.second.m_target); //source
 			}
 
@@ -362,7 +362,6 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){ //source
-			result.push_back(0); //to add possibility for escape behaviour inshallah
 			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
 			break;
 		}
