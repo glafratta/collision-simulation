@@ -1799,7 +1799,7 @@ void Configurator::applyAffineTrans(const b2Transform& deltaPose, Disturbance& d
 
 void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	b2Transform deltaPose;
-	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
+	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK;
 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
 	deltaPose=b2Transform(b2Vec2(xdistance,
