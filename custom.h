@@ -109,6 +109,7 @@ void step( AlphaBot &motors){
 
 	c->trackTaskExecution(*c->getTask());
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
+	printf("current D index=%i\n", c->getTask()->disturbance.getAffIndex());
 	//bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
 	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
@@ -125,20 +126,23 @@ void step( AlphaBot &motors){
 		forget(c);
 
 	}
+	if (c->controlGoal.disturbance.getAffIndex()!=NONE){
+		debug::print_pose(c->controlGoal.disturbance.pose());
+	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	R= c->getTask()->getAction().getRWheelSpeed();
-	L=c->getTask()->getAction().getLWheelSpeed()*1.05;
+	L=c->getTask()->getAction().getLWheelSpeed();
 	if (c->getTask()->direction==LEFT){
-		R*=1.27; //23
-		L*=1.27;
+		R*=1.37; //23
+		L*=1.37;
 	}
 	else if (c->getTask()->direction==RIGHT){
-		R*=1.17; //17
-		L*=1.17;
+		R*=1.05; //17
+		L*=1.05*1.05;
 	}
 	else if (c->getTask()->direction==DEFAULT){
-		R*=1.13;
-		L*=1.13;
+		R*=1.15*1.1;
+		L*=1.15;
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
