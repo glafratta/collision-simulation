@@ -260,6 +260,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 	}
 	float remaining=distance/controlGoal.action.getLinearSpeed();
 	Robot robot(&w);
+	worldBuilder.bodies++;
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
