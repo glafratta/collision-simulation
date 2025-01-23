@@ -249,6 +249,7 @@ simResult Configurator::simulate(State& state, State src, Task  t, b2World & w, 
 		if (remaining<0.01){
 			remaining=0;
 		}
+	worldBuilder.bodies++;
 	result =t.willCollide(w, iteration, debugOn, remaining, _simulationStep); //default start from 0
 	//FILL IN CURRENT NODE WITH ANY COLLISION AND END POSE
 	if (b2Vec2(result.endPose.p -src.endPose.p).Length() <=.01){ //CYCLE PREVENTING HEURISTICS
