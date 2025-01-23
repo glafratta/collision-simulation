@@ -3,8 +3,8 @@
 #include "sensor.h"
 
 class WorldBuilder{
-    int bodies=0;
     public:
+    int bodies=0;
         struct CompareCluster{
         CompareCluster()=default;
 
