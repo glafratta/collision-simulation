@@ -224,19 +224,19 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
 
-    bool has_D=false; //TRYING TO ABLATE
-    if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
-        for (int i=0; i<features.size(); i++){ //SEARCH THROUGH FEATures TO FIND TASK'S DI
-            if (features[i].match(disturbance.bf)){
-                features[i]=disturbance.bf;
-                has_D=true; //if found, do nothing
-                features[i].attention=true;
-            }
-        }
-        if (!has_D){
-            features.push_back(disturbance.bf); //if not found, add manually
-        }
-    }
+    // bool has_D=false; //TRYING TO ABLATE
+    // if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
+    //     for (int i=0; i<features.size(); i++){ //SEARCH THROUGH FEATures TO FIND TASK'S DI
+    //         if (features[i].match(disturbance.bf)){
+    //             features[i]=disturbance.bf;
+    //             has_D=true; //if found, do nothing
+    //             features[i].attention=true;
+    //         }
+    //     }
+    //     if (!has_D){
+    //         features.push_back(disturbance.bf); //if not found, add manually
+    //     }
+    // }
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
