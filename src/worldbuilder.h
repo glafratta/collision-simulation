@@ -3,8 +3,8 @@
 #include "sensor.h"
 
 class WorldBuilder{
-    int bodies=0;
     public:
+    int bodies=0;
     enum CLUSTERING{BOX=0, KMEANS=1, PARTITION=2}; //BOX: bounding box around points
         struct CompareCluster{
         CompareCluster()=default;
