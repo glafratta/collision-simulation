@@ -223,7 +223,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
-
+    
     // bool has_D=false; //TRYING TO ABLATE
     // if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
     //     for (int i=0; i<features.size(); i++){ //SEARCH THROUGH FEATures TO FIND TASK'S DI
