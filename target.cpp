@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 		configurator.planning= atoi(argv[2]);
 	}
 	if (configurator.planning){
-		configurator.setBenchmarking(1, "target_fw_nowalls_new");
+		configurator.setBenchmarking(1, "s4_open_old");
 	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
