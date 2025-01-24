@@ -233,20 +233,22 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     // }
     bool has_D=false;
     if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
-        for (int i=0; i<features.size(); i++){
-            if (features[i].match(disturbance.bf)){
-                features[i]=disturbance.bf;
-                has_D=true;
-                features[i].attention=true;
-            }
+        std::vector <b2Vec2> d_vertices=disturbance.vertices();
+        for (b2Vec2 &v: d_vertices){
+            v=v-start.p;
         }
-        if (!has_D){
-            features.push_back(disturbance.bf);
-        }
+        auto maxx_it= std::max_element(d_vertices.begin(), d_vertices.end(), CompareX());
+        float maxx= maxx_it.base()->x;
+        boxLength=ROBOT_HALFLENGTH*2-ROBOT_BOX_OFFSET_X+maxx;
     }
+    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
+    
+   // bool has_D=false;
+
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
+    int _count=world.GetBodyCount();
 	FILE *file;
 	if (debug){
 		file = fopen(bodyFile, "a+");

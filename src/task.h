@@ -11,6 +11,9 @@ b2Body * GetDisturbance(b2World *);
 
 bool overlaps(b2Body *, b2Body *);
 
+bool overlaps(b2Body *, Disturbance *);
+
+
 class Task{
 
 struct Ray{

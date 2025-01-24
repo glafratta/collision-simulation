@@ -279,6 +279,7 @@ simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ /
 	}
 	float remaining=distance/controlGoal.action.getLinearSpeed();
 	Robot robot(&w);
+	worldBuilder.bodies++;
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.willCollide(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
@@ -439,8 +440,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
+<<<<<<< HEAD
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
+=======
+				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.1, WorldBuilder::PARTITION); //was g[v].endPose
+				simResult sim=simulate(sk.first, g[v0], t, w, _simulationStep);
+>>>>>>> strategy-4
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
 				sk.second.it_observed=iteration;
@@ -727,6 +733,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	std::vector <Frontier> frontier_v;
 	bool run=true, _finished=false;
 	std::vector <Frontier> priorityQueue={Frontier(src, std::vector<vertexDescriptor>())};
+<<<<<<< HEAD
+=======
+	if (currentVertex==movingVertex){
+		//printf("current %i =moving%i! return, src=%i\n", currentVertex, movingVertex, src);
+		//return plan;
+	}
+>>>>>>> strategy-4
 	Task overarching_goal;
 	if (NULL==custom_ctrl_goal){
 		overarching_goal=controlGoal;
@@ -789,7 +802,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				break;
 			}
 			//printf("inner loop v %i \t", end);
+<<<<<<< HEAD
 			debug::print_pose(g[end].endPose);	
+=======
+			//debug::print_pose(g[end].endPose);	
+>>>>>>> strategy-4
 		}
 //		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -820,10 +837,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		}
 	}
 	//printf("PLANNED!\n");
+<<<<<<< HEAD
 	// if (_finished && g[plan[plan.size()-1]].Dn.getAffIndex()==NONE){
 	// 	g[plan[plan.size()-1]].Dn=controlGoal.disturbance;
 	// 	g[plan[plan.size()-1]].Dn.invalidate();
 	// }
+=======
+>>>>>>> strategy-4
 	return plan;
 
 }
@@ -1002,6 +1022,7 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	}
 	else{
 		if (g[e_start].direction==DEFAULT){
+<<<<<<< HEAD
 			//step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
 			printf("step=%f\n", step);
 		}
@@ -1009,6 +1030,13 @@ b2Transform Configurator::skip(edgeDescriptor& e, TransitionSystem &g, int& i, T
 	 	adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
 		}
 		printf("adjusted step=%f\n", step);
+=======
+			step = (g[e_start.m_source].endPose.p- g[v_tgt].endPose.p).Length();
+			//printf("step=%f\n", step);
+		}
+		adjustStepDistance(e_start.m_source,g, t, step, std::pair(true,v_tgt));
+		//printf("adjusted step=%f\n", step);
+>>>>>>> strategy-4
 	}
 
 	return result;
@@ -1700,7 +1728,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	// }
 	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
 		t.motorStep--;
-		printf("step =%i\n", t.motorStep);
+		//printf("step =%i\n", t.motorStep);
 	}
 	else if (fabs(error.r())>=TRACKING_ERROR_TOLERANCE){
 		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*LIDAR_SAMPLING_RATE)+0.5);

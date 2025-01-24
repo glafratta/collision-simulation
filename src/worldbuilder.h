@@ -3,8 +3,8 @@
 #include "sensor.h"
 
 class WorldBuilder{
-    int bodies=0;
     public:
+    int bodies=0;
     enum CLUSTERING{BOX=0, KMEANS=1, PARTITION=2}; //BOX: bounding box around points
         struct CompareCluster{
         CompareCluster()=default;
@@ -33,7 +33,7 @@ class WorldBuilder{
 
     bool checkDisturbance(Pointf, bool&,Task * curr =NULL, float range=0.025);
 
-    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.15, CLUSTERING clustering=BOX);
+    std::vector <BodyFeatures> getFeatures(CoordinateContainer , b2Transform, Direction , float, float halfWindowWidth=.1, CLUSTERING clustering=BOX);
 
     std::vector <BodyFeatures> buildWorld(b2World&,CoordinateContainer, b2Transform, Direction,  Disturbance disturbance=Disturbance(), float halfWindowWidth=.15, CLUSTERING clustering=BOX, Task * task=NULL);
 
