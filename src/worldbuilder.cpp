@@ -222,21 +222,19 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
  std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
+    if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
+        std::vector <b2Vec2> d_vertices=disturbance.vertices();
+        for (b2Vec2 &v: d_vertices){
+            v=v-start.p;
+        }
+        auto maxx_it= std::max_element(d_vertices.begin(), d_vertices.end(), CompareX());
+        float maxx= maxx_it.base()->x;
+        boxLength=ROBOT_HALFLENGTH*2-ROBOT_BOX_OFFSET_X+maxx;
+    }
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
     
-    // bool has_D=false; //TRYING TO ABLATE
-    // if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
-    //     for (int i=0; i<features.size(); i++){ //SEARCH THROUGH FEATures TO FIND TASK'S DI
-    //         if (features[i].match(disturbance.bf)){
-    //             features[i]=disturbance.bf;
-    //             has_D=true; //if found, do nothing
-    //             features[i].attention=true;
-    //         }
-    //     }
-    //     if (!has_D){
-    //         features.push_back(disturbance.bf); //if not found, add manually
-    //     }
-    // }
+   // bool has_D=false;
+
     for (BodyFeatures f: features){
         makeBody(world, f);
     }
