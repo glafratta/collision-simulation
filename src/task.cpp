@@ -206,7 +206,8 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 	if (disturbance.isValid()){
 		b2Vec2 v = disturbance.getPosition() - robotTransform.p; //distance between disturbance and robot
 		d= Distance(v.Length());
-		if (action.getOmega()!=0){			
+		if (action.getOmega()!=0){		
+			a =Angle(robotTransform.q.GetAngle());		
 			float angleL = start.q.GetAngle()+SAFE_ANGLE;
 			float angleR = start.q.GetAngle()-SAFE_ANGLE;
 			float robotAngle=robotTransform.q.GetAngle();
