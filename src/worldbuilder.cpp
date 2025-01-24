@@ -226,7 +226,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
     if (NULL!=task){
         pointer_to_track=&points_to_track;
     }
-    std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
+    //std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
     // if (occluded(current, disturbance)){
     //     salient.first.emplace(getPointf(disturbance.getPosition()));
     //     features.push_back(disturbance.bodyFeatures());
