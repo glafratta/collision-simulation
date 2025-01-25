@@ -79,7 +79,7 @@ if (argc>2){
 		configurator.planning= atoi(argv[2]);
 	}
 	if (configurator.planning){
-		configurator.setBenchmarking(1, "targetless");
+		configurator.setBenchmarking(1, "s2-cds");
 	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);
