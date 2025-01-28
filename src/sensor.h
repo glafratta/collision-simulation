@@ -106,6 +106,8 @@ class PointCloudProc{
 	
 	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer data=CoordinateContainer());
 
+	std::vector <Pointf> find_disturbance(const Disturbance &, const CoordinateContainer &);
+
 	void updatePrevious(CoordinateContainer c){
 		previous=set2vec(c);
 	}
